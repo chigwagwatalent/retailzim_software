@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Subscription')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('billing')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Subscription')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-credit-card"></i></div>
+        <div><p>Account billing</p><h1>Subscription</h1></div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-layer-group"></i><strong th:text="${plan != null ? plan.name : 'No plan'}">Plan</strong><span>Current package</span></div>
+        <div><i class="fa-solid fa-calendar-check"></i><strong th:text="${tenant.subscriptionEnd != null ? #temporals.format(tenant.subscriptionEnd, 'dd MMM') : '--'}">--</strong><span>Access until</span></div>
+      </div>
+    </section>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="billing-account-grid">
+      <article class="panel billing-current-plan">
+        <div class="panel-title-row">
+          <div><p class="eyebrow">Current package</p><h2 th:text="${plan != null ? plan.name : 'No package selected'}">Package</h2></div>
+          <span class="badge" th:classappend="${tenant.status.name() == 'ACTIVE' ? ' status-active' : ' status-suspended'}" th:text="${tenant.status}">ACTIVE</span>
+        </div>
+        <div class="billing-price" th:if="${plan != null}">
+          <strong th:text="${'USD ' + #numbers.formatDecimal(plan.priceUsd, 1, 2)}">USD 0.00</strong>
+          <span th:text="${plan.billingCycle.name().toLowerCase()}">monthly</span>
+        </div>
+        <div class="plan-limit-row" th:if="${plan != null}">
+          <span><i class="fa-solid fa-store"></i><b th:text="${plan.maxBranches}">1</b> branches</span>
+          <span><i class="fa-solid fa-users"></i><b th:text="${plan.maxUsers}">5</b> users</span>
+          <span><i class="fa-solid fa-box"></i><b th:text="${plan.maxProducts}">500</b> products</span>
+        </div>
+        <form method="post" th:action="@{/shop/billing/pay}">
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-bolt"></i>Pay or renew now</button>
+        </form>
+      </article>
+
+      <article class="panel billing-status-panel">
+        <p class="eyebrow">Billing period</p>
+        <dl>
+          <div><dt>Started</dt><dd th:text="${subscription != null ? #temporals.format(subscription.startsAt, 'dd MMM yyyy') : '--'}">--</dd></div>
+          <div><dt>Renews</dt><dd th:text="${subscription != null and subscription.endsAt != null ? #temporals.format(subscription.endsAt, 'dd MMM yyyy') : '--'}">--</dd></div>
+          <div><dt>Last payment</dt><dd th:text="${subscription != null ? subscription.currency + ' ' + #numbers.formatDecimal(subscription.amountPaid, 1, 2) : '--'}">--</dd></div>
+          <div><dt>Reference</dt><dd th:text="${subscription != null ? subscription.paymentReference : '--'}">--</dd></div>
+        </dl>
+        <div class="billing-autopilot"><i class="fa-solid fa-envelope-circle-check"></i><span><strong>Billing reminders active</strong><small>We email before expiry and confirm successful payments.</small></span></div>
+      </article>
+    </section>
+
+    <section class="panel table-panel" style="margin-top:16px">
+      <div class="panel-title-row"><div><p class="eyebrow">Payment history</p><h2>Subscription records</h2></div></div>
+      <table>
+        <thead><tr><th>Package</th><th>Status</th><th>Period</th><th>Amount</th><th>Reference</th></tr></thead>
+        <tbody>
+        <tr th:each="record : ${subscriptionHistory}">
+          <td th:text="${subscriptionPlanNames.get(record.planId) ?: 'Package'}">Plan</td>
+          <td><span class="badge" th:classappend="${record.status.name() == 'ACTIVE' ? ' status-active' : ' status-suspended'}" th:text="${record.status}">ACTIVE</span></td>
+          <td th:text="${#temporals.format(record.startsAt, 'dd MMM yyyy') + ' - ' + (record.endsAt != null ? #temporals.format(record.endsAt, 'dd MMM yyyy') : 'Open')}">Period</td>
+          <td th:text="${record.currency + ' ' + #numbers.formatDecimal(record.amountPaid ?: 0, 1, 2)}">USD 0.00</td>
+          <td th:text="${record.paymentReference ?: '--'}">--</td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(subscriptionHistory)}">No subscription payments yet.</div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

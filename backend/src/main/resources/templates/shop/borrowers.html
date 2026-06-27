@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Borrower Accounts')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('borrowers')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Borrower Accounts')}"></nav>
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div><p>Controlled shop credit,</p><h1>Borrower Accounts</h1></div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-users"></i><strong th:text="${borrowerPage.totalElements}">0</strong><span>Accounts</span></div>
+        <div><i class="fa-solid fa-shield"></i><strong>Live limits</strong><span>Validated at checkout</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-blue" href="#modal-search-borrower"><i class="fa-solid fa-magnifying-glass"></i>Find Borrower</a>
+      <a class="btn btn-primary" href="#modal-create-borrower"><i class="fa-solid fa-user-plus"></i>Add Borrower</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="panel table-panel">
+      <div class="toolbar"><h2>Credit Accounts</h2><span class="badge" th:text="${borrowerPage.totalElements + ' accounts'}">0 accounts</span></div>
+      <table>
+        <thead><tr><th>Borrower</th><th>Account</th><th>Limit</th><th>Balance</th><th>Available</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="b : ${borrowerAccounts}">
+          <td><strong th:text="${b.fullName}">Name</strong><small th:text="${b.phone}">Phone</small><small th:text="${b.nationalId ?: 'No ID recorded'}">ID</small></td>
+          <td><strong th:text="${b.accountNumber}">BRW</strong><small th:text="${b.currency}">USD</small></td>
+          <td th:text="${b.currency + ' ' + b.creditLimit}">USD 0</td>
+          <td><strong th:text="${b.currency + ' ' + b.currentBalance}">USD 0</strong></td>
+          <td><strong th:text="${b.currency + ' ' + b.availableCredit}">USD 0</strong></td>
+          <td><span th:class="${b.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${b.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+          <td><div class="action-row">
+            <a class="icon-button mini" th:href="${'#modal-edit-borrower-' + b.id}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+            <a class="icon-button mini" th:href="${'#modal-repay-borrower-' + b.id}" title="Repayment"><i class="fa-solid fa-money-bill-transfer"></i></a>
+            <a class="icon-button mini" th:href="${'#modal-history-borrower-' + b.id}" title="History"><i class="fa-solid fa-clock-rotate-left"></i></a>
+            <form method="post" th:action="@{'/shop/borrowers/' + ${b.id} + '/' + ${b.isActive ? 'deactivate' : 'activate'}}">
+              <button th:class="${b.isActive ? 'icon-button mini danger' : 'icon-button mini'}" type="submit" th:title="${b.isActive ? 'Deactivate' : 'Activate'}">
+                <i th:class="${b.isActive ? 'fa-solid fa-toggle-off' : 'fa-solid fa-toggle-on'}"></i>
+              </button>
+            </form>
+          </div></td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(borrowerAccounts)}">No borrower accounts match this search.</div>
+      <div th:replace="~{common/layout :: pagination(${borrowerPage}, ${borrowerPageLinks}, ${borrowerPrevUrl}, ${borrowerNextUrl})}"></div>
+    </section>
+
+    <div id="modal-search-borrower" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Find Borrower</h2><a class="close" href="#">&times;</a></div>
+      <form method="get" th:action="@{/shop/borrowers}" class="form-grid">
+        <label style="grid-column:1/-1">Name, phone or account number<input name="search" th:value="${borrowerSearch}" autofocus></label>
+        <div class="modal-actions"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-create-borrower" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Add Borrower</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/borrowers}" class="form-grid">
+        <label>Full Name<input name="fullName" required></label>
+        <label>Phone<input name="phone" required></label>
+        <label>Account Number<input name="accountNumber" placeholder="Auto-generated if blank"></label>
+        <label>National ID<input name="nationalId"></label>
+        <label>Currency<select name="currency"><option>USD</option><option>ZWG</option></select></label>
+        <label>Credit Limit<input name="creditLimit" type="number" min="0" step="0.01" required></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Create Account</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="b : ${borrowerAccounts}" th:id="${'modal-edit-borrower-' + b.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Edit ' + b.fullName}">Edit Borrower</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/borrowers/' + ${b.id} + '/update'}" class="form-grid">
+        <label>Full Name<input name="fullName" th:value="${b.fullName}" required></label>
+        <label>Phone<input name="phone" th:value="${b.phone}" required></label>
+        <label>Account Number<input name="accountNumber" th:value="${b.accountNumber}" required></label>
+        <label>National ID<input name="nationalId" th:value="${b.nationalId}"></label>
+        <label>Currency<select name="currency"><option th:selected="${b.currency.name() == 'USD'}">USD</option><option th:selected="${b.currency.name() == 'ZWG'}">ZWG</option></select></label>
+        <label>Credit Limit<input name="creditLimit" type="number" min="0" step="0.01" th:value="${b.creditLimit}" required></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes" th:text="${b.notes}"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Changes</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="b : ${borrowerAccounts}" th:id="${'modal-repay-borrower-' + b.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Post repayment for ' + b.fullName}">Repayment</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/borrowers/' + ${b.id} + '/repayment'}" class="form-grid">
+        <label>Amount<input name="amount" type="number" min="0.01" step="0.01" required></label>
+        <label>Currency<input th:value="${b.currency}" disabled></label>
+        <label style="grid-column:1/-1">Reference / notes<textarea name="notes" required></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-money-bill-transfer"></i>Post Repayment</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="b : ${borrowerAccounts}" th:id="${'modal-history-borrower-' + b.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${b.fullName + ' history'}">History</h2><a class="close" href="#">&times;</a></div>
+      <table>
+        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Balance</th><th>Notes</th></tr></thead>
+        <tbody>
+        <tr th:each="tx : ${borrowerTransactions.get(b.id)}">
+          <td th:text="${#temporals.format(tx.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+          <td><span class="badge" th:text="${tx.transactionType}">BORROW</span></td>
+          <td th:text="${tx.currency + ' ' + tx.amount}">USD 0</td>
+          <td th:text="${tx.currency + ' ' + tx.balanceAfter}">USD 0</td>
+          <td th:text="${tx.notes ?: '-'}">-</td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(borrowerTransactions.get(b.id))}">No account transactions yet.</div>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

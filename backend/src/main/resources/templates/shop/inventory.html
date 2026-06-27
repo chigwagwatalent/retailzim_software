@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Inventory')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('inventory')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Inventory')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-warehouse"></i></div>
+        <div>
+          <p th:text="${'Stock control for ' + selectedBranchName}">Branch stock</p>
+          <h1>Branch Inventory</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-boxes-stacked"></i><strong th:text="${summaryTotalProducts}">0</strong><span>Stock Lines</span></div>
+        <div><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${summaryLowStock}">0</strong><span>Low Stock</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-blue" th:href="@{/shop/products(branchId=${selectedBranchId})}"><i class="fa-solid fa-box-open"></i>Products</a>
+      <a class="btn btn-primary" href="#modal-adjust"><i class="fa-solid fa-plus-minus"></i>Adjust Stock</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Stock Lines</span><strong th:text="${summaryTotalProducts}">0</strong><div><em style="width:78%"></em></div><small th:text="${selectedBranchName}">Branch</small></div>
+      <div class="metric-card metric-green"><span>Value USD</span><strong th:text="${'USD ' + summaryValueUsd}">USD 0</strong><div><em style="width:70%"></em></div><small>Average cost valuation</small></div>
+      <div class="metric-card metric-orange"><span>Value ZWG</span><strong th:text="${'ZWG ' + summaryValueZwg}">ZWG 0</strong><div><em style="width:64%"></em></div><small>Average cost valuation</small></div>
+      <div class="metric-card metric-red"><span>Low Stock</span><strong th:text="${summaryLowStock}">0</strong><div><em style="width:42%"></em></div><small>Needs replenishment</small></div>
+    </section>
+
+    <section class="panel filter-panel">
+      <form method="get" th:action="@{/shop/inventory}" class="filter-grid">
+        <label>Branch
+          <select name="branchId" onchange="this.form.submit()">
+            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
+          </select>
+        </label>
+        <label>Search stock
+          <input name="search" th:value="${inventorySearch}" placeholder="Product, SKU or barcode">
+        </label>
+        <button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
+      </form>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2 th:text="${'Inventory at ' + selectedBranchName}">Inventory</h2>
+        <span class="badge" th:text="${inventoryPage.totalElements + ' stock lines'}">0 stock lines</span>
+      </div>
+      <table>
+        <thead><tr><th>Product</th><th>On Hand</th><th>Reserved</th><th>Available</th><th>On Order</th><th>Average Cost</th><th>Reorder</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="item : ${inventoryItems}" th:with="p=${inventoryProductById.get(item.productId)}">
+          <td>
+            <div class="user-cell">
+              <span class="product-avatar"><i class="fa-solid fa-box"></i></span>
+              <div>
+                <strong th:text="${p != null ? p.name : 'Product #' + item.productId}">Product</strong>
+                <small th:text="${p != null ? 'SKU ' + (p.sku ?: 'N/A') + ' / Barcode ' + (p.barcode ?: 'N/A') : 'No product record'}">SKU</small>
+                <small th:text="${p != null && p.category != null ? p.category.name : 'Uncategorised'}">Category</small>
+              </div>
+            </div>
+          </td>
+          <td><strong th:text="${item.quantityOnHand ?: 0}">0</strong></td>
+          <td th:text="${item.quantityReserved ?: 0}">0</td>
+          <td th:text="${(item.quantityOnHand ?: 0) - (item.quantityReserved ?: 0)}">0</td>
+          <td th:text="${item.quantityOnOrder ?: 0}">0</td>
+          <td><strong th:text="${'USD ' + (item.averageCostUsd ?: 0)}">USD 0</strong><small th:text="${'ZWG ' + (item.averageCostZwg ?: 0)}">ZWG 0</small></td>
+          <td th:text="${p != null ? p.reorderLevel : 0}">0</td>
+          <td>
+            <span th:if="${p != null and p.reorderLevel != null and item.quantityOnHand <= p.reorderLevel}" class="badge status-pending">LOW STOCK</span>
+            <span th:unless="${p != null and p.reorderLevel != null and item.quantityOnHand <= p.reorderLevel}" class="badge status-active">OK</span>
+          </td>
+          <td><a class="icon-button mini" th:href="${'#modal-adjust-' + item.productId}" title="Adjust"><i class="fa-solid fa-plus-minus"></i></a></td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(inventoryItems)}">No inventory records found for this branch/filter.</div>
+      <div th:replace="~{common/layout :: pagination(${inventoryPage}, ${inventoryPageLinks}, ${inventoryPrevUrl}, ${inventoryNextUrl})}"></div>
+    </section>
+
+    <div id="modal-adjust" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Adjust Stock</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/inventory/adjust}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label>Product<select name="productId" required><option th:each="p : ${branchProductOptions}" th:value="${p.id}" th:text="${p.name}">Product</option></select></label>
+        <label>Quantity Change<input name="quantityChange" type="number" step="0.0001" required></label>
+        <label>Reason<select name="reason"><option>DAMAGED</option><option>EXPIRED</option><option>THEFT</option><option>FOUND</option><option>WRITE_OFF</option><option>CORRECTION</option><option>OPENING_STOCK</option><option>OTHER</option></select></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Apply Adjustment</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="item : ${inventoryItems}" th:id="${'modal-adjust-' + item.productId}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Adjust ' + (inventoryProductById.get(item.productId) != null ? inventoryProductById.get(item.productId).name : 'Product #' + item.productId)}">Adjust Product</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/inventory/adjust}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <input type="hidden" name="productId" th:value="${item.productId}">
+        <label>Current On Hand<input th:value="${item.quantityOnHand}" readonly></label>
+        <label>Quantity Change<input name="quantityChange" type="number" step="0.0001" required></label>
+        <label>Reason<select name="reason"><option>DAMAGED</option><option>EXPIRED</option><option>THEFT</option><option>FOUND</option><option>WRITE_OFF</option><option>CORRECTION</option><option>OPENING_STOCK</option><option>OTHER</option></select></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Apply Adjustment</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

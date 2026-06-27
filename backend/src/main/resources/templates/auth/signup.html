@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shop Signup | RetailZW</title>
+  <script>
+    document.documentElement.dataset.theme = localStorage.getItem('retailzw-theme') || 'light';
+  </script>
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=16)}">
+  <link rel="stylesheet" th:href="@{/css/auth-clean.css}">
+  <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+  <script defer th:src="@{/js/retailzw.js(v=14)}"></script>
+</head>
+<body class="auth-shell signup-shell">
+  <div class="auth-preloader" data-auth-preloader>
+    <div class="auth-preloader-card">
+      <span class="brand-mark"><span></span></span>
+      <strong>RetailZW</strong>
+      <small>Preparing signup</small>
+      <i></i>
+    </div>
+  </div>
+
+  <form class="auth-card signup-card" method="post" th:action="@{/auth/signup}" onsubmit="this.classList.add('is-loading')">
+    <div class="auth-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="brand auth-brand"><span class="brand-mark"><span></span></span><span>RetailZW</span></div>
+    <div class="auth-copy">
+      <p>Launch your retail workspace</p>
+      <h1>Create your shop</h1>
+      <span>Minimal setup. Clean controls. Ready for real counters.</span>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="signup-section">
+      <h2><i class="fa-solid fa-box-open"></i> Choose Package</h2>
+      <div class="signup-plan-grid">
+        <label class="signup-plan-card" th:each="p, iter : ${plans}">
+          <input type="radio" name="planId" th:value="${p.id}" th:checked="${iter.index == 0}" required>
+          <strong th:text="${p.name}">Plan</strong>
+          <span th:text="${p.description}">Description</span>
+          <em th:text="${'USD ' + p.priceUsd + ' / ZWG ' + p.priceZwg}">Price</em>
+          <small th:text="${(p.maxBranches ?: 0) + ' branches - ' + (p.maxUsers ?: 0) + ' users - ' + (p.maxProducts ?: 0) + ' products'}">Limits</small>
+        </label>
+      </div>
+    </section>
+
+    <section class="signup-section">
+      <h2><i class="fa-solid fa-shapes"></i> Business Modules</h2>
+      <div class="form-grid">
+        <label>Business Mode
+          <select name="businessMode" required>
+            <option value="SINGLE_MODULE">Single module</option>
+            <option value="MIXED_MODULE">Mixed shop and gas</option>
+          </select>
+        </label>
+        <div class="form-full">
+          <span class="field-title">Select what this business runs</span>
+          <label class="check-row" th:each="m : ${businessModules}">
+            <input name="modules" type="checkbox" th:value="${m}" th:checked="${m.name() == 'SHOP_MODULE'}">
+            <span th:text="${m.displayName}">Retail Shop</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="signup-section">
+      <h2><i class="fa-solid fa-building"></i> Company Data</h2>
+      <div class="form-grid">
+        <label>Company Name<input name="companyName" required placeholder="Harare Demo Retail"></label>
+        <label>Main Email<input name="email" type="email" required placeholder="admin@shop.co.zw"></label>
+        <label>Phone<input name="phone" required placeholder="+263 77 000 0000"></label>
+        <label>City<input name="city" value="Harare"></label>
+        <label>Country<input name="country" value="Zimbabwe"></label>
+        <label>Website<input name="website" placeholder="https://shop.co.zw"></label>
+        <label>Registration Number<input name="registrationNumber" placeholder="Company reg number"></label>
+        <label>VAT Number<input name="vatNumber" placeholder="VAT / tax number"></label>
+        <label style="grid-column:1/-1">Address<textarea name="address" placeholder="Street, suburb, city"></textarea></label>
+        <label style="grid-column:1/-1">Logo URL<input name="logoUrl" placeholder="https://.../logo.png"></label>
+        <label style="grid-column:1/-1">Receipt Footer<textarea name="receiptFooter" placeholder="Thank you for shopping with us."></textarea></label>
+      </div>
+    </section>
+
+    <section class="signup-section">
+      <h2><i class="fa-solid fa-user-shield"></i> Head Office System User</h2>
+      <div class="form-grid">
+        <label>First Name<input name="adminFirstName" required></label>
+        <label>Last Name<input name="adminLastName" required></label>
+        <label>Username<input name="adminUsername" required placeholder="owner or admin"></label>
+        <label>Email<input name="adminEmail" type="email" placeholder="Uses company email if blank"></label>
+        <label>Password
+          <span class="auth-input-shell">
+            <i class="fa-solid fa-key"></i>
+            <input id="signupPassword" name="adminPassword" type="password" required>
+            <button class="auth-ghost-button" type="button" data-password-toggle="signupPassword" aria-label="Show password">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </span>
+        </label>
+        <label>Default Access<input value="Head Office - Super Admin" readonly></label>
+      </div>
+    </section>
+
+    <div class="signup-actions">
+      <button class="btn btn-primary auth-submit" type="submit"><span><i class="fa-solid fa-credit-card"></i>Create Shop & Pay</span><i></i></button>
+      <a class="btn btn-light" th:href="@{/auth/shop/login}"><i class="fa-solid fa-arrow-left"></i>Back to Login</a>
+    </div>
+  </form>
+</body>
+</html>

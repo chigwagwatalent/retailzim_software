@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RetailZW SaaS Admin</title>
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=16)}">
+</head>
+<body class="auth-shell">
+  <form class="auth-card" method="post" th:action="@{/auth/admin/login}">
+    <div class="brand"><span class="brand-mark">RZ</span><span>RetailZW SaaS Admin</span></div>
+    <h1>Platform sign in</h1>
+    <p>Demo: <strong>platform</strong> / <strong>Admin@123</strong></p>
+    <div th:if="${param.error}" class="alert">Invalid platform login.</div>
+    <label>Username <input name="username" required></label>
+    <label>Password <input name="password" type="password" required></label>
+    <button class="btn btn-primary" type="submit">Sign in</button>
+    <p class="auth-switch"><a th:href="@{/auth/admin/forgot}">Forgot password?</a></p>
+  </form>
+</body>
+</html>
+

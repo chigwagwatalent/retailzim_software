@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Tenant Shops')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: platformSidebar('tenants')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: platformTopbar('Tenant Shops')}"></nav>
+
+    <section class="page-hero tenant-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-building-shield"></i></div>
+        <div>
+          <p>SaaS command center</p>
+          <h1>Tenant Management</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-building"></i><strong th:text="${tenantPage.totalElements}">0</strong><span>Filtered Shops</span></div>
+        <div><i class="fa-solid fa-circle-check"></i><strong th:text="${#lists.size(plans)}">0</strong><span>Plans</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-light" href="#modal-announcement"><i class="fa-solid fa-bullhorn"></i>Send Announcement</a>
+      <a class="btn btn-primary" th:href="@{/auth/signup}"><i class="fa-solid fa-user-plus"></i>Register Shop</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="panel tenant-console">
+      <form method="get" th:action="@{/admin/tenants}" class="tenant-filter-grid">
+        <label>Search
+          <input name="search" th:value="${search}" placeholder="Shop, code or email">
+        </label>
+        <label>Status
+          <select name="status">
+            <option value="">All statuses</option>
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == selectedStatus}">ACTIVE</option>
+          </select>
+        </label>
+        <label>Package
+          <select name="planId">
+            <option value="">All packages</option>
+            <option th:each="p : ${plans}" th:value="${p.id}" th:text="${p.name}" th:selected="${p.id == selectedPlanId}">Package</option>
+          </select>
+        </label>
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+      </form>
+    </section>
+
+    <section class="tenant-management-grid">
+      <div class="panel table-panel">
+        <div class="panel-title-row">
+          <div>
+            <p class="eyebrow">Operating view</p>
+            <h2>Tenant Shops</h2>
+          </div>
+          <span class="badge status-active" th:text="${tenantPage.totalElements + ' records'}">0 records</span>
+        </div>
+        <table>
+          <thead>
+          <tr><th>Shop</th><th>Package</th><th>Footprint</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="t : ${tenants}">
+            <td>
+              <strong th:text="${t.companyName}">Shop</strong>
+              <small class="table-muted" th:text="${t.tenantCode + ' / ' + t.email}">Code</small>
+            </td>
+            <td th:text="${tenantPlanNames.get(t.id)}">Plan</td>
+            <td>
+              <strong th:text="${tenantBranchCounts.get(t.id) + ' branches'}">0 branches</strong>
+              <small class="table-muted" th:text="${tenantUserCounts.get(t.id) + ' users / ' + tenantProductCounts.get(t.id) + ' products'}">0 users</small>
+            </td>
+            <td><span class="badge" th:classappend="${' status-' + #strings.toLowerCase(t.status)}" th:text="${t.status}">ACTIVE</span></td>
+            <td class="mobile-tabs">
+              <a class="btn btn-blue btn-compact" th:href="@{/admin/tenants/{id}(id=${t.id})}"><i class="fa-solid fa-chart-line"></i>View</a>
+              <a class="btn btn-light btn-compact" th:href="${'#modal-tenant-' + t.id}"><i class="fa-solid fa-pen"></i>Edit</a>
+              <form th:action="@{'/admin/tenants/' + ${t.id} + '/activate'}" method="post"><button class="btn btn-light btn-compact" type="submit">Activate</button></form>
+              <form th:action="@{'/admin/tenants/' + ${t.id} + '/suspend'}" method="post"><button class="btn btn-light btn-compact" type="submit">Suspend</button></form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <div th:replace="~{common/layout :: pagination(${tenantPage}, ${tenantPageLinks}, ${tenantPrevUrl}, ${tenantNextUrl})}"></div>
+      </div>
+
+      <aside class="panel tenant-side-panel">
+        <div class="panel-title-row">
+          <div>
+            <p class="eyebrow">Broadcast history</p>
+            <h2>Recent Announcements</h2>
+          </div>
+        </div>
+        <div class="announcement-list">
+          <article th:each="a : ${announcements}">
+            <strong th:text="${a.subject}">Subject</strong>
+            <span th:text="${a.audienceSummary}">Audience</span>
+            <small th:text="${a.recipientCount + ' shops / ' + a.notificationSentCount + ' notifications / ' + a.emailSentCount + ' emails'}">0 sent</small>
+          </article>
+          <p class="empty" th:if="${#lists.isEmpty(announcements)}">No announcements sent yet.</p>
+        </div>
+      </aside>
+    </section>
+
+    <div id="modal-announcement" class="modal"><div class="modal-content modal-wide">
+      <div class="modal-head"><h2>Send Announcement</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/admin/tenants/announce}" class="form-grid">
+        <label>Audience
+          <select name="audienceMode" required>
+            <option value="ALL">All shops</option>
+            <option value="SELECTED">Selected shops</option>
+            <option value="PACKAGE">By package</option>
+            <option value="STATUS">By status</option>
+          </select>
+        </label>
+        <label>Subject<input name="subject" required placeholder="Important platform update"></label>
+        <label class="multi-select">Selected Shops
+          <select name="tenantIds" multiple size="6">
+            <option th:each="t : ${tenants}" th:value="${t.id}" th:text="${t.companyName + ' - ' + t.tenantCode}">Shop</option>
+          </select>
+        </label>
+        <label class="multi-select">Packages
+          <select name="planIds" multiple size="6">
+            <option th:each="p : ${plans}" th:value="${p.id}" th:text="${p.name}">Plan</option>
+          </select>
+        </label>
+        <label class="multi-select">Statuses
+          <select name="statuses" multiple size="6">
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}">ACTIVE</option>
+          </select>
+        </label>
+        <label class="check-row"><input name="emailEnabled" type="checkbox" value="true"> Send email too</label>
+        <label style="grid-column:1/-1">Message<textarea name="message" required placeholder="Write a clear announcement for shops."></textarea></label>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Send Announcement</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="t : ${tenants}" th:id="${'modal-tenant-' + t.id}" class="modal"><div class="modal-content modal-wide">
+      <div class="modal-head"><h2 th:text="${'Edit Tenant - ' + t.companyName}">Edit Tenant</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/admin/tenants/{id}/edit(id=${t.id})}" class="form-grid">
+        <label>Company<input name="companyName" th:value="${t.companyName}" required></label>
+        <label>Email<input name="email" type="email" th:value="${t.email}" required></label>
+        <label>Phone<input name="phone" th:value="${t.phone}"></label>
+        <label>Website<input name="website" th:value="${t.website}"></label>
+        <label>City<input name="city" th:value="${t.city}"></label>
+        <label>Country<input name="country" th:value="${t.country}"></label>
+        <label>Status<select name="status" required><option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == t.status}"></option></select></label>
+        <label>Package<select name="planId"><option value="">No package</option><option th:each="p : ${plans}" th:value="${p.id}" th:text="${p.name}" th:selected="${p.id == t.planId}"></option></select></label>
+        <label>Registration<input name="registrationNumber" th:value="${t.registrationNumber}"></label>
+        <label>VAT<input name="vatNumber" th:value="${t.vatNumber}"></label>
+        <label style="grid-column:1/-1">Address<textarea name="address" th:text="${t.address}"></textarea></label>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Tenant</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot" class="lm">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>RetailZW – Zimbabwe's Point of Sale Platform</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      <!-- Bootstrap 5.3 -->
+      <link href="css/bootstrap.min.css" rel="stylesheet"/>
+      <!-- AOS Animate on Scroll -->
+      <link href="css/aos.css" rel="stylesheet"/>
+      <!-- Swiper -->
+      <link href="css/swiper-bundle.min.css" rel="stylesheet"/>
+      <!-- all min css -->
+      <link rel="stylesheet" href="css/all.min.css"/>
+      <!-- magnific CSS -->
+      <link rel="stylesheet" href="css/magnific-popup.css"/>
+      <!-- Style CSS -->
+      <link rel="stylesheet" href="css/style.css" />
+   </head>
+   <body>
+      <!-- ======================== LANDING PAGE ======================== -->
+      <div id="landing">
+         <!-- NAVBAR -->
+         <nav id="nbar">
+            <div class="container">
+               <div class="d-flex align-items-center justify-content-between w-100">
+                  <a href="#" class="d-flex align-items-center gap-2" style="font-size:1.2rem;font-weight:700;color:var(--tx)">
+                     <div class="logo-i"><i class="fa-solid fa-cash-register"></i></div>
+                     <span>RetailZW</span>
+                  </a>
+                  <div class="d-none d-lg-flex align-items-center gap-1 mx-auto">
+                     <a href="#features" class="nav-link">Features</a>
+                     <a href="#integrations" class="nav-link">Hardware</a>
+                     <a href="#pricing" class="nav-link">Pricing</a>
+                     <a href="#faq" class="nav-link">FAQ</a>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                     <button class="boc d-flex align-items-center justify-content-center" id="thbtn" style="width:38px;height:38px;padding:0;border-radius:12px" aria-label="Toggle theme">
+                     <i class="fa-solid fa-sun" id="suni"></i>
+                     <i class="fa-solid fa-moon" id="mooni" style="display:none"></i>
+                     </button>
+                     <a href="https://admin.retailzw.co.zw/auth/shop/login" class="boc btn px-3 py-2 d-none d-sm-flex align-items-center gap-1">
+                     <i class="fa-regular fa-user fa-sm"></i> Log in
+                     </a>
+                     <a href="https://admin.retailzw.co.zw/auth/signup" class="bgrd btn px-3 py-2 d-none d-sm-flex align-items-center gap-1">
+                     Open Your Shop <i class="fa-solid fa-arrow-right fa-sm"></i>
+                     </a>
+                     <button class="boc d-lg-none px-2 py-2" id="mbtog" style="border-radius:10px">
+                     <i class="fa-solid fa-bars" id="barIcon"></i>
+                     <i class="fa-solid fa-xmark" id="xIcon" style="display:none"></i>
+                     </button>
+                  </div>
+               </div>
+            </div>
+         </nav>
+         <div id="mbmenu">
+            <a href="#features" class="nav-link d-block py-3 border-bottom" style="border-color:var(--bd)!important">Features</a>
+            <a href="#integrations" class="nav-link d-block py-3 border-bottom" style="border-color:var(--bd)!important">Hardware</a>
+            <a href="#pricing" class="nav-link d-block py-3 border-bottom" style="border-color:var(--bd)!important">Pricing</a>
+            <a href="#faq" class="nav-link d-block py-3">FAQ</a>
+            <div class="d-flex gap-2 mt-3">
+               <a href="https://admin.retailzw.co.zw/auth/shop/login" class="boc flex-fill py-2 btn">Log in</a>
+               <a href="https://admin.retailzw.co.zw/auth/signup" class="bgrd flex-fill py-2 btn">Open Your Shop</a>
+            </div>
+         </div>
+         <!-- HERO -->
+         <section id="hero">
+            <div class="aur aur-a" style="top:-80px;left:-120px"></div>
+            <div class="aur aur-b" style="top:180px;right:-180px"></div>
+            <div class="aur aur-a" style="bottom:-80px;left:45%;transform:translateX(-50%);opacity:.4"></div>
+            <div class="container position-relative" style="z-index:2">
+               <div class="text-center">
+                  <div class="afu" style="animation-delay:.05s"><span class="hbadge"><span class="bdot"></span>Built specifically for shops in Zimbabwe</span></div>
+                  <h1 class="h1 afu" style="animation-delay:.12s">The POS Built for<br>Zimbabwean <span class="gt">Retailers</span></h1>
+                  <p class="mx-auto afu" style="max-width:580px;font-size:clamp(.95rem,1.8vw,1.2rem);color:var(--tx2);margin-bottom:36px;animation-delay:.2s">Multi-currency checkout, offline selling, and real-time inventory — all from your Android phone or tablet. Keep selling even when the internet goes down.</p>
+                  <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap afu" style="animation-delay:.28s">
+                     <a href="https://admin.retailzw.co.zw/auth/signup" class="bgrd btn px-4 py-3 fs-6">Open Your Shop Free — No Card Needed</a>
+                     <a href="https://admin.retailzw.co.zw/auth/shop/login" class="boc btn px-4 py-3 fs-6"><i class="fa-regular fa-user me-2" style="color:var(--pur)"></i>Shop Login</a>
+                  </div>
+                  <div class="mt-5 afu" style="animation-delay:.4s">
+                     <p style="font-size:.71rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px">Trusted by shops across Zimbabwe</p>
+                     <div class="d-flex align-items-center justify-content-center gap-4 flex-wrap">
+                        <span class="tlog">Grocery</span><span class="tlog">Hardware</span><span class="tlog">Pharmacy</span><span class="tlog">Butchery</span><span class="tlog">Clothing</span><span class="tlog">Bottle Store</span>
+                     </div>
+                  </div>
+               </div>
+               <div class="row justify-content-center mt-5">
+                  <div class="col-lg-11 adi">
+                     <div class="dwrap">
+                        <div class="dtbar"><span class="dd" style="background:#ff5f57"></span><span class="dd" style="background:#ffbd2e"></span><span class="dd" style="background:#28c840"></span><span class="ms-auto me-auto" style="font-size:.76rem;color:var(--tx3)">RetailZW POS Dashboard – retailzw.co.zw</span></div>
+                        <div class="dgrid">
+                           <div class="dside">
+                              <div style="font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);padding:0 10px 10px;font-weight:700">Today</div>
+                              <button class="dsi on"><i class="fa-solid fa-gauge-high"></i> Dashboard</button>
+                              <button class="dsi"><i class="fa-solid fa-cash-register"></i> Sales</button>
+                              <button class="dsi"><i class="fa-solid fa-boxes-stacked"></i> Inventory</button>
+                              <button class="dsi"><i class="fa-solid fa-users"></i> Customers</button>
+                              <button class="dsi"><i class="fa-solid fa-chart-bar"></i> Reports</button>
+                           </div>
+                           <div class="p-3">
+                              <div class="row g-2 mb-3">
+                                 <div class="col-6 col-sm-3">
+                                    <div class="stpill">
+                                       <div style="font-size:1.4rem;font-weight:700" class="gt">$1,284</div>
+                                       <div style="font-size:.67rem;color:var(--tx3)">Today's Sales</div>
+                                       <div style="font-size:.67rem;color:#34d399;font-weight:600"><i class="fa-solid fa-caret-up me-1"></i>12.3%</div>
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-sm-3">
+                                    <div class="stpill">
+                                       <div style="font-size:1.4rem;font-weight:700">143</div>
+                                       <div style="font-size:.67rem;color:var(--tx3)">Transactions</div>
+                                       <div style="font-size:.67rem;color:#34d399;font-weight:600"><i class="fa-solid fa-caret-up me-1"></i>8.1%</div>
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-sm-3">
+                                    <div class="stpill">
+                                       <div style="font-size:1.4rem;font-weight:700">$8.97</div>
+                                       <div style="font-size:.67rem;color:var(--tx3)">Avg Basket</div>
+                                       <div style="font-size:.67rem;color:#60a5fa;font-weight:600"><i class="fa-solid fa-caret-up me-1"></i>$0.42</div>
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-sm-3">
+                                    <div class="stpill">
+                                       <div style="font-size:1.4rem;font-weight:700">7</div>
+                                       <div style="font-size:.67rem;color:var(--tx3)">Low Stock Alerts</div>
+                                       <div style="font-size:.67rem;color:#f87171;font-weight:600"><i class="fa-solid fa-triangle-exclamation me-1"></i>Reorder</div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="row g-2">
+                                 <div class="col-sm-7">
+                                    <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:12px;padding:14px">
+                                       <div style="font-size:.73rem;color:var(--tx3);margin-bottom:10px;font-weight:600"><i class="fa-solid fa-chart-bar me-1"></i>Sales – Last 7 days</div>
+                                       <div style="display:flex;align-items:flex-end;gap:5px;height:76px">
+                                          <div class="bbar" style="height:52%"></div>
+                                          <div class="bbar" style="height:68%"></div>
+                                          <div class="bbar" style="height:44%"></div>
+                                          <div class="bbar" style="height:91%"></div>
+                                          <div class="bbar" style="height:73%"></div>
+                                          <div class="bbar" style="height:86%"></div>
+                                          <div class="bbar" style="height:100%"></div>
+                                       </div>
+                                       <div class="d-flex justify-content-between mt-2" style="font-size:.62rem;color:var(--tx3)"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-5">
+                                    <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:12px;padding:12px;height:100%;display:flex;flex-direction:column;gap:8px">
+                                       <div style="font-size:.71rem;color:var(--tx3);font-weight:600"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--pur);box-shadow:0 0 6px var(--pur);margin-right:6px;animation:bpls 2s infinite"></span>Live Sale</div>
+                                       <div class="cbbl cbus">Bread x2, Milk x1 — USD</div>
+                                       <div class="cbbl cbai"><strong>$3.40 received.</strong> Change: $1.60. Receipt printed.</div>
+                                       <div style="display:flex;gap:4px;padding:8px 12px">
+                                          <div class="tdot"></div>
+                                          <div class="tdot" style="animation-delay:.15s"></div>
+                                          <div class="tdot" style="animation-delay:.3s"></div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- SOCIAL PROOF -->
+         <section id="proof">
+            <div class="container">
+               <div class="row g-3 align-items-center text-center">
+                  <div class="col-6 col-sm-3">
+                     <div class="pnum">4.9/5</div>
+                     <div class="plbl"><i class="fa-solid fa-star text-warning me-1"></i>Shop Rating</div>
+                  </div>
+                  <div class="col-6 col-sm-3">
+                     <div class="pnum">500+</div>
+                     <div class="plbl">Active Shops</div>
+                  </div>
+                  <div class="col-6 col-sm-3">
+                     <div class="pnum">$2M+</div>
+                     <div class="plbl">Sales Processed</div>
+                  </div>
+                  <div class="col-6 col-sm-3">
+                     <div class="pnum">99.9%</div>
+                     <div class="plbl">Uptime SLA</div>
+                  </div>
+               </div>
+               <div class="lscroll">
+                  <div class="ltrack"><span class="lbr">Grocery Stores</span><span class="lbr">Hardware Shops</span><span class="lbr">Pharmacies</span><span class="lbr">Butcheries</span><span class="lbr">Clothing Stores</span><span class="lbr">Bottle Stores</span><span class="lbr">Supermarkets</span><span class="lbr">Electronics</span><span class="lbr">Takeaways</span><span class="lbr">Grocery Stores</span><span class="lbr">Hardware Shops</span><span class="lbr">Pharmacies</span><span class="lbr">Butcheries</span><span class="lbr">Clothing Stores</span><span class="lbr">Bottle Stores</span><span class="lbr">Supermarkets</span><span class="lbr">Electronics</span><span class="lbr">Takeaways</span></div>
+               </div>
+            </div>
+         </section>
+         <!-- PROBLEM -->
+         <section class="sp position-relative">
+            <div class="aur aur-b" style="top:50%;right:-200px;transform:translateY(-50%)"></div>
+            <div class="container position-relative" style="z-index:1">
+               <div class="text-center mb-5 rv">
+                  <span class="slbl">The Problem</span>
+                  <h2 class="stitle">Running a shop in Zimbabwe is <span class="gt">hard enough</span></h2>
+                  <p class="ssub mx-auto">Most POS systems weren't built for the Zimbabwean market — and it shows every single day.</p>
+               </div>
+               <div class="row g-4">
+                  <div class="col-md-4 rv">
+                     <div class="gc p-4 h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px"><i class="fa-regular fa-clock fa-lg" style="color:#f87171"></i></div>
+                        <h3 class="fw-semibold fs-5 mb-2">Manual Cash Books</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Hours wasted every evening balancing handwritten books, counting cash, and chasing up cashiers — time you should spend growing your business.</p>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.1s">
+                     <div class="gc p-4 h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px"><i class="fa-solid fa-coins fa-lg" style="color:#fbbf24"></i></div>
+                        <h3 class="fw-semibold fs-5 mb-2">Currency Confusion</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Switching between USD and ZWG manually at checkout leads to errors, disputes, and lost revenue. Your POS should handle it automatically.</p>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.2s">
+                     <div class="gc p-4 h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px"><i class="fa-solid fa-wifi fa-lg" style="color:#a78bfa"></i></div>
+                        <h3 class="fw-semibold fs-5 mb-2">No Internet = No Sales</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Load shedding and unstable connections shouldn't stop your shop from trading. Most cloud-only systems leave you stuck. RetailZW keeps selling offline.</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- FEATURES -->
+         <section id="features" class="sp" style="background:var(--bg2)">
+            <div class="container">
+               <div class="text-center mb-5 rv">
+                  <span class="slbl">Features</span>
+                  <h2 class="stitle">Everything your shop needs to <span class="gt">run smoothly</span></h2>
+                  <p class="ssub mx-auto">Purpose-built for the Zimbabwean retail environment — multi-currency, offline-first, mobile-ready.</p>
+               </div>
+               <div class="row g-3">
+                  <div class="col-md-4 rv">
+                     <div class="gc p-4 h-100">
+                        <div class="ftico"><i class="fa-solid fa-cash-register"></i></div>
+                        <h3 class="fs-5 fw-semibold mb-2">Fast POS Checkout</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Scan barcodes or search products by name. Process sales in seconds with automatic tax, change calculation, and instant receipt printing.</p>
+                        <span class="ftag">Bluetooth receipt printer</span>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.05s">
+                     <div class="gc p-4 h-100">
+                        <div class="ftico"><i class="fa-solid fa-tower-broadcast"></i></div>
+                        <h3 class="fs-5 fw-semibold mb-2">Full Offline Mode</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Keep selling during load shedding or network outages. All sales sync automatically when you're back online — zero data loss, zero disruption.</p>
+                        <span class="ftag">Works without internet</span>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.1s">
+                     <div class="gc p-4 h-100">
+                        <div class="ftico"><i class="fa-solid fa-coins"></i></div>
+                        <h3 class="fs-5 fw-semibold mb-2">Multi-Currency (USD &amp; ZWG)</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Price in USD, ZWG, or both. Cashiers select the payment currency at checkout and the system handles conversion, change, and reporting automatically.</p>
+                        <span class="ftag">USD + ZWG built-in</span>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.15s">
+                     <div class="gc p-4 h-100">
+                        <div class="ftico"><i class="fa-solid fa-boxes-stacked"></i></div>
+                        <h3 class="fs-5 fw-semibold mb-2">Inventory Management</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Track stock levels in real time. Get low-stock alerts before you run out. Manage products across multiple branches from a single dashboard.</p>
+                        <span class="ftag">Real-time stock</span>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.2s">
+                     <div class="gc p-4 h-100">
+                        <div class="ftico"><i class="fa-solid fa-chart-line"></i></div>
+                        <h3 class="fs-5 fw-semibold mb-2">Sales Analytics</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Daily, weekly, and monthly sales reports. See your best-selling products, busiest hours, and top cashiers — all from your phone or laptop.</p>
+                        <span class="ftag">Instant reports</span>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.25s">
+                     <div class="gc p-4 h-100">
+                        <div class="ftico"><i class="fa-solid fa-store"></i></div>
+                        <h3 class="fs-5 fw-semibold mb-2">Branch Management</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Run multiple branches under one account. Assign cashiers to branches, compare performance, and manage all your shops from a single admin panel.</p>
+                        <span class="ftag">Multi-branch ready</span>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- HOW IT WORKS -->
+         <section id="how" class="sp" style="background:var(--bg3)">
+            <div class="container">
+               <div class="text-center mb-5 rv">
+                  <span class="slbl">How It Works</span>
+                  <h2 class="stitle">Your shop is live in <span class="gt">3 simple steps</span></h2>
+               </div>
+               <div class="row g-4">
+                  <div class="col-md-4 rv">
+                     <div class="gc p-4 h-100 text-center">
+                        <div class="hnum">1</div>
+                        <h3 class="fs-5 fw-semibold mb-2">Create Your Shop</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Sign up, enter your shop details and your preferred currency. Your admin dashboard is ready immediately — no waiting, no setup fees.</p>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.1s">
+                     <div class="gc p-4 h-100 text-center">
+                        <div class="hnum">2</div>
+                        <h3 class="fs-5 fw-semibold mb-2">Add Your Products</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Upload your product list, set prices in USD or ZWG, and configure stock levels. Scan barcodes to add products even faster.</p>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.2s">
+                     <div class="gc p-4 h-100 text-center">
+                        <div class="hnum">3</div>
+                        <h3 class="fs-5 fw-semibold mb-2">Start Selling</h3>
+                        <p style="font-size:.875rem;color:var(--tx2)">Download the RetailZW app on any Android device, log in as a cashier, and start processing sales. Works online and offline from day one.</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- HARDWARE -->
+         <section id="integrations" class="sp position-relative">
+            <div class="aur aur-b" style="top:50%;right:-200px;transform:translateY(-50%)"></div>
+            <div class="container position-relative" style="z-index:1">
+               <div class="text-center mb-5 rv">
+                  <span class="slbl">Hardware</span>
+                  <h2 class="stitle">Works with the <span class="gt">hardware you already have</span></h2>
+                  <p class="ssub mx-auto">RetailZW connects to affordable, widely available hardware — no expensive proprietary equipment required.</p>
+               </div>
+               <div class="row g-3 justify-content-center rv">
+                  <div class="col-6 col-md-4">
+                     <div class="gc p-4 text-center h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(74,21,75,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i class="fa-solid fa-print fa-xl" style="color:#a78bfa"></i></div>
+                        <div class="fw-semibold mb-1">Bluetooth Printers</div>
+                        <div style="font-size:.78rem;color:var(--tx3);margin-bottom:8px">Prints 58mm or 80mm thermal receipts wirelessly</div>
+                        <span class="ftag"><i class="fa-solid fa-check me-1"></i>Supported</span>
+                     </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                     <div class="gc p-4 text-center h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i class="fa-solid fa-barcode fa-xl" style="color:var(--tx2)"></i></div>
+                        <div class="fw-semibold mb-1">Barcode Scanners</div>
+                        <div style="font-size:.78rem;color:var(--tx3);margin-bottom:8px">USB and Bluetooth scanners for fast product lookup</div>
+                        <span class="ftag"><i class="fa-solid fa-check me-1"></i>Supported</span>
+                     </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                     <div class="gc p-4 text-center h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(88,101,242,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i class="fa-brands fa-android fa-xl" style="color:#34d399"></i></div>
+                        <div class="fw-semibold mb-1">Android Devices</div>
+                        <div style="font-size:.78rem;color:var(--tx3);margin-bottom:8px">Any Android phone or tablet running Android 8+</div>
+                        <span class="ftag"><i class="fa-solid fa-check me-1"></i>Supported</span>
+                     </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                     <div class="gc p-4 text-center h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(36,41,47,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i class="fa-solid fa-usb fa-xl" style="color:var(--tx2)"></i></div>
+                        <div class="fw-semibold mb-1">USB Printers</div>
+                        <div style="font-size:.78rem;color:var(--tx3);margin-bottom:8px">Connect USB thermal printers for desktop POS setups</div>
+                        <span class="ftag"><i class="fa-solid fa-check me-1"></i>Supported</span>
+                     </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                     <div class="gc p-4 text-center h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,102,0,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i class="fa-solid fa-tablet-screen-button fa-xl" style="color:#ff6600"></i></div>
+                        <div class="fw-semibold mb-1">POS Tablets</div>
+                        <div style="font-size:.78rem;color:var(--tx3);margin-bottom:8px">Dedicated tablet kiosks with cashier-optimised layout</div>
+                        <span class="ftag"><i class="fa-solid fa-check me-1"></i>Supported</span>
+                     </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                     <div class="gc p-4 text-center h-100">
+                        <div style="width:52px;height:52px;border-radius:14px;background:rgba(52,168,83,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i class="fa-solid fa-laptop fa-xl" style="color:#34d399"></i></div>
+                        <div class="fw-semibold mb-1">Web Admin Panel</div>
+                        <div style="font-size:.78rem;color:var(--tx3);margin-bottom:8px">Full management dashboard accessible from any browser</div>
+                        <span class="ftag"><i class="fa-solid fa-check me-1"></i>Supported</span>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- PRICING -->
+         <section id="pricing" class="sp position-relative" style="background:var(--bg2)">
+            <div class="aur aur-a" style="top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+            <div class="container position-relative" style="z-index:1">
+               <div class="text-center mb-5 rv">
+                  <span class="slbl">Pricing</span>
+                  <h2 class="stitle">Simple, <span class="gt">affordable pricing</span></h2>
+                  <p class="ssub mx-auto">Priced for Zimbabwean businesses. Start free, grow without surprises. All plans include offline mode and multi-currency.</p>
+               </div>
+               <div class="d-flex align-items-center justify-content-center gap-3 mb-5 rv">
+                  <span style="font-size:.9rem;color:var(--tx2);font-weight:500">Monthly</span>
+                  <div style="position:relative;width:52px;height:28px"><input type="checkbox" id="ptog" style="position:absolute;opacity:0;width:0;height:0"><label for="ptog" id="ptogLabel" style="position:absolute;inset:0;background:var(--sf);border:1px solid var(--bd2);border-radius:100px;cursor:pointer;transition:.3s"><span id="ptogThumb" style="position:absolute;width:20px;height:20px;left:3px;top:3px;background:var(--grad);border-radius:50%;transition:.3s;display:block"></span></label></div>
+                  <span style="font-size:.9rem;color:var(--tx2);font-weight:500">Yearly</span>
+                  <span style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);color:#34d399;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:100px"><i class="fa-solid fa-tag me-1"></i>Save 2 months</span>
+               </div>
+               <div class="row g-4 align-items-start rv">
+                  <div class="col-md-4">
+                     <div class="pcard h-100">
+                        <div style="font-size:.82rem;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Starter</div>
+                        <div class="pamt mb-1"><sup>$</sup><span class="pv" data-m="20" data-y="15">20</span></div>
+                        <div style="font-size:.82rem;color:var(--tx3)" class="pper">USD per month &nbsp;/&nbsp; ZWG 600.00</div>
+                        <p style="font-size:.875rem;color:var(--tx2);margin:14px 0 20px;padding-bottom:20px;border-bottom:1px solid var(--bd)">Perfect for small single-branch shops getting started with a proper POS.</p>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>1 branch</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Up to 5 users / cashiers</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Up to 500 products</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Offline mode included</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>USD &amp; ZWG checkout</div>
+                        <a href="https://admin.retailzw.co.zw/auth/signup" class="boc btn w-100 py-2 mt-4">Start Free Trial</a>
+                     </div>
+                  </div>
+                  <div class="col-md-4">
+                     <div class="pcard pop h-100">
+                        <span class="pbadge"><i class="fa-solid fa-star me-1"></i>Most Popular</span>
+                        <div style="font-size:.82rem;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Growth</div>
+                        <div class="pamt mb-1"><sup>$</sup><span class="pv" data-m="40" data-y="30">40</span></div>
+                        <div style="font-size:.82rem;color:var(--tx3)" class="pper">USD per month &nbsp;/&nbsp; ZWG 1,200.00</div>
+                        <p style="font-size:.875rem;color:var(--tx2);margin:14px 0 20px;padding-bottom:20px;border-bottom:1px solid var(--bd)">For growing businesses with multiple branches that need full control.</p>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Up to 5 branches</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Up to 25 users / cashiers</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Up to 5,000 products</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Advanced reports &amp; analytics</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Priority WhatsApp support</div>
+                        <a href="https://admin.retailzw.co.zw/auth/signup" class="bgrd btn w-100 py-2 mt-4">Get Started <i class="fa-solid fa-arrow-right ms-1 fa-sm"></i></a>
+                     </div>
+                  </div>
+                  <div class="col-md-4">
+                     <div class="pcard h-100">
+                        <div style="font-size:.82rem;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Enterprise</div>
+                        <div class="pamt mb-1"><sup>$</sup><span class="pv" data-m="100" data-y="80">100</span></div>
+                        <div style="font-size:.82rem;color:var(--tx3)" class="pper">USD per month &nbsp;/&nbsp; ZWG 3,000.00</div>
+                        <p style="font-size:.875rem;color:var(--tx2);margin:14px 0 20px;padding-bottom:20px;border-bottom:1px solid var(--bd)">Unlimited branches and users for large chains and supermarkets.</p>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>999 branches</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>999 users / cashiers</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>999,999 products</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Dedicated account manager</div>
+                        <div class="pfl"><span class="pchk"><i class="fa-solid fa-check"></i></span>Custom integrations &amp; API access</div>
+                        <a href="https://admin.retailzw.co.zw/auth/signup" class="boc btn w-100 py-2 mt-4">Get Started</a>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- TESTIMONIALS -->
+         <section id="testimonials" class="sp">
+            <div class="container">
+               <div class="text-center mb-5 rv">
+                  <span class="slbl">Testimonials</span>
+                  <h2 class="stitle">Loved by shops <span class="gt">across Zimbabwe</span></h2>
+               </div>
+               <div class="row g-3">
+                  <div class="col-md-4 rv">
+                     <div class="gc p-4 h-100">
+                        <div class="d-flex gap-1 mb-3"><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i></div>
+                        <p style="font-size:.875rem;color:var(--tx2);line-height:1.65;font-style:italic;margin-bottom:18px">"We used to spend 2 hours every evening balancing the till. With RetailZW it takes 10 minutes. The offline mode saved us during the last big ZESA outage — we never stopped selling."</p>
+                        <div class="d-flex align-items-center gap-2">
+                           <div style="width:38px;height:38px;border-radius:50%;background:var(--pur);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0">T</div>
+                           <div>
+                              <div style="font-size:.88rem;font-weight:600">Tendai Moyo</div>
+                              <div style="font-size:.76rem;color:var(--tx3)">Owner, Moyo General Dealers – Bulawayo</div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.1s">
+                     <div class="gc p-4 h-100">
+                        <div class="d-flex gap-1 mb-3"><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i></div>
+                        <p style="font-size:.875rem;color:var(--tx2);line-height:1.65;font-style:italic;margin-bottom:18px">"The multi-currency feature is brilliant. My cashiers used to struggle when customers paid in USD or ZWG — now the system handles all the calculations automatically. No more arguments at the till."</p>
+                        <div class="d-flex align-items-center gap-2">
+                           <div style="width:38px;height:38px;border-radius:50%;background:#34d399;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0">F</div>
+                           <div>
+                              <div style="font-size:.88rem;font-weight:600">Farai Chikwanda</div>
+                              <div style="font-size:.76rem;color:var(--tx3)">Manager, Chikwanda Superette – Harare</div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-md-4 rv" style="transition-delay:.2s">
+                     <div class="gc p-4 h-100">
+                        <div class="d-flex gap-1 mb-3"><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i></div>
+                        <p style="font-size:.875rem;color:var(--tx2);line-height:1.65;font-style:italic;margin-bottom:18px">"I manage 3 branches and used to drive between them to check stock. Now I see everything in real time from my phone. RetailZW paid for itself in the first month alone."</p>
+                        <div class="d-flex align-items-center gap-2">
+                           <div style="width:38px;height:38px;border-radius:50%;background:#fbbf24;display:flex;align-items:center;justify-content:center;font-weight:700;color:#1a1a2e;flex-shrink:0">N</div>
+                           <div>
+                              <div style="font-size:.88rem;font-weight:600">Nyasha Dube</div>
+                              <div style="font-size:.76rem;color:var(--tx3)">Director, Dube Hardware – Gweru</div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- FAQ -->
+         <section id="faq" class="sp" style="background:var(--bg2)">
+            <div class="container">
+               <div class="text-center mb-5 rv">
+                  <span class="slbl">FAQ</span>
+                  <h2 class="stitle">Common <span class="gt">questions</span></h2>
+               </div>
+               <div class="row justify-content-center rv">
+                  <div class="col-lg-8">
+                     <div class="accordion acco" id="faqAcc">
+                        <div class="accordion-item">
+                           <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#f1">How long does it take to set up my shop?</button></h2>
+                           <div id="f1" class="accordion-collapse collapse show" data-bs-parent="#faqAcc">
+                              <div class="accordion-body">Most shops are live within 30 minutes. Sign up, add your products, download the Android app, and your cashiers can start selling the same day. No hardware setup or IT skills required.</div>
+                           </div>
+                        </div>
+                        <div class="accordion-item">
+                           <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f2">Does RetailZW work without internet?</button></h2>
+                           <div id="f2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                              <div class="accordion-body">Yes — RetailZW is built offline-first. All sales, stock movements, and receipts work completely without an internet connection. Everything syncs automatically once you're back online. Perfect for load shedding and poor network areas.</div>
+                           </div>
+                        </div>
+                        <div class="accordion-item">
+                           <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f3">Which currencies are supported?</button></h2>
+                           <div id="f3" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                              <div class="accordion-body">RetailZW fully supports USD and ZWG (Zimbabwe Gold). Cashiers can accept payment in either currency and the system automatically calculates change. You can price products in USD, ZWG, or both simultaneously.</div>
+                           </div>
+                        </div>
+                        <div class="accordion-item">
+                           <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f4">What devices does the app run on?</button></h2>
+                           <div id="f4" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                              <div class="accordion-body">The cashier app runs on any Android phone or tablet running Android 8 or newer. The admin dashboard is web-based and works in any modern browser on desktop or mobile. No expensive proprietary hardware is required.</div>
+                           </div>
+                        </div>
+                        <div class="accordion-item">
+                           <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f5">Is there a free trial?</button></h2>
+                           <div id="f5" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                              <div class="accordion-body">Yes — your first 14 days are completely free, no credit card required. You get access to all features on the Business plan. After the trial you can choose the plan that fits your shop, or contact us to discuss pricing in ZWG.</div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- FINAL CTA -->
+         <section id="cta">
+            <div class="aur aur-a" style="top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(139,92,246,.2),transparent 70%);pointer-events:none"></div>
+            <div class="container position-relative" style="z-index:2">
+               <div class="rv">
+                  <span class="hbadge mb-4 d-inline-flex"><span class="bdot"></span>14-day free trial — No credit card required</span>
+                  <h2 style="font-size:clamp(2rem,5vw,3.8rem);font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-bottom:18px">Ready to upgrade your<br><span class="gt">shop's checkout?</span></h2>
+                  <p style="font-size:1.05rem;color:var(--tx2);max-width:500px;margin:0 auto 36px">Join hundreds of Zimbabwean shops using RetailZW to sell faster, track stock, and take full control of their business.</p>
+                  <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+                     <a href="https://admin.retailzw.co.zw/auth/signup" class="bgrd btn px-4 py-3 fs-6">Open Your Shop Free <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                     <a href="mailto:sales@retailzw.co.zw" class="boc btn px-4 py-3 fs-6"><i class="fa-regular fa-envelope me-2"></i>Talk to Sales</a>
+                  </div>
+               </div>
+            </div>
+         </section>
+         <!-- FOOTER -->
+         <footer id="foot">
+            <div class="container">
+               <div class="row g-5 mb-5">
+                  <div class="col-lg-4">
+                     <a class="d-flex align-items-center gap-2 mb-3" href="#" style="font-size:1.15rem;font-weight:700;color:var(--tx)">
+                        <div class="logo-i"><i class="fa-solid fa-cash-register"></i></div>
+                        RetailZW
+                     </a>
+                     <p style="font-size:.875rem;color:var(--tx3);line-height:1.65;max-width:280px">Zimbabwe's point of sale platform. Built for local shops, designed for the Zimbabwean market.</p>
+                     <div class="d-flex gap-2 mt-3">
+                        <a href="mailto:info@retailzw.co.zw" class="boc btn px-3 py-2" style="font-size:.85rem;white-space:nowrap"><i class="fa-regular fa-envelope me-1"></i>info@retailzw.co.zw</a>
+                     </div>
+                  </div>
+                  <div class="col-6 col-md-2 fcol">
+                     <h5>Product</h5>
+                     <a href="#features">Features</a>
+                     <a href="#integrations">Hardware</a>
+                     <a href="#pricing">Pricing</a>
+                     <a href="https://admin.retailzw.co.zw/auth/signup">Sign Up</a>
+                     <a href="https://admin.retailzw.co.zw/auth/shop/login">Shop Login</a>
+                  </div>
+                  <div class="col-6 col-md-2 fcol">
+                     <h5>Support</h5>
+                     <a href="mailto:support@retailzw.co.zw">Help Desk</a>
+                     <a href="mailto:support@retailzw.co.zw">Contact Us</a>
+                     <a href="#faq">FAQ</a>
+                     <a href="mailto:support@retailzw.co.zw">WhatsApp Support</a>
+                  </div>
+                  <div class="col-6 col-md-2 fcol">
+                     <h5>Company</h5>
+                     <a href="#">About RetailZW</a>
+                     <a href="mailto:sales@retailzw.co.zw">Sales</a>
+                     <a href="#" onclick="openLegal('privacy');return false;">Privacy Policy</a>
+                     <a href="#" onclick="openLegal('terms');return false;">Terms of Service</a>
+                     <a href="#" onclick="openLegal('appstore');return false;">App Store Policy</a>
+                  </div>
+               </div>
+               <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pt-4" style="border-top:1px solid var(--bd)">
+                  <p style="font-size:.8rem;color:var(--tx3);margin:0">&copy; 2025 Charnodia Technologies (Pvt) Ltd. All rights reserved. &mdash; <a href="https://retailzw.co.zw" class="text-primary fw-bold">retailzw.co.zw</a> &nbsp;&middot;&nbsp; <a href="#" onclick="openLegal('terms');return false;" style="color:var(--pur)">Terms</a> &nbsp;&middot;&nbsp; <a href="#" onclick="openLegal('privacy');return false;" style="color:var(--pur)">Privacy</a> &nbsp;&middot;&nbsp; <a href="#" onclick="openLegal('appstore');return false;" style="color:var(--pur)">App Policy</a></p>
+                  <div class="d-flex gap-2">
+                     <a href="mailto:support@retailzw.co.zw" class="sico"><i class="fa-regular fa-envelope"></i></a>
+                     <a href="#" class="sico"><i class="fa-brands fa-facebook-f"></i></a>
+                     <a href="#" class="sico"><i class="fa-brands fa-x-twitter"></i></a>
+                     <a href="#" class="sico"><i class="fa-brands fa-whatsapp"></i></a>
+                  </div>
+               </div>
+            </div>
+         </footer>
+      </div>
+      <!-- /landing -->
+      <!-- ======================== SHOP LOGIN OFFCANVAS ======================== -->
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="lofc">
+         <div class="offcanvas-header">
+            <div class="d-flex align-items-center gap-2">
+               <div class="logo-i" style="width:30px;height:30px;font-size:.8rem"><i class="fa-solid fa-cash-register"></i></div>
+               <h5 class="offcanvas-title mb-0">RetailZW</h5>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" style="filter:invert(1)"></button>
+         </div>
+         <div class="offcanvas-body p-4">
+            <div class="tab-switch"><button class="tab-sw-btn on" id="tabLogin" onclick="swTab('login')">Log In</button><button class="tab-sw-btn" id="tabSignup" onclick="swTab('signup')">Sign Up</button></div>
+            <!-- Login redirect -->
+            <div id="fLogin">
+               <div class="text-center py-4">
+                  <div style="width:64px;height:64px;border-radius:18px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 18px"><i class="fa-solid fa-cash-register fa-xl" style="color:var(--pur)"></i></div>
+                  <h5 class="fw-700 mb-2">Sign in to your shop</h5>
+                  <p style="font-size:.875rem;color:var(--tx2);margin-bottom:24px">You'll be taken to the RetailZW shop login page where you can sign in with your tenant code and credentials.</p>
+                  <a href="https://admin.retailzw.co.zw/auth/shop/login" class="bgrd btn w-100 py-3 fw-semibold fs-6">Go to Shop Login <i class="fa-solid fa-arrow-right ms-1 fa-sm"></i></a>
+               </div>
+               <p class="text-center mt-4" style="font-size:.82rem;color:var(--tx3)">Don't have a shop yet? <a href="https://admin.retailzw.co.zw/auth/signup" style="color:var(--pur)">Create your shop free</a></p>
+            </div>
+            <!-- Sign Up redirect -->
+            <div id="fSignup" style="display:none">
+               <div class="text-center py-4">
+                  <div style="width:64px;height:64px;border-radius:18px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 18px"><i class="fa-solid fa-store fa-xl" style="color:#34d399"></i></div>
+                  <h5 class="fw-700 mb-2">Open your shop today</h5>
+                  <p style="font-size:.875rem;color:var(--tx2);margin-bottom:24px">Create your RetailZW account in minutes. No credit card required — your first 14 days are completely free.</p>
+                  <a href="https://admin.retailzw.co.zw/auth/signup" class="bgrd btn w-100 py-3 fw-semibold fs-6">Create Your Shop Free <i class="fa-solid fa-arrow-right ms-1 fa-sm"></i></a>
+               </div>
+               <p class="text-center mt-3" style="font-size:.76rem;color:var(--tx3)">Already have an account? <a href="https://admin.retailzw.co.zw/auth/shop/login" style="color:var(--pur)">Sign in here</a></p>
+            </div>
+         </div>
+      </div>
+      <!-- ======================== DASHBOARD (Admin preview) ======================== -->
+      <div id="dashboard">
+         <!-- Sidebar -->
+         <div class="db-sidebar" id="dbSidebar">
+            <div class="db-logo">
+               <div class="logo-i"><i class="fa-solid fa-cash-register"></i></div>
+               <span>RetailZW</span>
+            </div>
+            <div class="db-nav">
+               <div class="db-nav-section">Shop</div>
+               <button class="db-nl active" onclick="dbNav('overview',this)"><i class="fa-solid fa-gauge-high"></i> Overview</button>
+               <button class="db-nl" onclick="dbNav('agents',this)"><i class="fa-solid fa-cash-register"></i> Sales <span class="db-badge">Live</span></button>
+               <button class="db-nl" onclick="dbNav('chat',this)"><i class="fa-solid fa-boxes-stacked"></i> Inventory <span class="db-badge" style="background:#34d399">Low</span></button>
+               <button class="db-nl" onclick="dbNav('analytics',this)"><i class="fa-solid fa-chart-line"></i> Analytics</button>
+               <button class="db-nl" onclick="dbNav('automations',this)"><i class="fa-solid fa-users"></i> Cashiers</button>
+               <div class="db-nav-section">Manage</div>
+               <button class="db-nl" onclick="dbNav('integrations',this)"><i class="fa-solid fa-store"></i> Branches</button>
+               <button class="db-nl" onclick="dbNav('settings',this)"><i class="fa-solid fa-gear"></i> Settings</button>
+            </div>
+            <div class="db-bottom">
+               <button class="db-nl" onclick="doLogout()" style="color:#f87171"><i class="fa-solid fa-right-from-bracket"></i> Log Out</button>
+            </div>
+         </div>
+         <!-- Top bar -->
+         <div class="db-top">
+            <button class="boc d-lg-none me-2 px-2 py-2" style="border-radius:10px;width:38px;height:38px" onclick="document.getElementById('dbSidebar').classList.toggle('mob-open')">
+            <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="db-top-search">
+               <i class="fa-solid fa-magnifying-glass"></i>
+               <input type="text" placeholder="Search products, sales, cashiers...">
+            </div>
+            <div class="ms-auto d-flex align-items-center gap-3">
+               <button class="boc d-flex align-items-center justify-content-center" id="dbThBtn" style="width:38px;height:38px;padding:0;border-radius:12px" onclick="toggleTheme()">
+               <i class="fa-solid fa-sun" id="dbSunI"></i>
+               <i class="fa-solid fa-moon" id="dbMoonI" style="display:none"></i>
+               </button>
+               <div style="position:relative" id="notifWrap">
+                  <button class="boc d-flex align-items-center justify-content-center" id="bellBtn" style="width:38px;height:38px;padding:0;border-radius:12px" onclick="toggleNotif(event)">
+                  <i class="fa-regular fa-bell"></i>
+                  </button>
+                  <span id="notifBadge" style="position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;background:#f87171;border:2px solid var(--bg)"></span>
+                  <!-- Notification Dropdown -->
+                  <div class="db-dropdown" id="notifDropdown" style="right:0;min-width:360px">
+                     <div class="dd-header">
+                        <div class="dd-header-title"><i class="fa-regular fa-bell me-2" style="color:var(--pur)"></i>Notifications <span id="unreadCount" style="background:rgba(248,113,113,.15);color:#f87171;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:100px;margin-left:6px">3 new</span></div>
+                        <div class="d-flex gap-2">
+                           <button class="dd-close" onclick="markAllRead()" title="Mark all read" style="width:auto;padding:4px 10px;font-size:.72rem;color:var(--pur);border-color:rgba(139,92,246,.3)">Mark all read</button>
+                           <button class="dd-close" onclick="toggleNotif(event)"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                     </div>
+                     <div class="dd-body" id="notifList">
+                        <div class="notif-item notif-unread d-flex gap-3 mb-2">
+                           <div class="notif-ico" style="background:rgba(248,113,113,.12)"><i class="fa-solid fa-triangle-exclamation" style="color:#f87171;font-size:.9rem"></i></div>
+                           <div style="flex:1">
+                              <div style="font-size:.85rem;font-weight:600;margin-bottom:3px">7 products low on stock</div>
+                              <div style="font-size:.78rem;color:var(--tx2)">Bread, Cooking Oil, Sugar and 4 others are below reorder level.</div>
+                              <div style="font-size:.7rem;color:var(--tx3);margin-top:5px"><i class="fa-regular fa-clock me-1"></i>15 minutes ago</div>
+                           </div>
+                           <div class="notif-dot"></div>
+                        </div>
+                        <div class="notif-item notif-unread d-flex gap-3 mb-2">
+                           <div class="notif-ico" style="background:rgba(52,211,153,.12)"><i class="fa-solid fa-chart-line" style="color:#34d399;font-size:.9rem"></i></div>
+                           <div style="flex:1">
+                              <div style="font-size:.85rem;font-weight:600;margin-bottom:3px">Sales target reached!</div>
+                              <div style="font-size:.78rem;color:var(--tx2)">Your shop hit today's $1,000 target. Current: $1,284 with 2 hours to go.</div>
+                              <div style="font-size:.7rem;color:var(--tx3);margin-top:5px"><i class="fa-regular fa-clock me-1"></i>42 minutes ago</div>
+                           </div>
+                           <div class="notif-dot"></div>
+                        </div>
+                        <div class="notif-item notif-unread d-flex gap-3 mb-2">
+                           <div class="notif-ico" style="background:rgba(139,92,246,.12)"><i class="fa-solid fa-tower-broadcast" style="color:#a78bfa;font-size:.9rem"></i></div>
+                           <div style="flex:1">
+                              <div style="font-size:.85rem;font-weight:600;margin-bottom:3px">8 offline sales synced</div>
+                              <div style="font-size:.78rem;color:var(--tx2)">Sales from the 2-hour outage synced successfully. All stock updated.</div>
+                              <div style="font-size:.7rem;color:var(--tx3);margin-top:5px"><i class="fa-regular fa-clock me-1"></i>3 hours ago</div>
+                           </div>
+                           <div class="notif-dot"></div>
+                        </div>
+                        <div class="notif-item d-flex gap-3 mb-2">
+                           <div class="notif-ico" style="background:rgba(59,130,246,.1)"><i class="fa-solid fa-file-lines" style="color:#60a5fa;font-size:.9rem"></i></div>
+                           <div style="flex:1">
+                              <div style="font-size:.85rem;font-weight:600;margin-bottom:3px">Weekly report ready</div>
+                              <div style="font-size:.78rem;color:var(--tx2)">Your sales report for last week is ready to download from Analytics.</div>
+                              <div style="font-size:.7rem;color:var(--tx3);margin-top:5px"><i class="fa-regular fa-clock me-1"></i>Yesterday</div>
+                           </div>
+                           <div class="notif-dot read"></div>
+                        </div>
+                     </div>
+                     <div style="padding:12px 14px;border-top:1px solid var(--bd);text-align:center">
+                        <button class="boc btn w-100 py-2" style="font-size:.82rem;border-radius:10px"><i class="fa-solid fa-list me-1"></i>View All Notifications</button>
+                     </div>
+                  </div>
+               </div>
+               <div style="position:relative" id="profileWrap">
+                  <div class="db-user-pill" id="userPill" onclick="toggleProfile(event)">
+                     <div class="db-avatar" id="userAvatar">A</div>
+                     <div class="d-none d-md-block">
+                        <div style="font-size:.85rem;font-weight:600;line-height:1.2" id="userName">Admin</div>
+                        <div style="font-size:.72rem;color:var(--tx3)" id="userPlan">Business Plan</div>
+                     </div>
+                     <i class="fa-solid fa-chevron-down fa-xs" id="profileChevron" style="color:var(--tx3);margin-left:2px;transition:.3s"></i>
+                  </div>
+                  <!-- Profile Dropdown -->
+                  <div class="db-dropdown profile-dd" id="profileDropdown" style="right:0">
+                     <div class="profile-dd-top">
+                        <div class="db-avatar" id="pdAvatar" style="width:46px;height:46px;border-radius:14px;font-size:1rem;flex-shrink:0">A</div>
+                        <div>
+                           <div style="font-weight:700;font-size:.95rem" id="pdName">Admin</div>
+                           <div style="font-size:.78rem;color:var(--tx3)" id="pdEmail">admin@yourshop.co.zw</div>
+                           <div style="margin-top:5px"><span class="bst son" style="font-size:.68rem" id="pdPlan">Business Plan</span></div>
+                        </div>
+                     </div>
+                     <div style="padding:8px 0">
+                        <button class="profile-menu-item" onclick="dbNav('settings',document.querySelector('[onclick*=settings]'));toggleProfile()"><i class="fa-regular fa-user" style="color:var(--pur)"></i>My Profile</button>
+                        <button class="profile-menu-item" onclick="dbNav('settings',document.querySelector('[onclick*=settings]'));toggleProfile()"><i class="fa-solid fa-gear" style="color:var(--tx3)"></i>Shop Settings</button>
+                        <button class="profile-menu-item" onclick="dbNav('integrations',document.querySelector('[onclick*=integrations]'));toggleProfile()"><i class="fa-solid fa-store" style="color:#60a5fa"></i>Branches</button>
+                        <button class="profile-menu-item" onclick="dbNav('analytics',document.querySelector('[onclick*=analytics]'));toggleProfile()"><i class="fa-solid fa-chart-line" style="color:#34d399"></i>Sales Reports</button>
+                        <div style="height:1px;background:var(--bd);margin:8px 16px"></div>
+                        <div style="padding:8px 16px 4px">
+                           <div style="font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:8px">Current Plan</div>
+                           <div style="background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(59,130,246,.08));border:1px solid rgba(139,92,246,.25);border-radius:12px;padding:12px">
+                              <div style="font-weight:700;font-size:.88rem;margin-bottom:3px" id="pdPlanDetail">Business Plan</div>
+                              <div style="font-size:.76rem;color:var(--tx2);margin-bottom:8px">Renews June 1, 2025</div>
+                              <button class="bgrd btn w-100 py-1" style="font-size:.75rem;border-radius:8px">Upgrade to Enterprise</button>
+                           </div>
+                        </div>
+                        <div style="height:1px;background:var(--bd);margin:8px 16px"></div>
+                        <button class="profile-menu-item danger" onclick="doLogout();toggleProfile()"><i class="fa-solid fa-right-from-bracket" style="color:#f87171"></i>Log Out</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- Main Content -->
+         <div class="db-main">
+            <div class="db-content">
+               <!-- -- OVERVIEW -- -->
+               <div class="db-section active" id="sec-overview">
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                     <div>
+                        <h4 class="fw-700 mb-1" style="font-size:1.4rem;font-weight:700">Good morning, <span id="greetName">Admin</span> &#x1F44B;</h4>
+                        <p style="font-size:.875rem;color:var(--tx3);margin:0">Here's how your shop is performing today.</p>
+                     </div>
+                     <button class="bgrd btn px-3 py-2" style="font-size:.85rem;white-space:nowrap" onclick="dbNav('analytics',document.querySelector('[onclick*=analytics]'))"><i class="fa-solid fa-chart-bar me-2"></i>View Reports</button>
+                  </div>
+                  <!-- Stat cards -->
+                  <div class="row g-3 mb-4">
+                     <div class="col-6 col-xl-3">
+                        <div class="db-stat-card">
+                           <div class="d-flex justify-content-between align-items-start mb-3">
+                              <div style="width:38px;height:38px;border-radius:11px;background:rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-dollar-sign" style="color:#a78bfa"></i></div>
+                              <span style="font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(52,211,153,.1);color:#34d399">&#x2191; 12.3%</span>
+                           </div>
+                           <div class="db-stat-val gt">$1,284</div>
+                           <div class="db-stat-lbl">Today's Sales</div>
+                        </div>
+                     </div>
+                     <div class="col-6 col-xl-3">
+                        <div class="db-stat-card">
+                           <div class="d-flex justify-content-between align-items-start mb-3">
+                              <div style="width:38px;height:38px;border-radius:11px;background:rgba(52,211,153,.12);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-cash-register" style="color:#34d399"></i></div>
+                              <span style="font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(52,211,153,.1);color:#34d399">&#x2191; 8.1%</span>
+                           </div>
+                           <div class="db-stat-val" style="color:#34d399">143</div>
+                           <div class="db-stat-lbl">Transactions</div>
+                        </div>
+                     </div>
+                     <div class="col-6 col-xl-3">
+                        <div class="db-stat-card">
+                           <div class="d-flex justify-content-between align-items-start mb-3">
+                              <div style="width:38px;height:38px;border-radius:11px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-basket-shopping" style="color:#60a5fa"></i></div>
+                              <span style="font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(59,130,246,.1);color:#60a5fa">&#x2191; $0.42</span>
+                           </div>
+                           <div class="db-stat-val" style="color:#60a5fa">$8.97</div>
+                           <div class="db-stat-lbl">Avg Basket Size</div>
+                        </div>
+                     </div>
+                     <div class="col-6 col-xl-3">
+                        <div class="db-stat-card">
+                           <div class="d-flex justify-content-between align-items-start mb-3">
+                              <div style="width:38px;height:38px;border-radius:11px;background:rgba(248,113,113,.1);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-boxes-stacked" style="color:#f87171"></i></div>
+                              <span style="font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(248,113,113,.1);color:#f87171">Reorder</span>
+                           </div>
+                           <div class="db-stat-val" style="color:#f87171">7</div>
+                           <div class="db-stat-lbl">Low Stock Alerts</div>
+                        </div>
+                     </div>
+                  </div>
+                  <!-- Chart + Activity -->
+                  <div class="row g-3">
+                     <div class="col-lg-8">
+                        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:24px">
+                           <div class="d-flex align-items-center justify-content-between mb-3">
+                              <div style="font-weight:600"><i class="fa-solid fa-chart-area me-2" style="color:var(--pur)"></i>Sales Volume</div>
+                              <div style="font-size:.75rem;color:var(--tx3)">Last 30 days</div>
+                           </div>
+                           <canvas id="ovChart" height="100"></canvas>
+                        </div>
+                     </div>
+                     <div class="col-lg-4">
+                        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:20px;height:100%">
+                           <div class="d-flex align-items-center justify-content-between mb-3">
+                              <div style="font-weight:600;font-size:.9rem">Live Sales</div>
+                              <div class="d-flex align-items-center gap-2"><span style="width:7px;height:7px;border-radius:50%;background:#34d399;animation:bpls 1.5s infinite"></span><span style="font-size:.72rem;color:#34d399;font-weight:600">Live</span></div>
+                           </div>
+                           <div id="liveActivity" style="display:flex;flex-direction:column;gap:8px">
+                              <div style="display:flex;gap:10px;padding:10px;background:var(--bg3);border-radius:10px;font-size:.78rem"><span style="width:7px;height:7px;border-radius:50%;background:#34d399;margin-top:4px;flex-shrink:0"></span><span style="color:var(--tx2)">Cashier Rudo: Bread x2, Milk — $3.40</span><span style="margin-left:auto;color:var(--tx3);white-space:nowrap">2s ago</span></div>
+                              <div style="display:flex;gap:10px;padding:10px;background:var(--bg3);border-radius:10px;font-size:.78rem"><span style="width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin-top:4px;flex-shrink:0"></span><span style="color:var(--tx2)">Cashier Tendai: Sugar 2kg, Cooking Oil — $7.80</span><span style="margin-left:auto;color:var(--tx3);white-space:nowrap">18s ago</span></div>
+                              <div style="display:flex;gap:10px;padding:10px;background:var(--bg3);border-radius:10px;font-size:.78rem"><span style="width:7px;height:7px;border-radius:50%;background:#34d399;margin-top:4px;flex-shrink:0"></span><span style="color:var(--tx2)">Refund processed — 1x Chips $0.50</span><span style="margin-left:auto;color:var(--tx3);white-space:nowrap">45s ago</span></div>
+                              <div style="display:flex;gap:10px;padding:10px;background:var(--bg3);border-radius:10px;font-size:.78rem"><span style="width:7px;height:7px;border-radius:50%;background:#fbbf24;margin-top:4px;flex-shrink:0"></span><span style="color:var(--tx2)">ZWG payment — 7 items $214 ZWG</span><span style="margin-left:auto;color:var(--tx3);white-space:nowrap">1m ago</span></div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- -- SALES (was AI AGENTS) -- -->
+               <div class="db-section" id="sec-agents">
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                     <div>
+                        <h4 style="font-size:1.4rem;font-weight:700;margin-bottom:4px">Today's Sales</h4>
+                        <p style="font-size:.875rem;color:var(--tx3);margin:0">All transactions processed today across your branches.</p>
+                     </div>
+                     <button class="bgrd btn px-3 py-2" style="font-size:.85rem"><i class="fa-solid fa-file-export me-2"></i>Export Report</button>
+                  </div>
+                  <div class="row g-3">
+                     <div class="col-md-6">
+                        <div class="agent-card">
+                           <div class="d-flex align-items-start gap-3 mb-3">
+                              <div style="width:46px;height:46px;border-radius:14px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-cash-register" style="color:#34d399;font-size:1.1rem"></i></div>
+                              <div style="flex:1">
+                                 <div class="d-flex align-items-center gap-2 mb-1"><strong>Main Branch – Harare</strong><span style="width:9px;height:9px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399"></span></div>
+                                 <div style="font-size:.78rem;color:var(--tx3)">3 cashiers active</div>
+                              </div>
+                              <span class="bst son">Open</span>
+                           </div>
+                           <div class="row g-2 mb-3">
+                              <div class="col-6">
+                                 <div style="background:var(--bg3);border-radius:10px;padding:10px">
+                                    <div style="font-size:1.1rem;font-weight:700">$924</div>
+                                    <div style="font-size:.7rem;color:var(--tx3)">Sales today</div>
+                                 </div>
+                              </div>
+                              <div class="col-6">
+                                 <div style="background:var(--bg3);border-radius:10px;padding:10px">
+                                    <div style="font-size:1.1rem;font-weight:700;color:#34d399">97 txns</div>
+                                    <div style="font-size:.7rem;color:var(--tx3)">Transactions</div>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="d-flex gap-2"><button class="boc btn flex-fill py-2" style="font-size:.82rem"><i class="fa-solid fa-eye me-1"></i>View</button><button class="bgrd btn flex-fill py-2" style="font-size:.82rem"><i class="fa-solid fa-sliders me-1"></i>Manage</button></div>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="agent-card">
+                           <div class="d-flex align-items-start gap-3 mb-3">
+                              <div style="width:46px;height:46px;border-radius:14px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-cash-register" style="color:#a78bfa;font-size:1.1rem"></i></div>
+                              <div style="flex:1">
+                                 <div class="d-flex align-items-center gap-2 mb-1"><strong>Branch 2 – Chitungwiza</strong><span style="width:9px;height:9px;border-radius:50%;background:#8b5cf6;box-shadow:0 0 8px #8b5cf6"></span></div>
+                                 <div style="font-size:.78rem;color:var(--tx3)">2 cashiers active</div>
+                              </div>
+                              <span class="bst sbz">Open</span>
+                           </div>
+                           <div class="row g-2 mb-3">
+                              <div class="col-6">
+                                 <div style="background:var(--bg3);border-radius:10px;padding:10px">
+                                    <div style="font-size:1.1rem;font-weight:700">$360</div>
+                                    <div style="font-size:.7rem;color:var(--tx3)">Sales today</div>
+                                 </div>
+                              </div>
+                              <div class="col-6">
+                                 <div style="background:var(--bg3);border-radius:10px;padding:10px">
+                                    <div style="font-size:1.1rem;font-weight:700;color:#a78bfa">46 txns</div>
+                                    <div style="font-size:.7rem;color:var(--tx3)">Transactions</div>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="d-flex gap-2"><button class="boc btn flex-fill py-2" style="font-size:.82rem"><i class="fa-solid fa-eye me-1"></i>View</button><button class="bgrd btn flex-fill py-2" style="font-size:.82rem"><i class="fa-solid fa-sliders me-1"></i>Manage</button></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- -- INVENTORY (was AI CHAT) -- -->
+               <div class="db-section" id="sec-chat">
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                     <div>
+                        <h4 style="font-size:1.4rem;font-weight:700;margin-bottom:4px">Inventory</h4>
+                        <p style="font-size:.875rem;color:var(--tx3);margin:0">Manage your product stock levels and reorder alerts.</p>
+                     </div>
+                     <button class="boc btn px-3 py-2" style="font-size:.82rem"><i class="fa-solid fa-plus me-1"></i>Add Product</button>
+                  </div>
+                  <div class="row g-3">
+                     <div class="col-12">
+                        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:24px">
+                           <div class="d-flex flex-column gap-2">
+                              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.15);border-radius:10px;font-size:.84rem">
+                                 <span style="width:8px;height:8px;border-radius:50%;background:#f87171;flex-shrink:0"></span>
+                                 <span style="flex:1;color:var(--tx2)"><strong>Bread Loaf 700g</strong></span>
+                                 <span style="color:#f87171;font-weight:600">2 left</span>
+                                 <button class="bgrd btn px-3 py-1" style="font-size:.75rem">Reorder</button>
+                              </div>
+                              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.15);border-radius:10px;font-size:.84rem">
+                                 <span style="width:8px;height:8px;border-radius:50%;background:#f87171;flex-shrink:0"></span>
+                                 <span style="flex:1;color:var(--tx2)"><strong>Cooking Oil 2L</strong></span>
+                                 <span style="color:#f87171;font-weight:600">4 left</span>
+                                 <button class="bgrd btn px-3 py-1" style="font-size:.75rem">Reorder</button>
+                              </div>
+                              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:10px;font-size:.84rem">
+                                 <span style="width:8px;height:8px;border-radius:50%;background:#fbbf24;flex-shrink:0"></span>
+                                 <span style="flex:1;color:var(--tx2)"><strong>Sugar 2kg</strong></span>
+                                 <span style="color:#fbbf24;font-weight:600">11 left</span>
+                                 <button class="boc btn px-3 py-1" style="font-size:.75rem">Review</button>
+                              </div>
+                              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:10px;font-size:.84rem">
+                                 <span style="width:8px;height:8px;border-radius:50%;background:#34d399;flex-shrink:0"></span>
+                                 <span style="flex:1;color:var(--tx2)"><strong>Milk 500ml</strong></span>
+                                 <span style="color:#34d399;font-weight:600">48 left</span>
+                                 <button class="boc btn px-3 py-1" style="font-size:.75rem">Edit</button>
+                              </div>
+                              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:10px;font-size:.84rem">
+                                 <span style="width:8px;height:8px;border-radius:50%;background:#34d399;flex-shrink:0"></span>
+                                 <span style="flex:1;color:var(--tx2)"><strong>Eggs (tray 30)</strong></span>
+                                 <span style="color:#34d399;font-weight:600">23 left</span>
+                                 <button class="boc btn px-3 py-1" style="font-size:.75rem">Edit</button>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- -- ANALYTICS -- -->
+               <div class="db-section" id="sec-analytics">
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                     <div>
+                        <h4 style="font-size:1.4rem;font-weight:700;margin-bottom:4px">Sales Analytics</h4>
+                        <p style="font-size:.875rem;color:var(--tx3);margin:0">Performance reports across all your branches.</p>
+                     </div>
+                     <button class="bgrd btn px-3 py-2" style="font-size:.85rem"><i class="fa-solid fa-file-export me-2"></i>Export CSV</button>
+                  </div>
+                  <div class="row g-3">
+                     <div class="col-12">
+                        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:24px">
+                           <div class="d-flex align-items-center justify-content-between mb-3">
+                              <div style="font-weight:600"><i class="fa-solid fa-chart-area me-2" style="color:var(--pur)"></i>Revenue – Last 30 days</div>
+                           </div>
+                           <canvas id="analyticsChart" height="80"></canvas>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- -- CASHIERS (was AUTOMATIONS) -- -->
+               <div class="db-section" id="sec-automations">
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                     <div>
+                        <h4 style="font-size:1.4rem;font-weight:700;margin-bottom:4px">Cashiers</h4>
+                        <p style="font-size:.875rem;color:var(--tx3);margin:0">Manage cashier accounts and branch assignments.</p>
+                     </div>
+                     <button class="bgrd btn px-3 py-2" style="font-size:.85rem"><i class="fa-solid fa-plus me-2"></i>Add Cashier</button>
+                  </div>
+                  <div class="row g-3">
+                     <div class="col-12">
+                        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:24px">
+                           <p style="color:var(--tx3);font-size:.875rem">Manage your cashier users, reset PINs, and assign branches from the full admin dashboard.</p>
+                           <a href="https://admin.retailzw.co.zw/auth/shop/login" class="bgrd btn px-4 py-2" style="font-size:.875rem">Go to Admin Dashboard</a>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- -- BRANCHES (was INTEGRATIONS) -- -->
+               <div class="db-section" id="sec-integrations">
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                     <div>
+                        <h4 style="font-size:1.4rem;font-weight:700;margin-bottom:4px">Branches</h4>
+                        <p style="font-size:.875rem;color:var(--tx3);margin:0">Manage all your shop branches and their cashiers.</p>
+                     </div>
+                     <button class="bgrd btn px-3 py-2" style="font-size:.85rem"><i class="fa-solid fa-plus me-2"></i>Add Branch</button>
+                  </div>
+                  <div class="row g-3">
+                     <div class="col-md-6">
+                        <div class="gc p-4">
+                           <div class="d-flex align-items-center gap-3 mb-3">
+                              <div style="width:46px;height:46px;border-radius:14px;background:rgba(52,211,153,.12);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-store fa-xl" style="color:#34d399"></i></div>
+                              <div>
+                                 <div class="fw-semibold">Main Branch – Harare</div>
+                                 <div style="font-size:.75rem;color:var(--tx3)">3 cashiers &middot; Est. Jan 2024</div>
+                              </div>
+                              <span class="bst son ms-auto">Active</span>
+                           </div>
+                           <div style="font-size:.8rem;color:var(--tx2);margin-bottom:12px">$924 sales today &middot; 97 transactions</div>
+                           <button class="boc btn w-100 py-2" style="font-size:.82rem"><i class="fa-solid fa-gear me-1"></i>Manage</button>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="gc p-4">
+                           <div class="d-flex align-items-center gap-3 mb-3">
+                              <div style="width:46px;height:46px;border-radius:14px;background:rgba(139,92,246,.12);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-store fa-xl" style="color:#a78bfa"></i></div>
+                              <div>
+                                 <div class="fw-semibold">Branch 2 – Chitungwiza</div>
+                                 <div style="font-size:.75rem;color:var(--tx3)">2 cashiers &middot; Est. Mar 2024</div>
+                              </div>
+                              <span class="bst son ms-auto">Active</span>
+                           </div>
+                           <div style="font-size:.8rem;color:var(--tx2);margin-bottom:12px">$360 sales today &middot; 46 transactions</div>
+                           <button class="boc btn w-100 py-2" style="font-size:.82rem"><i class="fa-solid fa-gear me-1"></i>Manage</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- -- SETTINGS -- -->
+               <div class="db-section" id="sec-settings">
+                  <div class="mb-4">
+                     <h4 style="font-size:1.4rem;font-weight:700;margin-bottom:4px">Settings</h4>
+                     <p style="font-size:.875rem;color:var(--tx3);margin:0">Manage your shop account and preferences.</p>
+                  </div>
+                  <div class="row g-3">
+                     <div class="col-lg-6">
+                        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:24px;margin-bottom:16px">
+                           <div style="font-weight:600;font-size:1rem;margin-bottom:20px"><i class="fa-solid fa-store me-2" style="color:var(--pur)"></i>Shop Profile</div>
+                           <div class="d-flex align-items-center gap-3 mb-4">
+                              <div class="db-avatar" id="settingsAvatar" style="width:56px;height:56px;font-size:1.2rem;border-radius:16px">S</div>
+                              <div>
+                                 <div id="settingsName" style="font-weight:600;font-size:1rem">Shop Name</div>
+                                 <div id="settingsEmail" style="font-size:.82rem;color:var(--tx3)">admin@yourshop.co.zw</div>
+                                 <div style="margin-top:4px"><span class="bst son" style="font-size:.68rem">Business Plan</span></div>
+                              </div>
+                           </div>
+                           <div style="margin-bottom:12px"><label class="olbl">Shop Name</label><input class="oinp" type="text" id="profileName" placeholder="Your shop name"></div>
+                           <div style="margin-bottom:12px"><label class="olbl">Email</label><input class="oinp" type="email" id="profileEmail" placeholder="admin@yourshop.co.zw"></div>
+                           <button class="bgrd btn px-4 py-2" style="font-size:.875rem">Save Changes</button>
+                        </div>
+                     </div>
+                     <div class="col-lg-6">
+                        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:24px">
+                           <div style="font-weight:600;font-size:1rem;margin-bottom:20px"><i class="fa-solid fa-toggle-on me-2" style="color:var(--pur)"></i>Preferences</div>
+                           <div class="setting-row">
+                              <div>
+                                 <div style="font-size:.875rem;font-weight:500">Dark Mode</div>
+                                 <div style="font-size:.78rem;color:var(--tx3)">Toggle interface theme</div>
+                              </div>
+                              <label class="toggle-switch"><input type="checkbox" id="darkModeToggle" onchange="toggleTheme()"><span class="toggle-thumb"></span></label>
+                           </div>
+                           <div class="setting-row">
+                              <div>
+                                 <div style="font-size:.875rem;font-weight:500">Email Notifications</div>
+                                 <div style="font-size:.78rem;color:var(--tx3)">Daily sales digest to your email</div>
+                              </div>
+                              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-thumb"></span></label>
+                           </div>
+                           <div class="setting-row">
+                              <div>
+                                 <div style="font-size:.875rem;font-weight:500">Low Stock Alerts</div>
+                                 <div style="font-size:.78rem;color:var(--tx3)">Alert when stock drops below reorder level</div>
+                              </div>
+                              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-thumb"></span></label>
+                           </div>
+                           <div class="setting-row">
+                              <div>
+                                 <div style="font-size:.875rem;font-weight:500">Offline Mode</div>
+                                 <div style="font-size:.78rem;color:var(--tx3)">Continue selling without internet</div>
+                              </div>
+                              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-thumb"></span></label>
+                           </div>
+                           <div class="setting-row" style="border:none">
+                              <div>
+                                 <div style="font-size:.875rem;font-weight:500">Auto Receipt Print</div>
+                                 <div style="font-size:.78rem;color:var(--tx3)">Auto-print receipt after every sale</div>
+                              </div>
+                              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-thumb"></span></label>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- /db-content -->
+         </div>
+         <!-- /db-main -->
+      </div>
+      <!-- /dashboard -->
+      <!-- ======================== LEGAL MODAL ======================== -->
+      <div class="modal fade" id="legalModal" tabindex="-1" aria-labelledby="legalModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+          <div class="modal-content" style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;color:var(--tx)">
+            <div class="modal-header" style="border-bottom:1px solid var(--bd);padding:20px 28px">
+              <div class="d-flex align-items-center gap-2">
+                <div class="logo-i" style="width:32px;height:32px;font-size:.85rem"><i class="fa-solid fa-cash-register"></i></div>
+                <h5 class="modal-title fw-700 mb-0" id="legalModalLabel" style="font-size:1.1rem;font-weight:700">RetailZW &mdash; Legal Documents</h5>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:var(--close-filter,none)"></button>
+            </div>
+            <!-- Tabs -->
+            <div style="background:var(--bg2);border-bottom:1px solid var(--bd);padding:0 28px">
+              <div class="tab-switch" style="border:none;background:transparent;padding:14px 0;gap:8px;justify-content:flex-start">
+                <button class="tab-sw-btn on" id="lTab-terms" onclick="switchLegalTab('terms')">Terms &amp; Conditions</button>
+                <button class="tab-sw-btn" id="lTab-privacy" onclick="switchLegalTab('privacy')">Privacy Policy</button>
+                <button class="tab-sw-btn" id="lTab-appstore" onclick="switchLegalTab('appstore')">App Store &amp; Data Safety</button>
+              </div>
+            </div>
+            <div class="modal-body" style="padding:32px 28px;font-size:.9rem;line-height:1.75;color:var(--tx2)">
+
+              <!-- ===== TERMS & CONDITIONS ===== -->
+              <div id="lSec-terms">
+                <p style="font-size:.78rem;color:var(--tx3);margin-bottom:24px"><strong>Last updated:</strong> 1 June 2025 &nbsp;&middot;&nbsp; <strong>Effective:</strong> 1 June 2025</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:0 0 8px">1. Acceptance of Terms</h6>
+                <p>By creating a RetailZW account, accessing the RetailZW web platform at <strong>retailzw.co.zw</strong>, or installing and using the RetailZW mobile application (collectively, the &ldquo;Service&rdquo;), you (&ldquo;Customer&rdquo;, &ldquo;you&rdquo; or &ldquo;your&rdquo;) agree to be bound by these Terms and Conditions (&ldquo;Terms&rdquo;). If you do not agree to these Terms, do not use the Service. These Terms constitute a legally binding agreement between you and Charnodia Technologies (Pvt) Ltd, a company incorporated in Zimbabwe (&ldquo;RetailZW&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo; or &ldquo;our&rdquo;).</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">2. Description of Service</h6>
+                <p>RetailZW provides a cloud-hosted, multi-tenant point-of-sale (POS) software platform, including a web administration dashboard and an Android mobile cashier application. The Service enables retail businesses to process sales transactions, manage inventory, manage staff users, generate reports, and perform related retail management activities. The Service is provided on a Software-as-a-Service (SaaS) subscription basis.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">3. Account Registration and Shop Setup</h6>
+                <p>3.1 To access the Service you must register a shop account. You agree to provide accurate, complete, and current information during registration and to keep your account information updated at all times.</p>
+                <p>3.2 You are responsible for maintaining the confidentiality of your account credentials including your tenant code, administrator username, administrator password, and all cashier PINs or passwords created under your account.</p>
+                <p>3.3 You are fully responsible for all activity that occurs under your account, whether performed by you, your employees, your cashiers, or any other person to whom you have granted access.</p>
+                <p>3.4 You must notify RetailZW immediately at <strong>support@retailzw.co.zw</strong> if you become aware of any unauthorised use of your account or any other breach of security.</p>
+                <p>3.5 RetailZW reserves the right to refuse registration, suspend, or terminate any account at its sole discretion.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">4. Subscription Plans and Billing</h6>
+                <p>4.1 <strong>Plans.</strong> The Service is available under the following subscription plans, with limits as described on the pricing page: Starter, Growth, and Enterprise. Plan features, user limits, branch limits, and product limits are described on our pricing page and may be updated from time to time with reasonable notice.</p>
+                <p>4.2 <strong>Fees.</strong> Subscription fees are charged monthly in advance. Fees are quoted in United States Dollars (USD) or Zimbabwe Gold (ZWG) as selected at signup. RetailZW reserves the right to adjust pricing with at least 30 days&rsquo; written notice to the registered email address on your account.</p>
+                <p>4.3 <strong>Free Trial.</strong> New accounts receive a 14-day free trial period. No credit card is required during the trial. At the end of the trial, you must choose a paid plan to continue using the Service. Data created during the trial is retained for 30 days after trial expiry before deletion.</p>
+                <p>4.4 <strong>Payment.</strong> You authorise RetailZW to charge your selected payment method on a recurring monthly basis. Failure to pay within 7 days of a due invoice will result in your account being suspended. Accounts suspended for non-payment for more than 30 days may be terminated and data deleted with 7 days&rsquo; final notice.</p>
+                <p>4.5 <strong>Refunds.</strong> Subscription fees are non-refundable except where required by applicable Zimbabwean law. If you believe you have been incorrectly charged, contact <strong>billing@retailzw.co.zw</strong> within 14 days of the charge.</p>
+                <p>4.6 <strong>Upgrades and Downgrades.</strong> You may upgrade your plan at any time; the upgrade takes effect immediately and is prorated for the remainder of the billing period. Downgrades take effect at the start of the next billing period.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">5. Acceptable Use Policy</h6>
+                <p>You agree to use the Service only for lawful business purposes and in accordance with these Terms. You must not:</p>
+                <p style="padding-left:16px">(a) Use the Service to process transactions for illegal goods or services;<br>
+                (b) Attempt to gain unauthorised access to any part of the Service, server infrastructure, or database;<br>
+                (c) Reverse-engineer, decompile, disassemble, or create derivative works from any part of the Service;<br>
+                (d) Use automated scripts, bots, or scrapers to extract data from the Service;<br>
+                (e) Transmit viruses, malware, or any other malicious code through the Service;<br>
+                (f) Impersonate any person or entity or misrepresent your affiliation with any person or entity;<br>
+                (g) Use the Service to store, process, or transmit cardholder data (PAN, CVV, expiry dates) in violation of PCI-DSS standards;<br>
+                (h) Resell, sublicense, or otherwise make the Service available to third parties without prior written consent from RetailZW.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">6. Customer Data</h6>
+                <p>6.1 You retain all ownership of the business data you enter into the Service, including product catalogues, transaction records, customer records, and financial data (&ldquo;Customer Data&rdquo;).</p>
+                <p>6.2 You grant RetailZW a limited, non-exclusive licence to store, process, and transmit Customer Data solely to the extent necessary to provide the Service to you.</p>
+                <p>6.3 RetailZW will not sell, rent, or share your Customer Data with third parties for commercial purposes except as required to provide the Service (e.g., email delivery providers) or as required by law.</p>
+                <p>6.4 You are responsible for ensuring that your Customer Data, and your use of the Service in connection with it, complies with all applicable laws including the Zimbabwe Data Protection Act [Chapter 11:12].</p>
+                <p>6.5 Upon termination of your account, RetailZW will retain your Customer Data for 30 days during which you may request an export. After this period, your data will be permanently deleted from our systems.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">7. Offline Mode and Data Sync</h6>
+                <p>The RetailZW mobile application includes an offline mode that stores transaction data locally on the device when an internet connection is unavailable. You acknowledge and accept that: (a) locally stored data is the responsibility of the device operator until it is successfully synced to the RetailZW servers; (b) data stored only on-device may be lost in the event of device failure, loss, theft, or factory reset; (c) RetailZW accepts no liability for loss of data that has not been synced to the server. It is your responsibility to ensure devices are regularly connected to sync pending data.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">8. Service Availability and Uptime</h6>
+                <p>RetailZW targets 99.9% server uptime measured monthly, excluding scheduled maintenance windows. Scheduled maintenance will be communicated via email or in-app notification at least 24 hours in advance where possible. RetailZW does not guarantee uninterrupted access to the web dashboard and makes no warranty regarding connectivity between the mobile application and the server, which is subject to the availability of your internet service provider. The offline mode of the mobile application is designed to allow continued selling during outages.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">9. Intellectual Property</h6>
+                <p>9.1 The Service, including its software, design, trademarks, logos, user interface, and documentation, is the exclusive property of Charnodia Technologies (Pvt) Ltd and is protected by Zimbabwean and international intellectual property laws.</p>
+                <p>9.2 These Terms grant you a limited, non-exclusive, non-transferable, revocable licence to access and use the Service solely for your internal business purposes.</p>
+                <p>9.3 Nothing in these Terms transfers any intellectual property rights to you. You may not copy, modify, create derivative works from, or use the RetailZW name, logo, or branding without prior written consent.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">10. Disclaimer of Warranties</h6>
+                <p>THE SERVICE IS PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. RETAILZW DOES NOT WARRANT THAT THE SERVICE WILL BE ERROR-FREE, UNINTERRUPTED, SECURE, OR FREE FROM VIRUSES OR OTHER HARMFUL COMPONENTS. YOUR USE OF THE SERVICE IS ENTIRELY AT YOUR OWN RISK.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">11. Limitation of Liability</h6>
+                <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, RETAILZW SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, LOSS OF DATA, BUSINESS INTERRUPTION, OR LOSS OF GOODWILL, ARISING FROM OR RELATING TO YOUR USE OF OR INABILITY TO USE THE SERVICE, EVEN IF RETAILZW HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN NO EVENT SHALL RETAILZW&rsquo;S TOTAL AGGREGATE LIABILITY TO YOU EXCEED THE AMOUNT YOU PAID TO RETAILZW IN THE THREE (3) MONTHS IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO THE CLAIM.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">12. Indemnification</h6>
+                <p>You agree to indemnify, defend, and hold harmless Charnodia Technologies (Pvt) Ltd and its officers, directors, employees, and agents from any claims, liabilities, damages, costs, and expenses (including reasonable legal fees) arising from: (a) your use of the Service; (b) your violation of these Terms; (c) your violation of any applicable law; or (d) any transaction you process through the Service.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">13. Termination</h6>
+                <p>13.1 <strong>By You.</strong> You may cancel your subscription at any time by contacting <strong>support@retailzw.co.zw</strong>. Cancellation takes effect at the end of the current billing period. No refund is given for unused time within the billing period.</p>
+                <p>13.2 <strong>By RetailZW.</strong> RetailZW may suspend or terminate your account immediately and without notice if: (a) you breach any material term of these Terms; (b) you engage in fraudulent, abusive, or illegal activity; (c) required to do so by law; or (d) RetailZW discontinues the Service.</p>
+                <p>13.3 <strong>Effect of Termination.</strong> Upon termination, your licence to use the Service immediately ends. You may request a data export within 30 days of termination after which all Customer Data is permanently deleted.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">14. Changes to Terms</h6>
+                <p>RetailZW may modify these Terms at any time. We will provide at least 14 days&rsquo; notice of material changes via email to your registered address or via a prominent notice within the Service. Your continued use of the Service after the effective date of changes constitutes acceptance of the updated Terms.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">15. Governing Law and Dispute Resolution</h6>
+                <p>These Terms are governed by and construed in accordance with the laws of the Republic of Zimbabwe. Any dispute arising under these Terms shall first be referred to mediation in good faith. If mediation fails, the dispute shall be submitted to the exclusive jurisdiction of the courts of Zimbabwe located in Harare.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">16. Contact</h6>
+                <p>For questions regarding these Terms, contact: <strong>Charnodia Technologies (Pvt) Ltd</strong> &nbsp;&middot;&nbsp; Email: <a href="mailto:legal@retailzw.co.zw" style="color:var(--pur)">legal@retailzw.co.zw</a> &nbsp;&middot;&nbsp; Website: <a href="https://retailzw.co.zw" style="color:var(--pur)">retailzw.co.zw</a></p>
+              </div>
+
+              <!-- ===== PRIVACY POLICY ===== -->
+              <div id="lSec-privacy" style="display:none">
+                <p style="font-size:.78rem;color:var(--tx3);margin-bottom:24px"><strong>Last updated:</strong> 1 June 2025 &nbsp;&middot;&nbsp; <strong>Effective:</strong> 1 June 2025</p>
+
+                <p>Charnodia Technologies (Pvt) Ltd (&ldquo;RetailZW&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) is committed to protecting the privacy of our customers and the end-users of the RetailZW platform. This Privacy Policy explains what personal data we collect, how we use it, how we protect it, and your rights in relation to it. This policy applies to the RetailZW website at <strong>retailzw.co.zw</strong>, the RetailZW web administration dashboard, and the RetailZW Android mobile application.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">1. Data Controller</h6>
+                <p>The data controller responsible for your personal data is:<br>
+                <strong>Charnodia Technologies (Pvt) Ltd</strong><br>
+                Zimbabwe<br>
+                Email: <a href="mailto:privacy@retailzw.co.zw" style="color:var(--pur)">privacy@retailzw.co.zw</a></p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">2. Personal Data We Collect</h6>
+                <p><strong>2.1 Account and Registration Data.</strong> When you create a RetailZW shop account we collect: your full name, business name (company name), email address, phone number, physical address, city, country, business registration number, VAT number (if applicable), and subscription plan details.</p>
+                <p><strong>2.2 Cashier and Staff User Data.</strong> When you create cashier or staff accounts within the Service, we store: first name, last name, username, encrypted password hash, assigned branch, and user role.</p>
+                <p><strong>2.3 Transaction Data.</strong> All sales transactions processed through the Service are stored, including: items sold, quantities, prices, currencies (USD/ZWG), payment method, change given, receipt number, date and time, and the cashier who processed the sale.</p>
+                <p><strong>2.4 Device and Technical Data.</strong> When you use the mobile application or web dashboard we may automatically collect: device type and model, operating system version, app version, IP address, approximate location (country/city level only, derived from IP address), crash reports, and usage analytics.</p>
+                <p><strong>2.5 Communication Data.</strong> If you contact us for support, we retain records of those communications including email correspondence and support ticket content.</p>
+                <p><strong>2.6 Data We Do Not Collect.</strong> We do not collect, store, or process: payment card numbers (PAN), CVV codes, bank account credentials, biometric data, or precise GPS location data. The application does not access your camera, microphone, contacts, or call log.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">3. How We Use Your Personal Data</h6>
+                <p>We use the personal data we collect for the following purposes:<br>
+                (a) <strong>Service Delivery</strong> &mdash; to provide, maintain, and operate the RetailZW platform and mobile application;<br>
+                (b) <strong>Account Management</strong> &mdash; to manage your subscription, process billing, and send invoices;<br>
+                (c) <strong>Communications</strong> &mdash; to send service-related emails such as account activation, password reset, subscription confirmations, billing notices, and system announcements;<br>
+                (d) <strong>Customer Support</strong> &mdash; to respond to your support requests and improve the Service;<br>
+                (e) <strong>Security</strong> &mdash; to detect, prevent, and investigate fraud, abuse, or unauthorised access;<br>
+                (f) <strong>Legal Compliance</strong> &mdash; to comply with applicable legal obligations under Zimbabwean law;<br>
+                (g) <strong>Service Improvement</strong> &mdash; to analyse aggregated, anonymised usage patterns to improve the platform. We do not use individual personal data for marketing profiling or behavioural advertising.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">4. Sharing of Personal Data</h6>
+                <p>We do not sell, rent, or trade your personal data. We may share your data with third parties only in the following limited circumstances:</p>
+                <p>(a) <strong>Email Service Provider</strong> &mdash; We use our mail server at mail.retailzw.co.zw to send transactional emails. Email addresses and message content necessary for delivery are processed through this server;<br>
+                (b) <strong>Cloud Infrastructure</strong> &mdash; The Service is hosted on a dedicated server. Server operators may have access to infrastructure-level data in accordance with their own privacy policies;<br>
+                (c) <strong>Legal Obligations</strong> &mdash; We may disclose personal data if required by Zimbabwean law, court order, or lawful government request;<br>
+                (d) <strong>Business Transfers</strong> &mdash; In the event of a merger, acquisition, or sale of all or part of RetailZW&rsquo;s business, your data may be transferred to the acquiring entity. You will be notified in advance of any such transfer.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">5. Data Storage and Security</h6>
+                <p>5.1 Your data is stored on servers located in Europe (Hetzner Cloud). RetailZW implements industry-standard security measures including: bcrypt password hashing for all user passwords, HTTPS/TLS encryption for all data in transit between the app/browser and the server, JWT-based authentication tokens with expiry, and server-level firewall protection.</p>
+                <p>5.2 Offline data stored locally on Android devices is stored in a SQLite database on-device and is subject to the security features of the Android operating system and device. You are responsible for the physical security of devices used as POS terminals.</p>
+                <p>5.3 No method of electronic storage or transmission over the internet is 100% secure. While we use commercially reasonable measures to protect your data, we cannot guarantee absolute security.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">6. Data Retention</h6>
+                <p>We retain personal data for as long as your account is active. Upon account termination or cancellation: (a) your data is retained for a 30-day grace period during which you may export it; (b) after 30 days, all Customer Data is permanently and irreversibly deleted from our servers. We may retain anonymised, aggregated data (containing no personal identifiers) indefinitely for service improvement purposes. We may also retain records required by applicable law for the legally mandated retention period.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">7. Cookies and Tracking</h6>
+                <p>The RetailZW web dashboard uses session cookies strictly necessary for authentication and maintaining your logged-in state. We do not use advertising cookies, third-party tracking cookies, or analytics cookies that identify individual users. The RetailZW Android application does not use cookies. We do not use Google Analytics, Facebook Pixel, or similar third-party tracking technologies.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">8. Your Rights</h6>
+                <p>Subject to applicable Zimbabwean law, you have the following rights regarding your personal data:</p>
+                <p>(a) <strong>Right of Access</strong> &mdash; You may request a copy of the personal data we hold about you;<br>
+                (b) <strong>Right to Rectification</strong> &mdash; You may request correction of inaccurate or incomplete personal data;<br>
+                (c) <strong>Right to Erasure</strong> &mdash; You may request deletion of your personal data (subject to legal retention obligations);<br>
+                (d) <strong>Right to Data Portability</strong> &mdash; You may request an export of your Customer Data in a machine-readable format (CSV/JSON);<br>
+                (e) <strong>Right to Restrict Processing</strong> &mdash; You may request that we restrict processing of your data in certain circumstances;<br>
+                (f) <strong>Right to Object</strong> &mdash; You may object to processing of your data where we are relying on legitimate interests as the legal basis.</p>
+                <p>To exercise any of these rights, contact us at <a href="mailto:privacy@retailzw.co.zw" style="color:var(--pur)">privacy@retailzw.co.zw</a>. We will respond within 30 days.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">9. Children&rsquo;s Privacy</h6>
+                <p>The RetailZW Service is intended solely for business use by adults aged 18 and over. We do not knowingly collect personal data from children under the age of 18. If you believe a child has provided personal data to us, please contact us immediately at <a href="mailto:privacy@retailzw.co.zw" style="color:var(--pur)">privacy@retailzw.co.zw</a> and we will delete the data promptly.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">10. Links to Third-Party Sites</h6>
+                <p>The Service may contain links to third-party websites. This Privacy Policy does not apply to those websites. We encourage you to review the privacy policies of any third-party sites you visit.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">11. Changes to This Privacy Policy</h6>
+                <p>We may update this Privacy Policy from time to time to reflect changes in our practices or applicable law. We will notify you of material changes via email to your registered address at least 14 days before the changes take effect. The updated policy will always be available at <strong>retailzw.co.zw</strong>.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:20px 0 8px">12. Contact Us</h6>
+                <p>For any privacy-related enquiries, to exercise your rights, or to report a data protection concern, please contact:<br>
+                <strong>Charnodia Technologies (Pvt) Ltd &mdash; Privacy Officer</strong><br>
+                Email: <a href="mailto:privacy@retailzw.co.zw" style="color:var(--pur)">privacy@retailzw.co.zw</a><br>
+                Website: <a href="https://retailzw.co.zw" style="color:var(--pur)">retailzw.co.zw</a></p>
+              </div>
+
+              <!-- ===== APP STORE & DATA SAFETY ===== -->
+              <div id="lSec-appstore" style="display:none">
+                <p style="font-size:.78rem;color:var(--tx3);margin-bottom:24px"><strong>Last updated:</strong> 1 June 2025 &nbsp;&middot;&nbsp; This section provides the disclosures required by the Google Play Store Data Safety form and the Apple App Store App Privacy Details section.</p>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:0 0 8px">PART A &mdash; Google Play Store: Data Safety Disclosure</h6>
+                <p>The following is the complete data safety disclosure for the <strong>RetailZW</strong> Android application as submitted to and required by Google Play Store.</p>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">A1. Is data collected or shared?</h6>
+                <p><strong>Data is collected:</strong> Yes &mdash; The app collects data as described below.<br>
+                <strong>Data is shared:</strong> No &mdash; User data is not shared with third parties for advertising, analytics, or any other purpose outside of core service delivery to the user&rsquo;s own account.</p>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">A2. Data Types Collected and Their Purposes</h6>
+                <div style="overflow-x:auto">
+                  <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+                    <thead>
+                      <tr style="background:var(--bg3)">
+                        <th style="padding:10px 12px;border:1px solid var(--bd);color:var(--tx);text-align:left">Data Type</th>
+                        <th style="padding:10px 12px;border:1px solid var(--bd);color:var(--tx);text-align:left">Data Collected</th>
+                        <th style="padding:10px 12px;border:1px solid var(--bd);color:var(--tx);text-align:left">Purpose</th>
+                        <th style="padding:10px 12px;border:1px solid var(--bd);color:var(--tx);text-align:left">Shared with 3rd Parties</th>
+                        <th style="padding:10px 12px;border:1px solid var(--bd);color:var(--tx);text-align:left">Optional</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Personal Info &mdash; Name</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">First name, last name of cashier / admin</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Account management, receipt identification</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No (required)</td>
+                      </tr>
+                      <tr style="background:var(--bg3)">
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Personal Info &mdash; Email</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Email address of shop owner / admin</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Account authentication, billing, service emails</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No (required)</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Personal Info &mdash; Phone</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Phone number of shop owner</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Account verification, support contact</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No (required)</td>
+                      </tr>
+                      <tr style="background:var(--bg3)">
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Financial Info &mdash; Purchase history</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Sales transactions processed in the app (items, amounts, currency)</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Core app functionality &mdash; POS service delivery</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No (core function)</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">App Activity &mdash; Crash logs</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">App crash reports and error logs</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">App improvement and bug fixing</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No</td>
+                      </tr>
+                      <tr style="background:var(--bg3)">
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Device &amp; other IDs</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Device OS version, app version</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">Compatibility and support</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No</td>
+                        <td style="padding:9px 12px;border:1px solid var(--bd);color:var(--tx2)">No</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">A3. Data NOT Collected</h6>
+                <p>The RetailZW app does <strong>not</strong> collect or access the following data types:<br>
+                &bull; Precise or coarse location / GPS data<br>
+                &bull; Contacts or call logs<br>
+                &bull; Camera or microphone input<br>
+                &bull; Photos or media files<br>
+                &bull; Payment card numbers, CVV, or bank credentials<br>
+                &bull; Biometric data<br>
+                &bull; Browsing history or web history<br>
+                &bull; SMS or call data<br>
+                &bull; Calendar or reminders</p>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">A4. Permissions Required</h6>
+                <p>The RetailZW Android app requests the following system permissions:</p>
+                <p>
+                &bull; <strong>INTERNET</strong> &mdash; Required to sync sales data, authenticate users, and communicate with the RetailZW server.<br>
+                &bull; <strong>BLUETOOTH / BLUETOOTH_CONNECT / BLUETOOTH_SCAN</strong> &mdash; Required to discover and connect to Bluetooth thermal receipt printers. The app does not pair with or communicate with any device other than a receipt printer.<br>
+                &bull; <strong>BLUETOOTH_ADMIN</strong> &mdash; Required on older Android versions to manage Bluetooth connections to printers.<br>
+                &bull; <strong>ACCESS_FINE_LOCATION / ACCESS_COARSE_LOCATION</strong> &mdash; Required by the Android operating system as a prerequisite for Bluetooth device scanning on Android 6&ndash;11. The app does <strong>not</strong> use, store, or transmit the user&rsquo;s location. This permission is used solely to satisfy the Android OS requirement for Bluetooth scanning and will be removed when Android&rsquo;s Bluetooth API no longer requires it.<br>
+                &bull; <strong>RECEIVE_BOOT_COMPLETED</strong> &mdash; Optional; used to restore the app&rsquo;s shift state after device restart.
+                </p>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">A5. Data Security Practices</h6>
+                <p>&bull; All data is transmitted over encrypted HTTPS/TLS connections.<br>
+                &bull; User passwords are never stored or transmitted in plain text; bcrypt hashing is used.<br>
+                &bull; Authentication uses short-lived JWT tokens.<br>
+                &bull; Offline/local data is stored in a private SQLite database inaccessible to other apps (Android&rsquo;s app sandbox).<br>
+                &bull; No sensitive financial data (card numbers, bank details) is ever processed or stored.</p>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">A6. User Data Deletion</h6>
+                <p>Users may request deletion of all their data by contacting <a href="mailto:privacy@retailzw.co.zw" style="color:var(--pur)">privacy@retailzw.co.zw</a> or by cancelling their account. Upon account cancellation, all server-side Customer Data is permanently deleted within 30 days. To delete locally stored offline data from a device, the user may clear the app&rsquo;s storage via Android Settings &gt; Apps &gt; RetailZW &gt; Storage &gt; Clear Data, or by uninstalling the application.</p>
+
+                <div style="height:1px;background:var(--bd);margin:28px 0"></div>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:0 0 8px">PART B &mdash; Apple App Store: App Privacy Details</h6>
+                <p>The following disclosures are provided for Apple App Store review. The RetailZW app is an Android application but if submitted to Apple platforms, the following disclosures apply.</p>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">B1. Privacy Nutrition Label</h6>
+                <p><strong>Data Used to Track You:</strong> None &mdash; RetailZW does not track users across apps or websites owned by other companies, and does not use data for targeted advertising.</p>
+                <p><strong>Data Linked to You:</strong><br>
+                &bull; Contact Info: Name, email address, phone number (linked to your account)<br>
+                &bull; Financial Info: Transaction records / purchase history (linked to your shop account)<br>
+                &bull; Identifiers: User ID / account ID</p>
+                <p><strong>Data Not Linked to You:</strong><br>
+                &bull; Diagnostics: Crash data and performance data (anonymised)</p>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">B2. App Tracking Transparency (ATT)</h6>
+                <p>RetailZW does not engage in cross-app tracking. The app does not use Apple&rsquo;s Advertising Identifier (IDFA) and does not request App Tracking Transparency permission. No data is shared with advertising networks, data brokers, or measurement companies.</p>
+
+                <h6 style="font-size:.95rem;font-weight:700;color:var(--tx);margin:18px 0 8px">B3. Privacy Policy URL</h6>
+                <p>Privacy Policy: <a href="https://retailzw.co.zw" style="color:var(--pur)">https://retailzw.co.zw</a> (click &ldquo;Privacy&rdquo; in footer)<br>
+                Privacy Contact: <a href="mailto:privacy@retailzw.co.zw" style="color:var(--pur)">privacy@retailzw.co.zw</a></p>
+
+                <div style="height:1px;background:var(--bd);margin:28px 0"></div>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:0 0 8px">PART C &mdash; COPPA and Children&rsquo;s Online Privacy</h6>
+                <p>The RetailZW application is rated for users aged <strong>18 and over</strong>. It is a business-to-business (B2B) tool used by retail business operators. The app is not directed at children under 13 (US) or under 18 (Zimbabwe) and does not knowingly collect personal data from minors. The app store age rating should be set to: <strong>Google Play: Everyone (business tool, no restricted content)</strong> / <strong>Apple App Store: 4+ (no restricted content, business utility)</strong>. Content ratings should reflect a general business productivity application.</p>
+
+                <div style="height:1px;background:var(--bd);margin:28px 0"></div>
+
+                <h6 style="font-size:1rem;font-weight:700;color:var(--tx);margin:0 0 8px">PART D &mdash; Contact for App Store Review Teams</h6>
+                <p>If a Play Store or App Store review team requires further information about RetailZW&rsquo;s data practices, permissions, or legal documentation, please contact:<br><br>
+                <strong>Charnodia Technologies (Pvt) Ltd</strong><br>
+                Email: <a href="mailto:privacy@retailzw.co.zw" style="color:var(--pur)">privacy@retailzw.co.zw</a><br>
+                Support: <a href="mailto:support@retailzw.co.zw" style="color:var(--pur)">support@retailzw.co.zw</a><br>
+                Website: <a href="https://retailzw.co.zw" style="color:var(--pur)">https://retailzw.co.zw</a><br>
+                Privacy Policy URL: <a href="https://retailzw.co.zw" style="color:var(--pur)">https://retailzw.co.zw</a> &rarr; footer &rarr; Privacy</p>
+              </div>
+
+            </div>
+            <div class="modal-footer" style="border-top:1px solid var(--bd);padding:16px 28px;justify-content:space-between;flex-wrap:wrap;gap:10px">
+              <p style="font-size:.78rem;color:var(--tx3);margin:0">&copy; 2025 Charnodia Technologies (Pvt) Ltd &mdash; All rights reserved &mdash; <a href="mailto:legal@retailzw.co.zw" style="color:var(--pur)">legal@retailzw.co.zw</a></p>
+              <button type="button" class="bgrd btn px-4 py-2" data-bs-dismiss="modal" style="font-size:.875rem">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        /* Legal modal tab switcher */
+        function switchLegalTab(tab) {
+          ['terms','privacy','appstore'].forEach(function(t) {
+            document.getElementById('lSec-' + t).style.display = (t === tab) ? 'block' : 'none';
+            document.getElementById('lTab-' + t).classList.toggle('on', t === tab);
+          });
+        }
+        /* Open modal and jump to a tab */
+        function openLegal(tab) {
+          switchLegalTab(tab || 'terms');
+          var m = new bootstrap.Modal(document.getElementById('legalModal'));
+          m.show();
+        }
+      </script>
+
+      <!-- ======================== SCRIPTS ======================== -->
+      <!-- jQuery -->
+      <script src="js/jquery-3.7.1.min.js"></script>
+      <!-- Bootstrap 5 -->
+      <script src="js/bootstrap.bundle.min.js"></script>
+      <!-- AOS -->
+      <script src="js/aos.js"></script>
+      <!-- Swiper -->
+      <script src="js/chart.umd.min.js"></script>
+      <!-- CounterUp -->
+      <script src="js/jquery.magnific-popup.min.js"></script>
+      <!-- Main js -->
+      <script src="js/main.js"></script>
+   </body>
+</html>

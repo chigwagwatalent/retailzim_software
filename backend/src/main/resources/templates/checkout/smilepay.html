@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Secure payment | RetailZW</title>
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=16)}">
+  <link rel="stylesheet" th:href="@{/css/billing.css(v=1)}">
+  <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+</head>
+<body class="billing-checkout-shell">
+<main class="billing-checkout" th:attr="data-status-url=@{/checkout/smilepay/{ref}/status(ref=${checkout.orderReference})}">
+  <header class="checkout-brand">
+    <div class="brand"><span class="brand-mark"><span></span></span><span>RetailZW</span></div>
+    <span class="secure-chip"><i class="fa-solid fa-lock"></i> Secure checkout</span>
+  </header>
+
+  <div class="checkout-layout">
+    <section class="checkout-payment-panel">
+      <div class="checkout-heading">
+        <p>Smile &amp; Pay Express</p>
+        <h1>Choose how to pay</h1>
+        <span>Fast approval without leaving RetailZW.</span>
+      </div>
+
+      <div class="alert" th:if="${message}" th:text="${message}"></div>
+
+      <section class="checkout-recheck" th:if="${checkout.status.name() == 'FAILED'}">
+        <div>
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span><strong>Payment not confirmed</strong><small>If the request appeared on your phone, check its status before trying again.</small></span>
+        </div>
+        <a class="btn btn-light"
+           th:href="@{/checkout/smilepay/{ref}/recheck(ref=${checkout.orderReference})}">
+          <i class="fa-solid fa-rotate"></i>Check payment status
+        </a>
+      </section>
+
+      <section class="payment-complete" th:if="${checkout.status.name() == 'PAID'}">
+        <i class="fa-solid fa-circle-check"></i>
+        <h2>Payment confirmed</h2>
+        <p>Your subscription is active.</p>
+        <a class="btn btn-primary" th:href="@{/auth/shop/login}">Continue to RetailZW</a>
+      </section>
+
+      <section class="payment-pending" th:if="${checkout.status.name() == 'PROCESSING'}" data-payment-pending>
+        <div class="payment-loader"><i></i><span></span></div>
+        <h2>Confirming payment</h2>
+        <p th:text="${checkout.providerStatus ?: 'Approve the request, then keep this page open.'}">Approve the payment.</p>
+        <small>RetailZW will activate automatically after verification.</small>
+      </section>
+
+      <form class="express-payment-form"
+            th:if="${checkout.status.name() != 'PAID' and checkout.status.name() != 'PROCESSING' and checkout.status.name() != 'AWAITING_OTP'}"
+            method="post"
+            th:action="@{/checkout/smilepay/{ref}/initiate(ref=${checkout.orderReference})}"
+            data-express-payment-form>
+        <div class="payment-method-grid">
+          <label class="payment-method-card" th:each="method, iter : ${paymentMethods}">
+            <input type="radio" name="paymentMethod" th:value="${method}" th:checked="${iter.index == 0}" required>
+            <span class="payment-logo">
+              <img th:src="@{'/img/payments/' + ${#strings.toLowerCase(method.name())} + '.svg'}"
+                   th:alt="${method.label + ' logo'}">
+            </span>
+            <span>
+              <strong th:text="${method.label}">Payment</strong>
+              <small th:text="${method.name() == 'CARD' ? 'Secure 3DS card payment' : (method.otpRequired ? 'Mobile number and OTP' : (method.mobileRequired ? 'Approval on your phone' : 'Approve in your app'))}">Express payment</small>
+            </span>
+            <i class="fa-solid fa-circle-check"></i>
+          </label>
+        </div>
+
+        <div class="payment-fields" data-mobile-fields>
+          <label>Mobile number
+            <span class="checkout-input">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <input name="mobile" inputmode="tel" autocomplete="tel" placeholder="077 123 4567">
+            </span>
+          </label>
+        </div>
+
+        <div class="payment-fields card-fields" data-card-fields hidden>
+          <div class="form-grid">
+            <label>First name<input name="firstName" autocomplete="cc-given-name"></label>
+            <label>Last name<input name="lastName" autocomplete="cc-family-name"></label>
+            <label class="card-number-field">Card number
+              <span class="checkout-input">
+                <i class="fa-regular fa-credit-card"></i>
+                <input name="pan" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000">
+              </span>
+            </label>
+            <label>Expiry month<input name="expMonth" inputmode="numeric" autocomplete="cc-exp-month" maxlength="2" placeholder="MM"></label>
+            <label>Expiry year<input name="expYear" inputmode="numeric" autocomplete="cc-exp-year" maxlength="4" placeholder="YYYY"></label>
+            <label>Security code<input name="securityCode" type="password" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="CVV"></label>
+          </div>
+          <p class="card-security"><i class="fa-solid fa-shield-halved"></i> Card details go directly to Smile &amp; Pay and are never stored by RetailZW.</p>
+        </div>
+
+        <button class="btn btn-primary checkout-pay-button" type="submit">
+          <span th:text="${'Pay USD ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">Pay USD 0.00</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <form class="otp-form"
+            th:if="${checkout.status.name() == 'AWAITING_OTP'}"
+            method="post"
+            th:action="@{/checkout/smilepay/{ref}/confirm-otp(ref=${checkout.orderReference})}">
+        <div class="otp-icon"><i class="fa-solid fa-message"></i></div>
+        <div>
+          <p>Verification code</p>
+          <h2 th:text="${checkout.paymentMethod.label + ' OTP'}">Payment OTP</h2>
+          <span th:text="${'Sent to ' + checkout.customerMobile}">Sent to your phone</span>
+        </div>
+        <input name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="000000" required autofocus>
+        <button class="btn btn-primary" type="submit">Confirm payment</button>
+      </form>
+    </section>
+
+    <aside class="checkout-summary">
+      <div>
+        <span class="summary-label">Subscription</span>
+        <h2 th:text="${plan.name}">Plan</h2>
+        <p th:text="${plan.description}">Retail package</p>
+      </div>
+      <dl>
+        <div><dt>Shop</dt><dd th:text="${tenant.companyName}">Shop</dd></div>
+        <div><dt>Billing</dt><dd th:text="${plan.billingCycle}">MONTHLY</dd></div>
+        <div><dt>Reference</dt><dd th:text="${checkout.orderReference}">RZW</dd></div>
+      </dl>
+      <div class="checkout-total">
+        <span>Total due</span>
+        <strong th:text="${'USD ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">USD 0.00</strong>
+      </div>
+      <div class="checkout-trust">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span><strong>Protected payment</strong><small>Processed by Smile &amp; Pay, ZB Bank</small></span>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script>
+(() => {
+  const form = document.querySelector('[data-express-payment-form]');
+  const root = document.querySelector('.billing-checkout');
+  const pending = document.querySelector('[data-payment-pending]');
+  if (form) {
+    const mobileFields = form.querySelector('[data-mobile-fields]');
+    const cardFields = form.querySelector('[data-card-fields]');
+    const mobileInput = form.querySelector('input[name="mobile"]');
+    const radios = [...form.querySelectorAll('input[name="paymentMethod"]')];
+    const update = () => {
+      const method = radios.find(radio => radio.checked)?.value;
+      const card = method === 'CARD';
+      const mobile = ['ECOCASH', 'SMILECASH', 'OMARI', 'ONEMONEY'].includes(method);
+      cardFields.hidden = !card;
+      mobileFields.hidden = !mobile;
+      mobileInput.required = mobile;
+      cardFields.querySelectorAll('input').forEach(input => input.required = card);
+    };
+    radios.forEach(radio => radio.addEventListener('change', update));
+    const pan = form.querySelector('input[name="pan"]');
+    pan?.addEventListener('input', () => {
+      pan.value = pan.value.replace(/\D/g, '').slice(0, 19).replace(/(.{4})/g, '$1 ').trim();
+    });
+    form.addEventListener('submit', () => {
+      const button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      button.querySelector('span').textContent = 'Starting secure payment...';
+    });
+    update();
+  }
+  if (pending && root?.dataset.statusUrl) {
+    let attempts = 0;
+    const poll = async () => {
+      attempts++;
+      try {
+        const response = await fetch(root.dataset.statusUrl, {headers: {'Accept': 'application/json'}});
+        if (response.ok) {
+          const result = await response.json();
+          if (result.paid && result.redirectUrl) {
+            window.location.assign(result.redirectUrl);
+            return;
+          }
+          if (['FAILED', 'CANCELLED'].includes(result.status)) {
+            window.location.reload();
+            return;
+          }
+        }
+      } catch (_) {}
+      if (attempts < 60) window.setTimeout(poll, 5000);
+    };
+    window.setTimeout(poll, 2500);
+  }
+})();
+</script>
+</body>
+</html>

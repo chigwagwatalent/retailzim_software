@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Customers')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('customers')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Customers')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-user-tag"></i></div>
+        <div>
+          <p>Loyalty and profiles,</p>
+          <h1>Customer Management</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-medal"></i><strong th:text="${goldCount + platinumCount}">0</strong><span>Premium Members</span></div>
+        <div><i class="fa-solid fa-wallet"></i><strong th:text="${'USD ' + totalCustomerSpendUsd}">USD 0</strong><span>Total Spend</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-blue" href="#modal-search-customer"><i class="fa-solid fa-magnifying-glass"></i>Find Customer</a>
+      <a class="btn btn-primary" href="#modal-create-customer"><i class="fa-solid fa-user-plus"></i>Register Customer</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Total Customers</span><strong th:text="${customerPage.totalElements}">0</strong><div><em style="width:78%"></em></div><small>Profiles matching filter</small></div>
+      <div class="metric-card metric-green"><span>Active</span><strong th:text="${activeCustomerCount}">0</strong><div><em style="width:72%"></em></div><small>Can earn loyalty</small></div>
+      <div class="metric-card metric-orange"><span>Loyalty Points</span><strong th:text="${totalLoyaltyPoints}">0</strong><div><em style="width:60%"></em></div><small>Total points balance</small></div>
+      <div class="metric-card metric-red"><span>Store Credit</span><strong th:text="${'ZWG ' + totalCustomerSpendZwg}">ZWG 0</strong><div><em style="width:54%"></em></div><small>ZWG customer value</small></div>
+    </section>
+
+    <section class="grid customer-tier-grid">
+      <div class="panel customer-tier-card tier-bronze"><i class="fa-solid fa-medal"></i><h2>Bronze</h2><strong th:text="${bronzeCount}">0</strong><p>New and occasional shoppers.</p></div>
+      <div class="panel customer-tier-card tier-silver"><i class="fa-solid fa-medal"></i><h2>Silver</h2><strong th:text="${silverCount}">0</strong><p>Repeat buyers with growing spend.</p></div>
+      <div class="panel customer-tier-card tier-gold"><i class="fa-solid fa-medal"></i><h2>Gold</h2><strong th:text="${goldCount}">0</strong><p>High-value regular customers.</p></div>
+      <div class="panel customer-tier-card tier-platinum"><i class="fa-solid fa-crown"></i><h2>Platinum</h2><strong th:text="${platinumCount}">0</strong><p>VIP shoppers and key accounts.</p></div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Customer Profiles</h2>
+        <span class="badge" th:text="${customerPage.totalElements + ' customer records'}">0 customer records</span>
+      </div>
+      <table>
+        <thead>
+        <tr><th>Customer</th><th>Contact</th><th>Loyalty</th><th>Spend</th><th>Store Credit</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${tenantCustomers}">
+          <td>
+            <div class="user-cell">
+              <span class="avatar-chip small-avatar" th:text="${#strings.substring(c.firstName,0,1)}">C</span>
+              <div>
+                <strong th:text="${c.firstName + ' ' + (c.lastName ?: '')}">Customer</strong>
+                <small th:text="${c.loyaltyCardNumber ?: 'No loyalty card'}">LOY</small>
+                <small th:text="${c.address ?: 'No address captured'}">Address</small>
+              </div>
+            </div>
+          </td>
+          <td><strong th:text="${c.phone}">Phone</strong><small th:text="${c.email ?: 'No email'}">Email</small></td>
+          <td>
+            <span th:class="${'badge tier-badge tier-' + #strings.toLowerCase(c.loyaltyTier.name())}" th:text="${c.loyaltyTier}">BRONZE</span>
+            <small th:text="${(c.loyaltyPoints ?: 0) + ' points'}">0 points</small>
+          </td>
+          <td><strong th:text="${'USD ' + c.totalSpentUsd}">USD 0</strong><small th:text="${'ZWG ' + c.totalSpentZwg}">ZWG 0</small></td>
+          <td><strong th:text="${'USD ' + c.storeCreditUsd}">USD 0</strong><small th:text="${'ZWG ' + c.storeCreditZwg}">ZWG 0</small></td>
+          <td><span th:class="${c.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${c.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+          <td>
+            <div class="action-row">
+              <a class="icon-button mini" th:href="${'#modal-edit-customer-' + c.id}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+              <form th:if="${!c.isActive}" method="post" th:action="@{'/shop/customers/' + ${c.id} + '/activate'}"><button class="icon-button mini" type="submit" title="Activate"><i class="fa-solid fa-toggle-on"></i></button></form>
+              <form th:if="${c.isActive}" method="post" th:action="@{'/shop/customers/' + ${c.id} + '/deactivate'}"><button class="icon-button mini danger" type="submit" title="Deactivate"><i class="fa-solid fa-toggle-off"></i></button></form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(tenantCustomers)}">No customers yet. Register your first shopper.</div>
+      <div th:replace="~{common/layout :: pagination(${customerPage}, ${customerPageLinks}, ${customerPrevUrl}, ${customerNextUrl})}"></div>
+    </section>
+
+    <div id="modal-search-customer" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Find Customer</h2><a class="close" href="#">&times;</a></div>
+      <form method="get" th:action="@{/shop/customers}" class="form-grid">
+        <label style="grid-column:1/-1">Search by name, phone, email or loyalty card<input name="search" th:value="${customerSearch}" placeholder="+263, Tendai, email, LOY number"></label>
+        <div class="modal-actions"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-create-customer" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Register Customer</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/customers}" class="form-grid">
+        <label>First Name<input name="firstName" required></label>
+        <label>Last Name<input name="lastName"></label>
+        <label>Phone<input name="phone" placeholder="+263 77 000 0000" required></label>
+        <label>Email<input name="email" type="email"></label>
+        <label>Date of Birth<input name="dateOfBirth" type="date"></label>
+        <label>Gender<select name="gender"><option value="">Prefer not to say</option><option>Female</option><option>Male</option><option>Other</option></select></label>
+        <label style="grid-column:1/-1">Address<textarea name="address"></textarea></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes" placeholder="Preferences, delivery instructions, credit notes"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Customer</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="c : ${tenantCustomers}" th:id="${'modal-edit-customer-' + c.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Edit ' + c.firstName + ' ' + (c.lastName ?: '')}">Edit Customer</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/customers/' + ${c.id} + '/update'}" class="form-grid">
+        <label>First Name<input name="firstName" th:value="${c.firstName}" required></label>
+        <label>Last Name<input name="lastName" th:value="${c.lastName}"></label>
+        <label>Phone<input name="phone" th:value="${c.phone}" required></label>
+        <label>Email<input name="email" type="email" th:value="${c.email}"></label>
+        <label>Date of Birth<input name="dateOfBirth" type="date" th:value="${c.dateOfBirth}"></label>
+        <label>Gender<select name="gender"><option value="">Prefer not to say</option><option th:selected="${c.gender == 'Female'}">Female</option><option th:selected="${c.gender == 'Male'}">Male</option><option th:selected="${c.gender == 'Other'}">Other</option></select></label>
+        <label style="grid-column:1/-1">Address<textarea name="address" th:text="${c.address}"></textarea></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes" th:text="${c.notes}"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Customer</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

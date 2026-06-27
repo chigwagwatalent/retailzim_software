@@ -1,0 +1,166 @@
+2026-06-19 13:44:39.232 INFO  [main] com.retailzw.RetailSaasApplication - Starting RetailSaasApplication using Java 17.0.12 with PID 28964 (C:\Users\talen\OneDrive\Desktop\JAVA PROJECTS\retail_software\backend\target\classes started by talen in C:\Users\talen\OneDrive\Desktop\JAVA PROJECTS\retail_software\backend)
+2026-06-19 13:44:39.242 INFO  [main] com.retailzw.RetailSaasApplication - No active profile set, falling back to 1 default profile: "default"
+2026-06-19 13:44:42.129 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-19 13:44:42.679 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 531 ms. Found 53 JPA repository interfaces.
+2026-06-19 13:44:44.854 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-06-19 13:44:44.876 INFO  [main] org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-19 13:44:44.877 INFO  [main] org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-06-19 13:44:45.015 INFO  [main] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-19 13:44:45.016 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 5667 ms
+2026-06-19 13:44:45.579 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-06-19 13:44:45.939 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@70022d44
+2026-06-19 13:44:45.943 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-06-19 13:44:46.207 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.22.3 by Redgate
+2026-06-19 13:44:46.207 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2026-06-19 13:44:46.207 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - 
+2026-06-19 13:44:46.247 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/retail_zw (MySQL 8.0)
+2026-06-19 13:44:46.405 INFO  [main] org.flywaydb.core.internal.command.DbValidate - Successfully validated 29 migrations (execution time 00:00.121s)
+2026-06-19 13:44:46.444 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Current version of schema `retail_zw`: 29
+2026-06-19 13:44:46.457 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Schema `retail_zw` is up to date. No migration necessary.
+2026-06-19 13:44:46.681 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-19 13:44:46.804 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-06-19 13:44:46.889 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-06-19 13:44:47.417 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-19 13:44:47.535 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-19 13:44:53.501 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-19 13:44:54.426 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-19 13:44:55.911 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-06-19 13:44:58.619 WARN  [main] com.retailzw.service.EmailService - SMTP host is configured, but mailbox passwords are missing. Set MAIL_SUPPORT_PASSWORD, MAIL_BILLING_PASSWORD and MAIL_NOTIFICATIONS_PASSWORD.
+2026-06-19 13:45:11.163 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-06-19 13:45:12.883 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-06-19 13:45:12.926 INFO  [main] com.retailzw.RetailSaasApplication - Started RetailSaasApplication in 34.91 seconds (process running for 35.661)
+2026-06-19 13:49:42.518 INFO  [http-nio-8080-exec-1] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-19 13:49:42.518 INFO  [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-06-19 13:49:42.522 INFO  [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-06-19 13:49:42.698 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET / -> 302 (91 ms) client=0:0:0:0:0:0:0:1 requestId=1442cd2b
+2026-06-19 13:49:44.034 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET / -> 302 (140 ms) client=0:0:0:0:0:0:0:1 requestId=2a14e31a
+2026-06-19 13:49:44.748 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (1984 ms) client=0:0:0:0:0:0:0:1 requestId=8ccf463f
+2026-06-19 13:49:44.830 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (66 ms) client=0:0:0:0:0:0:0:1 requestId=5fcd771f
+2026-06-19 13:49:45.389 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (24 ms) client=0:0:0:0:0:0:0:1 requestId=f98aa4fe
+2026-06-19 13:50:02.761 WARN  [http-nio-8080-exec-2] org.apache.catalina.util.SessionIdGeneratorBase - Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [182] milliseconds.
+2026-06-19 13:50:02.817 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=fddad5aa
+2026-06-19 13:50:07.770 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/signup -> 200 (132 ms) client=0:0:0:0:0:0:0:1 requestId=3282a9be
+2026-06-19 13:51:01.522 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP POST /auth/signup -> 302 (304 ms) client=0:0:0:0:0:0:0:1 requestId=a991da5e
+2026-06-19 13:51:01.582 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/signup -> 200 (28 ms) client=0:0:0:0:0:0:0:1 requestId=11bf53e0
+2026-06-19 13:51:41.300 ERROR [http-nio-8080-exec-2] com.retailzw.service.EmailService - Email not sent: SMTP password is missing for mailbox=support@retailzw.co.zw
+2026-06-19 13:51:41.302 ERROR [http-nio-8080-exec-2] com.retailzw.service.EmailService - Email not sent: SMTP password is missing for mailbox=sales@retailzw.co.zw
+2026-06-19 13:51:41.381 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP POST /auth/signup -> 302 (1032 ms) client=0:0:0:0:0:0:0:1 requestId=9e709ec9
+2026-06-19 13:51:41.523 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /checkout/smilepay/RZW1317818699013670238DCBCAE2C -> 200 (123 ms) client=0:0:0:0:0:0:0:1 requestId=0e8f9ccb
+2026-06-19 13:52:11.060 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET / -> 302 (4 ms) client=0:0:0:0:0:0:0:1 requestId=0c589d60
+2026-06-19 13:52:11.082 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (9 ms) client=0:0:0:0:0:0:0:1 requestId=b6a2e9b8
+2026-06-19 13:52:21.090 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (8 ms) client=0:0:0:0:0:0:0:1 requestId=ae1ced99
+2026-06-19 13:52:39.022 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (193 ms) client=0:0:0:0:0:0:0:1 requestId=9e72668e
+2026-06-19 13:52:52.202 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (270 ms) client=0:0:0:0:0:0:0:1 requestId=b64ca51a
+2026-06-19 13:53:00.597 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/signup -> 200 (26 ms) client=0:0:0:0:0:0:0:1 requestId=f5031c3e
+2026-06-19 13:53:01.197 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/signup -> 200 (35 ms) client=0:0:0:0:0:0:0:1 requestId=8bf1532b
+2026-06-19 13:53:03.730 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (31 ms) client=0:0:0:0:0:0:0:1 requestId=c43ad861
+2026-06-19 13:53:27.004 ERROR [http-nio-8080-exec-1] com.retailzw.service.EmailService - Email not sent: SMTP password is missing for mailbox=support@retailzw.co.zw
+2026-06-19 13:53:27.004 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP POST /admin/tenants/13/activate -> 302 (73 ms) client=0:0:0:0:0:0:0:1 requestId=ade3ad08
+2026-06-19 13:53:27.134 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (120 ms) client=0:0:0:0:0:0:0:1 requestId=f4777fab
+2026-06-19 13:53:32.748 WARN  [http-nio-8080-exec-2] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:53:33.092 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/dashboard -> 200 (611 ms) client=0:0:0:0:0:0:0:1 requestId=dea1cd29
+2026-06-19 13:53:33.272 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (44 ms) client=0:0:0:0:0:0:0:1 requestId=c2329150
+2026-06-19 13:53:36.761 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (30 ms) client=0:0:0:0:0:0:0:1 requestId=5293b017
+2026-06-19 13:53:40.271 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (34 ms) client=0:0:0:0:0:0:0:1 requestId=b0b31de7
+2026-06-19 13:53:45.058 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (69 ms) client=0:0:0:0:0:0:0:1 requestId=4ef7bfb4
+2026-06-19 13:53:45.212 WARN  [http-nio-8080-exec-9] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:53:45.353 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/borrowers -> 200 (364 ms) client=0:0:0:0:0:0:0:1 requestId=8ee220b9
+2026-06-19 13:53:45.468 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (29 ms) client=0:0:0:0:0:0:0:1 requestId=ffcec210
+2026-06-19 13:53:48.973 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (27 ms) client=0:0:0:0:0:0:0:1 requestId=9c4624de
+2026-06-19 13:53:52.480 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (33 ms) client=0:0:0:0:0:0:0:1 requestId=d81e6204
+2026-06-19 13:53:55.972 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (31 ms) client=0:0:0:0:0:0:0:1 requestId=61297f1e
+2026-06-19 13:53:59.152 WARN  [http-nio-8080-exec-4] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:53:59.278 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/inventory -> 200 (226 ms) client=0:0:0:0:0:0:0:1 requestId=0880abd2
+2026-06-19 13:53:59.458 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (39 ms) client=0:0:0:0:0:0:0:1 requestId=0fb43460
+2026-06-19 13:54:02.943 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (33 ms) client=0:0:0:0:0:0:0:1 requestId=a65b126a
+2026-06-19 13:54:03.902 WARN  [http-nio-8080-exec-1] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:54:03.952 WARN  [http-nio-8080-exec-1] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:54:04.178 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/sales -> 200 (446 ms) client=0:0:0:0:0:0:0:1 requestId=6ac6a340
+2026-06-19 13:54:04.356 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (70 ms) client=0:0:0:0:0:0:0:1 requestId=6d653b20
+2026-06-19 13:54:07.811 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (31 ms) client=0:0:0:0:0:0:0:1 requestId=4f28f96f
+2026-06-19 13:54:11.323 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (33 ms) client=0:0:0:0:0:0:0:1 requestId=181f224c
+2026-06-19 13:54:14.811 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (28 ms) client=0:0:0:0:0:0:0:1 requestId=a783d505
+2026-06-19 13:54:18.302 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=2ad56888
+2026-06-19 13:54:21.812 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (27 ms) client=0:0:0:0:0:0:0:1 requestId=d9b596e9
+2026-06-19 13:54:21.848 WARN  [http-nio-8080-exec-8] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:54:21.952 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/change -> 200 (213 ms) client=0:0:0:0:0:0:0:1 requestId=50abda0e
+2026-06-19 13:54:22.151 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (58 ms) client=0:0:0:0:0:0:0:1 requestId=49b115d9
+2026-06-19 13:54:25.621 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (39 ms) client=0:0:0:0:0:0:0:1 requestId=d2672385
+2026-06-19 13:54:29.101 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (26 ms) client=0:0:0:0:0:0:0:1 requestId=d7a330c6
+2026-06-19 13:54:32.620 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (27 ms) client=0:0:0:0:0:0:0:1 requestId=e9b2f5a0
+2026-06-19 13:54:36.986 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (27 ms) client=0:0:0:0:0:0:0:1 requestId=e8563955
+2026-06-19 13:54:39.610 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (25 ms) client=0:0:0:0:0:0:0:1 requestId=dfba94b6
+2026-06-19 13:54:43.109 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (28 ms) client=0:0:0:0:0:0:0:1 requestId=52b2d6b8
+2026-06-19 13:54:44.141 WARN  [http-nio-8080-exec-2] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:54:44.245 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/products -> 200 (194 ms) client=0:0:0:0:0:0:0:1 requestId=e00a3ec6
+2026-06-19 13:54:45.011 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (608 ms) client=0:0:0:0:0:0:0:1 requestId=5f1211ca
+2026-06-19 13:54:47.905 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (28 ms) client=0:0:0:0:0:0:0:1 requestId=ef501674
+2026-06-19 13:54:51.228 WARN  [http-nio-8080-exec-6] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:54:51.348 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/branches -> 200 (219 ms) client=0:0:0:0:0:0:0:1 requestId=631b622a
+2026-06-19 13:54:51.529 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (44 ms) client=0:0:0:0:0:0:0:1 requestId=9f410387
+2026-06-19 13:54:55.018 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (41 ms) client=0:0:0:0:0:0:0:1 requestId=f9c52f5a
+2026-06-19 13:54:58.512 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (29 ms) client=0:0:0:0:0:0:0:1 requestId=07960ddd
+2026-06-19 13:55:02.978 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (26 ms) client=0:0:0:0:0:0:0:1 requestId=0665843b
+2026-06-19 13:55:05.990 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (31 ms) client=0:0:0:0:0:0:0:1 requestId=0bbc5387
+2026-06-19 13:55:10.141 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (95 ms) client=0:0:0:0:0:0:0:1 requestId=4ef28d2c
+2026-06-19 13:55:12.985 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (35 ms) client=0:0:0:0:0:0:0:1 requestId=a10f5fed
+2026-06-19 13:55:13.533 WARN  [http-nio-8080-exec-3] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-06-19 13:55:13.567 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/dashboard -> 200 (95 ms) client=0:0:0:0:0:0:0:1 requestId=3dd35f11
+2026-06-19 13:55:13.705 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (32 ms) client=0:0:0:0:0:0:0:1 requestId=ed1ef347
+2026-06-19 13:55:16.970 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=708915c1
+2026-06-19 13:55:17.198 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (23 ms) client=0:0:0:0:0:0:0:1 requestId=5c4abb9d
+2026-06-19 13:55:19.974 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=1e19fcc9
+2026-06-19 13:55:20.703 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (24 ms) client=0:0:0:0:0:0:0:1 requestId=c07b490e
+2026-06-19 13:55:23.963 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (26 ms) client=0:0:0:0:0:0:0:1 requestId=37af2539
+2026-06-19 13:55:24.195 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=85041bd0
+2026-06-19 13:55:26.970 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (25 ms) client=0:0:0:0:0:0:0:1 requestId=db71c04d
+2026-06-19 13:55:27.697 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=36e7f529
+2026-06-19 13:55:30.970 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (25 ms) client=0:0:0:0:0:0:0:1 requestId=6e2ec4f8
+2026-06-19 13:55:31.202 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (24 ms) client=0:0:0:0:0:0:0:1 requestId=2642688a
+2026-06-19 13:55:33.971 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (24 ms) client=0:0:0:0:0:0:0:1 requestId=20788404
+2026-06-19 13:55:34.697 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=8675b254
+2026-06-19 13:55:37.967 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=bf99a892
+2026-06-19 13:55:38.199 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (24 ms) client=0:0:0:0:0:0:0:1 requestId=fade0ed8
+2026-06-19 13:55:39.045 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (190 ms) client=0:0:0:0:0:0:0:1 requestId=12415241
+2026-06-19 13:55:39.231 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (48 ms) client=0:0:0:0:0:0:0:1 requestId=2618141a
+2026-06-19 13:55:40.980 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (33 ms) client=0:0:0:0:0:0:0:1 requestId=133f9cb2
+2026-06-19 13:55:42.707 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=310fcd22
+2026-06-19 13:55:43.658 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP POST /shop/billing/pay -> 302 (31 ms) client=0:0:0:0:0:0:0:1 requestId=08ec8684
+2026-06-19 13:55:43.701 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /checkout/smilepay/RZW1317818699013670238DCBCAE2C -> 200 (34 ms) client=0:0:0:0:0:0:0:1 requestId=2139e39b
+2026-06-19 13:55:44.977 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (27 ms) client=0:0:0:0:0:0:0:1 requestId=ed85c0e7
+2026-06-19 13:55:47.197 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (54 ms) client=0:0:0:0:0:0:0:1 requestId=1496c2f1
+2026-06-19 13:55:47.327 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (28 ms) client=0:0:0:0:0:0:0:1 requestId=ec0fd622
+2026-06-19 13:55:47.971 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=73d12fc7
+2026-06-19 13:55:50.835 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=dee2c691
+2026-06-19 13:55:51.967 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=affc1105
+2026-06-19 13:55:54.329 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=eb7e8a2d
+2026-06-19 13:55:54.967 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=6b133d21
+2026-06-19 13:55:57.825 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=b0e12da3
+2026-06-19 13:55:58.969 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=f96f0580
+2026-06-19 13:56:01.318 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (23 ms) client=0:0:0:0:0:0:0:1 requestId=1c426a86
+2026-06-19 13:56:01.978 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (23 ms) client=0:0:0:0:0:0:0:1 requestId=7819c32f
+2026-06-19 13:56:04.823 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=0b82492b
+2026-06-19 13:56:08.329 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=1b8dae22
+2026-06-19 13:56:11.823 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (28 ms) client=0:0:0:0:0:0:0:1 requestId=2d6c94a6
+2026-06-19 13:56:15.320 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=b005044e
+2026-06-19 13:56:20.073 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=382bd460
+2026-06-19 13:56:22.324 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=a2eed600
+2026-06-19 13:56:25.966 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=6ab2c464
+2026-06-19 13:56:29.963 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (23 ms) client=0:0:0:0:0:0:0:1 requestId=1e211574
+2026-06-19 13:56:32.972 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (26 ms) client=0:0:0:0:0:0:0:1 requestId=22b15bd6
+2026-06-19 13:56:36.986 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (29 ms) client=0:0:0:0:0:0:0:1 requestId=8d9828dc
+2026-06-19 13:56:39.965 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=37776695
+2026-06-19 13:56:43.962 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=c1dea9b5
+2026-06-19 13:56:46.970 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=e5252ac2
+2026-06-19 13:56:50.969 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (25 ms) client=0:0:0:0:0:0:0:1 requestId=655cbac9
+2026-06-19 13:56:57.647 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (38 ms) client=0:0:0:0:0:0:0:1 requestId=a75d74d5
+2026-06-19 13:56:58.031 INFO  [http-nio-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (62 ms) client=0:0:0:0:0:0:0:1 requestId=6e33b5a8
+2026-06-19 13:57:04.161 INFO  [http-nio-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (39 ms) client=0:0:0:0:0:0:0:1 requestId=872b92a2
+2026-06-19 13:57:10.751 INFO  [http-nio-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=0df73fbb
+2026-06-19 13:58:01.969 INFO  [http-nio-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=ec5eb1c8
+2026-06-19 13:58:13.377 INFO  [http-nio-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (25 ms) client=0:0:0:0:0:0:0:1 requestId=c5149a69
+2026-06-19 13:58:14.320 INFO  [http-nio-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (25 ms) client=0:0:0:0:0:0:0:1 requestId=c128e166
+2026-06-19 13:58:18.036 INFO  [http-nio-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (29 ms) client=0:0:0:0:0:0:0:1 requestId=54db29a5
+2026-06-19 13:58:21.986 INFO  [http-nio-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (39 ms) client=0:0:0:0:0:0:0:1 requestId=1170248b
+2026-06-19 13:58:24.978 INFO  [http-nio-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=2c7a0fb4
+2026-06-19 13:59:02.009 INFO  [http-nio-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (28 ms) client=0:0:0:0:0:0:0:1 requestId=379224c9

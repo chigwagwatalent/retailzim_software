@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head(${pageTitle})}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar(${module})}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar(${pageTitle})}"></nav>
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i th:class="${moduleIcons.get(module)}"></i></div>
+        <div>
+          <p>Welcome back,</p>
+          <h1 th:text="${pageTitle}">Module</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-truck-fast"></i><strong>USD 836k</strong><span>Overall Sales</span></div>
+        <div><i class="fa-solid fa-arrow-trend-up"></i><strong>ZWG 689M</strong><span>Overall Revenue</span></div>
+      </div>
+    </section>
+    <div class="page-toolbar">
+      <a class="btn btn-primary" href="#modal-create"><i class="fa-solid fa-plus"></i>New</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section th:if="${module == 'products'}" class="table-wrap">
+      <table><thead><tr><th>Name</th><th>SKU</th><th>Barcode</th><th>USD</th><th>ZWG</th><th>Tax</th></tr></thead>
+        <tbody><tr th:each="p : ${products}"><td th:text="${p.name}"></td><td th:text="${p.sku}"></td><td th:text="${p.barcode}"></td><td th:text="${p.sellingPriceUsd}"></td><td th:text="${p.sellingPriceZwg}"></td><td th:text="${p.taxRate + '%'}"></td></tr></tbody>
+      </table>
+    </section>
+
+    <section th:if="${module == 'categories'}" class="table-wrap">
+      <table><thead><tr><th>Name</th><th>Code</th><th>Description</th></tr></thead>
+        <tbody><tr th:each="c : ${categories}"><td th:text="${c.name}"></td><td th:text="${c.code}"></td><td th:text="${c.description}"></td></tr></tbody>
+      </table>
+    </section>
+
+    <section th:if="${module == 'inventory'}" class="table-wrap">
+      <div class="toolbar"><a class="btn btn-primary" href="#modal-adjust">Adjust Stock</a></div>
+      <table><thead><tr><th>Product ID</th><th>On Hand</th><th>Reserved</th><th>On Order</th><th>Avg USD</th><th>Avg ZWG</th></tr></thead>
+        <tbody><tr th:each="i : ${inventory}"><td th:text="${i.productId}"></td><td th:text="${i.quantityOnHand}"></td><td th:text="${i.quantityReserved}"></td><td th:text="${i.quantityOnOrder}"></td><td th:text="${i.averageCostUsd}"></td><td th:text="${i.averageCostZwg}"></td></tr></tbody>
+      </table>
+    </section>
+
+    <section th:if="${module == 'customers'}" class="table-wrap">
+      <table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Loyalty</th><th>Points</th></tr></thead>
+        <tbody><tr th:each="c : ${customers}"><td th:text="${c.firstName + ' ' + (c.lastName ?: '')}"></td><td th:text="${c.phone}"></td><td th:text="${c.email}"></td><td th:text="${c.loyaltyTier}"></td><td th:text="${c.loyaltyPoints}"></td></tr></tbody>
+      </table>
+    </section>
+
+    <section th:if="${module == 'suppliers'}" class="table-wrap">
+      <table><thead><tr><th>Name</th><th>Contact</th><th>Phone</th><th>Email</th><th>Terms</th></tr></thead>
+        <tbody><tr th:each="s : ${suppliers}"><td th:text="${s.name}"></td><td th:text="${s.contactPerson}"></td><td th:text="${s.phone}"></td><td th:text="${s.email}"></td><td th:text="${s.paymentTerms}"></td></tr></tbody>
+      </table>
+    </section>
+
+    <section th:if="${module == 'branches'}" class="table-wrap">
+      <table><thead><tr><th>Code</th><th>Name</th><th>City</th><th>Phone</th><th>Status</th></tr></thead>
+        <tbody><tr th:each="b : ${branches}"><td th:text="${b.branchCode}"></td><td th:text="${b.name}"></td><td th:text="${b.city}"></td><td th:text="${b.phone}"></td><td><span class="badge status-active">ACTIVE</span></td></tr></tbody>
+      </table>
+    </section>
+
+    <section th:if="${module == 'users'}" class="table-wrap">
+      <table><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Branch</th></tr></thead>
+        <tbody><tr th:each="u : ${users}"><td th:text="${u.firstName + ' ' + u.lastName}"></td><td th:text="${u.username}"></td><td th:text="${u.email}"></td><td th:text="${u.role.name}"></td><td th:text="${u.branchId ?: 'HQ'}"></td></tr></tbody>
+      </table>
+    </section>
+
+    <section th:if="${module == 'cash'}" class="metric-grid">
+      <div class="stat">Drawers<strong th:text="${#lists.size(drawers)}">0</strong></div>
+      <div class="stat">Sessions<strong th:text="${#lists.size(sessions)}">0</strong></div>
+      <div class="panel"><h2>Drawers</h2><table><tr th:each="d : ${drawers}"><td th:text="${d.name}"></td><td th:text="${d.description}"></td></tr></table></div>
+      <div class="panel"><h2>Sessions</h2><table><tr th:each="s : ${sessions}"><td th:text="${s.id}"></td><td><span class="badge status-open" th:text="${s.status}"></span></td><td th:text="${s.openedAt}"></td></tr></table></div>
+    </section>
+
+    <section th:if="${module == 'purchasing'}" class="table-wrap">
+      <table><thead><tr><th>PO</th><th>Supplier</th><th>Status</th><th>Total USD</th></tr></thead>
+        <tbody><tr th:each="o : ${orders}"><td th:text="${o.poNumber}"></td><td th:text="${o.supplierId}"></td><td><span class="badge status-draft" th:text="${o.status}"></span></td><td th:text="${o.totalUsd}"></td></tr></tbody>
+      </table>
+    </section>
+
+    <section th:if="${module == 'sales'}" class="table-wrap table-panel">
+      <div class="toolbar">
+        <h2 th:text="${'Sales History - ' + selectedBranchName}">Sales History</h2>
+        <form method="get" th:action="@{/shop/sales}" class="inline-filter">
+          <select name="branchId" onchange="this.form.submit()">
+            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
+          </select>
+        </form>
+      </div>
+      <table><thead><tr><th>Receipt</th><th>Currency</th><th>Total</th><th>Status</th><th>Created</th></tr></thead>
+        <tbody><tr th:each="sale : ${sales}"><td th:text="${sale.receiptNumber}"></td><td th:text="${sale.currency}"></td><td th:text="${sale.grandTotal}"></td><td><span class="badge status-completed" th:text="${sale.status}"></span></td><td th:text="${sale.createdAt}"></td></tr></tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(sales)}">No sales yet.</div>
+    </section>
+
+    <section th:if="${module == 'notifications'}" class="panel table-panel">
+      <div class="toolbar">
+        <h2>Notifications</h2>
+        <form method="post" th:action="@{/shop/notifications/read-all}">
+          <button class="btn btn-blue" type="submit"><i class="fa-solid fa-check-double"></i>Mark all read</button>
+        </form>
+      </div>
+      <table><thead><tr><th>Type</th><th>Title</th><th>Message</th><th>Status</th></tr></thead>
+        <tbody><tr th:each="n : ${notifications}">
+          <td th:text="${n.type}"></td><td th:text="${n.title}"></td><td th:text="${n.message}"></td>
+          <td><span th:class="${n.isRead ? 'badge status-completed' : 'badge status-pending'}" th:text="${n.isRead ? 'READ' : 'UNREAD'}"></span></td>
+        </tr></tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(notifications)}">No notifications yet.</div>
+    </section>
+
+    <section th:if="${module == 'notifications'}" id="live-chat" class="panel chat-panel" style="margin-top:16px" th:attr="data-feed-url=@{/shop/support/chat/feed}">
+      <div class="panel-title-row">
+        <div>
+          <p class="eyebrow">Realtime support</p>
+          <h2>Platform Chat</h2>
+        </div>
+        <span class="badge status-active">LIVE</span>
+      </div>
+      <div class="chat-feed">
+        <article th:each="m : ${chatMessages}" th:class="${m.senderType.name() == 'PLATFORM' ? 'chat-message platform' : 'chat-message shop'}">
+          <strong th:text="${m.senderName}">Sender</strong>
+          <p th:text="${m.message}">Message</p>
+          <small th:text="${m.createdAt != null ? #temporals.format(m.createdAt, 'dd MMM HH:mm') : ''}">time</small>
+        </article>
+      </div>
+      <form method="post" th:action="@{/shop/support/chat}" class="chat-form">
+        <input name="message" required placeholder="Reply to platform support">
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i>Send</button>
+      </form>
+    </section>
+
+    <section th:if="${module == 'reports'}" class="grid" style="grid-template-columns: repeat(3, minmax(0, 1fr))">
+      <div class="stat"><span>Sales Today</span><strong th:text="${#lists.size(sales)}">0</strong><small>Recent transaction count</small></div>
+      <div class="stat"><span>Inventory Items</span><strong th:text="${#lists.size(inventory)}">0</strong><small>Current branch stock lines</small></div>
+      <div class="stat"><span>Open POs</span><strong th:text="${#lists.size(orders)}">0</strong><small>Purchasing pipeline</small></div>
+      <div class="panel table-panel" style="grid-column:1/-1"><h2>Management Reports</h2><table><thead><tr><th>Report</th><th>Description</th><th>Action</th></tr></thead><tbody>
+        <tr><td>Daily Sales</td><td>USD and ZWG sales summary for tills and branches.</td><td><a class="btn btn-blue" th:href="@{/shop/sales}">Open</a></td></tr>
+        <tr><td>Stock Position</td><td>On-hand stock, low stock and valuation view.</td><td><a class="btn btn-blue" th:href="@{/shop/inventory}">Open</a></td></tr>
+        <tr><td>Purchasing</td><td>Supplier orders, drafts and receiving pipeline.</td><td><a class="btn btn-blue" th:href="@{/shop/purchasing}">Open</a></td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section th:if="${module == 'returns' or module == 'audit'}" class="panel table-panel">
+      <h2 th:text="${pageTitle}">Module</h2>
+      <table><thead><tr><th>Area</th><th>Capability</th><th>Status</th></tr></thead><tbody>
+        <tr><td th:text="${pageTitle}">Area</td><td>Tenant-aware records, branch filtering, audit-friendly transaction references.</td><td><span class="badge status-active">READY</span></td></tr>
+        <tr><td>API</td><td>Backed by the shared service and repository layer.</td><td><span class="badge status-active">READY</span></td></tr>
+      </tbody></table>
+    </section>
+
+    <div id="modal-create" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'New ' + pageTitle}">New</h2><a class="close" href="#">&times;</a></div>
+      <form th:if="${module == 'products'}" method="post" th:action="@{/shop/products}" class="form-grid">
+        <label>Name<input name="name" required></label><label>SKU<input name="sku"></label><label>Barcode<input name="barcode"></label>
+        <label>Category<select name="categoryId"><option value="">None</option><option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option></select></label>
+        <label>UOM<select name="uomId"><option value="">None</option><option th:each="u : ${uoms}" th:value="${u.id}" th:text="${u.abbreviation}"></option></select></label>
+        <label>Cost USD<input name="costPriceUsd" type="number" step="0.0001" value="0"></label><label>Selling USD<input name="sellingPriceUsd" type="number" step="0.0001" value="0"></label>
+        <label>Cost ZWG<input name="costPriceZwg" type="number" step="0.0001" value="0"></label><label>Selling ZWG<input name="sellingPriceZwg" type="number" step="0.0001" value="0"></label>
+        <label>Tax Rate<input name="taxRate" type="number" step="0.01" value="15"></label><label>Reorder Level<input name="reorderLevel" type="number" step="0.0001" value="0"></label>
+        <label style="grid-column:1/-1">Description<textarea name="description"></textarea></label><button class="btn btn-primary" type="submit">Save Product</button>
+      </form>
+      <form th:if="${module == 'categories'}" method="post" th:action="@{/shop/categories}" class="form-grid"><label>Name<input name="name" required></label><label>Code<input name="code"></label><button class="btn btn-primary" type="submit">Save Category</button></form>
+      <form th:if="${module == 'customers'}" method="post" th:action="@{/shop/customers}" class="form-grid"><label>First Name<input name="firstName" required></label><label>Last Name<input name="lastName"></label><label>Phone<input name="phone" required></label><label>Email<input name="email" type="email"></label><label style="grid-column:1/-1">Address<textarea name="address"></textarea></label><button class="btn btn-primary" type="submit">Save Customer</button></form>
+      <form th:if="${module == 'suppliers'}" method="post" th:action="@{/shop/suppliers}" class="form-grid"><label>Name<input name="name" required></label><label>Contact<input name="contactPerson"></label><label>Phone<input name="phone"></label><label>Email<input name="email"></label><label>Terms<input name="paymentTerms" placeholder="30 days"></label><button class="btn btn-primary" type="submit">Save Supplier</button></form>
+      <form th:if="${module == 'branches'}" method="post" th:action="@{/shop/branches}" class="form-grid"><label>Code<input name="branchCode" required></label><label>Name<input name="name" required></label><label>City<input name="city"></label><label>Phone<input name="phone"></label><label style="grid-column:1/-1">Address<textarea name="address"></textarea></label><button class="btn btn-primary" type="submit">Save Branch</button></form>
+      <form th:if="${module == 'users'}" method="post" th:action="@{/shop/users}" class="form-grid"><label>First Name<input name="firstName" required></label><label>Last Name<input name="lastName" required></label><label>Username<input name="username" required></label><label>Email<input name="email" type="email" required></label><label>Password<input name="password" type="password" required></label><label>Role<select name="roleId" required><option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name}"></option></select></label><label>Branch<select name="branchId"><option value="">HQ</option><option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}"></option></select></label><button class="btn btn-primary" type="submit">Save User</button></form>
+      <form th:if="${module == 'cash'}" method="post" th:action="@{/shop/cash/drawers}" class="form-grid"><label>Name<input name="name" required></label><label>Description<input name="description"></label><button class="btn btn-primary" type="submit">Save Drawer</button></form>
+      <form th:if="${module == 'purchasing'}" method="post" th:action="@{/shop/purchasing}" class="form-grid"><label>Supplier<select name="supplierId" required><option th:each="s : ${suppliers}" th:value="${s.id}" th:text="${s.name}"></option></select></label><button class="btn btn-primary" type="submit">Create Draft PO</button></form>
+      <p class="empty" th:if="${modalPlaceholderModules.contains(module)}">This module is available as a workspace. Its operational data appears as transactions are created through the mobile cashier app, inventory, cash and API workflows.</p>
+    </div></div>
+
+    <div id="modal-adjust" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Adjust Stock</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/inventory/adjust}" class="form-grid">
+        <label>Product<select name="productId" required><option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option></select></label>
+        <label>Quantity Change<input name="quantityChange" type="number" step="0.0001" required></label>
+        <label>Reason<select name="reason"><option>DAMAGED</option><option>EXPIRED</option><option>THEFT</option><option>FOUND</option><option>WRITE_OFF</option><option>CORRECTION</option><option>OPENING_STOCK</option><option>OTHER</option></select></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label><button class="btn btn-primary" type="submit">Apply Adjustment</button>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>
+

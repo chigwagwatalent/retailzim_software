@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Purchasing')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('purchasing')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Purchasing')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div>
+          <p th:text="${'Buying for ' + selectedBranchName}">Buying for branch</p>
+          <h1>Purchasing</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-truck-ramp-box"></i><strong th:text="${openPoCount}">0</strong><span>Open Orders</span></div>
+        <div><i class="fa-solid fa-sack-dollar"></i><strong th:text="${'USD ' + #numbers.formatDecimal(purchaseValueUsd, 1, 2)}">USD 0.00</strong><span>PO Value</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <form method="get" th:action="@{/shop/purchasing}" class="inline-filter">
+        <select name="branchId" onchange="this.form.submit()">
+          <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
+        </select>
+      </form>
+      <a class="btn btn-blue" href="#modal-search-po"><i class="fa-solid fa-magnifying-glass"></i>Find PO</a>
+      <form method="post" th:action="@{/shop/purchasing/auto-reorder}">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <button class="btn btn-light" type="submit"><i class="fa-solid fa-wand-magic-sparkles"></i>Auto Reorder</button>
+      </form>
+      <a class="btn btn-primary" href="#modal-create-po"><i class="fa-solid fa-plus"></i>New PO</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Total POs</span><strong th:text="${purchaseOrderPage.totalElements}">0</strong><div><em style="width:78%"></em></div><small>In selected branch</small></div>
+      <div class="metric-card metric-orange"><span>Drafts</span><strong th:text="${draftPoCount}">0</strong><div><em style="width:48%"></em></div><small>Not yet submitted</small></div>
+      <div class="metric-card metric-red"><span>Needs Approval</span><strong th:text="${approvalPoCount}">0</strong><div><em style="width:38%"></em></div><small>Submitted by team</small></div>
+      <div class="metric-card metric-green"><span>Received</span><strong th:text="${receivedPoCount}">0</strong><div><em style="width:68%"></em></div><small>Goods posted to stock</small></div>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <h2>Status Pipeline</h2>
+        <span class="badge" th:text="${poStatusFilter ?: 'ALL'}">ALL</span>
+      </div>
+      <div class="status-filter-row">
+        <a th:class="${poStatusFilter == null or poStatusFilter == '' ? 'badge status-open' : 'badge'}" th:href="@{/shop/purchasing(branchId=${selectedBranchId}, search=${poSearch})}">ALL</a>
+        <a th:each="s : ${purchaseOrderStatuses}"
+           th:class="${poStatusFilter == s.name() ? 'badge status-open' : 'badge'}"
+           th:href="@{/shop/purchasing(branchId=${selectedBranchId}, status=${s.name()}, search=${poSearch})}"
+           th:text="${s}">DRAFT</a>
+      </div>
+    </section>
+
+    <section class="grid purchasing-card-grid">
+      <div class="panel branch-card purchasing-card" th:each="po : ${purchaseOrderList}">
+        <div class="branch-card-head">
+          <span class="branch-badge"><i class="fa-solid fa-file-invoice"></i></span>
+          <div>
+            <h2 th:text="${po.poNumber}">PO</h2>
+            <small th:text="${supplierById.get(po.supplierId) != null ? supplierById.get(po.supplierId).name : 'Supplier'}">Supplier</small>
+          </div>
+          <span th:class="${'badge status-' + #strings.toLowerCase(po.status.name())}" th:text="${po.status}">DRAFT</span>
+        </div>
+        <p th:text="${po.notes ?: 'No purchasing notes captured.'}">Notes</p>
+        <div class="branch-mini-stats">
+          <div><strong th:text="${#lists.size(purchaseOrderItemsById.get(po.id))}">0</strong><span>Lines</span></div>
+          <div><strong th:text="${po.currency}">USD</strong><span>Currency</span></div>
+          <div><strong th:text="${grnCountsByPo.get(po.id) ?: 0}">0</strong><span>GRNs</span></div>
+        </div>
+        <div class="branch-actions">
+          <a class="btn btn-light" th:href="${'#modal-view-po-' + po.id}"><i class="fa-solid fa-eye"></i>View</a>
+          <form th:if="${po.status.name() == 'DRAFT'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/submit'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-paper-plane"></i>Submit</button></form>
+          <form th:if="${po.status.name() == 'SUBMITTED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/approve'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-check"></i>Approve</button></form>
+          <a th:if="${po.status.name() == 'SUBMITTED'}" class="btn btn-light" th:href="${'#modal-reject-po-' + po.id}"><i class="fa-solid fa-xmark"></i>Reject</a>
+          <form th:if="${po.status.name() == 'APPROVED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/order'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-truck"></i>Sent</button></form>
+          <a th:if="${po.status.name() == 'APPROVED' or po.status.name() == 'ORDERED' or po.status.name() == 'PARTIAL'}" class="btn btn-primary" th:href="${'#modal-receive-po-' + po.id}"><i class="fa-solid fa-boxes-packing"></i>Receive</a>
+        </div>
+      </div>
+    </section>
+
+    <div th:each="po : ${purchaseOrderList}" th:id="${'modal-reject-po-' + po.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Reject ' + po.poNumber}">Reject Purchase Order</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/reject'}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label style="grid-column:1/-1">Reason<textarea name="reason" required></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit">Reject Purchase Order</button></div>
+      </form>
+    </div></div>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Purchase Orders</h2>
+        <span class="badge" th:text="${purchaseOrderPage.totalElements + ' records'}">0 records</span>
+      </div>
+      <table>
+        <thead><tr><th>PO</th><th>Supplier</th><th>Dates</th><th>Lines</th><th>Totals</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="po : ${purchaseOrderList}">
+          <td><strong th:text="${po.poNumber}">PO</strong><small th:text="${'Branch: ' + selectedBranchName}">Branch</small></td>
+          <td><strong th:text="${supplierById.get(po.supplierId) != null ? supplierById.get(po.supplierId).name : 'Supplier unavailable'}">Supplier</strong><small th:text="${supplierById.get(po.supplierId) != null ? supplierById.get(po.supplierId).phone : 'No phone'}">Phone</small></td>
+          <td><strong th:text="${po.createdAt != null ? #temporals.format(po.createdAt, 'dd MMM yyyy') : '-'}">Date</strong><small th:text="${po.expectedDeliveryDate != null ? 'Due ' + po.expectedDeliveryDate : 'No delivery date'}">Due</small></td>
+          <td><strong th:text="${#lists.size(purchaseOrderItemsById.get(po.id))}">0</strong><small th:text="${(grnCountsByPo.get(po.id) ?: 0) + ' goods receipts'}">0 GRNs</small></td>
+          <td><strong th:text="${'USD ' + #numbers.formatDecimal(po.totalUsd ?: 0, 1, 2)}">USD</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(po.totalZwg ?: 0, 1, 2)}">ZWG</small></td>
+          <td><span th:class="${'badge status-' + #strings.toLowerCase(po.status.name())}" th:text="${po.status}">DRAFT</span></td>
+          <td>
+            <div class="action-row">
+              <a class="icon-button mini" th:href="${'#modal-view-po-' + po.id}" title="View"><i class="fa-solid fa-eye"></i></a>
+              <a th:if="${po.status.name() == 'APPROVED' or po.status.name() == 'ORDERED' or po.status.name() == 'PARTIAL'}" class="icon-button mini" th:href="${'#modal-receive-po-' + po.id}" title="Receive"><i class="fa-solid fa-boxes-packing"></i></a>
+              <form th:if="${po.status.name() != 'RECEIVED' and po.status.name() != 'CANCELLED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/cancel'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="icon-button mini danger" type="submit" title="Cancel"><i class="fa-solid fa-ban"></i></button></form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(purchaseOrderList)}">No purchase orders found for this branch.</div>
+      <div th:replace="~{common/layout :: pagination(${purchaseOrderPage}, ${purchaseOrderPageLinks}, ${purchaseOrderPrevUrl}, ${purchaseOrderNextUrl})}"></div>
+    </section>
+
+    <div id="modal-search-po" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Find Purchase Orders</h2><a class="close" href="#">&times;</a></div>
+      <form method="get" th:action="@{/shop/purchasing}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label>Search PO or supplier<input name="search" th:value="${poSearch}" placeholder="PO number, supplier"></label>
+        <label>Status<select name="status"><option value="">All statuses</option><option th:each="s : ${purchaseOrderStatuses}" th:value="${s.name()}" th:text="${s}" th:selected="${poStatusFilter == s.name()}"></option></select></label>
+        <div class="modal-actions"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-create-po" class="modal"><div class="modal-content wide-modal">
+      <div class="modal-head"><h2>New Purchase Order</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/purchasing}" class="form-grid" id="po-create-form">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label>Supplier<select name="supplierId" required><option value="">Select active supplier</option><option th:each="s : ${activeSuppliers}" th:value="${s.id}" th:text="${s.name}"></option></select></label>
+        <label>Currency<select name="currency"><option value="USD">USD</option><option value="ZWG">ZWG</option></select></label>
+        <label>Expected Delivery<input name="expectedDeliveryDate" type="date"></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes" placeholder="Supplier instructions, delivery notes"></textarea></label>
+
+        <div class="po-line-builder">
+          <div class="po-line-row">
+            <label>Product<select name="productId" required><option value="">Select branch product</option><option th:each="p : ${branchProductOptions}" th:value="${p.id}" th:text="${p.name + ' - ' + p.sku}"></option></select></label>
+            <label>Quantity<input name="quantity" class="po-qty" type="number" step="0.0001" min="0.0001" value="1" required></label>
+            <label>USD Cost<input name="unitCostUsd" class="po-cost-usd" type="number" step="0.0001" min="0" value="0"></label>
+            <label>ZWG Cost<input name="unitCostZwg" class="po-cost-zwg" type="number" step="0.0001" min="0" value="0"></label>
+            <label>Tax %<input name="taxRate" type="number" step="0.01" min="0" value="0"></label>
+            <label>Line Notes<input name="lineNotes" placeholder="Optional"></label>
+            <button class="icon-button mini danger po-remove-line" type="button" title="Remove line"><i class="fa-solid fa-minus"></i></button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-light" type="button" id="po-add-line"><i class="fa-solid fa-plus"></i>Add Line</button>
+          <button class="btn btn-blue" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Draft</button>
+          <button class="btn btn-primary" type="submit" name="submit" value="true"><i class="fa-solid fa-paper-plane"></i>Submit</button>
+        </div>
+      </form>
+    </div></div>
+
+    <div th:each="po : ${purchaseOrderList}" th:id="${'modal-view-po-' + po.id}" class="modal"><div class="modal-content wide-modal">
+      <div class="modal-head"><h2 th:text="${po.poNumber}">PO</h2><a class="close" href="#">&times;</a></div>
+      <section class="grid compact-grid">
+        <div class="panel"><h2>Supplier</h2><p th:text="${supplierById.get(po.supplierId) != null ? supplierById.get(po.supplierId).name : 'Supplier unavailable'}">Supplier</p></div>
+        <div class="panel"><h2>Status</h2><span th:class="${'badge status-' + #strings.toLowerCase(po.status.name())}" th:text="${po.status}">DRAFT</span></div>
+        <div class="panel"><h2>USD Total</h2><p th:text="${'USD ' + #numbers.formatDecimal(po.totalUsd ?: 0, 1, 2)}">USD</p></div>
+        <div class="panel"><h2>ZWG Total</h2><p th:text="${'ZWG ' + #numbers.formatDecimal(po.totalZwg ?: 0, 1, 2)}">ZWG</p></div>
+      </section>
+      <table>
+        <thead><tr><th>Product</th><th>Ordered</th><th>Received</th><th>Unit Cost</th><th>Line Total</th><th>Notes</th></tr></thead>
+        <tbody>
+        <tr th:each="item : ${purchaseOrderItemsById.get(po.id)}">
+          <td><strong th:text="${productById.get(item.productId) != null ? productById.get(item.productId).name : 'Product'}">Product</strong><small th:text="${productById.get(item.productId) != null ? productById.get(item.productId).sku : ''}">SKU</small></td>
+          <td th:text="${item.quantity}">0</td>
+          <td th:text="${item.quantityReceived ?: 0}">0</td>
+          <td><strong th:text="${'USD ' + #numbers.formatDecimal(item.unitCostUsd ?: 0, 1, 4)}">USD</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(item.unitCostZwg ?: 0, 1, 4)}">ZWG</small></td>
+          <td><strong th:text="${'USD ' + #numbers.formatDecimal(item.lineTotalUsd ?: 0, 1, 2)}">USD</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(item.lineTotalZwg ?: 0, 1, 2)}">ZWG</small></td>
+          <td th:text="${item.notes ?: '-'}">-</td>
+        </tr>
+        </tbody>
+      </table>
+    </div></div>
+
+    <div th:each="po : ${purchaseOrderList}" th:if="${po.status.name() == 'APPROVED' or po.status.name() == 'ORDERED' or po.status.name() == 'PARTIAL'}" th:id="${'modal-receive-po-' + po.id}" class="modal"><div class="modal-content wide-modal">
+      <div class="modal-head"><h2 th:text="${'Receive ' + po.poNumber}">Receive</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/receive'}">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <table>
+          <thead><tr><th>Product</th><th>Ordered</th><th>Already Received</th><th>Receive Now</th></tr></thead>
+          <tbody>
+          <tr th:each="item : ${purchaseOrderItemsById.get(po.id)}">
+            <td><strong th:text="${productById.get(item.productId) != null ? productById.get(item.productId).name : 'Product'}">Product</strong></td>
+            <td th:text="${item.quantity}">0</td>
+            <td th:text="${item.quantityReceived ?: 0}">0</td>
+            <td><input th:name="${'received_' + item.id}" type="number" step="0.0001" min="0" th:max="${item.quantity.subtract(item.quantityReceived ?: 0)}" th:value="${item.quantity.subtract(item.quantityReceived ?: 0)}"></td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-boxes-packing"></i>Confirm Receipt</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+<script>
+document.addEventListener('click', function (event) {
+  if (event.target.closest('#po-add-line')) {
+    const builder = document.querySelector('.po-line-builder');
+    const clone = builder.querySelector('.po-line-row').cloneNode(true);
+    clone.querySelectorAll('input, select').forEach(function (field) {
+      if (field.name === 'quantity') field.value = '1';
+      else if (field.name === 'unitCostUsd' || field.name === 'unitCostZwg' || field.name === 'taxRate') field.value = '0';
+      else field.value = '';
+    });
+    builder.appendChild(clone);
+  }
+  const remove = event.target.closest('.po-remove-line');
+  if (remove) {
+    const rows = document.querySelectorAll('.po-line-builder .po-line-row');
+    if (rows.length > 1) remove.closest('.po-line-row').remove();
+  }
+});
+</script>
+</body>
+</html>

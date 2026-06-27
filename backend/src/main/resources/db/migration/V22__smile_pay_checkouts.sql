@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS smile_pay_checkouts (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    tenant_id BIGINT NOT NULL,
+    plan_id BIGINT NOT NULL,
+    order_reference VARCHAR(80) NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL,
+    currency VARCHAR(5) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    payment_url VARCHAR(1000),
+    provider_reference VARCHAR(150),
+    provider_status VARCHAR(60),
+    raw_response TEXT,
+    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    paid_at DATETIME(6) NULL,
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_smile_pay_order_reference (order_reference),
+    KEY idx_smile_pay_tenant (tenant_id),
+    KEY idx_smile_pay_status (status),
+    CONSTRAINT fk_smile_pay_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id),
+    CONSTRAINT fk_smile_pay_plan FOREIGN KEY (plan_id) REFERENCES saas_plans(id)
+);

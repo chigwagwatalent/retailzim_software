@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head(${tenant.companyName})}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: platformSidebar('tenants')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: platformTopbar(${tenant.companyName})}"></nav>
+
+    <section class="page-hero tenant-detail-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-store"></i></div>
+        <div>
+          <p th:text="${tenant.tenantCode + ' / ' + planName}">Code</p>
+          <h1 th:text="${tenant.companyName}">Tenant</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-receipt"></i><strong th:text="${monthSales}">0</strong><span>Sales this month</span></div>
+        <div><i class="fa-solid fa-sack-dollar"></i><strong th:text="${'USD ' + monthRevenueUsd}">USD 0.00</strong><span>Month revenue</span></div>
+        <div><i class="fa-solid fa-chart-line"></i><strong th:text="${'USD ' + monthProfit}">USD 0.00</strong><span>Gross profit</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-light" th:href="@{/admin/tenants}"><i class="fa-solid fa-arrow-left"></i>Tenants</a>
+      <a class="btn btn-light" href="#modal-edit-tenant"><i class="fa-solid fa-pen"></i>Edit Profile</a>
+      <a class="btn btn-primary" href="#modal-tenant-announcement"><i class="fa-solid fa-bullhorn"></i>Message Shop</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="subscription-command-grid">
+      <article class="subscription-command-card metric-blue"><span>Today Sales</span><strong th:text="${todaySales}">0</strong><small>Transactions today</small></article>
+      <article class="subscription-command-card metric-green"><span>Users</span><strong th:text="${activeUsers}">0</strong><small th:text="${#lists.size(users) + ' total users'}">0 total</small></article>
+      <article class="subscription-command-card metric-orange"><span>Products</span><strong th:text="${activeProducts}">0</strong><small>Active catalogue lines</small></article>
+      <article class="subscription-command-card metric-red"><span>Risk Signals</span><strong th:text="${voidedMonth}">0</strong><small>Voided sales this month</small></article>
+    </section>
+
+    <section class="tenant-detail-grid">
+      <div class="panel table-panel">
+        <div class="panel-title-row"><div><p class="eyebrow">Behavior</p><h2>Recent Sales</h2></div></div>
+        <table><thead><tr><th>Receipt</th><th>Currency</th><th>Total</th><th>Profit</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody><tr th:each="s : ${recentSales}">
+            <td th:text="${s.receiptNumber}">Receipt</td><td th:text="${s.currency}">USD</td><td th:text="${s.grandTotal}">0</td><td th:text="${s.grossProfit}">0</td>
+            <td><span class="badge" th:classappend="${' status-' + #strings.toLowerCase(s.status)}" th:text="${s.status}">COMPLETED</span></td>
+            <td th:text="${s.createdAt != null ? #temporals.format(s.createdAt, 'dd MMM HH:mm') : ''}">Date</td>
+          </tr></tbody>
+        </table>
+        <p class="empty" th:if="${#lists.isEmpty(recentSales)}">No sales yet.</p>
+      </div>
+
+      <aside class="panel tenant-profile-card">
+        <div class="panel-title-row"><div><p class="eyebrow">Profile</p><h2>Shop Details</h2></div><span class="badge" th:classappend="${' status-' + #strings.toLowerCase(tenant.status)}" th:text="${tenant.status}">ACTIVE</span></div>
+        <dl class="detail-list">
+          <div><dt>Email</dt><dd th:text="${tenant.email}">email</dd></div>
+          <div><dt>Phone</dt><dd th:text="${tenant.phone ?: 'Not set'}">phone</dd></div>
+          <div><dt>Location</dt><dd th:text="${(tenant.city ?: 'Unknown') + ', ' + (tenant.country ?: '')}">city</dd></div>
+          <div><dt>Subscription End</dt><dd th:text="${tenant.subscriptionEnd != null ? #temporals.format(tenant.subscriptionEnd, 'dd MMM yyyy') : 'Open ended'}">date</dd></div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="tenant-detail-grid" style="margin-top:16px">
+      <div id="live-chat" class="panel chat-panel" th:attr="data-feed-url=@{/admin/tenants/{id}/chat/feed(id=${tenant.id})}">
+        <div class="panel-title-row"><div><p class="eyebrow">Realtime support</p><h2>Live Chat</h2></div><span class="badge status-active">LIVE</span></div>
+        <div class="chat-feed">
+          <article th:each="m : ${chatMessages}" th:class="${m.senderType.name() == 'PLATFORM' ? 'chat-message platform' : 'chat-message shop'}">
+            <strong th:text="${m.senderName}">Sender</strong>
+            <p th:text="${m.message}">Message</p>
+            <small th:text="${m.createdAt != null ? #temporals.format(m.createdAt, 'dd MMM HH:mm') : ''}">time</small>
+          </article>
+        </div>
+        <form method="post" th:action="@{/admin/tenants/{id}/chat(id=${tenant.id})}" class="chat-form">
+          <input name="message" required placeholder="Type a live support message">
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i>Send</button>
+        </form>
+      </div>
+
+      <div class="panel table-panel">
+        <div class="panel-title-row"><div><p class="eyebrow">Recent signals</p><h2>Notifications</h2></div></div>
+        <table><thead><tr><th>Type</th><th>Title</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody><tr th:each="n : ${recentNotifications}">
+            <td th:text="${n.type}">SYSTEM</td><td th:text="${n.title}">Title</td>
+            <td><span th:class="${n.isRead ? 'badge status-completed' : 'badge status-pending'}" th:text="${n.isRead ? 'READ' : 'UNREAD'}">UNREAD</span></td>
+            <td th:text="${n.createdAt != null ? #temporals.format(n.createdAt, 'dd MMM HH:mm') : ''}">Date</td>
+          </tr></tbody>
+        </table>
+        <p class="empty" th:if="${#lists.isEmpty(recentNotifications)}">No notifications yet.</p>
+      </div>
+    </section>
+
+    <section class="tenant-detail-grid" style="margin-top:16px">
+      <div class="panel table-panel">
+        <div class="panel-title-row"><div><p class="eyebrow">Structure</p><h2>Branches</h2></div></div>
+        <table><thead><tr><th>Code</th><th>Name</th><th>City</th><th>Status</th></tr></thead>
+          <tbody><tr th:each="b : ${branches}"><td th:text="${b.branchCode}"></td><td th:text="${b.name}"></td><td th:text="${b.city}"></td><td><span class="badge status-active">ACTIVE</span></td></tr></tbody>
+        </table>
+      </div>
+      <div class="panel table-panel">
+        <div class="panel-title-row"><div><p class="eyebrow">Billing</p><h2>Subscriptions</h2></div></div>
+        <table><thead><tr><th>Plan</th><th>Status</th><th>Currency</th><th>Amount</th><th>Ends</th></tr></thead>
+          <tbody><tr th:each="s : ${subscriptions}"><td th:text="${s.planId}">Plan</td><td th:text="${s.status}">ACTIVE</td><td th:text="${s.currency}">USD</td><td th:text="${s.amountPaid}">0</td><td th:text="${s.endsAt}">Date</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div id="modal-tenant-announcement" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Message ' + tenant.companyName}">Message Shop</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/admin/tenants/{id}/announce(id=${tenant.id})}" class="form-grid">
+        <label>Subject<input name="subject" required></label>
+        <label class="check-row"><input name="emailEnabled" type="checkbox" value="true"> Send email too</label>
+        <label style="grid-column:1/-1">Message<textarea name="message" required></textarea></label>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Send</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-edit-tenant" class="modal"><div class="modal-content modal-wide">
+      <div class="modal-head"><h2>Edit Tenant</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/admin/tenants/{id}/edit(id=${tenant.id})}" class="form-grid">
+        <label>Company<input name="companyName" th:value="${tenant.companyName}" required></label>
+        <label>Email<input name="email" type="email" th:value="${tenant.email}" required></label>
+        <label>Phone<input name="phone" th:value="${tenant.phone}"></label>
+        <label>Website<input name="website" th:value="${tenant.website}"></label>
+        <label>City<input name="city" th:value="${tenant.city}"></label>
+        <label>Country<input name="country" th:value="${tenant.country}"></label>
+        <label>Status<select name="status" required><option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == tenant.status}"></option></select></label>
+        <label>Package<select name="planId"><option value="">No package</option><option th:each="p : ${plans}" th:value="${p.id}" th:text="${p.name}" th:selected="${p.id == tenant.planId}"></option></select></label>
+        <label>Registration<input name="registrationNumber" th:value="${tenant.registrationNumber}"></label>
+        <label>VAT<input name="vatNumber" th:value="${tenant.vatNumber}"></label>
+        <label style="grid-column:1/-1">Address<textarea name="address" th:text="${tenant.address}"></textarea></label>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Tenant</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title + ' | RetailZW'}">RetailZW</title>
+  <script>
+    document.documentElement.dataset.theme = localStorage.getItem('retailzw-theme') || 'light';
+  </script>
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=17)}">
+  <link rel="stylesheet" th:href="@{/css/billing.css(v=1)}">
+  <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
+  <script defer th:src="@{/js/retailzw.js(v=15)}"></script>
+</head>
+<body>
+<aside class="sidebar" th:fragment="shopSidebar(active)">
+  <div class="brand sidebar-brand">
+    <span class="brand-mark"><span></span></span><span>RetailZW</span>
+  </div>
+  <a th:class="${active == 'dashboard' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/dashboard}">
+    <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+  </a>
+
+  <details class="nav-group" th:attr="open=${salesModules.contains(active)} ? 'open' : null">
+    <summary><i class="fa-solid fa-cash-register"></i><span>Sales Desk</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
+    <a th:each="m : ${salesModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+    </a>
+  </details>
+
+  <details class="nav-group" th:attr="open=${stockModules.contains(active)} ? 'open' : null">
+    <summary><i class="fa-solid fa-boxes-stacked"></i><span>Stock Control</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
+    <a th:each="m : ${stockModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+    </a>
+  </details>
+
+  <details class="nav-group" th:attr="open=${peopleModules.contains(active)} ? 'open' : null">
+    <summary><i class="fa-solid fa-users"></i><span>People</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
+    <a th:each="m : ${peopleModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+    </a>
+  </details>
+
+  <details class="nav-group" th:attr="open=${financeModules.contains(active)} ? 'open' : null">
+    <summary><i class="fa-solid fa-chart-line"></i><span>Finance</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
+    <a th:each="m : ${financeModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+    </a>
+  </details>
+
+  <a th:class="${active == 'billing' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/billing}">
+    <i class="fa-solid fa-credit-card"></i><span>Subscription</span>
+  </a>
+
+  <details class="nav-group" th:attr="open=${systemModules.contains(active)} ? 'open' : null">
+    <summary><i class="fa-solid fa-sliders"></i><span>System</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
+    <a th:each="m : ${systemModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+    </a>
+  </details>
+</aside>
+
+<aside class="sidebar" th:fragment="platformSidebar(active)">
+  <div class="brand sidebar-brand">
+    <span class="brand-mark"><span></span></span><span>RetailZW SaaS</span>
+  </div>
+  <details class="nav-group" open>
+    <summary><i class="fa-solid fa-building-shield"></i><span>Platform</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
+    <a th:class="${active == 'dashboard' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/dashboard}"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+    <a th:class="${active == 'tenants' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/tenants}"><i class="fa-solid fa-store"></i><span>Tenant Shops</span></a>
+    <a th:class="${active == 'support' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/support}">
+      <i class="fa-solid fa-headset"></i><span>Live Support</span>
+      <small th:if="${supportUnreadCount != null and supportUnreadCount > 0}" class="nav-pill" th:text="${supportUnreadCount}">0</small>
+    </a>
+    <a th:class="${active == 'subscriptions' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/subscriptions}"><i class="fa-solid fa-receipt"></i><span>Subscriptions</span></a>
+  </details>
+</aside>
+
+<nav class="app-topbar" th:fragment="shopTopbar(title)">
+  <button class="back-button" type="button" onclick="history.back()" title="Back"><i class="fa-solid fa-chevron-left"></i></button>
+  <div class="topbar-actions">
+    <label class="topbar-search">
+      <input type="search" placeholder="Search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </label>
+    <details class="quick-links">
+      <summary class="icon-button" title="Quick links"><i class="fa-solid fa-grip"></i></summary>
+      <div class="quick-menu">
+        <strong>Quick Links</strong>
+        <div class="quick-grid">
+          <a th:href="@{/shop/products}"><i class="fa-solid fa-box-open"></i></a>
+          <a th:href="@{/shop/inventory}"><i class="fa-solid fa-warehouse"></i></a>
+          <a th:href="@{/shop/categories}"><i class="fa-solid fa-layer-group"></i></a>
+          <a th:href="@{/shop/customers}"><i class="fa-solid fa-users"></i></a>
+          <a th:href="@{/shop/reports}"><i class="fa-solid fa-chart-line"></i></a>
+          <a th:href="@{/shop/company}"><i class="fa-solid fa-building"></i></a>
+        </div>
+      </div>
+    </details>
+    <button class="icon-button theme-toggle dotted" type="button" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    <a th:class="${unreadNotificationCount != null and unreadNotificationCount > 0 ? 'icon-button dotted has-badge' : 'icon-button dotted'}"
+       th:href="@{/shop/notifications}" title="Notifications">
+      <i class="fa-solid fa-bell"></i><span th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
+    </a>
+    <details class="account-menu">
+      <summary class="account-summary" title="Account menu">
+        <span class="avatar-chip" th:text="${currentUser != null ? currentUser.initials : 'U'}">U</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </summary>
+      <div class="account-dropdown">
+        <div class="account-head">
+          <span class="avatar-chip" th:text="${currentUser != null ? currentUser.initials : 'U'}">U</span>
+          <div>
+            <strong th:text="${currentUser != null ? currentUser.displayName : #authentication.name}">User</strong>
+            <small th:text="${currentUser != null ? currentUser.email : #authentication.name}">user@retailzw.co.zw</small>
+            <small th:text="${currentUser != null ? currentUser.roleLabel + ' - ' + currentUser.branchLabel : ''}">Role</small>
+          </div>
+        </div>
+        <a th:href="@{/shop/users}"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+        <a th:href="@{/shop/company}"><i class="fa-solid fa-building"></i><span>Company Profile</span></a>
+        <button class="theme-toggle account-action" type="button"><i class="fa-solid fa-moon"></i><span>Light / Dark Mode</span></button>
+        <form method="post" th:action="@{/auth/shop/logout}">
+          <button class="account-action danger" type="submit"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
+        </form>
+      </div>
+    </details>
+  </div>
+  <div id="support-chat" class="support-widget chat-panel" th:attr="data-feed-url=@{/shop/support/chat/feed}">
+    <button class="support-fab" type="button" data-chat-toggle title="Live support">
+      <i class="fa-solid fa-headset"></i>
+      <span th:if="${supportUnreadCount != null and supportUnreadCount > 0}" th:text="${supportUnreadCount}">0</span>
+    </button>
+    <div class="support-window" data-chat-window>
+      <div class="support-head">
+        <div>
+          <strong>RetailZW Support</strong>
+          <small>Live platform assistance</small>
+        </div>
+        <button class="icon-button" type="button" data-chat-toggle title="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="chat-feed support-feed">
+        <article th:each="m : ${supportChatMessages}" th:class="${m.senderType.name() == 'PLATFORM' ? 'chat-message platform' : 'chat-message shop'}">
+          <strong th:text="${m.senderName}">Sender</strong>
+          <p th:text="${m.message}">Message</p>
+          <small th:text="${m.createdAt != null ? #temporals.format(m.createdAt, 'dd MMM HH:mm') : ''}">time</small>
+        </article>
+      </div>
+      <form method="post" th:action="@{/shop/support/chat}" class="chat-form" data-async-chat>
+        <input name="message" required placeholder="Type your message">
+        <button class="btn btn-primary" type="submit" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<nav class="app-topbar" th:fragment="platformTopbar(title)">
+  <button class="back-button" type="button" onclick="history.back()" title="Back"><i class="fa-solid fa-chevron-left"></i></button>
+  <div class="topbar-actions">
+    <label class="topbar-search">
+      <input type="search" placeholder="Search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </label>
+    <details class="quick-links">
+      <summary class="icon-button" title="Quick links"><i class="fa-solid fa-grip"></i></summary>
+      <div class="quick-menu">
+        <strong>Quick Links</strong>
+        <div class="quick-grid">
+          <a th:href="@{/admin/dashboard}"><i class="fa-solid fa-building-shield"></i></a>
+          <a th:href="@{/admin/tenants}"><i class="fa-solid fa-store"></i></a>
+          <a th:href="@{/admin/support}"><i class="fa-solid fa-headset"></i></a>
+          <a th:href="@{/admin/subscriptions}"><i class="fa-solid fa-receipt"></i></a>
+          <a th:href="@{/auth/signup}"><i class="fa-solid fa-user-plus"></i></a>
+          <a th:href="@{/auth/admin/login}"><i class="fa-solid fa-lock"></i></a>
+        </div>
+      </div>
+    </details>
+    <button class="icon-button theme-toggle dotted" type="button" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    <span th:class="${unreadNotificationCount != null and unreadNotificationCount > 0 ? 'icon-button dotted has-badge' : 'icon-button dotted'}">
+      <i class="fa-solid fa-bell"></i><span th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
+    </span>
+    <a th:class="${supportUnreadCount != null and supportUnreadCount > 0 ? 'icon-button dotted has-badge' : 'icon-button dotted'}"
+       th:href="@{/admin/support}" title="Live support">
+      <i class="fa-solid fa-headset"></i><span th:if="${supportUnreadCount != null and supportUnreadCount > 0}" th:text="${supportUnreadCount}">0</span>
+    </a>
+    <details class="account-menu">
+      <summary class="account-summary" title="Account menu">
+        <span class="avatar-chip" th:text="${currentUser != null ? currentUser.initials : 'U'}">U</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </summary>
+      <div class="account-dropdown">
+        <div class="account-head">
+          <span class="avatar-chip" th:text="${currentUser != null ? currentUser.initials : 'U'}">U</span>
+          <div>
+            <strong th:text="${currentUser != null ? currentUser.displayName : #authentication.name}">User</strong>
+            <small th:text="${currentUser != null ? currentUser.email : #authentication.name}">admin@info.com</small>
+            <small th:text="${currentUser != null ? currentUser.roleLabel + ' - ' + currentUser.branchLabel : ''}">Role</small>
+          </div>
+        </div>
+        <a th:href="@{/admin/dashboard}"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+        <a th:href="@{/admin/tenants}"><i class="fa-solid fa-store"></i><span>Tenant Shops</span></a>
+        <a th:href="@{/admin/subscriptions}"><i class="fa-solid fa-receipt"></i><span>Subscriptions</span></a>
+        <button class="theme-toggle account-action" type="button"><i class="fa-solid fa-moon"></i><span>Light / Dark Mode</span></button>
+        <form method="post" th:action="@{/auth/admin/logout}">
+          <button class="account-action danger" type="submit"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
+        </form>
+      </div>
+    </details>
+  </div>
+</nav>
+
+<div class="pagination-bar" th:fragment="pagination(page, links, prevUrl, nextUrl)"
+     th:if="${page != null and page.totalElements > page.size}">
+  <div>
+    <strong th:text="${page.totalElements + ' records'}">0 records</strong>
+    <small th:text="${'Page ' + (page.number + 1) + ' of ' + page.totalPages}">Page 1 of 1</small>
+  </div>
+  <nav>
+    <a class="btn btn-light" th:classappend="${prevUrl == null ? ' disabled' : ''}" th:href="${prevUrl ?: '#'}"><i class="fa-solid fa-chevron-left"></i>Prev</a>
+    <a th:each="link : ${links}" th:href="${link.url}" th:class="${link.active ? 'page-number active' : 'page-number'}" th:text="${link.label}">1</a>
+    <a class="btn btn-light" th:classappend="${nextUrl == null ? ' disabled' : ''}" th:href="${nextUrl ?: '#'}">Next<i class="fa-solid fa-chevron-right"></i></a>
+  </nav>
+</div>
+</body>
+</html>

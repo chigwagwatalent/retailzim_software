@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Categories')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('categories')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Categories')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-layer-group"></i></div>
+        <div>
+          <p>Catalogue structure,</p>
+          <h1>Product Categories</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-layer-group"></i><strong th:text="${#lists.size(categoryList)}">0</strong><span>Categories</span></div>
+        <div><i class="fa-solid fa-box-open"></i><strong th:text="${#aggregates.sum(categoryProductCounts.values()) ?: 0}">0</strong><span>Linked Products</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-blue" th:href="@{/shop/products}"><i class="fa-solid fa-box-open"></i>Products</a>
+      <a class="btn btn-primary" href="#modal-create-category"><i class="fa-solid fa-plus"></i>Add Category</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Search Results</span><strong th:text="${categoryPage.totalElements}">0</strong><div><em style="width:75%"></em></div><small>Matching category filters</small></div>
+      <div class="metric-card metric-green"><span>Active</span><strong th:text="${activeCategoryCount}">0</strong><div><em style="width:80%"></em></div><small>Visible to products</small></div>
+      <div class="metric-card metric-orange"><span>Empty</span><strong th:text="${emptyCategoryCount}">0</strong><div><em style="width:45%"></em></div><small>No linked products yet</small></div>
+      <div class="metric-card metric-red"><span>Products</span><strong th:text="${#aggregates.sum(categoryProductCounts.values()) ?: 0}">0</strong><div><em style="width:65%"></em></div><small>Active products grouped</small></div>
+    </section>
+
+    <section class="panel filter-panel">
+      <form method="get" th:action="@{/shop/categories}" class="filter-grid">
+        <label>Search categories
+          <input name="search" th:value="${categorySearch}" placeholder="Name, code or description">
+        </label>
+        <button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
+        <a class="btn btn-light" th:href="@{/shop/categories}"><i class="fa-solid fa-rotate-right"></i>Reset</a>
+      </form>
+    </section>
+
+    <section class="grid category-card-grid">
+      <div class="panel category-card" th:each="c : ${categoryList}">
+        <div class="branch-card-head">
+          <span class="branch-badge"><i class="fa-solid fa-layer-group"></i></span>
+          <div>
+            <h2 th:text="${c.name}">Category</h2>
+            <small th:text="${(c.code ?: 'NO-CODE') + (c.parentId != null ? ' - under ' + (parentCategoryById.get(c.parentId) ?: 'parent') : '')}">Code</small>
+          </div>
+          <span th:class="${c.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${c.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
+        </div>
+        <p th:text="${c.description ?: 'No description captured.'}">Description</p>
+        <div class="branch-mini-stats">
+          <div><strong th:text="${categoryProductCounts.get(c.id) ?: 0}">0</strong><span>Products</span></div>
+          <div><strong th:text="${c.sortOrder ?: 0}">0</strong><span>Sort</span></div>
+          <div><strong th:text="${c.parentId == null ? 'Root' : 'Child'}">Root</strong><span>Level</span></div>
+        </div>
+        <div class="branch-actions">
+          <a class="btn btn-light" th:href="${'#modal-edit-category-' + c.id}"><i class="fa-solid fa-pen"></i>Edit</a>
+          <form th:if="${!c.isActive}" method="post" th:action="@{'/shop/categories/' + ${c.id} + '/activate'}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-toggle-on"></i>Activate</button></form>
+          <form th:if="${c.isActive}" method="post" th:action="@{'/shop/categories/' + ${c.id} + '/deactivate'}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-toggle-off"></i>Deactivate</button></form>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Category Directory</h2>
+        <span class="badge" th:text="${categoryPage.totalElements + ' categories'}">0 categories</span>
+      </div>
+      <table>
+        <thead><tr><th>Category</th><th>Parent</th><th>Products</th><th>Sort</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="c : ${categoryList}">
+          <td><strong th:text="${c.name}">Name</strong><small th:text="${c.code ?: 'No code'}">Code</small></td>
+          <td th:text="${c.parentId == null ? 'Root category' : (parentCategoryById.get(c.parentId) ?: 'Parent #' + c.parentId)}">Parent</td>
+          <td th:text="${categoryProductCounts.get(c.id) ?: 0}">0</td>
+          <td th:text="${c.sortOrder ?: 0}">0</td>
+          <td><span th:class="${c.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${c.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+          <td><a class="icon-button mini" th:href="${'#modal-edit-category-' + c.id}" title="Edit"><i class="fa-solid fa-pen"></i></a></td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(categoryList)}">No categories match this search.</div>
+      <div th:replace="~{common/layout :: pagination(${categoryPage}, ${categoryPageLinks}, ${categoryPrevUrl}, ${categoryNextUrl})}"></div>
+    </section>
+
+    <div id="modal-create-category" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Add Category</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/categories}" class="form-grid">
+        <label>Name<input name="name" required placeholder="Groceries"></label>
+        <label>Code<input name="code" placeholder="GROC"></label>
+        <label>Parent
+          <select name="parentId">
+            <option value="">Root category</option>
+            <option th:each="c : ${categoryList}" th:value="${c.id}" th:text="${c.name}">Category</option>
+          </select>
+        </label>
+        <label>Sort Order<input name="sortOrder" type="number" value="0"></label>
+        <label>Image URL<input name="imageUrl"></label>
+        <label style="grid-column:1/-1">Description<textarea name="description" placeholder="Fast moving retail lines"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Category</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="c : ${categoryList}" th:id="${'modal-edit-category-' + c.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Edit ' + c.name}">Edit Category</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/categories/' + ${c.id} + '/update'}" class="form-grid">
+        <label>Name<input name="name" th:value="${c.name}" required></label>
+        <label>Code<input name="code" th:value="${c.code}"></label>
+        <label>Parent
+          <select name="parentId">
+            <option value="" th:selected="${c.parentId == null}">Root category</option>
+            <option th:each="p : ${categoryList}" th:if="${p.id != c.id}" th:value="${p.id}" th:selected="${c.parentId == p.id}" th:text="${p.name}">Category</option>
+          </select>
+        </label>
+        <label>Sort Order<input name="sortOrder" type="number" th:value="${c.sortOrder ?: 0}"></label>
+        <label>Image URL<input name="imageUrl" th:value="${c.imageUrl}"></label>
+        <label style="grid-column:1/-1">Description<textarea name="description" th:text="${c.description}"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Category</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

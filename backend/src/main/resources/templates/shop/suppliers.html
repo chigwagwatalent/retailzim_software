@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Suppliers')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('suppliers')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Suppliers')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-truck-field"></i></div>
+        <div>
+          <p>Zimbabwe supplier network,</p>
+          <h1>Supplier Management</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-file-invoice-dollar"></i><strong th:text="${totalPurchaseOrderCount}">0</strong><span>Purchase Orders</span></div>
+        <div><i class="fa-solid fa-sack-dollar"></i><strong th:text="${'USD ' + #numbers.formatDecimal(totalPurchaseValueUsd, 1, 2)}">USD 0.00</strong><span>Order Value</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-blue" href="#modal-search-supplier"><i class="fa-solid fa-magnifying-glass"></i>Find Supplier</a>
+      <a class="btn btn-light" th:href="@{/shop/purchasing}"><i class="fa-solid fa-file-invoice"></i>Purchase Orders</a>
+      <a class="btn btn-primary" href="#modal-create-supplier"><i class="fa-solid fa-plus"></i>Add Supplier</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Total Suppliers</span><strong th:text="${supplierPage.totalElements}">0</strong><div><em style="width:78%"></em></div><small>Trading partners</small></div>
+      <div class="metric-card metric-green"><span>Active</span><strong th:text="${activeSupplierCount}">0</strong><div><em style="width:72%"></em></div><small>Available for purchasing</small></div>
+      <div class="metric-card metric-orange"><span>Local Zimbabwe</span><strong th:text="${localSupplierCount}">0</strong><div><em style="width:62%"></em></div><small>Country set as Zimbabwe</small></div>
+      <div class="metric-card metric-red"><span>Archived</span><strong th:text="${inactiveSupplierCount}">0</strong><div><em style="width:36%"></em></div><small>Hidden from new POs</small></div>
+    </section>
+
+    <section class="grid supplier-card-grid">
+      <div class="panel branch-card supplier-card" th:each="s : ${supplierList}">
+        <div class="branch-card-head">
+          <span class="branch-badge"><i class="fa-solid fa-industry"></i></span>
+          <div>
+            <h2 th:text="${s.name}">Supplier</h2>
+            <small th:text="${s.contactPerson ?: 'No contact person'}">Contact</small>
+          </div>
+          <span th:class="${s.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${s.isActive ? 'ACTIVE' : 'ARCHIVED'}">ACTIVE</span>
+        </div>
+        <p th:text="${s.address ?: ((s.city ?: 'Zimbabwe') + ' supplier')}">Address</p>
+        <div class="branch-mini-stats">
+          <div><strong th:text="${supplierPoCounts.get(s.id) ?: 0}">0</strong><span>Orders</span></div>
+          <div><strong th:text="${supplierOpenPoCounts.get(s.id) ?: 0}">0</strong><span>Open POs</span></div>
+          <div><strong th:text="${supplierLastOrder.get(s.id) ?: '-'}">-</strong><span>Last order</span></div>
+        </div>
+        <div class="branch-actions">
+          <a class="btn btn-light" th:href="${'#modal-edit-supplier-' + s.id}"><i class="fa-solid fa-pen"></i>Edit</a>
+          <form th:if="${!s.isActive}" method="post" th:action="@{'/shop/suppliers/' + ${s.id} + '/activate'}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-toggle-on"></i>Activate</button></form>
+          <form th:if="${s.isActive}" method="post" th:action="@{'/shop/suppliers/' + ${s.id} + '/deactivate'}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-box-archive"></i>Archive</button></form>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Supplier Directory</h2>
+        <span class="badge" th:text="${supplierPage.totalElements + ' suppliers'}">0 suppliers</span>
+      </div>
+      <table>
+        <thead>
+        <tr><th>Supplier</th><th>Contact</th><th>Location</th><th>Terms</th><th>Orders</th><th>Value</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${supplierList}">
+          <td>
+            <div class="user-cell">
+              <span class="avatar-chip small-avatar" th:text="${#strings.substring(s.name,0,1)}">S</span>
+              <div>
+                <strong th:text="${s.name}">Supplier</strong>
+                <small th:text="${s.taxNumber ?: 'No tax number'}">Tax</small>
+                <small th:text="${s.notes ?: 'No notes captured'}">Notes</small>
+              </div>
+            </div>
+          </td>
+          <td><strong th:text="${s.contactPerson ?: 'No contact'}">Contact</strong><small th:text="${(s.phone ?: 'No phone') + ' / ' + (s.mobile ?: 'No mobile')}">Phone</small><small th:text="${s.email ?: 'No email'}">Email</small></td>
+          <td><strong th:text="${s.city ?: 'No city'}">City</strong><small th:text="${s.country ?: 'Zimbabwe'}">Country</small></td>
+          <td><strong th:text="${s.paymentTerms ?: 'Cash / agreed terms'}">Terms</strong><small th:text="${s.bankName ?: 'No bank captured'}">Bank</small></td>
+          <td><strong th:text="${supplierPoCounts.get(s.id) ?: 0}">0</strong><small th:text="${(supplierOpenPoCounts.get(s.id) ?: 0) + ' open'}">0 open</small></td>
+          <td><strong th:text="${'USD ' + #numbers.formatDecimal(supplierOrderValueUsd.get(s.id) ?: 0, 1, 2)}">USD 0</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(supplierOrderValueZwg.get(s.id) ?: 0, 1, 2)}">ZWG 0</small></td>
+          <td><span th:class="${s.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${s.isActive ? 'ACTIVE' : 'ARCHIVED'}">ACTIVE</span></td>
+          <td>
+            <div class="action-row">
+              <a class="icon-button mini" th:href="${'#modal-edit-supplier-' + s.id}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+              <form th:if="${!s.isActive}" method="post" th:action="@{'/shop/suppliers/' + ${s.id} + '/activate'}"><button class="icon-button mini" type="submit" title="Activate"><i class="fa-solid fa-toggle-on"></i></button></form>
+              <form th:if="${s.isActive}" method="post" th:action="@{'/shop/suppliers/' + ${s.id} + '/deactivate'}"><button class="icon-button mini danger" type="submit" title="Archive"><i class="fa-solid fa-box-archive"></i></button></form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(supplierList)}">No suppliers found. Add your first supplier or clear the search.</div>
+      <div th:replace="~{common/layout :: pagination(${supplierPage}, ${supplierPageLinks}, ${supplierPrevUrl}, ${supplierNextUrl})}"></div>
+    </section>
+
+    <div id="modal-search-supplier" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Find Supplier</h2><a class="close" href="#">&times;</a></div>
+      <form method="get" th:action="@{/shop/suppliers}" class="form-grid">
+        <label style="grid-column:1/-1">Search by name, contact, city, phone, email or tax number<input name="search" th:value="${supplierSearch}" placeholder="Delta, Harare, +263, VAT number"></label>
+        <div class="modal-actions"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-create-supplier" class="modal"><div class="modal-content wide-modal">
+      <div class="modal-head"><h2>Add Supplier</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/suppliers}" class="form-grid">
+        <label>Company Name<input name="name" required placeholder="Delta Beverages"></label>
+        <label>Contact Person<input name="contactPerson" placeholder="John Moyo"></label>
+        <label>Phone<input name="phone" placeholder="+263 24 000 0000"></label>
+        <label>Mobile<input name="mobile" placeholder="+263 77 000 0000"></label>
+        <label>Email<input name="email" type="email" placeholder="supplier@example.co.zw"></label>
+        <label>City<input name="city" placeholder="Harare"></label>
+        <label>Country<input name="country" value="Zimbabwe"></label>
+        <label>Tax Number<input name="taxNumber" placeholder="VAT / tax registration"></label>
+        <label>Payment Terms<input name="paymentTerms" placeholder="Cash, 7 days, 30 days"></label>
+        <label>Bank Name<input name="bankName" placeholder="CBZ, Stanbic, FBC"></label>
+        <label>Bank Account<input name="bankAccount" placeholder="Account number"></label>
+        <label style="grid-column:1/-1">Address<textarea name="address" placeholder="Street, industrial area, city"></textarea></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes" placeholder="Lead times, delivery days, preferred ordering method"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Supplier</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="s : ${supplierList}" th:id="${'modal-edit-supplier-' + s.id}" class="modal"><div class="modal-content wide-modal">
+      <div class="modal-head"><h2 th:text="${'Edit ' + s.name}">Edit Supplier</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/suppliers/' + ${s.id} + '/update'}" class="form-grid">
+        <label>Company Name<input name="name" th:value="${s.name}" required></label>
+        <label>Contact Person<input name="contactPerson" th:value="${s.contactPerson}"></label>
+        <label>Phone<input name="phone" th:value="${s.phone}"></label>
+        <label>Mobile<input name="mobile" th:value="${s.mobile}"></label>
+        <label>Email<input name="email" type="email" th:value="${s.email}"></label>
+        <label>City<input name="city" th:value="${s.city}"></label>
+        <label>Country<input name="country" th:value="${s.country}"></label>
+        <label>Tax Number<input name="taxNumber" th:value="${s.taxNumber}"></label>
+        <label>Payment Terms<input name="paymentTerms" th:value="${s.paymentTerms}"></label>
+        <label>Bank Name<input name="bankName" th:value="${s.bankName}"></label>
+        <label>Bank Account<input name="bankAccount" th:value="${s.bankAccount}"></label>
+        <label style="grid-column:1/-1">Address<textarea name="address" th:text="${s.address}"></textarea></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes" th:text="${s.notes}"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Supplier</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

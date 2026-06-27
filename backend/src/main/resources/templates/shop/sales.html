@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Sales History')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('sales')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Sales History')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-receipt"></i></div>
+        <div>
+          <p th:text="${'Viewing ' + selectedBranchName}">Viewing branch</p>
+          <h1>Sales History</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-dollar-sign"></i><strong th:text="${'USD ' + #numbers.formatDecimal(summaryRevenueUsd, 1, 2)}">USD 0.00</strong><span>Filtered revenue</span></div>
+        <div><i class="fa-solid fa-coins"></i><strong th:text="${'ZWG ' + #numbers.formatDecimal(summaryRevenueZwg, 1, 2)}">ZWG 0.00</strong><span>Filtered revenue</span></div>
+      </div>
+    </section>
+
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Transactions</span><strong th:text="${summaryTransactions}">0</strong><div><em style="width:75%"></em></div><small>Matching the current filter</small></div>
+      <div class="metric-card metric-green"><span>Completed Today</span><strong th:text="${#numbers.formatDecimal(summaryToday, 1, 2)}">0.00</strong><div><em style="width:68%"></em></div><small>Branch gross sales</small></div>
+      <div class="metric-card metric-orange"><span>Voided</span><strong th:text="${summaryVoided}">0</strong><div><em style="width:42%"></em></div><small>Cancelled receipts</small></div>
+      <div class="metric-card metric-red"><span>Branch</span><strong th:text="${selectedBranchName}">Branch</strong><div><em style="width:58%"></em></div><small>Isolated sales view</small></div>
+    </section>
+
+    <section class="panel cashier-performance-panel">
+      <div class="toolbar">
+        <div>
+          <h2>Cashier Performance</h2>
+          <small>Totals follow the branch, date, status and receipt filters below.</small>
+        </div>
+        <a class="btn btn-blue" href="#modal-cashier-summary"><i class="fa-solid fa-users-viewfinder"></i>View Cashier Report</a>
+      </div>
+      <div class="cashier-performance-grid">
+        <article class="cashier-performance-card" th:each="summary : ${cashierSummaries}">
+          <div class="cashier-avatar" th:text="${#strings.isEmpty(summary.name) ? 'C' : #strings.substring(summary.name, 0, 1)}">C</div>
+          <div class="cashier-card-copy">
+            <strong th:text="${summary.name}">Cashier</strong>
+            <span th:text="${summary.transactions + ' transactions / ' + summary.items + ' line items'}">0 transactions</span>
+          </div>
+          <div class="cashier-card-totals">
+            <strong th:text="${'USD ' + #numbers.formatDecimal(summary.revenueUsd, 1, 2)}">USD 0.00</strong>
+            <span th:text="${'ZWG ' + #numbers.formatDecimal(summary.revenueZwg, 1, 2)}">ZWG 0.00</span>
+          </div>
+          <a class="icon-button" th:href="${'#modal-cashier-' + summary.cashierId}" title="View cashier sales"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </article>
+      </div>
+      <div class="empty" th:if="${#lists.isEmpty(cashierSummaries)}">No cashier activity matches the current filters.</div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Receipt Search</h2>
+        <form method="get" th:action="@{/shop/sales}" class="inline-filter">
+          <select name="branchId" onchange="this.form.submit()">
+            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
+          </select>
+          <input type="date" name="from" th:value="${dateFrom}">
+          <input type="date" name="to" th:value="${dateTo}">
+          <select name="status">
+            <option value="">All Status</option>
+            <option value="COMPLETED" th:selected="${statusFilter == 'COMPLETED'}">Completed</option>
+            <option value="PARTIAL_REFUND" th:selected="${statusFilter == 'PARTIAL_REFUND'}">Partial Refund</option>
+            <option value="REFUNDED" th:selected="${statusFilter == 'REFUNDED'}">Refunded</option>
+            <option value="VOIDED" th:selected="${statusFilter == 'VOIDED'}">Voided</option>
+          </select>
+          <select name="cashierId">
+            <option value="">All Cashiers</option>
+            <option th:each="u : ${branchCashiers}" th:value="${u.id}" th:text="${u.firstName + ' ' + u.lastName}" th:selected="${u.id == cashierFilter}">Cashier</option>
+          </select>
+          <input name="search" placeholder="Receipt number" th:value="${saleSearch}">
+          <button class="btn btn-blue" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+          <a class="btn btn-light" th:href="@{/shop/sales(branchId=${selectedBranchId})}"><i class="fa-solid fa-xmark"></i>Clear</a>
+        </form>
+      </div>
+
+      <table>
+        <thead>
+        <tr><th>Receipt</th><th>Cashier</th><th>Items</th><th>Currency</th><th>Total</th><th>Payments</th><th>Status</th><th>Created</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="sale : ${saleList}">
+          <td><strong th:text="${sale.receiptNumber}">Receipt</strong><small th:text="${sale.isOfflineSale ? 'Offline synced' : 'Cloud sale'}">Source</small></td>
+          <td th:text="${cashierById.get(sale.cashierId) ?: 'User #' + sale.cashierId}">Cashier</td>
+          <td th:text="${#lists.size(sale.items)}">0</td>
+          <td><span class="badge" th:text="${sale.currency}">USD</span></td>
+          <td><strong th:text="${#numbers.formatDecimal(sale.grandTotal, 1, 2)}">0.00</strong><small th:text="${'Tax ' + #numbers.formatDecimal(sale.taxAmount, 1, 2)}">Tax</small></td>
+          <td><span class="badge status-active" th:each="payment : ${paymentsBySale.get(sale.id)}" th:text="${payment}">CASH USD</span></td>
+          <td><span th:class="${sale.status.name() == 'COMPLETED' ? 'badge status-active' : (sale.status.name() == 'VOIDED' ? 'badge status-suspended' : 'badge status-pending')}" th:text="${sale.status}">Status</span></td>
+          <td th:text="${#temporals.format(sale.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+          <td>
+            <div class="action-row">
+              <a class="icon-button mini" th:href="${'#modal-sale-' + sale.id}" title="View"><i class="fa-solid fa-eye"></i></a>
+              <a class="icon-button mini" th:if="${sale.status.name() == 'COMPLETED'}" th:href="${'#modal-return-sale-' + sale.id}" title="Return"><i class="fa-solid fa-rotate-left"></i></a>
+              <a class="icon-button mini danger" th:if="${sale.status.name() == 'COMPLETED'}" th:href="${'#modal-void-sale-' + sale.id}" title="Void"><i class="fa-solid fa-ban"></i></a>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(saleList)}">No sales found for this branch/filter.</div>
+      <div th:replace="~{common/layout :: pagination(${salesPage}, ${salePageLinks}, ${salePrevUrl}, ${saleNextUrl})}"></div>
+    </section>
+
+    <div th:each="sale : ${saleList}" th:id="${'modal-sale-' + sale.id}" class="modal"><div class="modal-content wide-modal">
+      <div class="modal-head"><h2 th:text="${sale.receiptNumber}">Receipt</h2><a class="close" href="#">&times;</a></div>
+      <section class="metric-grid compact-grid">
+        <div class="metric-card metric-blue"><span>Subtotal</span><strong th:text="${#numbers.formatDecimal(sale.subtotal, 1, 2)}">0</strong></div>
+        <div class="metric-card metric-green"><span>Tax</span><strong th:text="${#numbers.formatDecimal(sale.taxAmount, 1, 2)}">0</strong></div>
+        <div class="metric-card metric-orange"><span>Total</span><strong th:text="${#numbers.formatDecimal(sale.grandTotal, 1, 2)}">0</strong></div>
+        <div class="metric-card metric-red"><span>Status</span><strong th:text="${sale.status}">Status</strong></div>
+      </section>
+      <div class="table-wrap">
+        <table><thead><tr><th>Product</th><th>SKU</th><th>Qty</th><th>Unit</th><th>Tax</th><th>Total</th></tr></thead>
+          <tbody><tr th:each="item : ${sale.items}"><td th:text="${item.productName}">Product</td><td th:text="${item.productSku}">SKU</td><td th:text="${item.quantity}">0</td><td th:text="${#numbers.formatDecimal(item.unitPrice, 1, 2)}">0</td><td th:text="${#numbers.formatDecimal(item.taxAmount, 1, 2)}">0</td><td th:text="${#numbers.formatDecimal(item.lineTotal, 1, 2)}">0</td></tr></tbody>
+        </table>
+      </div>
+    </div></div>
+
+    <div th:each="sale : ${saleList}" th:id="${'modal-return-sale-' + sale.id}" class="modal"><div class="modal-content wide-modal">
+      <div class="modal-head"><h2 th:text="${'Return ' + sale.receiptNumber}">Return Sale</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/returns}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <input type="hidden" name="originalReceiptNumber" th:value="${sale.receiptNumber}">
+        <label>Reason<select name="reason" required><option>DEFECTIVE</option><option>WRONG_ITEM</option><option>CUSTOMER_CHANGED_MIND</option><option>DAMAGED</option><option>EXPIRED</option><option>OVERCHARGED</option><option>OTHER</option></select></label>
+        <label>Refund Method<select name="refundMethod" required><option>CASH</option><option>CARD</option><option>ECOCASH</option><option>ONEMONEY</option><option>INNBUCKS</option><option>STORE_CREDIT</option><option>EXCHANGE</option></select></label>
+        <div class="table-wrap" style="grid-column:1/-1">
+          <table><thead><tr><th>Product</th><th>Sold</th><th>Qty To Return</th><th>Restock</th><th>Notes</th></tr></thead>
+            <tbody><tr th:each="item,iter : ${sale.items}">
+              <td><input type="hidden" th:name="${'items[' + iter.index + '].productId'}" th:value="${item.productId}"><strong th:text="${item.productName}">Product</strong><small th:text="${item.productSku}">SKU</small></td><td th:text="${item.quantity}">0</td>
+              <td><input th:name="${'items[' + iter.index + '].quantity'}" type="number" step="0.0001" min="0" th:max="${item.quantity}" value="0"></td>
+              <td><select th:name="${'items[' + iter.index + '].restockItem'}"><option value="true">Yes</option><option value="false">No</option></select></td>
+              <td><input th:name="${'items[' + iter.index + '].notes'}" placeholder="Condition"></td>
+            </tr></tbody>
+          </table>
+        </div>
+        <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-rotate-left"></i>Process Return</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="sale : ${saleList}" th:id="${'modal-void-sale-' + sale.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Void ' + sale.receiptNumber}">Void Sale</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/sales/' + ${sale.id} + '/void'}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label style="grid-column:1/-1">Reason<textarea name="reason" required></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary danger" type="submit"><i class="fa-solid fa-ban"></i>Void Sale</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-cashier-summary" class="modal"><div class="modal-content wide-modal cashier-report-modal">
+      <div class="modal-head">
+        <div><p class="modal-eyebrow">Filtered performance</p><h2>Cashier Sales Report</h2></div>
+        <a class="close" href="#">&times;</a>
+      </div>
+      <section class="metric-grid compact-grid">
+        <div class="metric-card metric-blue"><span>Cashiers</span><strong th:text="${#lists.size(cashierSummaries)}">0</strong></div>
+        <div class="metric-card metric-green"><span>Transactions</span><strong th:text="${summaryTransactions}">0</strong></div>
+        <div class="metric-card metric-orange"><span>USD Revenue</span><strong th:text="${#numbers.formatDecimal(summaryRevenueUsd, 1, 2)}">0</strong></div>
+        <div class="metric-card metric-red"><span>ZWG Revenue</span><strong th:text="${#numbers.formatDecimal(summaryRevenueZwg, 1, 2)}">0</strong></div>
+      </section>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cashier</th><th>Transactions</th><th>Completed</th><th>Voided</th><th>Items</th><th>USD</th><th>ZWG</th><th>Average USD</th><th></th></tr></thead>
+          <tbody><tr th:each="summary : ${cashierSummaries}">
+            <td><strong th:text="${summary.name}">Cashier</strong><small th:text="${summary.lastSaleAt != null ? 'Last sale ' + #temporals.format(summary.lastSaleAt, 'dd MMM HH:mm') : 'No sales'}">Last sale</small></td>
+            <td th:text="${summary.transactions}">0</td>
+            <td th:text="${summary.completed}">0</td>
+            <td th:text="${summary.voided}">0</td>
+            <td th:text="${summary.items}">0</td>
+            <td th:text="${#numbers.formatDecimal(summary.revenueUsd, 1, 2)}">0</td>
+            <td th:text="${#numbers.formatDecimal(summary.revenueZwg, 1, 2)}">0</td>
+            <td th:text="${#numbers.formatDecimal(summary.averageUsd, 1, 2)}">0</td>
+            <td><a class="icon-button mini" th:href="${'#modal-cashier-' + summary.cashierId}" title="Open details"><i class="fa-solid fa-eye"></i></a></td>
+          </tr></tbody>
+        </table>
+      </div>
+    </div></div>
+
+    <div th:each="summary : ${cashierSummaries}" th:id="${'modal-cashier-' + summary.cashierId}" class="modal"><div class="modal-content wide-modal cashier-report-modal">
+      <div class="modal-head">
+        <div><p class="modal-eyebrow">Cashier sales history</p><h2 th:text="${summary.name}">Cashier</h2></div>
+        <a class="close" href="#">&times;</a>
+      </div>
+      <section class="cashier-detail-strip">
+        <div><span>Transactions</span><strong th:text="${summary.transactions}">0</strong></div>
+        <div><span>Completed</span><strong th:text="${summary.completed}">0</strong></div>
+        <div><span>USD Total</span><strong th:text="${#numbers.formatDecimal(summary.revenueUsd, 1, 2)}">0</strong></div>
+        <div><span>ZWG Total</span><strong th:text="${#numbers.formatDecimal(summary.revenueZwg, 1, 2)}">0</strong></div>
+        <div><span>Average USD</span><strong th:text="${#numbers.formatDecimal(summary.averageUsd, 1, 2)}">0</strong></div>
+      </section>
+      <div class="table-wrap cashier-sales-table">
+        <table>
+          <thead><tr><th>Receipt</th><th>Items</th><th>Currency</th><th>Total</th><th>Payments</th><th>Status</th><th>Created</th></tr></thead>
+          <tbody><tr th:each="sale : ${cashierSales.get(summary.cashierId)}">
+            <td><strong th:text="${sale.receiptNumber}">Receipt</strong><small th:text="${sale.isOfflineSale ? 'Offline synced' : 'Cloud sale'}">Source</small></td>
+            <td th:text="${#lists.size(sale.items)}">0</td>
+            <td><span class="badge" th:text="${sale.currency}">USD</span></td>
+            <td th:text="${#numbers.formatDecimal(sale.grandTotal, 1, 2)}">0</td>
+            <td><span class="badge status-active" th:each="payment : ${cashierPaymentsBySale.get(sale.id)}" th:text="${payment}">CASH</span></td>
+            <td><span th:class="${sale.status.name() == 'COMPLETED' ? 'badge status-active' : 'badge status-pending'}" th:text="${sale.status}">Status</span></td>
+            <td th:text="${#temporals.format(sale.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+          </tr></tbody>
+        </table>
+      </div>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

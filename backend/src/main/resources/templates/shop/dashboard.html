@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Dashboard')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('dashboard')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Dashboard')}"></nav>
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-chart-pie"></i></div>
+        <div>
+          <p>Welcome back,</p>
+          <h1>Retail Dashboard</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-arrow-trend-up"></i><strong>USD 860k</strong><span>Yearly Sales</span></div>
+        <div><i class="fa-solid fa-chart-line"></i><strong>ZWG 990k</strong><span>Overall Revenue</span></div>
+      </div>
+    </section>
+    <div class="page-toolbar">
+      <a class="btn btn-blue" th:href="@{/shop/products}"><i class="fa-solid fa-box-open"></i>Manage Products</a>
+      <a class="btn btn-primary" th:href="@{/shop/inventory#modal-adjust}"><i class="fa-solid fa-boxes-stacked"></i>Adjust Stock</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Total Products</span><strong th:text="${productCount}">0</strong><div><em style="width:75%"></em></div><small>75% of catalogue target</small></div>
+      <div class="metric-card metric-red"><span>Customers</span><strong th:text="${customerCount}">0</strong><div><em style="width:65%"></em></div><small>Active buyer records</small></div>
+      <div class="metric-card metric-green"><span>Branches</span><strong th:text="${branchCount}">0</strong><div><em style="width:50%"></em></div><small>50% rollout coverage</small></div>
+      <div class="metric-card metric-orange"><span>Today Sales</span><strong th:text="${'USD ' + todaySales}">USD 0.00</strong><div><em style="width:58%"></em></div><small>Multi-currency tills</small></div>
+    </section>
+    <section class="grid" style="grid-template-columns: 1.4fr .8fr; margin-top:16px">
+      <div class="panel table-panel">
+        <h2>Recent Sales</h2>
+        <table><thead><tr><th>Receipt</th><th>Currency</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody><tr th:each="sale : ${recentSales}"><td th:text="${sale.receiptNumber}"></td><td th:text="${sale.currency}"></td><td th:text="${sale.grandTotal}"></td><td><span class="badge status-completed" th:text="${sale.status}"></span></td></tr></tbody>
+        </table>
+        <div class="empty" th:if="${#lists.isEmpty(recentSales)}">No sales yet.</div>
+      </div>
+      <div class="panel table-panel">
+        <h2>Low Stock</h2>
+        <table><thead><tr><th>Product</th><th>On Hand</th></tr></thead>
+          <tbody><tr th:each="item : ${lowStock}"><td th:text="${item.productId}"></td><td th:text="${item.quantityOnHand}"></td></tr></tbody>
+        </table>
+        <div class="empty" th:if="${#lists.isEmpty(lowStock)}">No low-stock alerts.</div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
+

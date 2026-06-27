@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 54" role="img" aria-labelledby="title">
+  <title id="title">EcoCash</title>
+  <rect width="180" height="54" rx="7" fill="#fff"/>
+  <text x="10" y="37" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#1768ad">Eco</text>
+  <text x="66" y="37" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#e4232d">Cash</text>
+</svg>

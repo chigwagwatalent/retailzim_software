@@ -1,0 +1,324 @@
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && location.hash.startsWith('#modal')) {
+    history.pushState('', document.title, location.pathname + location.search);
+  }
+});
+
+document.addEventListener('click', (event) => {
+  const button = event.target.closest('.theme-toggle');
+  if (!button) return;
+  const current = document.documentElement.dataset.theme || 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('retailzw-theme', next);
+  button.querySelector('i')?.classList.toggle('fa-sun', next === 'dark');
+  button.querySelector('i')?.classList.toggle('fa-moon', next !== 'dark');
+});
+
+document.addEventListener('click', (event) => {
+  const openMenus = document.querySelectorAll('details.quick-links[open], details.account-menu[open]');
+  openMenus.forEach((menu) => {
+    if (!menu.contains(event.target)) {
+      menu.removeAttribute('open');
+    }
+  });
+});
+
+document.addEventListener('toggle', (event) => {
+  const menu = event.target;
+  if (!menu.matches('details.quick-links, details.account-menu') || !menu.open) return;
+  document.querySelectorAll('details.quick-links[open], details.account-menu[open]').forEach((other) => {
+    if (other !== menu) {
+      other.removeAttribute('open');
+    }
+  });
+}, true);
+
+document.querySelectorAll('.theme-toggle i').forEach((icon) => {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  icon.classList.toggle('fa-sun', dark);
+  icon.classList.toggle('fa-moon', !dark);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  enhanceForms();
+});
+
+window.addEventListener('load', () => {
+  window.setTimeout(() => {
+    document.querySelectorAll('[data-auth-preloader]').forEach((preloader) => {
+      preloader.classList.add('is-hidden');
+    });
+  }, 420);
+});
+
+document.addEventListener('click', (event) => {
+  const toggle = event.target.closest('[data-password-toggle]');
+  if (!toggle) return;
+  const input = document.getElementById(toggle.dataset.passwordToggle);
+  if (!input) return;
+  const visible = input.type === 'text';
+  input.type = visible ? 'password' : 'text';
+  toggle.setAttribute('aria-label', visible ? 'Show password' : 'Hide password');
+  const icon = toggle.querySelector('i');
+  icon?.classList.toggle('fa-eye', visible);
+  icon?.classList.toggle('fa-eye-slash', !visible);
+});
+
+const supportWidget = document.getElementById('support-chat');
+if (supportWidget && supportWidget.parentElement !== document.body) {
+  document.body.appendChild(supportWidget);
+}
+
+document.addEventListener('click', (event) => {
+  const toggle = event.target.closest('[data-chat-toggle]');
+  if (!toggle) return;
+  const widget = toggle.closest('.support-widget');
+  if (!widget) return;
+  widget.classList.toggle('open');
+});
+
+document.querySelectorAll('.chat-panel[data-feed-url]').forEach((panel) => {
+  const feed = panel.querySelector('.chat-feed');
+  const url = panel.dataset.feedUrl;
+  if (!feed || !url) return;
+
+  const render = (messages) => {
+    feed.innerHTML = messages.map((message) => {
+      const side = message.senderType === 'PLATFORM' ? 'platform' : 'shop';
+      const when = message.createdAt ? new Date(message.createdAt).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+      return `<article class="chat-message ${side}">
+        <strong>${escapeHtml(message.senderName || 'User')}</strong>
+        <p>${escapeHtml(message.message || '')}</p>
+        <small>${escapeHtml(when)}</small>
+      </article>`;
+    }).join('');
+    feed.scrollTop = feed.scrollHeight;
+  };
+
+  const refresh = async () => {
+    try {
+      const response = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (response.ok) render(await response.json());
+    } catch (error) {
+      console.debug('Chat refresh failed', error);
+    }
+  };
+
+  panel.addEventListener('submit', async (event) => {
+    const form = event.target.closest('form[data-async-chat]');
+    if (!form) return;
+    event.preventDefault();
+    const button = form.querySelector('button[type="submit"]');
+    button?.setAttribute('disabled', 'disabled');
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      if (response.ok || response.redirected) {
+        form.reset();
+        await refresh();
+      }
+    } catch (error) {
+      console.debug('Chat send failed', error);
+    } finally {
+      button?.removeAttribute('disabled');
+    }
+  });
+
+  refresh();
+  window.setInterval(refresh, 3500);
+});
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function enhanceForms() {
+  document.querySelectorAll('form').forEach((form) => {
+    if (form.dataset.validationReady === 'true') return;
+    form.dataset.validationReady = 'true';
+    form.noValidate = true;
+
+    form.querySelectorAll('input, select, textarea').forEach((field) => {
+      if (field.required) {
+        field.setAttribute('aria-required', 'true');
+        markRequiredLabel(field);
+      }
+
+      field.addEventListener('input', () => clearFieldError(field));
+      field.addEventListener('change', () => clearFieldError(field));
+      field.addEventListener('blur', () => {
+        if (field.required || field.value) validateField(field, form);
+      });
+    });
+
+    form.addEventListener('submit', (event) => {
+      if (form.dataset.asyncChat !== undefined) return;
+      if (validateForm(form)) return;
+      event.preventDefault();
+      event.stopPropagation();
+    });
+  });
+}
+
+function validateForm(form) {
+  clearFormAlert(form);
+  const fields = Array.from(form.querySelectorAll('input, select, textarea'));
+  const validatedRadioGroups = new Set();
+  let firstInvalid = null;
+
+  fields.forEach((field) => {
+    if (shouldSkipValidation(field)) return;
+    if (field.type === 'radio') {
+      if (!field.name || validatedRadioGroups.has(field.name)) return;
+      validatedRadioGroups.add(field.name);
+    }
+    const valid = validateField(field, form);
+    if (!valid && !firstInvalid) {
+      firstInvalid = field.type === 'radio' ? form.querySelector(`input[type="radio"][name="${cssName(field.name)}"]`) : field;
+    }
+  });
+
+  if (!firstInvalid) {
+    return true;
+  }
+
+  showFormAlert(form, 'Please complete the highlighted required fields before saving.');
+  firstInvalid.focus({ preventScroll: true });
+  firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return false;
+}
+
+function validateField(field, form) {
+  if (shouldSkipValidation(field)) return true;
+  clearFieldError(field);
+
+  const message = fieldValidationMessage(field, form);
+  if (!message) return true;
+
+  field.classList.add('field-invalid');
+  field.setAttribute('aria-invalid', 'true');
+  showFieldError(field, message);
+  return false;
+}
+
+function shouldSkipValidation(field) {
+  const type = (field.getAttribute('type') || '').toLowerCase();
+  const ignored = ['hidden', 'submit', 'button', 'reset', 'image'];
+  return field.disabled || ignored.includes(type);
+}
+
+function fieldValidationMessage(field, form) {
+  const label = readableFieldName(field);
+  const type = (field.getAttribute('type') || '').toLowerCase();
+
+  if (type === 'radio' && field.required) {
+    const checked = form.querySelector(`input[type="radio"][name="${cssName(field.name)}"]:checked`);
+    return checked ? '' : `${label} is required.`;
+  }
+
+  if (type === 'checkbox' && field.required && !field.checked) {
+    return `${label} is required.`;
+  }
+
+  if (field.required) {
+    if (field.tagName === 'SELECT' && field.multiple) {
+      const selected = Array.from(field.options).some((option) => option.selected && option.value !== '');
+      if (!selected) return `${label} is required.`;
+    } else if (type === 'file') {
+      if (!field.files || field.files.length === 0) return `${label} is required.`;
+    } else if (!String(field.value || '').trim()) {
+      return `${label} is required.`;
+    }
+  }
+
+  if (!String(field.value || '').trim()) return '';
+  if (field.validity.typeMismatch && type === 'email') return `Enter a valid email address.`;
+  if (field.validity.typeMismatch && type === 'url') return `Enter a valid website URL.`;
+  if (field.validity.badInput) return `${label} must be a valid number.`;
+  if (field.validity.rangeUnderflow) return `${label} must be at least ${field.min}.`;
+  if (field.validity.rangeOverflow) return `${label} must be at most ${field.max}.`;
+  if (field.validity.stepMismatch) return `${label} has an invalid increment.`;
+  if (field.validity.tooShort) return `${label} is too short.`;
+  if (field.validity.tooLong) return `${label} is too long.`;
+  if (field.validity.patternMismatch) return field.title || `${label} has an invalid format.`;
+  return '';
+}
+
+function markRequiredLabel(field) {
+  const label = field.closest('label') || labelByFor(field);
+  if (!label || label.dataset.requiredMarked === 'true') return;
+  label.dataset.requiredMarked = 'true';
+  label.classList.add('required-field');
+
+  const star = document.createElement('span');
+  star.className = 'required-star';
+  star.setAttribute('aria-hidden', 'true');
+  star.textContent = '*';
+
+  const firstElement = Array.from(label.childNodes).find((node) => node.nodeType === Node.ELEMENT_NODE);
+  if (firstElement && firstElement !== field && firstElement.tagName !== 'INPUT' && firstElement.tagName !== 'SELECT' && firstElement.tagName !== 'TEXTAREA') {
+    firstElement.insertAdjacentElement('afterend', star);
+    return;
+  }
+  label.insertBefore(star, field);
+}
+
+function labelByFor(field) {
+  if (!field.id) return null;
+  return document.querySelector(`label[for="${cssName(field.id)}"]`);
+}
+
+function readableFieldName(field) {
+  const label = field.closest('label') || labelByFor(field);
+  if (label) {
+    const clone = label.cloneNode(true);
+    clone.querySelectorAll('input, select, textarea, .required-star, .field-error').forEach((node) => node.remove());
+    const text = clone.textContent.replace('*', '').trim();
+    if (text) return text;
+  }
+  return field.placeholder || field.name || 'This field';
+}
+
+function showFieldError(field, message) {
+  const error = document.createElement('small');
+  error.className = 'field-error';
+  error.textContent = message;
+  const target = field.closest('.auth-input-shell') || field;
+  target.insertAdjacentElement('afterend', error);
+}
+
+function clearFieldError(field) {
+  field.classList.remove('field-invalid');
+  field.removeAttribute('aria-invalid');
+  const target = field.closest('.auth-input-shell') || field;
+  const next = target.nextElementSibling;
+  if (next?.classList.contains('field-error')) {
+    next.remove();
+  }
+}
+
+function showFormAlert(form, message) {
+  const alert = document.createElement('div');
+  alert.className = 'form-alert alert-error';
+  alert.setAttribute('role', 'alert');
+  alert.textContent = message;
+  form.prepend(alert);
+}
+
+function clearFormAlert(form) {
+  form.querySelectorAll(':scope > .form-alert').forEach((alert) => alert.remove());
+}
+
+function cssName(value) {
+  if (window.CSS && CSS.escape) return CSS.escape(value || '');
+  return String(value || '').replace(/["\\]/g, '\\$&');
+}

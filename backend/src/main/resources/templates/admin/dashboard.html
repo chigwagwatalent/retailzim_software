@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('SaaS Dashboard')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: platformSidebar('dashboard')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: platformTopbar('SaaS Dashboard')}"></nav>
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-building-shield"></i></div>
+        <div>
+          <p>Welcome back,</p>
+          <h1>SaaS Dashboard</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-store"></i><strong th:text="${totalTenants}">0</strong><span>Registered Shops</span></div>
+        <div><i class="fa-solid fa-receipt"></i><strong th:text="${#lists.size(plans)}">0</strong><span>Packages</span></div>
+      </div>
+    </section>
+    <div class="page-toolbar"><a class="btn btn-primary" th:href="@{/auth/signup}"><i class="fa-solid fa-user-plus"></i>Register Shop</a></div>
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Total Shops</span><strong th:text="${totalTenants}">0</strong><div><em style="width:75%"></em></div><small>All tenants on platform</small></div>
+      <div class="metric-card metric-green"><span>Active Shops</span><strong th:text="${activeTenants}">0</strong><div><em style="width:60%"></em></div><small>Live subscriptions</small></div>
+      <div class="metric-card metric-red"><span>Pending Shops</span><strong th:text="${pendingTenants}">0</strong><div><em style="width:35%"></em></div><small>Awaiting approval</small></div>
+      <div class="metric-card metric-orange"><span>Plans</span><strong th:text="${#lists.size(plans)}">0</strong><div><em style="width:50%"></em></div><small>Subscription packages</small></div>
+    </section>
+    <section class="panel table-panel" style="margin-top:16px">
+      <h2>Recent Shops</h2>
+      <table><thead><tr><th>Code</th><th>Company</th><th>Email</th><th>Status</th><th>City</th></tr></thead>
+        <tbody><tr th:each="t : ${tenants}"><td th:text="${t.tenantCode}"></td><td th:text="${t.companyName}"></td><td th:text="${t.email}"></td><td><span class="badge" th:classappend="${' status-' + #strings.toLowerCase(t.status)}" th:text="${t.status}"></span></td><td th:text="${t.city}"></td></tr></tbody>
+      </table>
+    </section>
+  </main>
+</div>
+</body>
+</html>
+

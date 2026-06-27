@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Users')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('users')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Users')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-user-gear"></i></div>
+        <div>
+          <p>Team access,</p>
+          <h1>User Management</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-user-shield"></i><strong th:text="${superAdminCount}">0</strong><span>Super Admins</span></div>
+        <div><i class="fa-solid fa-cash-register"></i><strong th:text="${cashierCount}">0</strong><span>App Cashiers</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-primary" href="#modal-create-user"><i class="fa-solid fa-user-plus"></i>Create User</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+    <div th:if="${branchlessCashierCount > 0 || invalidBranchUserCount > 0}" class="alert">
+      <strong>Cashier branch setup needs attention.</strong>
+      <span th:if="${branchlessCashierCount > 0}" th:text="${branchlessCashierCount + ' cashier account(s) must be assigned to an active branch before mobile login.'}">Cashiers need branches.</span>
+      <span th:if="${invalidBranchUserCount > 0}" th:text="${invalidBranchUserCount + ' user account(s) point to inactive or missing branches.'}">Inactive branch assignments.</span>
+    </div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Active Users</span><strong th:text="${activeUserCount}">0</strong><div><em style="width:80%"></em></div><small>Can sign in now</small></div>
+      <div class="metric-card metric-green"><span>Super Admin</span><strong th:text="${superAdminCount}">0</strong><div><em style="width:70%"></em></div><small>Full shop web access</small></div>
+      <div class="metric-card metric-orange"><span>Accounts</span><strong th:text="${accountsCount}">0</strong><div><em style="width:55%"></em></div><small>Finance and reports access</small></div>
+      <div class="metric-card metric-red"><span>Cashiers</span><strong th:text="${cashierCount}">0</strong><div><em style="width:65%"></em></div><small>Flutter app / POS only</small></div>
+    </section>
+
+    <section class="grid user-role-grid">
+      <div class="panel user-role-card">
+        <i class="fa-solid fa-user-shield"></i>
+        <h2>Super Admin</h2>
+        <p>Owns shop configuration, users, stock, reports and all web operations.</p>
+        <span class="badge status-active">WEB + APP</span>
+      </div>
+      <div class="panel user-role-card">
+        <i class="fa-solid fa-calculator"></i>
+        <h2>Accounts</h2>
+        <p>Handles finance views, reports, purchasing oversight and cash controls.</p>
+        <span class="badge status-active">WEB ACCESS</span>
+      </div>
+      <div class="panel user-role-card">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <h2>Cashier</h2>
+        <p>Signs into the Flutter POS app only for sales, cash sessions and customer service.</p>
+        <span class="badge status-pending">APP ONLY</span>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Team Profiles</h2>
+        <span class="badge" th:text="${userPage.totalElements + ' total users'}">0 total users</span>
+        <span class="badge" th:text="${selectedBranchUserCount + ' on selected branch'}">0 on selected branch</span>
+      </div>
+      <table>
+        <thead>
+        <tr><th>User</th><th>Role</th><th>Access</th><th>Branch</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${tenantUsers}">
+          <td>
+            <div class="user-cell">
+              <span class="avatar-chip small-avatar" th:text="${#strings.substring(u.firstName,0,1) + #strings.substring(u.lastName,0,1)}">U</span>
+              <div>
+                <strong th:text="${u.firstName + ' ' + u.lastName}">User Name</strong>
+                <small th:text="${u.email}">email</small>
+                <small th:text="${'@' + u.username}">@username</small>
+              </div>
+            </div>
+          </td>
+          <td><strong th:text="${u.role.name.displayName}">Role</strong></td>
+          <td>
+            <span class="badge status-active" th:if="${u.role.name.name() == 'SUPER_ADMIN'}">WEB + APP</span>
+            <span class="badge status-active" th:if="${u.role.name.name() == 'ACCOUNTANT'}">WEB ACCESS</span>
+            <span class="badge status-pending" th:if="${u.role.name.name() == 'CASHIER'}">APP ONLY</span>
+          </td>
+          <td>
+            <span th:if="${u.branchId == null && u.role.name.name() != 'CASHIER'}">Head Office</span>
+            <span th:if="${u.branchId == null && u.role.name.name() == 'CASHIER'}" class="badge status-suspended">ASSIGN BRANCH</span>
+            <span th:if="${u.branchId != null && activeBranchIds.contains(u.branchId)}" th:text="${branchById.get(u.branchId)}">Branch</span>
+            <span th:if="${u.branchId != null && !activeBranchIds.contains(u.branchId)}" class="badge status-suspended" th:text="${(branchById.get(u.branchId) != null ? branchById.get(u.branchId) : 'Branch #' + u.branchId) + ' inactive'}">Inactive branch</span>
+          </td>
+          <td><span th:class="${u.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${u.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+          <td>
+            <div class="action-row">
+              <a class="icon-button mini" th:href="${'#modal-edit-user-' + u.id}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+              <form th:if="${!u.isActive}" method="post" th:action="@{'/shop/users/' + ${u.id} + '/activate'}"><button class="icon-button mini" type="submit" title="Activate"><i class="fa-solid fa-toggle-on"></i></button></form>
+              <form th:if="${u.isActive}" method="post" th:action="@{'/shop/users/' + ${u.id} + '/deactivate'}"><button class="icon-button mini danger" type="submit" title="Deactivate"><i class="fa-solid fa-toggle-off"></i></button></form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(tenantUsers)}">No users yet. Create the first team member.</div>
+      <div th:replace="~{common/layout :: pagination(${userPage}, ${userPageLinks}, ${userPrevUrl}, ${userNextUrl})}"></div>
+    </section>
+
+    <div id="modal-create-user" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Create User</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/users}" class="form-grid user-form">
+        <label>First Name<input name="firstName" required></label>
+        <label>Last Name<input name="lastName" required></label>
+        <label>Username<input name="username" required></label>
+        <label>Email<input name="email" type="email" required></label>
+        <label>Phone<input name="phone"></label>
+        <label>Employee Number<input name="employeeNumber"></label>
+        <label>Password<input name="password" type="password" required></label>
+        <label>Role
+          <select name="roleId" required>
+            <option th:each="r : ${userRoleOptions}" th:value="${r.id}" th:attr="data-role-name=${r.name.name()}" th:text="${r.name.displayName + (r.name.name() == 'CASHIER' ? ' - App only' : '')}">Role</option>
+          </select>
+        </label>
+        <label>Branch
+          <select name="branchId">
+            <option value="">Head Office</option>
+            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}">Branch</option>
+          </select>
+        </label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save User</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="u : ${tenantUsers}" th:id="${'modal-edit-user-' + u.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Edit ' + u.firstName + ' ' + u.lastName}">Edit User</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/users/' + ${u.id} + '/update'}" class="form-grid user-form">
+        <label>First Name<input name="firstName" th:value="${u.firstName}" required></label>
+        <label>Last Name<input name="lastName" th:value="${u.lastName}" required></label>
+        <label>Username<input name="username" th:value="${u.username}" required></label>
+        <label>Email<input name="email" type="email" th:value="${u.email}" required></label>
+        <label>Phone<input name="phone" th:value="${u.phone}"></label>
+        <label>Employee Number<input name="employeeNumber" th:value="${u.employeeNumber}"></label>
+        <label>New Password<input name="password" type="password" placeholder="Leave blank to keep current password"></label>
+        <label>Role
+          <select name="roleId" required>
+            <option th:each="r : ${userRoleOptions}" th:value="${r.id}" th:selected="${u.role.id == r.id}" th:attr="data-role-name=${r.name.name()}" th:text="${r.name.displayName + (r.name.name() == 'CASHIER' ? ' - App only' : '')}">Role</option>
+          </select>
+        </label>
+        <label>Branch
+          <select name="branchId">
+            <option value="" th:selected="${u.branchId == null}">Head Office</option>
+            <option th:each="b : ${branches}" th:value="${b.id}" th:selected="${u.branchId == b.id}" th:text="${b.name}">Branch</option>
+          </select>
+        </label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Profile</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+<script>
+  document.querySelectorAll('.user-form').forEach((form) => {
+    const role = form.querySelector('select[name="roleId"]');
+    const branch = form.querySelector('select[name="branchId"]');
+    if (!role || !branch) return;
+
+    const syncBranchRule = () => {
+      const selected = role.options[role.selectedIndex];
+      const cashier = selected && selected.dataset.roleName === 'CASHIER';
+      branch.required = cashier;
+      branch.setCustomValidity(cashier && !branch.value ? 'Cashier users must be assigned to an active branch.' : '');
+    };
+
+    role.addEventListener('change', syncBranchRule);
+    branch.addEventListener('change', syncBranchRule);
+    form.addEventListener('submit', (event) => {
+      syncBranchRule();
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        form.reportValidity();
+      }
+    });
+    syncBranchRule();
+  });
+</script>
+</body>
+</html>

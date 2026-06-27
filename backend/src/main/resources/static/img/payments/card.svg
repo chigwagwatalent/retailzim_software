@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 54" role="img" aria-labelledby="title">
+  <title id="title">Visa and Mastercard</title>
+  <rect width="180" height="54" rx="7" fill="#fff"/>
+  <text x="8" y="35" font-family="Arial,sans-serif" font-size="26" font-weight="900" font-style="italic" fill="#1434cb">VISA</text>
+  <circle cx="111" cy="27" r="18" fill="#eb001b"/>
+  <circle cx="133" cy="27" r="18" fill="#f79e1b" fill-opacity=".92"/>
+</svg>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Gas Control')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('gas')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Gas Control')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-gas-pump"></i></div>
+        <div>
+          <p>LPG operations,</p>
+          <h1>Gas Control</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-database"></i><strong th:text="${gasTankCount}">0</strong><span>Tanks</span></div>
+        <div><i class="fa-solid fa-scale-balanced"></i><strong th:text="${gasTotalKg}">0</strong><span>Kg available</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <form method="get" th:action="@{/shop/gas}" class="inline-form">
+        <select name="branchId" onchange="this.form.submit()">
+          <option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option>
+        </select>
+      </form>
+      <a class="btn btn-blue" href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Set Price</a>
+      <a class="btn btn-primary" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Current Stock</span><strong th:text="${gasTotalKg + ' kg'}">0 kg</strong><div><em style="width:72%"></em></div><small>Total LPG on hand</small></div>
+      <div class="metric-card metric-green"><span>Capacity</span><strong th:text="${gasCapacityKg + ' kg'}">0 kg</strong><div><em style="width:65%"></em></div><small>Total tank capacity</small></div>
+      <div class="metric-card metric-orange"><span>Plan Limit</span><strong th:text="${maxGasTanks > 0 ? maxGasTanks : 'Unlimited'}">0</strong><div><em style="width:50%"></em></div><small>Allowed gas tanks</small></div>
+      <div class="metric-card metric-red"><span>Open Shift</span><strong th:text="${currentGasShift != null ? currentGasShift.shiftNumber : 'None'}">None</strong><div><em style="width:40%"></em></div><small>For current user</small></div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Gas Tanks</h2>
+        <span class="badge" th:text="${gasTankCount + ' tanks'}">0 tanks</span>
+      </div>
+      <table>
+        <thead><tr><th>Tank</th><th>Product</th><th>On Hand</th><th>Capacity</th><th>Reorder</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="t : ${gasTanks}">
+          <td><strong th:text="${t.name}">Tank</strong></td>
+          <td th:text="${t.productName}">LPG Gas</td>
+          <td><strong th:text="${t.currentKg + ' kg'}">0 kg</strong></td>
+          <td th:text="${(t.capacityKg ?: 0) + ' kg'}">0 kg</td>
+          <td th:text="${(t.reorderLevelKg ?: 0) + ' kg'}">0 kg</td>
+          <td><span th:class="${t.status.name() == 'ACTIVE' ? 'badge status-active' : 'badge status-suspended'}" th:text="${t.status}">ACTIVE</span></td>
+          <td><a class="icon-button mini" th:href="${'#modal-gas-tank-' + t.id}" title="Edit"><i class="fa-solid fa-pen"></i></a></td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(gasTanks)}">No gas tanks yet. Add a tank for this branch.</div>
+    </section>
+
+    <section class="grid two-col">
+      <div class="panel table-panel">
+        <div class="toolbar"><h2>Active Prices</h2><a class="btn btn-light" href="#modal-gas-price"><i class="fa-solid fa-pen"></i>Update</a></div>
+        <table>
+          <thead><tr><th>Currency</th><th>Price / kg</th><th>Created</th></tr></thead>
+          <tbody>
+          <tr th:each="p : ${gasPrices}">
+            <td><span class="badge" th:text="${p.currency}">USD</span></td>
+            <td><strong th:text="${p.pricePerKg}">0</strong></td>
+            <td th:text="${p.createdAt != null ? #temporals.format(p.createdAt, 'dd MMM yyyy HH:mm') : ''}">Date</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel table-panel">
+        <div class="toolbar"><h2>Current Shift Sales</h2><span class="badge" th:text="${#lists.size(gasShiftSales) + ' sales'}">0 sales</span></div>
+        <table>
+          <thead><tr><th>Receipt</th><th>Kg</th><th>Total</th></tr></thead>
+          <tbody>
+          <tr th:each="s : ${gasShiftSales}">
+            <td><strong th:text="${s.receiptNumber}">GAS</strong></td>
+            <td th:text="${s.quantityKg}">0</td>
+            <td th:text="${s.currency + ' ' + s.total}">USD 0</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div id="modal-gas-tank" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Add Gas Tank</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/gas/tanks}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <label>Tank Name *<input name="name" required placeholder="Main LPG Tank"></label>
+        <label>Product *<input name="productName" required value="LPG Gas"></label>
+        <label>Capacity Kg *<input name="capacityKg" type="number" step="0.001" min="0" required value="0"></label>
+        <label>Current Kg *<input name="currentKg" type="number" step="0.001" min="0" required value="0"></label>
+        <label>Reorder Kg *<input name="reorderLevelKg" type="number" step="0.001" min="0" required value="0"></label>
+        <label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}">ACTIVE</option></select></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Tank</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="t : ${gasTanks}" th:id="${'modal-gas-tank-' + t.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Edit ' + t.name}">Edit Tank</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/gas/tanks/' + ${t.id} + '/update'}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <label>Tank Name *<input name="name" required th:value="${t.name}"></label>
+        <label>Product *<input name="productName" required th:value="${t.productName}"></label>
+        <label>Capacity Kg *<input name="capacityKg" type="number" step="0.001" min="0" required th:value="${t.capacityKg}"></label>
+        <label>Current Kg *<input name="currentKg" type="number" step="0.001" min="0" required th:value="${t.currentKg}"></label>
+        <label>Reorder Kg *<input name="reorderLevelKg" type="number" step="0.001" min="0" required th:value="${t.reorderLevelKg}"></label>
+        <label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}" th:selected="${t.status == s}">ACTIVE</option></select></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Tank</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-gas-price" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Set Gas Price</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/gas/prices}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
+        <label>Price per kg *<input name="pricePerKg" type="number" step="0.0001" min="0.0001" required placeholder="2.0000"></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Price</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Inventory Intelligence')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('inventory-intelligence')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Inventory Intelligence')}"></nav>
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-brain"></i></div>
+        <div><p>Traceable stock operations,</p><h1>Inventory Intelligence</h1></div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-truck-ramp-box"></i><strong th:text="${#lists.size(transfers)}">0</strong><span>Transfers</span></div>
+        <div><i class="fa-solid fa-magnifying-glass-chart"></i><strong th:text="${#lists.size(varianceInvestigations)}">0</strong><span>Investigations</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-primary" href="#modal-transfer"><i class="fa-solid fa-arrow-right-arrow-left"></i>New Transfer</a>
+      <a class="btn btn-blue" href="#modal-stocktake"><i class="fa-solid fa-clipboard-check"></i>Start Stocktake</a>
+      <a class="btn btn-blue" href="#modal-tracking"><i class="fa-solid fa-fingerprint"></i>Tracking Policy</a>
+      <a class="btn btn-blue" href="#modal-lot"><i class="fa-solid fa-barcode"></i>Add Batch / Serial</a>
+      <a class="btn btn-blue" href="#modal-supplier-price"><i class="fa-solid fa-scale-balanced"></i>Add Supplier Quote</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="grid two">
+      <div class="panel table-panel">
+        <div class="toolbar"><h2>Branch Transfers</h2><span class="badge">Cloud controlled</span></div>
+        <table>
+          <thead><tr><th>Reference</th><th>Route</th><th>Items</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody><tr th:each="t : ${transfers}">
+            <td><strong th:text="${t.transferNumber}">TRF</strong><small th:text="${#temporals.format(t.initiatedAt, 'dd MMM HH:mm')}">date</small></td>
+            <td th:text="${branchById.get(t.fromBranchId) + ' to ' + branchById.get(t.toBranchId)}">Route</td>
+            <td th:text="${#lists.size(t.items)}">1</td>
+            <td><span class="badge" th:text="${t.status}">PENDING</span></td>
+            <td><div class="action-row">
+              <form th:if="${t.status.name() == 'PENDING'}" method="post" th:action="@{'/shop/inventory-intelligence/transfers/' + ${t.id} + '/dispatch'}">
+                <input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-blue" type="submit">Dispatch</button>
+              </form>
+              <form th:if="${t.status.name() == 'IN_TRANSIT'}" method="post" th:action="@{'/shop/inventory-intelligence/transfers/' + ${t.id} + '/receive'}">
+                <input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-primary" type="submit">Receive</button>
+              </form>
+            </div></td>
+          </tr></tbody>
+        </table>
+        <div class="empty" th:if="${#lists.isEmpty(transfers)}">No stock transfers yet.</div>
+      </div>
+
+      <div class="panel table-panel">
+        <div class="toolbar"><h2>Supplier Price Comparison</h2><a th:href="@{/shop/purchasing}" class="badge">Purchase approvals</a></div>
+        <table>
+          <thead><tr><th>Product</th><th>Supplier</th><th>USD</th><th>ZWG</th><th>Lead</th></tr></thead>
+          <tbody><tr th:each="q : ${supplierPrices}">
+            <td><strong th:text="${productById.get(q.productId)?.name ?: 'Product'}">Product</strong><small th:if="${q.isPreferred}">Preferred</small></td>
+            <td th:text="${supplierById.get(q.supplierId)?.name ?: 'Supplier'}">Supplier</td>
+            <td th:text="${q.costPriceUsd}">0</td><td th:text="${q.costPriceZwg}">0</td>
+            <td th:text="${(q.leadTimeDays ?: 0) + ' days'}">0 days</td>
+          </tr></tbody>
+        </table>
+        <div class="empty" th:if="${#lists.isEmpty(supplierPrices)}">Add quotes to compare supplier cost and lead time.</div>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar"><h2>Stocktakes and Variance Control</h2><span class="badge" th:text="${selectedBranchName}">Branch</span></div>
+      <table>
+        <thead><tr><th>Session</th><th>Status</th><th>Progress</th><th>Started</th><th>Actions</th></tr></thead>
+        <tbody><tr th:each="s : ${stocktakes}">
+          <td><strong th:text="${s.sessionNumber}">STK</strong></td>
+          <td><span class="badge" th:text="${s.status}">COUNTING</span></td>
+          <td th:text="${#lists.size(stocktakeItems.get(s.id)) + ' lines'}">0 lines</td>
+          <td th:text="${#temporals.format(s.startedAt, 'dd MMM yyyy HH:mm')}">Date</td>
+          <td><div class="action-row">
+            <a th:if="${s.status.name() == 'COUNTING'}" class="btn btn-blue" th:href="${'#modal-count-' + s.id}">Enter Counts</a>
+            <form th:if="${s.status.name() == 'COUNTING'}" method="post" th:action="@{'/shop/inventory-intelligence/stocktakes/' + ${s.id} + '/submit'}">
+              <input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+            <form th:if="${s.status.name() == 'SUBMITTED'}" method="post" th:action="@{'/shop/inventory-intelligence/stocktakes/' + ${s.id} + '/approve'}">
+              <input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-primary" type="submit">Approve</button>
+            </form>
+          </div></td>
+        </tr></tbody>
+      </table>
+    </section>
+
+    <section class="grid two">
+      <div class="panel table-panel">
+        <div class="toolbar"><h2>Variance Investigations</h2><span class="badge">Resolve before approval</span></div>
+        <table>
+          <thead><tr><th>Product</th><th>Expected</th><th>Counted</th><th>Variance</th><th>Status</th><th></th></tr></thead>
+          <tbody><tr th:each="v : ${varianceInvestigations}">
+            <td th:text="${productById.get(v.productId)?.name ?: 'Product'}">Product</td>
+            <td th:text="${v.systemQuantity}">0</td><td th:text="${v.countedQuantity}">0</td><td th:text="${v.variance}">0</td>
+            <td><span class="badge" th:text="${v.status}">OPEN</span></td>
+            <td><a th:if="${v.status.name() != 'RESOLVED'}" class="icon-button mini" th:href="${'#modal-variance-' + v.id}" title="Investigate"><i class="fa-solid fa-magnifying-glass"></i></a></td>
+          </tr></tbody>
+        </table>
+      </div>
+      <div class="panel table-panel">
+        <div class="toolbar"><h2>Batch, Serial and Expiry Register</h2><span class="badge" th:text="${#lists.size(inventoryLots) + ' records'}">0 records</span></div>
+        <table>
+          <thead><tr><th>Product</th><th>Batch / Serial</th><th>Expiry</th><th>Qty</th><th>Status</th></tr></thead>
+          <tbody><tr th:each="l : ${inventoryLots}">
+            <td th:text="${productById.get(l.productId)?.name ?: 'Product'}">Product</td>
+            <td><strong th:text="${l.batchNumber ?: l.serialNumber ?: '-'}">-</strong></td>
+            <td th:text="${l.expiryDate ?: '-'}">-</td><td th:text="${l.quantityOnHand}">0</td>
+            <td><span class="badge" th:text="${l.status}">AVAILABLE</span></td>
+          </tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div id="modal-transfer" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Create Branch Transfer</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/inventory-intelligence/transfers}" class="form-grid">
+        <label>From Branch<select name="fromBranchId" required><option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}"></option></select></label>
+        <label>To Branch<select name="toBranchId" required><option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}"></option></select></label>
+        <label>Product<select name="productId" required><option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name + ' - ' + (p.sku ?: '')}"></option></select></label>
+        <label>Quantity<input name="quantity" type="number" min="0.0001" step="0.0001" required></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit">Create Transfer</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-stocktake" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Start Stocktake</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/inventory-intelligence/stocktakes}" class="form-grid">
+        <label>Branch<select name="branchId"><option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}"></option></select></label>
+        <label style="grid-column:1/-1">Instructions<textarea name="notes"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit">Snapshot and Start</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-lot" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Add Batch or Serial</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/inventory-intelligence/lots}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label>Product<select name="productId"><option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option></select></label>
+        <label>Supplier<select name="supplierId"><option value="">None</option><option th:each="s : ${suppliers}" th:value="${s.id}" th:text="${s.name}"></option></select></label>
+        <label>Batch Number<input name="batchNumber"></label><label>Serial Number<input name="serialNumber"></label>
+        <label>Expiry Date<input name="expiryDate" type="date"></label><label>Quantity<input name="quantity" type="number" min="0" step="0.0001" required></label>
+        <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit">Save Traceability Record</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-tracking" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Product Tracking Policy</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/inventory-intelligence/tracking}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label>Product<select name="productId" required><option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name + ' - ' + (p.sku ?: '')}"></option></select></label>
+        <label>Tracking Mode<select name="trackingMode" required><option value="NONE">No batch or serial</option><option value="BATCH">Batch controlled</option><option value="SERIAL">Serial controlled</option></select></label>
+        <label><input name="expiryTracking" type="checkbox" value="true"> Track expiry dates</label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit">Apply Tracking Policy</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-supplier-price" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Add Supplier Quote</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/inventory-intelligence/supplier-prices}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label>Product<select name="productId"><option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option></select></label>
+        <label>Supplier<select name="supplierId"><option th:each="s : ${suppliers}" th:value="${s.id}" th:text="${s.name}"></option></select></label>
+        <label>USD Unit Cost<input name="costPriceUsd" type="number" min="0" step="0.0001"></label>
+        <label>ZWG Unit Cost<input name="costPriceZwg" type="number" min="0" step="0.0001"></label>
+        <label>Minimum Order<input name="minimumOrderQty" type="number" min="0" step="0.0001"></label>
+        <label>Lead Time Days<input name="leadTimeDays" type="number" min="0"></label>
+        <label><input name="preferred" type="checkbox" value="true"> Preferred supplier</label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit">Save Quote</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="s : ${stocktakes}" th:id="${'modal-count-' + s.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Count ' + s.sessionNumber}">Count Stock</h2><a class="close" href="#">&times;</a></div>
+      <div th:each="i : ${stocktakeItems.get(s.id)}" class="panel" style="margin-bottom:10px">
+        <form method="post" th:action="@{'/shop/inventory-intelligence/stocktakes/' + ${s.id} + '/count/' + ${i.id}}" class="form-grid">
+          <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+          <label>Product<input th:value="${productById.get(i.productId)?.name ?: 'Product'}" disabled></label>
+          <label>System Quantity<input th:value="${i.systemQuantity}" disabled></label>
+          <label>Counted Quantity<input name="countedQuantity" type="number" min="0" step="0.0001" th:value="${i.countedQuantity}" required></label>
+          <label>Count Note<input name="notes" th:value="${i.notes}"></label>
+          <div class="modal-actions"><button class="btn btn-blue" type="submit">Save Count</button></div>
+        </form>
+      </div>
+    </div></div>
+
+    <div th:each="v : ${varianceInvestigations}" th:id="${'modal-variance-' + v.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Resolve Stock Variance</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/inventory-intelligence/variances/' + ${v.id} + '/resolve'}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label>Reason<select name="reason"><option>COUNT_ERROR</option><option>DAMAGE</option><option>THEFT</option><option>UNRECORDED_TRANSFER</option><option>SUPPLIER_VARIANCE</option><option>OTHER</option></select></label>
+        <label style="grid-column:1/-1">Investigation and resolution<textarea name="notes" required></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit">Resolve Investigation</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

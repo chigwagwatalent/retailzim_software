@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 54" role="img" aria-labelledby="title">
+  <title id="title">OneMoney</title>
+  <rect width="180" height="54" rx="7" fill="#fff"/>
+  <text x="8" y="37" font-family="Arial,sans-serif" font-size="29" font-weight="900" font-style="italic" fill="#171717">1M</text>
+  <text x="49" y="37" font-family="Arial,sans-serif" font-size="27" font-weight="900" font-style="italic" fill="#f28c18">ONE</text>
+  <text x="112" y="37" font-family="Arial,sans-serif" font-size="25" font-weight="900" font-style="italic" fill="#171717">Y</text>
+</svg>

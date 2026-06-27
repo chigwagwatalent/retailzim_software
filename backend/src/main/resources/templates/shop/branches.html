@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Branches')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('branches')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Branches')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-store"></i></div>
+        <div>
+          <p>Multi-branch control,</p>
+          <h1>Branch Management</h1>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-shop"></i><strong th:text="${activeBranchCount}">0</strong><span>Active Branches</span></div>
+        <div><i class="fa-solid fa-boxes-stacked"></i><strong th:text="${#aggregates.sum(branchStockLineCounts.values()) ?: 0}">0</strong><span>Stock Lines</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <a class="btn btn-blue" th:href="@{/shop/inventory}"><i class="fa-solid fa-warehouse"></i>View Inventory</a>
+      <a class="btn btn-primary" href="#modal-create-branch"><i class="fa-solid fa-plus"></i>Add Branch</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>Total Branches</span><strong th:text="${branchPage.totalElements}">0</strong><div><em style="width:80%"></em></div><small>All locations</small></div>
+      <div class="metric-card metric-green"><span>Active</span><strong th:text="${activeBranchCount}">0</strong><div><em style="width:72%"></em></div><small>Trading locations</small></div>
+      <div class="metric-card metric-orange"><span>Inactive</span><strong th:text="${inactiveBranchCount}">0</strong><div><em style="width:35%"></em></div><small>Paused locations</small></div>
+      <div class="metric-card metric-red"><span>Low Stock</span><strong th:text="${#aggregates.sum(branchLowStockCounts.values()) ?: 0}">0</strong><div><em style="width:55%"></em></div><small>Across all branches</small></div>
+    </section>
+
+    <section class="grid branch-card-grid">
+      <div class="panel branch-card" th:each="b : ${tenantBranches}">
+        <div class="branch-card-head">
+          <span class="branch-badge"><i class="fa-solid fa-store"></i></span>
+          <div>
+            <h2 th:text="${b.name}">Branch Name</h2>
+            <small th:text="${b.branchCode + ' - ' + (b.city ?: 'Zimbabwe')}">CODE</small>
+          </div>
+          <span class="badge" th:text="${b.moduleType != null ? b.moduleType.displayName : 'Retail Shop'}">Retail Shop</span>
+          <span th:class="${b.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${b.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
+        </div>
+        <p th:text="${b.address ?: 'No branch address captured.'}">Address</p>
+        <div class="branch-mini-stats">
+          <div><strong th:text="${branchUserCounts.get(b.id) ?: 0}">0</strong><span>Users / HQ</span></div>
+          <div><strong th:text="${branchStockLineCounts.get(b.id) ?: 0}">0</strong><span>Stock lines</span></div>
+          <div><strong th:text="${branchTodaySaleCounts.get(b.id) ?: 0}">0</strong><span>Sales today</span></div>
+        </div>
+        <div class="branch-actions">
+          <a class="btn btn-light" th:href="${'#modal-edit-branch-' + b.id}"><i class="fa-solid fa-pen"></i>Edit</a>
+          <form th:if="${!b.isActive}" method="post" th:action="@{'/shop/branches/' + ${b.id} + '/activate'}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-toggle-on"></i>Activate</button></form>
+          <form th:if="${b.isActive}" method="post" th:action="@{'/shop/branches/' + ${b.id} + '/deactivate'}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-toggle-off"></i>Deactivate</button></form>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Branch Directory</h2>
+        <span class="badge" th:text="${branchPage.totalElements + ' locations'}">0 locations</span>
+      </div>
+      <table>
+        <thead><tr><th>Code</th><th>Branch</th><th>Module</th><th>Contact</th><th>Users</th><th>Inventory</th><th>Today</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="b : ${tenantBranches}">
+          <td><strong th:text="${b.branchCode}">CODE</strong></td>
+          <td><strong th:text="${b.name}">Name</strong><small th:text="${b.address ?: 'No address'}">Address</small></td>
+          <td><span class="badge" th:text="${b.moduleType != null ? b.moduleType.displayName : 'Retail Shop'}">Retail Shop</span></td>
+          <td><strong th:text="${b.phone ?: 'No phone'}">Phone</strong><small th:text="${b.email ?: 'No email'}">Email</small></td>
+          <td><strong th:text="${branchUserCounts.get(b.id) ?: 0}">0</strong><small>Assigned + HQ admins</small></td>
+          <td><strong th:text="${branchStockLineCounts.get(b.id) ?: 0}">0</strong><small th:text="${(branchLowStockCounts.get(b.id) ?: 0) + ' low stock'}">0 low stock</small></td>
+          <td><strong th:text="${branchTodaySaleCounts.get(b.id) ?: 0}">0</strong><small th:text="${'USD ' + (branchTodaySales.get(b.id) ?: 0)}">USD 0</small></td>
+          <td><span th:class="${b.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${b.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+          <td><a class="icon-button mini" th:href="${'#modal-edit-branch-' + b.id}" title="Edit"><i class="fa-solid fa-pen"></i></a></td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="empty" th:if="${#lists.isEmpty(tenantBranches)}">No branches yet. Add your first shop location.</div>
+      <div th:replace="~{common/layout :: pagination(${branchPage}, ${branchPageLinks}, ${branchPrevUrl}, ${branchNextUrl})}"></div>
+    </section>
+
+    <div id="modal-create-branch" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Add Branch</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/branches}" class="form-grid">
+        <label>Branch Code<input name="branchCode" required placeholder="HRE01"></label>
+        <label>Name<input name="name" required placeholder="Harare CBD"></label>
+        <label>Module
+          <select name="moduleType" required>
+            <option th:each="m : ${branchModuleOptions}" th:value="${m}" th:text="${m.displayName}">Retail Shop</option>
+          </select>
+        </label>
+        <label>City<input name="city" placeholder="Harare"></label>
+        <label>Phone<input name="phone" placeholder="+263 77 000 0000"></label>
+        <label>Email<input name="email" type="email" placeholder="branch@example.co.zw"></label>
+        <label style="grid-column:1/-1">Address<textarea name="address" placeholder="Street, suburb, city"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Branch</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="b : ${tenantBranches}" th:id="${'modal-edit-branch-' + b.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Edit ' + b.name}">Edit Branch</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/branches/' + ${b.id} + '/update'}" class="form-grid">
+        <label>Branch Code<input name="branchCode" th:value="${b.branchCode}" required></label>
+        <label>Name<input name="name" th:value="${b.name}" required></label>
+        <label>Module
+          <select name="moduleType" required>
+            <option th:each="m : ${branchModuleOptions}" th:value="${m}" th:text="${m.displayName}" th:selected="${b.moduleType == m}">Retail Shop</option>
+          </select>
+        </label>
+        <label>City<input name="city" th:value="${b.city}"></label>
+        <label>Phone<input name="phone" th:value="${b.phone}"></label>
+        <label>Email<input name="email" type="email" th:value="${b.email}"></label>
+        <label style="grid-column:1/-1">Address<textarea name="address" th:text="${b.address}"></textarea></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Branch</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>
