@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RetailZW POS — App Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: #071A52;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* ── Background decoration ── */
+  .bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .bc1 { width:600px; height:600px; left:-100px; top:-100px; background:radial-gradient(circle, #1255C5 0%, transparent 70%); opacity:0.18; }
+  .bc2 { width:500px; height:500px; right:-80px; bottom:-80px; background:radial-gradient(circle, #FFD600 0%, transparent 70%); opacity:0.08; }
+
+  /* ── Left info panel ── */
+  .info-panel {
+    width: 380px;
+    padding: 40px 36px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .app-icon {
+    width: 64px; height: 64px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #3EB5F9, #1255C5);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; flex-shrink: 0;
+  }
+  .icon-strip {
+    position: absolute;
+    width: 22px; height: 44px;
+    background: white;
+    border-radius: 5px;
+    transform: rotate(-33deg);
+  }
+  .icon-tri {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 13px solid #FFD600;
+    z-index: 2;
+  }
+  .icon-arc {
+    position: absolute;
+    bottom: 9px; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 18px;
+    border-bottom: 9px solid #0A2760;
+    border-radius: 0 0 18px 18px;
+    z-index: 2;
+  }
+  .app-name { font-size: 28px; font-weight: 700; line-height: 1; }
+  .app-sub  { font-size: 11px; color: #64B5F6; letter-spacing: 2px; margin-top: 4px; }
+
+  .feature-list { margin: 24px 0; list-style: none; }
+  .feature-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 14px; color: rgba(255,255,255,0.85);
+    margin-bottom: 14px; line-height: 1.4;
+  }
+  .feat-dot {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(25,118,210,0.7);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; margin-top: 1px;
+  }
+
+  .screen-label {
+    font-size: 13px;
+    color: #FFD600;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    min-height: 18px;
+    transition: opacity 0.3s;
+  }
+  .screen-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.5;
+    min-height: 48px;
+  }
+
+  /* ── Progress dots ── */
+  .progress-dots {
+    display: flex; gap: 8px; margin-top: 28px;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    transition: background 0.3s, transform 0.3s;
+  }
+  .dot.active { background: #FFD600; transform: scale(1.4); }
+
+  /* ── Phone frame ── */
+  .phone-wrap {
+    position: relative;
+    width: 320px;
+    flex-shrink: 0;
+    margin: 0 40px;
+  }
+  .phone-frame {
+    width: 320px; height: 620px;
+    background: #111;
+    border-radius: 44px;
+    padding: 14px 12px;
+    box-shadow:
+      0 0 0 2px #2A2A2A,
+      0 40px 80px rgba(0,0,0,0.6),
+      0 0 60px rgba(18,85,197,0.3);
+    position: relative;
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    background: #EEF2F8;
+  }
+  /* Camera pill */
+  .phone-frame::before {
+    content: '';
+    position: absolute;
+    top: 20px; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 12px;
+    background: #111;
+    border-radius: 6px;
+    z-index: 10;
+  }
+  /* Side buttons */
+  .phone-frame::after {
+    content: '';
+    position: absolute;
+    right: -5px; top: 120px;
+    width: 4px; height: 60px;
+    background: #2A2A2A;
+    border-radius: 2px;
+  }
+
+  /* ── Screen slides ── */
+  .screen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+  }
+  .screen.active { opacity: 1; pointer-events: auto; }
+
+  /* ── Screen 1: Splash ── */
+  .s-splash {
+    background: linear-gradient(160deg, #071A52, #0D2A7A, #071A52);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0;
+  }
+  .splash-icon {
+    width: 90px; height: 90px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #3EB5F9, #1255C5);
+    position: relative; overflow: hidden; margin-bottom: 20px;
+  }
+  .si-strip {
+    position: absolute; top: 50%; left: 50%;
+    width: 32px; height: 62px;
+    background: white; border-radius: 6px;
+    transform: translate(-50%,-50%) rotate(-33deg);
+  }
+  .si-tri {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-top: 18px solid #FFD600;
+    z-index: 3;
+  }
+  .si-arc {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    width: 52px; height: 26px;
+    border-bottom: 13px solid #0A2760;
+    border-radius: 0 0 26px 26px;
+    z-index: 3;
+  }
+  .splash-name {
+    font-size: 28px; font-weight: 700; color: white; letter-spacing: 0.5px;
+  }
+  .splash-sub {
+    font-size: 10px; color: #64B5F6; letter-spacing: 3px; margin-top: 6px;
+  }
+  .splash-url {
+    position: absolute; bottom: 24px;
+    font-size: 10px; color: rgba(100,181,246,0.7); letter-spacing: 1px;
+  }
+  .splash-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 5px; background: #FFD600;
+    transform-origin: left;
+    animation: barGrow 3.2s ease-in-out forwards;
+  }
+  @keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  /* ── Screen 2: Login ── */
+  .s-login {
+    background: linear-gradient(180deg, #E8F0F8 0%, #F4F7FC 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .login-icon {
+    width: 68px; height: 68px; border-radius: 16px;
+    background: linear-gradient(135deg, #3EB5F9, #1255C5);
+    position: relative; overflow: hidden; margin-bottom: 12px;
+  }
+  .li-strip {
+    position: absolute; top: 50%; left: 50%;
+    width: 24px; height: 48px; background: white; border-radius: 5px;
+    transform: translate(-50%,-50%) rotate(-33deg);
+  }
+  .li-tri {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 10px solid transparent; border-right: 10px solid transparent;
+    border-top: 14px solid #FFD600; z-index: 3;
+  }
+  .li-arc {
+    position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 20px;
+    border-bottom: 10px solid #0A2760; border-radius: 0 0 20px 20px; z-index: 3;
+  }
+  .login-title { font-size: 22px; font-weight: 700; color: #1A1A2E; margin-bottom: 4px; }
+  .login-sub   { font-size: 11px; color: #666; margin-bottom: 24px; text-align: center; }
+  .login-card  {
+    background: white; border-radius: 16px;
+    padding: 20px; width: 100%; max-width: 240px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .login-field {
+    display: flex; align-items: center; gap: 10px;
+    background: #F4F6FA; border-radius: 10px; padding: 10px 14px;
+    margin-bottom: 12px; font-size: 13px; color: #999;
+    border: 1px solid #E8ECF4;
+  }
+  .login-field svg { flex-shrink: 0; opacity: 0.5; }
+  .login-btn {
+    width: 100%; padding: 12px;
+    background: #1565C0; border-radius: 10px;
+    font-size: 14px; font-weight: 600; color: white;
+    text-align: center; margin-top: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .login-hint { font-size: 10px; color: #999; text-align: center; margin-top: 14px; }
+
+  /* ── Screen 3: No Active Shift (POS) ── */
+  .s-noshift {
+    background: #EEF2F8;
+    display: flex; flex-direction: column;
+  }
+  .app-header {
+    background: #1565C0;
+    padding: 0 12px;
+    height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .hdr-left { display: flex; align-items: center; gap: 8px; }
+  .hdr-badge {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: #FFD600; display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 800; color: #0D47A1;
+  }
+  .hdr-title { font-size: 13px; font-weight: 600; color: white; }
+  .hdr-cashier { font-size: 10px; color: rgba(255,255,255,0.7); margin-left: 4px; }
+  .hdr-online { display: flex; align-items: center; gap: 4px; font-size: 10px; color: white; }
+  .online-dot { width: 6px; height: 6px; border-radius: 50%; background: #4CAF50; }
+  .session-bar {
+    background: #FFC107; padding: 5px 12px;
+    font-size: 9px; font-weight: 600; color: #4A3000;
+    text-align: center; flex-shrink: 0;
+  }
+  .screen-content {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .empty-icon {
+    width: 72px; height: 72px; border-radius: 36px;
+    background: rgba(255,193,7,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; margin-bottom: 16px;
+  }
+  .empty-title { font-size: 16px; font-weight: 700; color: #1A1A2E; margin-bottom: 8px; }
+  .empty-desc  { font-size: 11px; color: #666; text-align: center; line-height: 1.5; }
+  .bottom-nav {
+    background: white; border-top: 1px solid #E8ECF4;
+    display: flex; justify-content: space-around;
+    padding: 8px 0; flex-shrink: 0;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .nav-icon { font-size: 18px; color: #ccc; }
+  .nav-lbl  { font-size: 8px; color: #aaa; }
+  .nav-item.active .nav-icon { color: #1565C0; }
+  .nav-item.active .nav-lbl  { color: #1565C0; font-weight: 600; }
+
+  /* ── Screen 4: Open Shift ── */
+  .s-shift { background: #EEF2F8; display: flex; flex-direction: column; }
+  .shift-card {
+    background: white; border-radius: 12px; margin: 12px;
+    padding: 14px; display: flex; align-items: flex-start; gap: 10px;
+  }
+  .shift-badge {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(21,101,192,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .shift-info h4 { font-size: 13px; font-weight: 700; color: #1A1A2E; margin-bottom: 3px; }
+  .shift-info p  { font-size: 10px; color: #666; margin-bottom: 10px; }
+  .shift-btn {
+    background: #1565C0; border-radius: 8px;
+    padding: 8px 14px; font-size: 11px; font-weight: 600;
+    color: white; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .offline-card {
+    background: white; border-radius: 12px; margin: 0 12px;
+    padding: 14px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .offline-left { display: flex; align-items: center; gap: 10px; }
+  .offline-info h4 { font-size: 12px; font-weight: 600; color: #1A1A2E; }
+  .offline-info p  { font-size: 10px; color: #666; }
+  .sync-icon { font-size: 18px; color: #999; }
+
+  /* ── Screen 5: Shift Sales ── */
+  .s-sales { background: #EEF2F8; display: flex; flex-direction: column; }
+  .sales-page-title { font-size: 16px; font-weight: 700; color: #1A1A2E; padding: 10px 12px 6px; }
+  .currency-cards { display: flex; gap: 8px; padding: 0 12px; margin-bottom: 10px; }
+  .cur-card {
+    flex: 1; background: white; border-radius: 10px; padding: 10px 12px;
+  }
+  .cur-label { font-size: 9px; color: #666; margin-bottom: 4px; }
+  .cur-value { font-size: 15px; font-weight: 700; color: #1A1A2E; }
+  .tx-list { padding: 0 12px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+  .tx-row {
+    background: white; border-radius: 8px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .tx-icon { font-size: 18px; color: #1565C0; flex-shrink: 0; }
+  .tx-info { flex: 1; }
+  .tx-ref   { font-size: 9px; font-weight: 500; color: #1A1A2E; }
+  .tx-meta  { font-size: 8px; color: #999; margin-top: 1px; }
+  .tx-amount { font-size: 12px; font-weight: 700; color: #1A1A2E; }
+
+  /* ── Screen 6: Profile ── */
+  .s-profile { background: #EEF2F8; display: flex; flex-direction: column; }
+  .profile-card {
+    background: white; border-radius: 12px; margin: 10px 12px;
+    padding: 14px; display: flex; align-items: center; gap: 12px;
+  }
+  .avatar {
+    width: 48px; height: 48px; border-radius: 24px;
+    background: #1565C0; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
+  }
+  .profile-name { font-size: 14px; font-weight: 700; color: #1A1A2E; }
+  .profile-user { font-size: 10px; color: #888; margin-bottom: 6px; }
+  .badge-row { display: flex; gap: 6px; }
+  .badge {
+    padding: 2px 10px; border-radius: 20px; font-size: 9px; font-weight: 600;
+    border: 1px solid #ddd; color: #666;
+  }
+  .badge.synced { border-color: #4CAF50; color: #2E7D32; }
+  .profile-rows { margin: 0 12px; background: white; border-radius: 12px; overflow: hidden; }
+  .profile-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border-bottom: 1px solid #F0F2F6;
+  }
+  .profile-row:last-child { border-bottom: none; }
+  .pr-icon { font-size: 18px; color: #1565C0; flex-shrink: 0; }
+  .pr-label { font-size: 10px; color: #888; }
+  .pr-value { font-size: 12px; font-weight: 500; color: #1A1A2E; }
+
+  /* ── Title card ── */
+  .s-title {
+    background: linear-gradient(160deg, #071A52, #0D2A7A, #071A52);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .title-logo {
+    width: 100px; height: 100px; border-radius: 24px;
+    background: linear-gradient(135deg, #3EB5F9, #1255C5);
+    position: relative; overflow: hidden; margin-bottom: 20px;
+  }
+  .tl-strip {
+    position: absolute; top: 50%; left: 50%;
+    width: 36px; height: 70px; background: white; border-radius: 8px;
+    transform: translate(-50%,-50%) rotate(-33deg);
+  }
+  .tl-tri {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 15px solid transparent; border-right: 15px solid transparent;
+    border-top: 20px solid #FFD600; z-index: 3;
+  }
+  .tl-arc {
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 30px;
+    border-bottom: 15px solid #0A2760; border-radius: 0 0 30px 30px; z-index: 3;
+  }
+  .title-name { font-size: 32px; font-weight: 800; color: white; }
+  .title-sub  { font-size: 11px; color: #64B5F6; letter-spacing: 3px; margin-top: 6px; }
+  .title-tagline { font-size: 15px; color: rgba(255,255,255,0.8); margin-top: 16px; }
+  .title-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 5px; background: #FFD600;
+  }
+
+  /* ── Right caption panel ── */
+  .caption-panel {
+    width: 320px; padding: 40px 36px;
+    flex-shrink: 0;
+  }
+  .step-number {
+    font-size: 64px; font-weight: 800;
+    color: rgba(255,255,255,0.07);
+    line-height: 1; margin-bottom: -10px;
+  }
+  .step-title {
+    font-size: 22px; font-weight: 700; color: white; margin-bottom: 10px;
+  }
+  .step-body {
+    font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.7;
+  }
+  .step-tag {
+    display: inline-block; margin-top: 18px;
+    padding: 5px 14px; border-radius: 20px;
+    background: rgba(255,214,0,0.12);
+    border: 1px solid rgba(255,214,0,0.3);
+    font-size: 11px; font-weight: 600; color: #FFD600; letter-spacing: 1px;
+  }
+
+  /* ── CTA end card ── */
+  .end-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    background: rgba(7,26,82,0.92);
+    opacity: 0; transition: opacity 1s ease;
+    pointer-events: none; z-index: 20;
+  }
+  .end-overlay.show { opacity: 1; pointer-events: auto; }
+  .end-title { font-size: 38px; font-weight: 800; color: white; text-align: center; }
+  .end-sub   { font-size: 16px; color: rgba(255,255,255,0.75); text-align: center; }
+  .end-url   { font-size: 18px; color: #FFD600; font-weight: 600; margin-top: 8px; }
+  .end-play  {
+    margin-top: 8px;
+    padding: 14px 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #1976D2, #0D47A1);
+    font-size: 16px; font-weight: 700; color: white;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 24px rgba(18,85,197,0.4);
+  }
+
+  /* caption slides */
+  .caption-slide { display: none; }
+  .caption-slide.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="bg-circle bc1"></div>
+<div class="bg-circle bc2"></div>
+
+<!-- Left info panel -->
+<div class="info-panel">
+  <div class="logo-row">
+    <div class="app-icon">
+      <div class="icon-strip"></div>
+      <div class="icon-tri"></div>
+      <div class="icon-arc"></div>
+    </div>
+    <div>
+      <div class="app-name">RetailZW</div>
+      <div class="app-sub">POS PLATFORM</div>
+    </div>
+  </div>
+
+  <ul class="feature-list">
+    <li><div class="feat-dot">✓</div>Offline-first — works without internet</li>
+    <li><div class="feat-dot">✓</div>USD &amp; ZWG dual-currency pricing</li>
+    <li><div class="feat-dot">✓</div>EcoCash · Zipit · Cash payments</li>
+    <li><div class="feat-dot">✓</div>Bluetooth receipt printing</li>
+    <li><div class="feat-dot">✓</div>Shift management &amp; reports</li>
+  </ul>
+
+  <div class="screen-label" id="infoLabel">APP OVERVIEW</div>
+  <div class="screen-desc" id="infoDesc">Zimbabwe's leading point-of-sale platform built for local retail shops.</div>
+
+  <div class="progress-dots" id="dots"></div>
+</div>
+
+<!-- Phone -->
+<div class="phone-wrap">
+  <div class="phone-frame">
+    <div class="phone-screen" id="phoneScreen">
+
+      <!-- Screen 0: Title -->
+      <div class="screen s-title active" id="sc-0">
+        <div class="title-logo">
+          <div class="tl-strip"></div>
+          <div class="tl-tri"></div>
+          <div class="tl-arc"></div>
+        </div>
+        <div class="title-name">RetailZW</div>
+        <div class="title-sub">ZIMBABWE'S POS PLATFORM</div>
+        <div class="title-tagline">Built for Zimbabwean retail shops</div>
+        <div class="title-bar"></div>
+      </div>
+
+      <!-- Screen 1: Splash -->
+      <div class="screen s-splash" id="sc-1">
+        <div class="splash-icon">
+          <div class="si-strip"></div>
+          <div class="si-tri"></div>
+          <div class="si-arc"></div>
+        </div>
+        <div class="splash-name">RetailZW</div>
+        <div class="splash-sub">ZIMBABWE'S POS PLATFORM</div>
+        <div class="splash-url">retailzw.co.zw</div>
+        <div class="splash-bar" id="splashBar"></div>
+      </div>
+
+      <!-- Screen 2: Login -->
+      <div class="screen s-login" id="sc-2">
+        <div class="login-icon">
+          <div class="li-strip"></div>
+          <div class="li-tri"></div>
+          <div class="li-arc"></div>
+        </div>
+        <div class="login-title">RetailZW</div>
+        <div class="login-sub">Clean POS access for today's shift.</div>
+        <div class="login-card">
+          <div class="login-field">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span>Username</span>
+          </div>
+          <div class="login-field">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Password</span>
+          </div>
+          <div class="login-btn">Sign In →</div>
+        </div>
+        <div class="login-hint">Online and offline shift ready</div>
+      </div>
+
+      <!-- Screen 3: No Active Shift -->
+      <div class="screen s-noshift" id="sc-3">
+        <div class="app-header">
+          <div class="hdr-left">
+            <div class="hdr-badge">RZ</div>
+            <span class="hdr-title">RetailZW POS</span>
+            <span class="hdr-cashier">Farai</span>
+          </div>
+          <div class="hdr-online"><div class="online-dot"></div>Online</div>
+        </div>
+        <div class="screen-content">
+          <div class="empty-icon">🕐</div>
+          <div class="empty-title">No Active Shift</div>
+          <div class="empty-desc">Open a cash shift before making sales. Products will sync to this device.</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><div class="nav-icon">🖥</div><div class="nav-lbl">POS</div></div>
+          <div class="nav-item"><div class="nav-icon">📋</div><div class="nav-lbl">Shift Sales</div></div>
+          <div class="nav-item"><div class="nav-icon">💵</div><div class="nav-lbl">Cash</div></div>
+          <div class="nav-item"><div class="nav-icon">⋮⋮</div><div class="nav-lbl">More</div></div>
+        </div>
+      </div>
+
+      <!-- Screen 4: Shift Control -->
+      <div class="screen s-shift" id="sc-4">
+        <div class="app-header">
+          <div class="hdr-left">
+            <div class="hdr-badge">RZ</div>
+            <span class="hdr-title">RetailZW POS</span>
+          </div>
+          <div class="hdr-online"><div class="online-dot"></div>Online</div>
+        </div>
+        <div class="session-bar">✓ Session Open · Float: $0.00 USD</div>
+        <div style="padding:8px 12px 4px;font-size:16px;font-weight:700;color:#1A1A2E;">Shift Control</div>
+        <div class="shift-card">
+          <div class="shift-badge">✅</div>
+          <div class="shift-info">
+            <h4>Shift #5 open</h4>
+            <p>Opening float: $0.00 / ZWG 0.00</p>
+            <div class="shift-btn">🖨 Close Shift &amp; Print</div>
+          </div>
+        </div>
+        <div class="offline-card">
+          <div class="offline-left">
+            <div style="font-size:22px;">☁️</div>
+            <div class="offline-info">
+              <h4>Offline queue</h4>
+              <p>0 sale(s) waiting to sync</p>
+            </div>
+          </div>
+          <div class="sync-icon">🔄</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-icon">🖥</div><div class="nav-lbl">POS</div></div>
+          <div class="nav-item"><div class="nav-icon">📋</div><div class="nav-lbl">Shift Sales</div></div>
+          <div class="nav-item active"><div class="nav-icon">💵</div><div class="nav-lbl">Cash</div></div>
+          <div class="nav-item"><div class="nav-icon">⋮⋮</div><div class="nav-lbl">More</div></div>
+        </div>
+      </div>
+
+      <!-- Screen 5: Shift Sales -->
+      <div class="screen s-sales" id="sc-5">
+        <div class="app-header">
+          <div class="hdr-left">
+            <div class="hdr-badge">RZ</div>
+            <span class="hdr-title">RetailZW POS</span>
+          </div>
+          <div class="hdr-online"><div class="online-dot"></div>Online</div>
+        </div>
+        <div class="session-bar">✓ Session Open · Float: $0.00 USD</div>
+        <div class="sales-page-title">Shift Sales</div>
+        <div class="currency-cards">
+          <div class="cur-card">
+            <div class="cur-label">USD Sales</div>
+            <div class="cur-value">$268.94</div>
+          </div>
+          <div class="cur-card">
+            <div class="cur-label">ZWG Sales</div>
+            <div class="cur-value" style="font-size:13px;">ZWG 0.00</div>
+          </div>
+        </div>
+        <div class="tx-list">
+          <div class="tx-row"><div class="tx-icon">🧾</div><div class="tx-info"><div class="tx-ref">BR1-20260527-177990724</div><div class="tx-meta">COMPLETED · 3 hours ago</div></div><div class="tx-amount">$4.03</div></div>
+          <div class="tx-row"><div class="tx-icon">🧾</div><div class="tx-info"><div class="tx-ref">BR1-20260527-177990722</div><div class="tx-meta">COMPLETED · 3 hours ago</div></div><div class="tx-amount">$8.86</div></div>
+          <div class="tx-row"><div class="tx-icon">🧾</div><div class="tx-info"><div class="tx-ref">BR1-20260527-177990712</div><div class="tx-meta">COMPLETED · 3 hours ago</div></div><div class="tx-amount">$13.35</div></div>
+          <div class="tx-row"><div class="tx-icon">🧾</div><div class="tx-info"><div class="tx-ref">BR1-20260527-177990302</div><div class="tx-meta">COMPLETED · 4 hours ago</div></div><div class="tx-amount">$32.95</div></div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-icon">🖥</div><div class="nav-lbl">POS</div></div>
+          <div class="nav-item active"><div class="nav-icon">📋</div><div class="nav-lbl">Shift Sales</div></div>
+          <div class="nav-item"><div class="nav-icon">💵</div><div class="nav-lbl">Cash</div></div>
+          <div class="nav-item"><div class="nav-icon">⋮⋮</div><div class="nav-lbl">More</div></div>
+        </div>
+      </div>
+
+      <!-- Screen 6: Profile -->
+      <div class="screen s-profile" id="sc-6">
+        <div class="app-header">
+          <div class="hdr-left">
+            <div class="hdr-badge">RZ</div>
+            <span class="hdr-title">RetailZW POS</span>
+          </div>
+          <div class="hdr-online"><div class="online-dot"></div>Online</div>
+        </div>
+        <div class="session-bar">✓ Session Open · Float: $0.00 USD</div>
+        <div style="padding:8px 12px 4px;font-size:16px;font-weight:700;color:#1A1A2E;">Profile</div>
+        <div class="profile-card">
+          <div class="avatar">FC</div>
+          <div>
+            <div class="profile-name">Farai Chikwanda</div>
+            <div class="profile-user">@cashier1</div>
+            <div class="badge-row">
+              <div class="badge">CASHIER</div>
+              <div class="badge synced">SYNCED</div>
+            </div>
+          </div>
+        </div>
+        <div class="profile-rows">
+          <div class="profile-row"><div class="pr-icon">🪪</div><div><div class="pr-label">User ID</div><div class="pr-value">4</div></div></div>
+          <div class="profile-row"><div class="pr-icon">🏪</div><div><div class="pr-label">Branch</div><div class="pr-value">Branch #1</div></div></div>
+          <div class="profile-row"><div class="pr-icon">🏢</div><div><div class="pr-label">Shop</div><div class="pr-value">Tenant #1</div></div></div>
+          <div class="profile-row"><div class="pr-icon">🖨</div><div><div class="pr-label">Bluetooth Printer</div><div class="pr-value" style="color:#1565C0;">Connect thermal printer →</div></div></div>
+          <div class="profile-row">
+            <div class="pr-icon">💱</div>
+            <div style="flex:1"><div class="pr-label">Currency</div><div class="pr-value">USD</div></div>
+            <div style="display:flex;border:1px solid #ddd;border-radius:20px;overflow:hidden;font-size:10px;">
+              <div style="padding:4px 10px;background:#1565C0;color:white;font-weight:600;">USD</div>
+              <div style="padding:4px 10px;color:#888;">ZWG</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><div class="nav-icon">🖥</div><div class="nav-lbl">POS</div></div>
+          <div class="nav-item"><div class="nav-icon">📋</div><div class="nav-lbl">Shift Sales</div></div>
+          <div class="nav-item"><div class="nav-icon">💵</div><div class="nav-lbl">Cash</div></div>
+          <div class="nav-item active"><div class="nav-icon">⋮⋮</div><div class="nav-lbl">More</div></div>
+        </div>
+      </div>
+
+    </div><!-- /phone-screen -->
+  </div><!-- /phone-frame -->
+</div><!-- /phone-wrap -->
+
+<!-- Right caption panel -->
+<div class="caption-panel">
+  <div class="caption-slide active" id="cap-0">
+    <div class="step-number">00</div>
+    <div class="step-title">RetailZW POS</div>
+    <div class="step-body">The complete point-of-sale solution built specifically for Zimbabwean retail shops.</div>
+    <div class="step-tag">INTRO</div>
+  </div>
+  <div class="caption-slide" id="cap-1">
+    <div class="step-number">01</div>
+    <div class="step-title">Fast launch</div>
+    <div class="step-body">The app loads in seconds. Fully branded for your shop with the retailzw.co.zw cloud backend.</div>
+    <div class="step-tag">LAUNCH</div>
+  </div>
+  <div class="caption-slide" id="cap-2">
+    <div class="step-number">02</div>
+    <div class="step-title">Cashier login</div>
+    <div class="step-body">Each cashier logs in with their own credentials. Works online and offline — shift ready from the moment you open.</div>
+    <div class="step-tag">SIGN IN</div>
+  </div>
+  <div class="caption-slide" id="cap-3">
+    <div class="step-number">03</div>
+    <div class="step-title">Open your shift</div>
+    <div class="step-body">Before selling, open a cash shift to track your float. Products sync automatically from the cloud.</div>
+    <div class="step-tag">POS</div>
+  </div>
+  <div class="caption-slide" id="cap-4">
+    <div class="step-number">04</div>
+    <div class="step-title">Shift control</div>
+    <div class="step-body">Monitor your open shift, view float, and close when done. Offline sales queue and sync automatically when reconnected.</div>
+    <div class="step-tag">CASH MANAGEMENT</div>
+  </div>
+  <div class="caption-slide" id="cap-5">
+    <div class="step-number">05</div>
+    <div class="step-title">Real-time sales</div>
+    <div class="step-body">Every transaction is captured instantly. USD and ZWG totals shown side-by-side. Full receipt history for the shift.</div>
+    <div class="step-tag">REPORTING</div>
+  </div>
+  <div class="caption-slide" id="cap-6">
+    <div class="step-number">06</div>
+    <div class="step-title">Cashier profile</div>
+    <div class="step-body">Multi-cashier support with role-based access. Connect Bluetooth printers and switch currencies on the fly.</div>
+    <div class="step-tag">SETTINGS</div>
+  </div>
+</div>
+
+<!-- End card overlay -->
+<div class="end-overlay" id="endOverlay">
+  <div class="title-logo" style="margin-bottom:16px;">
+    <div class="tl-strip"></div><div class="tl-tri"></div><div class="tl-arc"></div>
+  </div>
+  <div class="end-title">RetailZW POS</div>
+  <div class="end-sub">Zimbabwe's Retail Platform</div>
+  <div class="end-url">retailzw.co.zw</div>
+  <button class="end-play" onclick="restart()">▶ Watch Again</button>
+</div>
+
+<script>
+  const screens = 7;
+  const durations = [3200, 3500, 3800, 3800, 4000, 4500, 4500];
+
+  const labels = [
+    'APP OVERVIEW', 'APP LAUNCH', 'CASHIER LOGIN',
+    'POS SCREEN', 'SHIFT CONTROL', 'SHIFT SALES', 'PROFILE'
+  ];
+  const descs = [
+    'Zimbabwe\'s leading point-of-sale platform for local retail shops.',
+    'Loads in seconds with your branding and cloud connection.',
+    'Each cashier logs in securely. Works online and offline.',
+    'Open a cash shift and start selling immediately.',
+    'Monitor your shift, manage float, and sync offline sales.',
+    'Real-time USD and ZWG sales tracking with full receipt history.',
+    'Multi-cashier profiles, Bluetooth printers, and dual-currency settings.'
+  ];
+
+  let current = 0;
+  let timer = null;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < screens; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(idx) {
+    // Hide current
+    document.getElementById('sc-' + current).classList.remove('active');
+    document.getElementById('cap-' + current).classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+
+    current = idx;
+
+    // Show new
+    document.getElementById('sc-' + current).classList.add('active');
+    document.getElementById('cap-' + current).classList.add('active');
+    dotsEl.children[current].classList.add('active');
+
+    document.getElementById('infoLabel').textContent = labels[current];
+    document.getElementById('infoDesc').textContent  = descs[current];
+
+    // Restart splash bar if on splash
+    if (current === 1) {
+      const bar = document.getElementById('splashBar');
+      bar.style.animation = 'none';
+      bar.offsetHeight; // reflow
+      bar.style.animation = 'barGrow 3.2s ease-in-out forwards';
+    }
+  }
+
+  function next() {
+    if (current >= screens - 1) {
+      document.getElementById('endOverlay').classList.add('show');
+      return;
+    }
+    goTo(current + 1);
+    scheduleNext();
+  }
+
+  function scheduleNext() {
+    clearTimeout(timer);
+    timer = setTimeout(next, durations[current]);
+  }
+
+  function restart() {
+    document.getElementById('endOverlay').classList.remove('show');
+    goTo(0);
+    scheduleNext();
+  }
+
+  // Start
+  scheduleNext();
+</script>
+</body>
+</html>

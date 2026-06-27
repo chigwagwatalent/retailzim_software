@@ -1,0 +1,98 @@
+========================================
+ RetailZW POS — Play Store Release Notes
+========================================
+
+VERSION: 1.0.0 (versionCode 1)
+RELEASE TYPE: Initial Launch
+
+----------------------------------------
+WHAT'S NEW (en-US) — 500 char limit
+----------------------------------------
+
+🎉 Welcome to RetailZW POS — built for Zimbabwean retail shops.
+
+• Complete point-of-sale: scan barcodes, process sales, print receipts
+• Real-time stock management with low-stock alerts
+• Multi-payment: cash, EcoCash, Zipit, card
+• Works offline — syncs automatically when reconnected
+• Daily sales reports and transaction history
+• Multi-user support with role-based access
+• Supports USD and ZWG pricing
+
+Download free. Subscription from $20/month.
+
+----------------------------------------
+CHARACTER COUNT CHECK
+----------------------------------------
+(The above "What's New" block is ~370 characters — within the 500-char limit)
+
+----------------------------------------
+SHORT DESCRIPTION (80 chars max — shown on Play Store listing)
+----------------------------------------
+Fast, offline-ready POS for Zimbabwean shops. USD & ZWG. Multi-payment support.
+
+----------------------------------------
+FULL DESCRIPTION (4,000 chars max)
+----------------------------------------
+RetailZW POS is a point-of-sale and retail management system designed specifically for shops in Zimbabwe. Run your business faster, smarter, and even offline.
+
+KEY FEATURES:
+
+🛒 SALES & CHECKOUT
+- Barcode scanner support for fast item lookup
+- Quick manual item search
+- Process multiple items per transaction
+- Apply discounts at line or basket level
+- Print or email receipts
+
+💰 MULTI-CURRENCY PAYMENTS
+- Accept USD cash and ZWG cash
+- EcoCash mobile money integration
+- Zipit bank transfers
+- Card payments
+- Split payments across methods
+
+📦 STOCK MANAGEMENT
+- Real-time inventory tracking
+- Low-stock alerts and notifications
+- Bulk stock import via CSV
+- Stock take / stockcount support
+- Supplier and purchase order management
+
+📊 REPORTING & ANALYTICS
+- Daily, weekly, and monthly sales summaries
+- Best-selling products
+- Cashier performance reports
+- Export reports to PDF or Excel
+
+👥 STAFF & ACCESS CONTROL
+- Multi-cashier support
+- Role-based permissions (Owner, Manager, Cashier)
+- Per-cashier shift and sales tracking
+
+🔌 OFFLINE FIRST
+- Full POS functionality without internet
+- Automatic sync when connection is restored
+- No data loss during outages
+
+🔗 CLOUD SYNC
+- Real-time sync with RetailZW web dashboard
+- Manage your shop remotely from admin.retailzw.co.zw
+- Multi-branch support on Growth and Enterprise plans
+
+PRICING:
+- Starter: $20/month (1 device, core POS features)
+- Growth: $40/month (3 devices, advanced reporting)
+- Enterprise: $100/month (unlimited devices, API access, priority support)
+
+Operated by Charnodia Technologies (Pvt) Ltd, Zimbabwe.
+Support: support@retailzw.co.zw
+Website: https://retailzw.co.zw
+
+----------------------------------------
+NOTES FOR PLAY CONSOLE
+----------------------------------------
+- Copy the "WHAT'S NEW" block into: Release > Release notes > en-US
+- Copy "SHORT DESCRIPTION" into: Store listing > Short description
+- Copy "FULL DESCRIPTION" into: Store listing > Full description
+- These can be edited any time before publishing

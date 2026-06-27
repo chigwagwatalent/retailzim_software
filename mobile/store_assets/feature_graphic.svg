@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <defs>
+    <linearGradient id="navyBg" x1="0" y1="0" x2="1024" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#071A52"/>
+      <stop offset="60%" stop-color="#0A2266"/>
+      <stop offset="100%" stop-color="#0D1B4A"/>
+    </linearGradient>
+    <linearGradient id="phoneGrad" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#1A1A2E"/>
+      <stop offset="100%" stop-color="#0F0F1A"/>
+    </linearGradient>
+    <linearGradient id="iconBg" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#3EB5F9"/>
+      <stop offset="100%" stop-color="#1255C5"/>
+    </linearGradient>
+    <clipPath id="phone1Clip">
+      <rect x="560" y="28" width="196" height="386" rx="22"/>
+    </clipPath>
+    <clipPath id="phone2Clip">
+      <rect x="780" y="48" width="196" height="386" rx="22"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="500" fill="url(#navyBg)"/>
+
+  <!-- Decorative circle glow behind phones -->
+  <circle cx="730" cy="250" r="260" fill="#1255C5" opacity="0.12"/>
+  <circle cx="730" cy="250" r="180" fill="#1976D2" opacity="0.10"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="166" x2="1024" y2="166" stroke="#FFFFFF" stroke-width="0.3" opacity="0.06"/>
+  <line x1="0" y1="333" x2="1024" y2="333" stroke="#FFFFFF" stroke-width="0.3" opacity="0.06"/>
+  <line x1="341" y1="0" x2="341" y2="500" stroke="#FFFFFF" stroke-width="0.3" opacity="0.06"/>
+  <line x1="682" y1="0" x2="682" y2="500" stroke="#FFFFFF" stroke-width="0.3" opacity="0.06"/>
+
+  <!-- ═══ LEFT PANEL — Branding ═══ -->
+
+  <!-- App icon (70×70) -->
+  <rect x="52" y="62" width="70" height="70" rx="16" fill="url(#iconBg)"/>
+  <!-- icon: white diagonal strip -->
+  <g transform="translate(87,98) rotate(-33)">
+    <rect x="-10.5" y="-25" width="21" height="40" rx="4" fill="white"/>
+  </g>
+  <!-- icon: yellow triangle -->
+  <polygon points="79,82 87,69 95,82" fill="#FFD600"/>
+  <!-- icon: dark arc -->
+  <path d="M 63,111 A 26,22 0 0 0 111,106" fill="none" stroke="#0A2760" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- RetailZW wordmark -->
+  <text x="136" y="98" font-family="'Segoe UI', Arial, sans-serif" font-size="34" font-weight="700" fill="white" letter-spacing="0">RetailZW</text>
+  <text x="136" y="122" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="400" fill="#64B5F6" letter-spacing="2">POS</text>
+
+  <!-- Tagline -->
+  <text x="52" y="178" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="300" fill="white" opacity="0.92">Zimbabwe's Retail Platform</text>
+  <rect x="52" y="188" width="52" height="2" rx="1" fill="#FFD600"/>
+
+  <!-- Feature list -->
+  <!-- Feature 1 -->
+  <circle cx="68" cy="236" r="10" fill="#1976D2" opacity="0.8"/>
+  <text x="68" y="241" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="600" fill="white" text-anchor="middle">✓</text>
+  <text x="88" y="241" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="500" fill="white">Offline-first POS — works without internet</text>
+
+  <!-- Feature 2 -->
+  <circle cx="68" cy="272" r="10" fill="#1976D2" opacity="0.8"/>
+  <text x="68" y="277" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="600" fill="white" text-anchor="middle">✓</text>
+  <text x="88" y="277" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="500" fill="white">USD &amp; ZWG dual-currency pricing</text>
+
+  <!-- Feature 3 -->
+  <circle cx="68" cy="308" r="10" fill="#1976D2" opacity="0.8"/>
+  <text x="68" y="313" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="600" fill="white" text-anchor="middle">✓</text>
+  <text x="88" y="313" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="500" fill="white">EcoCash · Zipit · Card · Cash payments</text>
+
+  <!-- Feature 4 -->
+  <circle cx="68" cy="344" r="10" fill="#1976D2" opacity="0.8"/>
+  <text x="68" y="349" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="600" fill="white" text-anchor="middle">✓</text>
+  <text x="88" y="349" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="500" fill="white">Bluetooth receipt printer support</text>
+
+  <!-- Feature 5 -->
+  <circle cx="68" cy="380" r="10" fill="#1976D2" opacity="0.8"/>
+  <text x="68" y="385" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="600" fill="white" text-anchor="middle">✓</text>
+  <text x="88" y="385" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="500" fill="white">Shift management · Sales reports</text>
+
+  <!-- URL -->
+  <text x="52" y="460" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#64B5F6" opacity="0.8">retailzw.co.zw</text>
+
+  <!-- Yellow bottom bar accent -->
+  <rect x="52" y="476" width="280" height="3" rx="1.5" fill="#FFD600" opacity="0.8"/>
+
+  <!-- ═══ PHONE 1 — Shift Sales screen ═══ -->
+  <!-- Phone frame shadow -->
+  <rect x="557" y="25" width="202" height="392" rx="25" fill="#000000" opacity="0.5"/>
+  <!-- Phone body -->
+  <rect x="560" y="28" width="196" height="386" rx="22" fill="#1A1A2E"/>
+  <!-- Screen area (clipped) -->
+  <g clip-path="url(#phone1Clip)">
+    <!-- Screen bg -->
+    <rect x="560" y="28" width="196" height="386" fill="#EEF2F8"/>
+    <!-- Header bar -->
+    <rect x="560" y="28" width="196" height="48" fill="#1565C0"/>
+    <!-- RZ badge -->
+    <rect x="570" y="37" width="28" height="28" rx="7" fill="#FFD600"/>
+    <text x="584" y="56" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#0D47A1" text-anchor="middle">RZ</text>
+    <!-- App name -->
+    <text x="608" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="white">RetailZW POS</text>
+    <!-- Online dot -->
+    <circle cx="726" cy="51" r="4" fill="#4CAF50"/>
+    <text x="733" y="55" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="white">Online</text>
+
+    <!-- Session banner -->
+    <rect x="560" y="76" width="196" height="22" fill="#FFC107"/>
+    <text x="658" y="91" font-family="'Segoe UI', Arial, sans-serif" font-size="8" font-weight="500" fill="#4A3000" text-anchor="middle">✓ Session Open · Float: $0.00 USD</text>
+
+    <!-- Page title -->
+    <text x="572" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#1A1A2E">Shift Sales</text>
+
+    <!-- USD card -->
+    <rect x="568" y="126" width="82" height="44" rx="8" fill="white"/>
+    <text x="578" y="141" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#666">USD Sales</text>
+    <text x="578" y="160" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#1A1A2E">$268.94</text>
+
+    <!-- ZWG card -->
+    <rect x="658" y="126" width="88" height="44" rx="8" fill="white"/>
+    <text x="668" y="141" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#666">ZWG Sales</text>
+    <text x="668" y="160" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#1A1A2E">ZWG 0.00</text>
+
+    <!-- Transaction rows -->
+    <rect x="568" y="180" width="178" height="36" rx="6" fill="white"/>
+    <text x="588" y="196" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#1A1A2E">BR1-20260527-17799</text>
+    <text x="588" y="208" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#666">COMPLETED · 3 hrs ago</text>
+    <text x="736" y="202" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" fill="#1A1A2E" text-anchor="end">$4.03</text>
+
+    <rect x="568" y="222" width="178" height="36" rx="6" fill="white"/>
+    <text x="588" y="238" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#1A1A2E">BR1-20260527-17799</text>
+    <text x="588" y="250" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#666">COMPLETED · 3 hrs ago</text>
+    <text x="736" y="244" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" fill="#1A1A2E" text-anchor="end">$8.86</text>
+
+    <rect x="568" y="264" width="178" height="36" rx="6" fill="white"/>
+    <text x="588" y="280" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#1A1A2E">BR1-20260527-17799</text>
+    <text x="588" y="292" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#666">COMPLETED · 4 hrs ago</text>
+    <text x="736" y="286" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" fill="#1A1A2E" text-anchor="end">$32.95</text>
+
+    <rect x="568" y="306" width="178" height="36" rx="6" fill="white"/>
+    <text x="588" y="322" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#1A1A2E">BR1-20260527-17799</text>
+    <text x="588" y="334" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#666">COMPLETED · 4 hrs ago</text>
+    <text x="736" y="328" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" fill="#1A1A2E" text-anchor="end">$19.67</text>
+
+    <!-- Bottom nav -->
+    <rect x="560" y="388" width="196" height="26" fill="white" opacity="0.95"/>
+    <text x="588" y="405" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#1565C0" text-anchor="middle">POS</text>
+    <text x="630" y="405" font-family="'Segoe UI', Arial, sans-serif" font-size="7" font-weight="700" fill="#1565C0" text-anchor="middle">Shift Sales</text>
+    <text x="688" y="405" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#888" text-anchor="middle">Cash</text>
+    <text x="733" y="405" font-family="'Segoe UI', Arial, sans-serif" font-size="7" fill="#888" text-anchor="middle">More</text>
+  </g>
+  <!-- Phone notch/camera pill -->
+  <rect x="638" y="33" width="40" height="8" rx="4" fill="#0D0D1A"/>
+
+  <!-- ═══ PHONE 2 — Login screen (slightly behind) ═══ -->
+  <!-- Phone frame shadow -->
+  <rect x="777" y="45" width="202" height="392" rx="25" fill="#000000" opacity="0.5"/>
+  <!-- Phone body -->
+  <rect x="780" y="48" width="196" height="386" rx="22" fill="#1A1A2E"/>
+  <g clip-path="url(#phone2Clip)">
+    <!-- Splash screen -->
+    <rect x="780" y="48" width="196" height="386" fill="#071A52"/>
+    <!-- Glow circle -->
+    <circle cx="878" cy="220" r="80" fill="#1255C5" opacity="0.25"/>
+    <!-- App icon large -->
+    <rect x="850" y="168" width="56" height="56" rx="13" fill="url(#iconBg)"/>
+    <!-- icon strips -->
+    <g transform="translate(878,196) rotate(-33)">
+      <rect x="-8" y="-20" width="16" height="32" rx="3" fill="white"/>
+    </g>
+    <polygon points="869,182 878,169 887,182" fill="#FFD600"/>
+    <path d="M 858,212 A 21,18 0 0 0 898,208" fill="none" stroke="#0A2760" stroke-width="7" stroke-linecap="round"/>
+    <!-- App name -->
+    <text x="878" y="248" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="700" fill="white" text-anchor="middle">RetailZW</text>
+    <text x="878" y="265" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#64B5F6" text-anchor="middle" letter-spacing="2">ZIMBABWE'S POS PLATFORM</text>
+    <!-- URL -->
+    <text x="878" y="400" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#64B5F6" text-anchor="middle" opacity="0.7">retailzw.co.zw</text>
+    <!-- Yellow bottom bar -->
+    <rect x="780" y="428" width="196" height="6" fill="#FFD600"/>
+  </g>
+  <!-- Phone notch/camera pill -->
+  <rect x="858" y="53" width="40" height="8" rx="4" fill="#0D0D1A"/>
+
+  <!-- "Available on" badge -->
+  <rect x="52" y="428" width="140" height="32" rx="6" fill="#FFFFFF" opacity="0.1"/>
+  <rect x="52" y="428" width="140" height="32" rx="6" fill="none" stroke="#FFFFFF" stroke-width="0.8" opacity="0.3"/>
+  <text x="78" y="449" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="500" fill="white">GET IT ON</text>
+  <text x="112" y="449" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="white"> Google Play</text>
+
+</svg>

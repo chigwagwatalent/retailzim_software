@@ -1,0 +1,37 @@
+name: retailzw_mobile
+description: RetailZW Flutter POS app for Zimbabwean retail shops.
+publish_to: "none"
+version: 1.0.0+2
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  crypto: ^3.0.5
+  intl: ^0.19.0
+  flutter_secure_storage: ^9.2.2
+  provider: ^6.1.2
+  shared_preferences: ^2.2.3
+  sqflite: ^2.3.3+1
+  sqflite_common_ffi: ^2.3.4+4
+  barcode_scan2: ^4.3.3
+  printing: ^5.13.1
+  pdf: ^3.10.8
+  permission_handler: ^11.3.1
+  uuid: ^4.4.0
+  path: ^1.9.0
+  print_bluetooth_thermal: ^1.0.6
+  esc_pos_utils_plus: ^2.0.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
