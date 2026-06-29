@@ -950,6 +950,8 @@ class ApiService {
     double? estimatedTotal,
     String? customerName,
     String? customerPhone,
+    String paymentMethod = 'CASH',
+    String? paymentReference,
   }) async {
     await _ensureToken();
     final uuid = const Uuid().v4();
@@ -961,6 +963,9 @@ class ApiService {
       'offlineReceiptNumber': 'GAS-OFF-$uuid',
       'offlineCreatedAt': DateTime.now().toIso8601String(),
       'estimatedTotal': estimatedTotal ?? 0,
+      'paymentMethod': paymentMethod,
+      if (paymentReference != null && paymentReference.trim().isNotEmpty)
+        'paymentReference': paymentReference.trim(),
       if (customerName != null && customerName.trim().isNotEmpty)
         'customerName': customerName.trim(),
       if (customerPhone != null && customerPhone.trim().isNotEmpty)
@@ -992,6 +997,9 @@ class ApiService {
     required int tankId,
     required double quantityKg,
     String? supplierName,
+    String currency = 'USD',
+    double unitCost = 0,
+    String? supplierInvoice,
   }) async {
     await _ensureToken();
     final response = await http
@@ -1002,8 +1010,41 @@ class ApiService {
             'branchId': branchId,
             'tankId': tankId,
             'quantityKg': quantityKg,
+            'currency': currency,
+            'unitCost': unitCost,
             if (supplierName != null && supplierName.trim().isNotEmpty)
               'supplierName': supplierName.trim(),
+            if (supplierInvoice != null && supplierInvoice.trim().isNotEmpty)
+              'supplierInvoice': supplierInvoice.trim(),
+          }),
+        )
+        .timeout(_timeout);
+    _decode(response);
+  }
+
+  Future<void> recordGasExpense({
+    required int branchId,
+    required String category,
+    required String description,
+    required double amount,
+    required String currency,
+    String paymentMethod = 'CASH',
+    String? reference,
+  }) async {
+    await _ensureToken();
+    final response = await http
+        .post(
+          await _uri('/api/gas/expenses'),
+          headers: _headers(),
+          body: jsonEncode({
+            'branchId': branchId,
+            'category': category,
+            'description': description,
+            'amount': amount,
+            'currency': currency,
+            'paymentMethod': paymentMethod,
+            if (reference != null && reference.trim().isNotEmpty)
+              'reference': reference.trim(),
           }),
         )
         .timeout(_timeout);
@@ -1093,6 +1134,7 @@ class ApiService {
       unitPrice: quantity <= 0 ? 0 : total / quantity,
       total: total,
       currency: saleRequest['currency']?.toString() ?? 'USD',
+      paymentMethod: saleRequest['paymentMethod']?.toString() ?? 'CASH',
     );
   }
 
@@ -1110,6 +1152,9 @@ class ApiService {
       'sales': (data['shiftSales'] as List<dynamic>? ?? [])
           .map((e) => GasSale.fromJson(e as Map<String, dynamic>))
           .toList(),
+      'dashboard': data['dashboard'] == null
+          ? null
+          : GasDashboard.fromJson(data['dashboard'] as Map<String, dynamic>),
     };
   }
 

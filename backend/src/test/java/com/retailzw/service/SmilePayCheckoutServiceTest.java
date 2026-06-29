@@ -8,6 +8,7 @@ import com.retailzw.model.Tenant;
 import com.retailzw.model.TenantSubscription;
 import com.retailzw.repository.SaasPlanRepository;
 import com.retailzw.repository.SmilePayCheckoutRepository;
+import com.retailzw.repository.TenantEnabledModuleRepository;
 import com.retailzw.repository.TenantRepository;
 import com.retailzw.repository.TenantSubscriptionRepository;
 import com.sun.net.httpserver.HttpServer;
@@ -47,9 +48,10 @@ class SmilePayCheckoutServiceTest {
             TenantRepository tenants = mock(TenantRepository.class);
             SaasPlanRepository plans = mock(SaasPlanRepository.class);
             TenantSubscriptionRepository subscriptions = mock(TenantSubscriptionRepository.class);
+            TenantEnabledModuleRepository tenantModules = mock(TenantEnabledModuleRepository.class);
             EmailService email = mock(EmailService.class);
             SmilePayCheckoutService service = new SmilePayCheckoutService(
-                    checkouts, tenants, plans, subscriptions, email, new ObjectMapper());
+                    checkouts, tenants, plans, subscriptions, tenantModules, email, new ObjectMapper());
 
             Tenant tenant = Tenant.builder()
                     .id(7L)

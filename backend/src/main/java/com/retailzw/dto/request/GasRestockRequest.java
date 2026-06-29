@@ -1,5 +1,6 @@
 package com.retailzw.dto.request;
 
+import com.retailzw.enums.CurrencyCode;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,7 +17,10 @@ public class GasRestockRequest {
     @DecimalMin(value = "0.001", message = "Quantity must be greater than zero")
     private BigDecimal quantityKg;
 
+    private CurrencyCode currency = CurrencyCode.USD;
+    private BigDecimal unitCost = BigDecimal.ZERO;
     private String supplierName;
+    private String supplierInvoice;
     private String notes;
 
     public Long getBranchId() { return branchId; }
@@ -25,8 +29,14 @@ public class GasRestockRequest {
     public void setTankId(Long tankId) { this.tankId = tankId; }
     public BigDecimal getQuantityKg() { return quantityKg; }
     public void setQuantityKg(BigDecimal quantityKg) { this.quantityKg = quantityKg; }
+    public CurrencyCode getCurrency() { return currency; }
+    public void setCurrency(CurrencyCode currency) { this.currency = currency; }
+    public BigDecimal getUnitCost() { return unitCost; }
+    public void setUnitCost(BigDecimal unitCost) { this.unitCost = unitCost; }
     public String getSupplierName() { return supplierName; }
     public void setSupplierName(String supplierName) { this.supplierName = supplierName; }
+    public String getSupplierInvoice() { return supplierInvoice; }
+    public void setSupplierInvoice(String supplierInvoice) { this.supplierInvoice = supplierInvoice; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 }

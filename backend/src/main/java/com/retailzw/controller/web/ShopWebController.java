@@ -4,17 +4,18 @@ package com.retailzw.controller.web;
 import com.retailzw.enums.CurrencyCode;
 import com.retailzw.enums.BusinessModule;
 import com.retailzw.enums.GasTankStatus;
-import com.retailzw.enums.ModuleAccessStatus;
 import com.retailzw.enums.UserRole;
 import com.retailzw.dto.request.*;
 import com.retailzw.model.*;
 import com.retailzw.repository.*;
 import com.retailzw.service.CurrentUserService;
 import com.retailzw.service.CreditAndChangeService;
+import com.retailzw.service.BillingAccessService;
 import com.retailzw.service.GasOperationsService;
 import com.retailzw.service.InventoryIntelligenceService;
 import com.retailzw.service.NotificationService;
 import com.retailzw.service.PasswordResetService;
+import com.retailzw.service.PackageModuleAccessService;
 import com.retailzw.service.PurchaseOrderService;
 import com.retailzw.service.RetailOperationsService;
 import com.retailzw.service.ReturnService;
@@ -35,6 +36,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -56,6 +58,7 @@ public class ShopWebController {
     private static final List<String> PEOPLE_MODULES = List.of("customers", "borrowers", "users");
     private static final List<String> FINANCE_MODULES = List.of("suppliers", "purchasing", "reports");
     private static final List<String> SYSTEM_MODULES = List.of("branches", "company", "audit");
+    private static final List<String> GAS_MODULES = List.of("gas", "gas-sales", "gas-restocking", "gas-expenses", "gas-tanks", "gas-accounting");
     private static final List<UserRole> USER_MANAGEMENT_ROLES = List.of(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT, UserRole.CASHIER);
     private static final int DEFAULT_PAGE_SIZE = 25;
     private static final int MAX_PAGE_SIZE = 100;
@@ -73,6 +76,11 @@ public class ShopWebController {
             Map.entry("inventory", "Inventory"),
             Map.entry("inventory-intelligence", "Inventory Intelligence"),
             Map.entry("gas", "Gas Control"),
+            Map.entry("gas-sales", "Gas Sales"),
+            Map.entry("gas-restocking", "Tank Restocking"),
+            Map.entry("gas-expenses", "Gas Expenses"),
+            Map.entry("gas-tanks", "Tanks & Prices"),
+            Map.entry("gas-accounting", "Gas Accounting"),
             Map.entry("customers", "Customers"),
             Map.entry("borrowers", "Borrower Accounts"),
             Map.entry("change", "Held Change"),
@@ -95,6 +103,11 @@ public class ShopWebController {
             Map.entry("inventory", "fa-solid fa-warehouse"),
             Map.entry("inventory-intelligence", "fa-solid fa-brain"),
             Map.entry("gas", "fa-solid fa-gas-pump"),
+            Map.entry("gas-sales", "fa-solid fa-scale-balanced"),
+            Map.entry("gas-restocking", "fa-solid fa-truck-droplet"),
+            Map.entry("gas-expenses", "fa-solid fa-receipt"),
+            Map.entry("gas-tanks", "fa-solid fa-fire-flame-simple"),
+            Map.entry("gas-accounting", "fa-solid fa-chart-line"),
             Map.entry("customers", "fa-solid fa-user-tag"),
             Map.entry("borrowers", "fa-solid fa-hand-holding-dollar"),
             Map.entry("change", "fa-solid fa-coins"),
@@ -106,6 +119,15 @@ public class ShopWebController {
             Map.entry("company", "fa-solid fa-building"),
             Map.entry("notifications", "fa-solid fa-bell"),
             Map.entry("audit", "fa-solid fa-shield-halved")
+    );
+
+    private static final Map<String, String> MODULE_URLS = Map.ofEntries(
+            Map.entry("gas", "/shop/gas"),
+            Map.entry("gas-sales", "/shop/gas/sales"),
+            Map.entry("gas-restocking", "/shop/gas/restocking"),
+            Map.entry("gas-expenses", "/shop/gas/expenses"),
+            Map.entry("gas-tanks", "/shop/gas/tanks"),
+            Map.entry("gas-accounting", "/shop/gas/accounting")
     );
 
     private final CurrentUserService current;
@@ -138,8 +160,9 @@ public class ShopWebController {
     private final NotificationService notificationService;
     private final PasswordResetService passwordResetService;
     private final TenantSubscriptionRepository tenantSubscriptions;
-    private final TenantEnabledModuleRepository tenantModules;
     private final SmilePayCheckoutService smilePayCheckoutService;
+    private final BillingAccessService billingAccessService;
+    private final PackageModuleAccessService packageModuleAccessService;
     private final CreditAndChangeService creditAndChangeService;
     private final InventoryIntelligenceService inventoryIntelligenceService;
     private final BorrowerRepository borrowerRepository;
@@ -190,16 +213,54 @@ public class ShopWebController {
     public String dashboard(Model model) {
         Long tenantId = current.tenantId();
         Long branchId = activeBranch();
-        LocalDateTime start = LocalDateTime.now().toLocalDate().atStartOfDay();
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = start.plusDays(1);
+        LocalDateTime yesterdayStart = start.minusDays(1);
+        LocalDateTime weekStart = start.minusDays(6);
+        List<Branch> activeBranches = branches.findByTenantIdAndIsActiveTrue(tenantId);
+        List<Inventory> branchStock = inventory.findByTenantIdAndBranchId(tenantId, branchId);
+        List<Inventory> lowStockRows = inventory.findLowStockItems(tenantId, branchId);
+        Map<Long, Product> productById = products.findByTenantIdAndIsActiveTrue(tenantId).stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
+        DashboardMoney todayTotals = moneyTotals(tenantId, branchId, start, end);
+        DashboardMoney yesterdayTotals = moneyTotals(tenantId, branchId, yesterdayStart, start);
+        long todayTransactions = sales.countByTenantIdAndBranchIdAndStatusAndCreatedAtBetween(
+                tenantId, branchId, Sale.SaleStatus.COMPLETED, start, end);
+        long openCashSessions = cashSessions.findAllByTenantIdAndBranchIdAndStatus(
+                tenantId, branchId, CashSession.SessionStatus.OPEN).size();
+        BigDecimal openCashUsd = salePayments.sumCashCollected(tenantId, branchId, CurrencyCode.USD, start, end);
+        BigDecimal openCashZwg = salePayments.sumCashCollected(tenantId, branchId, CurrencyCode.ZWG, start, end);
+        TenantSubscription subscription = tenantSubscriptions
+                .findByTenantIdAndStatus(tenantId, TenantSubscription.SubscriptionStatus.ACTIVE)
+                .orElse(null);
+        BigDecimal billingOutstanding = subscription == null
+                ? BigDecimal.ZERO
+                : nvl(subscription.getAmount()).subtract(nvl(subscription.getAmountPaid())).max(BigDecimal.ZERO);
+        BigDecimal availableGasKg = dashboardAvailableGasKg(tenantId, activeBranches);
+
         model.addAttribute("module", "dashboard");
         addNavigationModel(model);
         model.addAttribute("productCount", products.countByTenantIdAndIsActiveTrue(tenantId));
         model.addAttribute("customerCount", customers.countByTenantId(tenantId));
-        model.addAttribute("branchCount", branches.countByTenantId(tenantId));
-        model.addAttribute("todaySales", sales.sumGrandTotal(tenantId, branchId, start, end));
-        model.addAttribute("recentSales", operations.recentSales(tenantId, branchId));
-        model.addAttribute("lowStock", inventory.findLowStockItems(tenantId, branchId));
+        model.addAttribute("branchCount", activeBranches.size());
+        model.addAttribute("todaySales", todayTotals);
+        model.addAttribute("yesterdaySales", yesterdayTotals);
+        model.addAttribute("salesVsYesterday", percentChange(todayTotals.usdRaw(), yesterdayTotals.usdRaw()));
+        model.addAttribute("todayTransactions", todayTransactions);
+        model.addAttribute("inventoryHealth", inventoryHealth(branchStock.size(), lowStockRows.size()));
+        model.addAttribute("lowStockCount", lowStockRows.size());
+        model.addAttribute("lowStockCategoryCount", lowStockCategoryCount(lowStockRows, productById));
+        model.addAttribute("cashSessionCount", cashSessions.findByTenantIdAndBranchId(tenantId, branchId, PageRequest.of(0, 100)).getTotalElements());
+        model.addAttribute("openCashSessions", openCashSessions);
+        model.addAttribute("openCashUsd", money(openCashUsd));
+        model.addAttribute("openCashZwg", money(openCashZwg));
+        model.addAttribute("billingOutstanding", money(billingOutstanding));
+        model.addAttribute("dashboardGasKg", quantity(availableGasKg) + " kg");
+        model.addAttribute("recentSales", dashboardRecentSales(tenantId, branchId));
+        model.addAttribute("lowStock", dashboardLowStock(lowStockRows, productById));
+        model.addAttribute("branchPerformance", dashboardBranchPerformance(tenantId, activeBranches, start, end));
+        model.addAttribute("salesChart", dashboardSalesChart(tenantId, branchId, weekStart, today));
         return "shop/dashboard";
     }
 
@@ -213,6 +274,11 @@ public class ShopWebController {
         model.addAttribute("module", "billing");
         model.addAttribute("tenant", tenant);
         model.addAttribute("plan", plan);
+        model.addAttribute("availablePlans", plans.findByIsActiveTrue());
+        BillingAccessService.BillingAccess billingAccess = billingAccessService.evaluateAndUpdate(tenantId);
+        model.addAttribute("billingAccessLocked", billingAccess.locked());
+        model.addAttribute("billingLockMessage", billingAccess.message());
+        model.addAttribute("billingOverdueDays", billingAccess.overdueDays());
         model.addAttribute("subscription", tenantSubscriptions
                 .findByTenantIdAndStatus(tenantId, TenantSubscription.SubscriptionStatus.ACTIVE)
                 .orElse(null));
@@ -233,9 +299,12 @@ public class ShopWebController {
     }
 
     @PostMapping("/shop/billing/pay")
-    public String paySubscription(RedirectAttributes redirect) {
+    public String paySubscription(@RequestParam(required = false) Long planId,
+                                  RedirectAttributes redirect) {
         try {
-            SmilePayCheckout checkout = smilePayCheckoutService.createCheckout(current.tenantId());
+            SmilePayCheckout checkout = planId == null
+                    ? smilePayCheckoutService.createCheckout(current.tenantId())
+                    : smilePayCheckoutService.createCheckout(current.tenantId(), planId);
             return "redirect:/checkout/smilepay/" + checkout.getOrderReference();
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
@@ -259,7 +328,15 @@ public class ShopWebController {
         Long activeBranchId = selectedBranch(branchId);
         int currentPage = safePage(page);
         int pageSize = safeSize(size);
-        model.addAttribute("module", module);
+        String activeModule = safeModule(module);
+        if ("gas".equals(activeModule) && !packageModuleAccessService.hasGas(tenantId)) {
+            return "redirect:/shop/billing";
+        }
+        if (packageModuleAccessService.retailWebModules().contains(activeModule)
+                && !packageModuleAccessService.hasRetailShop(tenantId)) {
+            return "redirect:/shop/billing";
+        }
+        model.addAttribute("module", activeModule);
         addNavigationModel(model);
         model.addAttribute("workspaceModules", WORKSPACE_MODULES);
         model.addAttribute("modalPlaceholderModules", MODAL_PLACEHOLDER_MODULES);
@@ -284,22 +361,22 @@ public class ShopWebController {
         model.addAttribute("chatMessages", chatMessages.findByTenantIdOrderByCreatedAtDesc(tenantId, PageRequest.of(0, 30)).stream()
                 .sorted(java.util.Comparator.comparing(TenantChatMessage::getCreatedAt))
                 .toList());
-        model.addAttribute("pageTitle", title(safeModule(module)));
+        model.addAttribute("pageTitle", title(activeModule));
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("pageSize", pageSize);
-        if ("products".equals(safeModule(module))) {
+        if ("products".equals(activeModule)) {
             addProductManagementModel(model, tenantId, activeBranchId, search, categoryId, currentPage, pageSize);
             return "shop/products";
         }
-        if ("categories".equals(safeModule(module))) {
+        if ("categories".equals(activeModule)) {
             addCategoryManagementModel(model, tenantId, search, currentPage, pageSize);
             return "shop/categories";
         }
-        if ("inventory".equals(safeModule(module))) {
+        if ("inventory".equals(activeModule)) {
             addInventoryManagementModel(model, tenantId, activeBranchId, search, currentPage, pageSize);
             return "shop/inventory";
         }
-        if ("inventory-intelligence".equals(safeModule(module))) {
+        if ("inventory-intelligence".equals(activeModule)) {
             var transferRows = inventoryIntelligenceService.transfers(tenantId);
             var stocktakeRows = inventoryIntelligenceService.stocktakes(tenantId, activeBranchId);
             model.addAttribute("transfers", transferRows);
@@ -317,19 +394,19 @@ public class ShopWebController {
                     .collect(java.util.stream.Collectors.toMap(Supplier::getId, Function.identity())));
             return "shop/inventory-intelligence";
         }
-        if ("gas".equals(safeModule(module))) {
+        if ("gas".equals(activeModule)) {
             addGasManagementModel(model, tenantId, activeBranchId);
             return "shop/gas";
         }
-        if ("users".equals(safeModule(module))) {
+        if ("users".equals(activeModule)) {
             addUserManagementModel(model, tenantId, activeBranchId, currentPage, pageSize);
             return "shop/users";
         }
-        if ("customers".equals(safeModule(module))) {
+        if ("customers".equals(activeModule)) {
             addCustomerManagementModel(model, tenantId, search, currentPage, pageSize);
             return "shop/customers";
         }
-        if ("borrowers".equals(safeModule(module))) {
+        if ("borrowers".equals(activeModule)) {
             var borrowerPage = creditAndChangeService.borrowers(tenantId, search, currentPage, pageSize);
             model.addAttribute("borrowerPage", borrowerPage);
             model.addAttribute("borrowerAccounts", borrowerPage.getContent());
@@ -342,7 +419,7 @@ public class ShopWebController {
             addPaginationModel(model, "borrower", borrowerPage, "/shop/borrowers", params("search", search));
             return "shop/borrowers";
         }
-        if ("change".equals(safeModule(module))) {
+        if ("change".equals(activeModule)) {
             HeldChange.Status changeStatus = parseEnum(status, HeldChange.Status.class);
             var changePage = creditAndChangeService.changeRecords(tenantId, changeStatus, search, currentPage, pageSize);
             model.addAttribute("changePage", changePage);
@@ -354,39 +431,73 @@ public class ShopWebController {
             addPaginationModel(model, "change", changePage, "/shop/change", params("search", search, "status", status));
             return "shop/change";
         }
-        if ("suppliers".equals(safeModule(module))) {
+        if ("suppliers".equals(activeModule)) {
             addSupplierManagementModel(model, tenantId, search, currentPage, pageSize);
             return "shop/suppliers";
         }
-        if ("branches".equals(safeModule(module))) {
+        if ("branches".equals(activeModule)) {
             addBranchManagementModel(model, tenantId, currentPage, pageSize);
             return "shop/branches";
         }
-        if ("sales".equals(safeModule(module))) {
+        if ("sales".equals(activeModule)) {
             addSalesHistoryModel(model, tenantId, activeBranchId, search, from, to, status, cashierId, currentPage, pageSize);
             return "shop/sales";
         }
-        if ("cash".equals(safeModule(module))) {
+        if ("cash".equals(activeModule)) {
             addCashDrawerModel(model, tenantId, activeBranchId, currentPage, pageSize);
             return "shop/cash";
         }
-        if ("returns".equals(safeModule(module))) {
+        if ("returns".equals(activeModule)) {
             addReturnsModel(model, tenantId, activeBranchId, search, from, to, currentPage, pageSize);
             return "shop/returns";
         }
-        if ("purchasing".equals(safeModule(module))) {
+        if ("purchasing".equals(activeModule)) {
             addPurchasingModel(model, tenantId, activeBranchId, search, status, currentPage, pageSize);
             return "shop/purchasing";
         }
-        if ("reports".equals(safeModule(module))) {
+        if ("reports".equals(activeModule)) {
             addReportsModel(model, tenantId, activeBranchId, from, to);
             return "shop/reports";
         }
-        if ("company".equals(safeModule(module))) {
+        if ("company".equals(activeModule)) {
             addCompanyProfileModel(model, tenantId);
             return "shop/company";
         }
         return "shop/module";
+    }
+
+    @GetMapping("/shop/gas/{section}")
+    public String gasSection(@PathVariable String section,
+                             @RequestParam(required = false) Long branchId,
+                             Model model) {
+        Long tenantId = current.tenantId();
+        if (!packageModuleAccessService.hasGas(tenantId)) {
+            return "redirect:/shop/billing";
+        }
+        Long activeBranchId = selectedBranch(branchId);
+        String activeModule = switch (section) {
+            case "sales" -> "gas-sales";
+            case "restocking" -> "gas-restocking";
+            case "expenses" -> "gas-expenses";
+            case "tanks" -> "gas-tanks";
+            case "accounting" -> "gas-accounting";
+            default -> "gas";
+        };
+        model.addAttribute("module", activeModule);
+        model.addAttribute("pageTitle", title(activeModule));
+        model.addAttribute("selectedBranchId", activeBranchId);
+        model.addAttribute("selectedBranchName", branchById(tenantId).get(activeBranchId));
+        model.addAttribute("branchById", branchById(tenantId));
+        addNavigationModel(model);
+        addGasManagementModel(model, tenantId, activeBranchId);
+        return switch (activeModule) {
+            case "gas-sales" -> "shop/gas-sales";
+            case "gas-restocking" -> "shop/gas-restocking";
+            case "gas-expenses" -> "shop/gas-expenses";
+            case "gas-tanks" -> "shop/gas-tanks";
+            case "gas-accounting" -> "shop/gas-accounting";
+            default -> "shop/gas";
+        };
     }
 
     @PostMapping("/shop/products")
@@ -829,36 +940,69 @@ public class ShopWebController {
     }
 
     @PostMapping("/shop/gas/tanks")
-    public String createGasTank(@Valid @ModelAttribute GasTankRequest request, RedirectAttributes redirect) {
+    public String createGasTank(@Valid @ModelAttribute GasTankRequest request,
+                                @RequestParam(required = false) String returnTo,
+                                RedirectAttributes redirect) {
         try {
             gasOperations.createTank(current.tenantId(), request);
             redirect.addFlashAttribute("message", "Gas tank saved.");
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
         }
-        return "redirect:/shop/gas?branchId=" + request.getBranchId();
+        return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/tanks");
     }
 
     @PostMapping("/shop/gas/tanks/{id}/update")
-    public String updateGasTank(@PathVariable Long id, @Valid @ModelAttribute GasTankRequest request, RedirectAttributes redirect) {
+    public String updateGasTank(@PathVariable Long id,
+                                @Valid @ModelAttribute GasTankRequest request,
+                                @RequestParam(required = false) String returnTo,
+                                RedirectAttributes redirect) {
         try {
             gasOperations.updateTank(current.tenantId(), id, request);
             redirect.addFlashAttribute("message", "Gas tank updated.");
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
         }
-        return "redirect:/shop/gas?branchId=" + request.getBranchId();
+        return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/tanks");
     }
 
     @PostMapping("/shop/gas/prices")
-    public String setGasPrice(@Valid @ModelAttribute GasPriceRequest request, RedirectAttributes redirect) {
+    public String setGasPrice(@Valid @ModelAttribute GasPriceRequest request,
+                              @RequestParam(required = false) String returnTo,
+                              RedirectAttributes redirect) {
         try {
             gasOperations.setPrice(current.tenantId(), request);
             redirect.addFlashAttribute("message", "Gas price updated.");
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
         }
-        return "redirect:/shop/gas?branchId=" + request.getBranchId();
+        return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/tanks");
+    }
+
+    @PostMapping("/shop/gas/restocks")
+    public String restockGasTank(@Valid @ModelAttribute GasRestockRequest request,
+                                 @RequestParam(required = false) String returnTo,
+                                 RedirectAttributes redirect) {
+        try {
+            gasOperations.restock(current.tenantId(), current.userId(), request);
+            redirect.addFlashAttribute("message", "Gas stock received and costing captured.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+        }
+        return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/restocking");
+    }
+
+    @PostMapping("/shop/gas/expenses")
+    public String recordGasExpense(@Valid @ModelAttribute GasExpenseRequest request,
+                                   @RequestParam(required = false) String returnTo,
+                                   RedirectAttributes redirect) {
+        try {
+            gasOperations.recordExpense(current.tenantId(), current.userId(), request);
+            redirect.addFlashAttribute("message", "Gas expense recorded.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+        }
+        return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/expenses");
     }
 
     @PostMapping("/shop/users")
@@ -1248,6 +1392,11 @@ public class ShopWebController {
                 .orElseGet(this::activeBranch);
     }
 
+    private String gasRedirect(String returnTo, Long branchId, String fallbackPath) {
+        String path = (returnTo != null && returnTo.startsWith("/shop/gas")) ? returnTo : fallbackPath;
+        return "redirect:" + path + "?branchId=" + branchId;
+    }
+
     private String safeModule(String module) {
         return switch (module) {
             case "products", "categories", "customers", "borrowers", "change", "suppliers", "branches", "users", "inventory", "gas",
@@ -1257,14 +1406,54 @@ public class ShopWebController {
     }
 
     private void addNavigationModel(Model model) {
-        model.addAttribute("salesModules", SALES_MODULES);
-        model.addAttribute("stockModules", STOCK_MODULES);
-        model.addAttribute("peopleModules", PEOPLE_MODULES);
-        model.addAttribute("financeModules", FINANCE_MODULES);
-        model.addAttribute("systemModules", SYSTEM_MODULES);
+        Long tenantId = current.tenantId();
+        Long activeBranchId = activeBranch();
+        Map<Long, String> branchNames = branchById(tenantId);
+        List<BusinessModule> enabledBusinessModules = packageModuleAccessService.syncAndGetEnabledModules(tenantId);
+        boolean shopEnabled = enabledBusinessModules.contains(BusinessModule.SHOP_MODULE);
+        boolean gasEnabled = enabledBusinessModules.contains(BusinessModule.GAS_MODULE);
+        BillingAccessService.BillingAccess billingAccess = billingAccessService.evaluate(tenantId);
+        if (billingAccess.locked()) {
+            model.addAttribute("salesModules", List.of());
+            model.addAttribute("stockModules", List.of());
+            model.addAttribute("gasModules", List.of());
+            model.addAttribute("peopleModules", List.of());
+            model.addAttribute("financeModules", List.of());
+            model.addAttribute("systemModules", List.of());
+            model.addAttribute("enabledBusinessModules", List.of());
+            model.addAttribute("gasModuleEnabled", false);
+            model.addAttribute("billingAccessLocked", true);
+            model.addAttribute("billingLockMessage", billingAccess.message());
+            model.addAttribute("billingOverdueDays", billingAccess.overdueDays());
+            model.addAttribute("topbarBranchName", branchNames.getOrDefault(activeBranchId, "Head Office Branch"));
+            model.addAttribute("topbarDateLabel", LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy")));
+            model.addAttribute("moduleLabels", MODULE_LABELS);
+            model.addAttribute("moduleIcons", MODULE_ICONS);
+            model.addAttribute("moduleUrls", MODULE_URLS);
+            model.addAttribute("supportChatMessages", List.of());
+            model.addAttribute("supportUnreadCount", 0L);
+            return;
+        }
+
+        model.addAttribute("salesModules", shopEnabled ? SALES_MODULES : List.of());
+        List<String> stockModules = new ArrayList<>();
+        if (shopEnabled) {
+            stockModules.addAll(STOCK_MODULES.stream().filter(module -> !"gas".equals(module)).toList());
+        }
+        model.addAttribute("stockModules", stockModules);
+        model.addAttribute("gasModules", gasEnabled ? GAS_MODULES : List.of());
+        model.addAttribute("peopleModules", shopEnabled ? PEOPLE_MODULES : (gasEnabled ? List.of("users") : List.of()));
+        model.addAttribute("financeModules", shopEnabled ? FINANCE_MODULES : List.of());
+        model.addAttribute("systemModules", shopEnabled ? SYSTEM_MODULES : List.of());
+        model.addAttribute("enabledBusinessModules", enabledBusinessModules.isEmpty()
+                ? List.of(BusinessModule.SHOP_MODULE)
+                : enabledBusinessModules);
+        model.addAttribute("gasModuleEnabled", gasEnabled);
+        model.addAttribute("topbarBranchName", branchNames.getOrDefault(activeBranchId, "Head Office Branch"));
+        model.addAttribute("topbarDateLabel", LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy")));
         model.addAttribute("moduleLabels", MODULE_LABELS);
         model.addAttribute("moduleIcons", MODULE_ICONS);
-        Long tenantId = current.tenantId();
+        model.addAttribute("moduleUrls", MODULE_URLS);
         model.addAttribute("supportChatMessages", chatMessages.findByTenantIdOrderByCreatedAtDesc(tenantId, PageRequest.of(0, 30)).stream()
                 .sorted(java.util.Comparator.comparing(TenantChatMessage::getCreatedAt))
                 .toList());
@@ -2152,6 +2341,173 @@ public class ShopWebController {
         return value == null ? BigDecimal.ZERO : value;
     }
 
+    private DashboardMoney moneyTotals(Long tenantId, Long branchId, LocalDateTime from, LocalDateTime to) {
+        BigDecimal usd = salePayments.sumCompletedPaymentsByCurrency(tenantId, branchId, CurrencyCode.USD, from, to);
+        BigDecimal zwg = salePayments.sumCompletedPaymentsByCurrency(tenantId, branchId, CurrencyCode.ZWG, from, to);
+        return new DashboardMoney(nvl(usd), nvl(zwg), "USD " + money(usd), "ZWG " + money(zwg));
+    }
+
+    private String money(BigDecimal value) {
+        return nvl(value).setScale(2, RoundingMode.HALF_UP).toPlainString();
+    }
+
+    private String quantity(BigDecimal value) {
+        return nvl(value).stripTrailingZeros().toPlainString();
+    }
+
+    private BigDecimal dashboardAvailableGasKg(Long tenantId, List<Branch> activeBranches) {
+        if (!packageModuleAccessService.hasGas(tenantId)) {
+            return BigDecimal.ZERO;
+        }
+        return activeBranches.stream()
+                .filter(branch -> BusinessModule.GAS_MODULE.equals(branch.getModuleType()))
+                .flatMap(branch -> gasOperations.tanks(tenantId, branch.getId()).stream())
+                .map(GasTank::getCurrentKg)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private String percentChange(BigDecimal currentValue, BigDecimal previousValue) {
+        BigDecimal currentAmount = nvl(currentValue);
+        BigDecimal previousAmount = nvl(previousValue);
+        if (previousAmount.compareTo(BigDecimal.ZERO) == 0) {
+            return currentAmount.compareTo(BigDecimal.ZERO) > 0 ? "+100.0%" : "0.0%";
+        }
+        BigDecimal change = currentAmount.subtract(previousAmount)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(previousAmount, 1, RoundingMode.HALF_UP);
+        return (change.compareTo(BigDecimal.ZERO) >= 0 ? "+" : "") + change.toPlainString() + "%";
+    }
+
+    private int inventoryHealth(int stockLines, int lowStockLines) {
+        if (stockLines <= 0) {
+            return 100;
+        }
+        int healthy = Math.max(0, stockLines - lowStockLines);
+        return BigDecimal.valueOf(healthy)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(stockLines), 0, RoundingMode.HALF_UP)
+                .intValue();
+    }
+
+    private long lowStockCategoryCount(List<Inventory> lowStockRows, Map<Long, Product> productById) {
+        return lowStockRows.stream()
+                .map(stock -> productById.get(stock.getProductId()))
+                .filter(Objects::nonNull)
+                .map(Product::getCategory)
+                .filter(Objects::nonNull)
+                .map(ProductCategory::getId)
+                .distinct()
+                .count();
+    }
+
+    private List<DashboardLowStockItem> dashboardLowStock(List<Inventory> lowStockRows, Map<Long, Product> productById) {
+        return lowStockRows.stream()
+                .sorted(Comparator.comparing(stock -> nvl(stock.getQuantityOnHand())))
+                .limit(5)
+                .map(stock -> {
+                    Product product = productById.get(stock.getProductId());
+                    ProductCategory category = product == null ? null : product.getCategory();
+                    return new DashboardLowStockItem(
+                            product == null ? "Product " + stock.getProductId() : product.getName(),
+                            category == null ? "Uncategorised" : category.getName(),
+                            quantity(stock.getQuantityOnHand()),
+                            product == null ? "0" : quantity(product.getReorderLevel()));
+                })
+                .toList();
+    }
+
+    private List<DashboardRecentSale> dashboardRecentSales(Long tenantId, Long branchId) {
+        return operations.recentSales(tenantId, branchId).stream()
+                .sorted(Comparator.comparing(Sale::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
+                .limit(5)
+                .map(sale -> new DashboardRecentSale(
+                        sale.getReceiptNumber(),
+                        sale.getCustomerId() == null ? "Walk-in Customer" : "Customer #" + sale.getCustomerId(),
+                        sale.getCurrency() + " " + money(sale.getGrandTotal()),
+                        sale.getStatus().name().replace('_', ' '),
+                        saleStatusClass(sale.getStatus()),
+                        dashboardTime(sale.getCreatedAt())))
+                .toList();
+    }
+
+    private String saleStatusClass(Sale.SaleStatus status) {
+        if (Sale.SaleStatus.COMPLETED.equals(status)) return "good";
+        if (Sale.SaleStatus.PENDING.equals(status)) return "warn";
+        if (Sale.SaleStatus.VOIDED.equals(status) || Sale.SaleStatus.REFUNDED.equals(status)) return "danger";
+        return "blue";
+    }
+
+    private String dashboardTime(LocalDateTime createdAt) {
+        if (createdAt == null) {
+            return "--";
+        }
+        LocalDate saleDate = createdAt.toLocalDate();
+        LocalDate today = LocalDate.now();
+        if (saleDate.equals(today)) {
+            return createdAt.format(DateTimeFormatter.ofPattern("HH:mm"));
+        }
+        if (saleDate.equals(today.minusDays(1))) {
+            return "Yesterday";
+        }
+        return createdAt.format(DateTimeFormatter.ofPattern("MMM d"));
+    }
+
+    private List<DashboardBranchPerformance> dashboardBranchPerformance(Long tenantId, List<Branch> activeBranches, LocalDateTime from, LocalDateTime to) {
+        return activeBranches.stream()
+                .map(branch -> {
+                    DashboardMoney totals = moneyTotals(tenantId, branch.getId(), from, to);
+                    long transactions = sales.countByTenantIdAndBranchIdAndStatusAndCreatedAtBetween(
+                            tenantId, branch.getId(), Sale.SaleStatus.COMPLETED, from, to);
+                    return new DashboardBranchPerformance(branch.getName(), totals.usd(), totals.zwg(), transactions, "Active");
+                })
+                .sorted(Comparator.comparing(DashboardBranchPerformance::transactions).reversed())
+                .limit(5)
+                .toList();
+    }
+
+    private DashboardSalesChart dashboardSalesChart(Long tenantId, Long branchId, LocalDateTime weekStart, LocalDate today) {
+        List<BigDecimal> values = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        BigDecimal max = BigDecimal.ZERO;
+        for (int i = 0; i < 7; i++) {
+            LocalDate date = weekStart.toLocalDate().plusDays(i);
+            BigDecimal amount = nvl(salePayments.sumCompletedPaymentsByCurrency(
+                    tenantId, branchId, CurrencyCode.USD, date.atStartOfDay(), date.plusDays(1).atStartOfDay()));
+            values.add(amount);
+            labels.add(date.format(DateTimeFormatter.ofPattern("MMM d")));
+            if (amount.compareTo(max) > 0) {
+                max = amount;
+            }
+        }
+        if (max.compareTo(BigDecimal.ZERO) == 0) {
+            max = BigDecimal.ONE;
+        }
+        int width = 650;
+        int top = 22;
+        int bottom = 225;
+        List<String> points = new ArrayList<>();
+        for (int i = 0; i < values.size(); i++) {
+            int x = values.size() == 1 ? 0 : i * width / (values.size() - 1);
+            BigDecimal ratio = values.get(i).divide(max, 6, RoundingMode.HALF_UP);
+            int y = bottom - ratio.multiply(BigDecimal.valueOf(bottom - top)).intValue();
+            points.add(x + " " + y);
+        }
+        String linePath = "M " + String.join(" L ", points);
+        String areaPath = linePath + " L " + width + " 260 L 0 260 Z";
+        int lastIndex = values.size() - 1;
+        String[] lastPoint = points.get(lastIndex).split(" ");
+        return new DashboardSalesChart(
+                linePath,
+                areaPath,
+                labels,
+                labels.get(lastIndex),
+                "USD " + money(values.get(lastIndex)),
+                lastPoint[0],
+                lastPoint[1],
+                "USD " + money(max));
+    }
+
     private BigDecimal sumSales(List<Sale> saleList, CurrencyCode currency, Function<Sale, BigDecimal> valueGetter) {
         return saleList.stream()
                 .filter(sale -> currency.equals(sale.getCurrency()))
@@ -2208,8 +2564,7 @@ public class ShopWebController {
         model.addAttribute("branchLowStockCounts", lowStockCounts);
         model.addAttribute("branchTodaySaleCounts", todaySaleCounts);
         model.addAttribute("branchTodaySales", todaySales);
-        List<BusinessModule> enabledModules = tenantModules.findByTenantIdAndStatus(tenantId, ModuleAccessStatus.ENABLED).stream()
-                .map(TenantEnabledModule::getModule)
+        List<BusinessModule> enabledModules = packageModuleAccessService.syncAndGetEnabledModules(tenantId).stream()
                 .filter(module -> !BusinessModule.RESTAURANT_MODULE.equals(module))
                 .distinct()
                 .toList();
@@ -2230,12 +2585,22 @@ public class ShopWebController {
         List<GasTank> gasTanks = List.of();
         List<GasPrice> gasPrices = List.of();
         List<GasSale> shiftSales = List.of();
+        List<GasSale> allGasSales = List.of();
+        List<GasRestock> gasRestocks = List.of();
+        List<GasExpense> gasExpenses = List.of();
+        Page<GasShift> gasShiftPage = Page.empty();
+        GasOperationsService.GasDashboard gasDashboard = null;
         GasShift currentGasShift = null;
         if (!gasBranches.isEmpty()) {
             gasTanks = gasOperations.tanks(tenantId, gasBranchId);
             gasPrices = gasOperations.prices(tenantId, gasBranchId);
             currentGasShift = gasOperations.currentShift(tenantId, gasBranchId, current.userId());
             shiftSales = gasOperations.shiftSales(tenantId, gasBranchId, current.userId());
+            allGasSales = gasOperations.sales(tenantId, gasBranchId);
+            gasRestocks = gasOperations.restocks(tenantId, gasBranchId);
+            gasExpenses = gasOperations.expenses(tenantId, gasBranchId);
+            gasShiftPage = gasOperations.shifts(tenantId, gasBranchId, PageRequest.of(0, 50));
+            gasDashboard = gasOperations.dashboard(tenantId, gasBranchId);
         }
 
         int maxGasTanks = tenantSubscriptions.findByTenantIdAndStatus(tenantId, TenantSubscription.SubscriptionStatus.ACTIVE)
@@ -2254,7 +2619,13 @@ public class ShopWebController {
         model.addAttribute("gasBranches", gasBranches);
         model.addAttribute("gasBranchId", gasBranchId);
         model.addAttribute("gasTanks", gasTanks);
+        model.addAttribute("gasTankNameById", gasTanks.stream().collect(Collectors.toMap(GasTank::getId, GasTank::getName)));
         model.addAttribute("gasPrices", gasPrices);
+        model.addAttribute("allGasSales", allGasSales);
+        model.addAttribute("gasRestocks", gasRestocks);
+        model.addAttribute("gasExpenses", gasExpenses);
+        model.addAttribute("gasShifts", gasShiftPage.getContent());
+        model.addAttribute("gasDashboard", gasDashboard);
         model.addAttribute("currentGasShift", currentGasShift);
         model.addAttribute("gasShiftSales", shiftSales);
         model.addAttribute("maxGasTanks", maxGasTanks);
@@ -2677,6 +3048,28 @@ public class ShopWebController {
         public BigDecimal getCostValueUsd() { return costValueUsd; }
         public String getRisk() { return risk; }
         public int getPercent() { return percent; }
+    }
+
+    public record DashboardMoney(BigDecimal usdRaw, BigDecimal zwgRaw, String usd, String zwg) {
+    }
+
+    public record DashboardRecentSale(String receipt, String customer, String amount, String status, String statusClass, String time) {
+    }
+
+    public record DashboardLowStockItem(String item, String category, String currentStock, String reorderLevel) {
+    }
+
+    public record DashboardBranchPerformance(String branch, String salesUsd, String salesZwg, long transactions, String status) {
+    }
+
+    public record DashboardSalesChart(String linePath,
+                                      String areaPath,
+                                      List<String> labels,
+                                      String latestLabel,
+                                      String latestValue,
+                                      String latestX,
+                                      String latestY,
+                                      String maxLabel) {
     }
 
     private String title(String module) {

@@ -23,6 +23,8 @@ public class GasSaleRequest {
     private String customerName;
     private String customerPhone;
     private String offlineReceiptNumber;
+    private String paymentMethod = "CASH";
+    private String paymentReference;
 
     public Long getBranchId() { return branchId; }
     public void setBranchId(Long branchId) { this.branchId = branchId; }
@@ -38,4 +40,8 @@ public class GasSaleRequest {
     public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }
     public String getOfflineReceiptNumber() { return offlineReceiptNumber; }
     public void setOfflineReceiptNumber(String offlineReceiptNumber) { this.offlineReceiptNumber = offlineReceiptNumber; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+    public String getPaymentReference() { return paymentReference; }
+    public void setPaymentReference(String paymentReference) { this.paymentReference = paymentReference; }
 }

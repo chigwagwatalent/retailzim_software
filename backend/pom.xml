@@ -197,6 +197,8 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+                    <fork>true</fork>
+                    <executable>C:\Program Files\Java\jdk-17\bin\javac.exe</executable>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -209,6 +211,13 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <jvm>C:\Program Files\Java\jdk-17\bin\java.exe</jvm>
                 </configuration>
             </plugin>
         </plugins>

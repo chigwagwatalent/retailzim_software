@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Secure payment | RetailZW</title>
-  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=16)}">
-  <link rel="stylesheet" th:href="@{/css/billing.css(v=1)}">
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=18)}">
+  <link rel="stylesheet" th:href="@{/css/billing.css(v=2)}">
   <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
 </head>
 <body class="billing-checkout-shell">
 <main class="billing-checkout" th:attr="data-status-url=@{/checkout/smilepay/{ref}/status(ref=${checkout.orderReference})}">
   <header class="checkout-brand">
-    <div class="brand"><span class="brand-mark"><span></span></span><span>RetailZW</span></div>
+    <div class="brand"><span class="brand-logo"><img th:src="@{/img/logo.png}" alt="RetailZW"></span><span>RetailZW</span></div>
     <span class="secure-chip"><i class="fa-solid fa-lock"></i> Secure checkout</span>
   </header>
 

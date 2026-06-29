@@ -38,5 +38,15 @@ public interface SalePaymentRepository extends JpaRepository<SalePayment, Long> 
                                 @Param("currency") CurrencyCode currency,
                                 @Param("from") LocalDateTime from,
                                 @Param("to") LocalDateTime to);
+
+    @Query("SELECT COALESCE(SUM(sp.amount), 0) FROM SalePayment sp JOIN sp.sale s " +
+           "WHERE s.tenantId = :tenantId AND s.branchId = :branchId " +
+           "AND sp.currency = :currency AND s.status = 'COMPLETED' " +
+           "AND s.createdAt >= :from AND s.createdAt < :to")
+    BigDecimal sumCompletedPaymentsByCurrency(@Param("tenantId") Long tenantId,
+                                              @Param("branchId") Long branchId,
+                                              @Param("currency") CurrencyCode currency,
+                                              @Param("from") LocalDateTime from,
+                                              @Param("to") LocalDateTime to);
 }
 

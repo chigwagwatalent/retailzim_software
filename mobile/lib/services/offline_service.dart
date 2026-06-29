@@ -906,6 +906,7 @@ class OfflineService {
       'unitPrice': unitPrice,
       'total': total,
       'currency': saleData['currency'] ?? 'USD',
+      'paymentMethod': saleData['paymentMethod'] ?? 'CASH',
       'status': 'PENDING',
       'createdAt': DateTime.now().toIso8601String(),
     };

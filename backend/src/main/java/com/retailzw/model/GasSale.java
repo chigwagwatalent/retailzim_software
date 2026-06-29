@@ -56,6 +56,13 @@ public class GasSale {
     @Column(nullable = false, length = 5)
     private CurrencyCode currency;
 
+    @Column(name = "payment_method", nullable = false, length = 30)
+    @Builder.Default
+    private String paymentMethod = "CASH";
+
+    @Column(name = "payment_reference", length = 120)
+    private String paymentReference;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default

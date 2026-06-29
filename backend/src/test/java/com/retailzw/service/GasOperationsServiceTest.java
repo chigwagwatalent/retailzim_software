@@ -29,6 +29,7 @@ class GasOperationsServiceTest {
     private GasShiftRepository shifts;
     private GasSaleRepository sales;
     private GasRestockRepository restocks;
+    private GasExpenseRepository expenses;
     private TenantSubscriptionRepository subscriptions;
     private SaasPlanRepository plans;
     private GasOperationsService service;
@@ -41,9 +42,10 @@ class GasOperationsServiceTest {
         shifts = mock(GasShiftRepository.class);
         sales = mock(GasSaleRepository.class);
         restocks = mock(GasRestockRepository.class);
+        expenses = mock(GasExpenseRepository.class);
         subscriptions = mock(TenantSubscriptionRepository.class);
         plans = mock(SaasPlanRepository.class);
-        service = new GasOperationsService(branches, tanks, prices, shifts, sales, restocks, subscriptions, plans);
+        service = new GasOperationsService(branches, tanks, prices, shifts, sales, restocks, expenses, subscriptions, plans);
     }
 
     @Test

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Tank Restocking')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('gas-restocking')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Tank Restocking')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-truck-droplet"></i></div>
+        <div><p>LPG receiving,</p><h1>Tank Restocking</h1></div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-database"></i><strong th:text="${gasTotalKg}">0</strong><span>Kg on hand</span></div>
+        <div><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${gasDashboard != null ? #lists.size(gasDashboard.reorderTanks) : 0}">0</strong><span>Reorder alerts</span></div>
+      </div>
+    </section>
+
+    <div class="page-toolbar">
+      <form method="get" th:action="@{/shop/gas/restocking}" class="inline-form">
+        <select name="branchId" onchange="this.form.submit()">
+          <option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option>
+        </select>
+      </form>
+      <a class="btn btn-primary" href="#modal-gas-restock"><i class="fa-solid fa-plus"></i>Receive LPG</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="panel table-panel" th:if="${gasDashboard != null && !#lists.isEmpty(gasDashboard.reorderTanks)}">
+      <div class="toolbar"><h2>Reorder Watch</h2><span class="badge status-pending">Needs stock</span></div>
+      <table>
+        <thead><tr><th>Tank</th><th>On Hand</th><th>Reorder Level</th><th>Suggested Order</th></tr></thead>
+        <tbody><tr th:each="t : ${gasDashboard.reorderTanks}">
+          <td><strong th:text="${t.name}">Tank</strong><small th:text="${t.productName}">LPG Gas</small></td>
+          <td th:text="${t.currentKg + ' kg'}">0 kg</td>
+          <td th:text="${t.reorderLevelKg + ' kg'}">0 kg</td>
+          <td th:text="${(t.capacityKg ?: 0) - (t.currentKg ?: 0) + ' kg'}">0 kg</td>
+        </tr></tbody>
+      </table>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar"><h2>Restock History</h2><span class="badge" th:text="${#lists.size(gasRestocks) + ' receipts'}">0 receipts</span></div>
+      <table>
+        <thead><tr><th>Supplier</th><th>Tank</th><th>Kg</th><th>Cost / kg</th><th>Total Cost</th><th>Date</th></tr></thead>
+        <tbody>
+        <tr th:each="r : ${gasRestocks}">
+          <td><strong th:text="${r.supplierName ?: 'Supplier'}">Supplier</strong><small th:text="${r.supplierInvoice ?: ''}">Invoice</small></td>
+          <td th:text="${gasTankNameById.get(r.tankId) ?: 'Tank #' + r.tankId}">Tank</td>
+          <td th:text="${r.quantityKg + ' kg'}">0 kg</td>
+          <td th:text="${r.currency + ' ' + r.unitCost}">USD 0</td>
+          <td><strong th:text="${r.currency + ' ' + #numbers.formatDecimal(r.totalCost, 1, 2)}">USD 0</strong></td>
+          <td th:text="${r.createdAt != null ? #temporals.format(r.createdAt, 'dd MMM yyyy HH:mm') : ''}">Date</td>
+        </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div id="modal-gas-restock" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Receive LPG Stock</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/gas/restocks}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <input type="hidden" name="returnTo" value="/shop/gas/restocking">
+        <label>Tank *<select name="tankId" required><option th:each="t : ${gasTanks}" th:value="${t.id}" th:text="${t.name + ' - ' + t.currentKg + ' kg'}">Tank</option></select></label>
+        <label>Quantity Kg *<input name="quantityKg" type="number" step="0.001" min="0.001" required></label>
+        <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
+        <label>Unit Cost / kg<input name="unitCost" type="number" step="0.0001" min="0" value="0"></label>
+        <label>Supplier<input name="supplierName" placeholder="LPG supplier"></label>
+        <label>Invoice / Reference<input name="supplierInvoice"></label>
+        <label class="span-2">Notes<input name="notes"></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Stock</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>

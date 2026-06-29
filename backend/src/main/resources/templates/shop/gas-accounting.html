@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Gas Accounting')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('gas-accounting')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Gas Accounting')}"></nav>
+    <section class="page-hero"><div class="hero-title"><div class="hero-icon"><i class="fa-solid fa-chart-line"></i></div><div><p>LPG profit view,</p><h1>Gas Accounting</h1></div></div></section>
+    <div class="page-toolbar"><form method="get" th:action="@{/shop/gas/accounting}" class="inline-form"><select name="branchId" onchange="this.form.submit()"><option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option></select></form></div>
+    <section class="metric-grid">
+      <div class="metric-card metric-blue"><span>USD Sales</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.revenueUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Today</small></div>
+      <div class="metric-card metric-orange"><span>USD Stock Cost</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.restockCostUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Today</small></div>
+      <div class="metric-card metric-red"><span>USD Expenses</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.expensesUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Today</small></div>
+      <div class="metric-card metric-green"><span>USD Margin</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.marginUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Sales less stock cost and expenses</small></div>
+      <div class="metric-card metric-blue"><span>ZWG Sales</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.revenueZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Today</small></div>
+      <div class="metric-card metric-orange"><span>ZWG Stock Cost</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.restockCostZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Today</small></div>
+      <div class="metric-card metric-red"><span>ZWG Expenses</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.expensesZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Today</small></div>
+      <div class="metric-card metric-green"><span>ZWG Margin</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.marginZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Sales less stock cost and expenses</small></div>
+    </section>
+    <section class="grid two-col">
+      <div class="panel table-panel"><div class="toolbar"><h2>Gas Shifts</h2><span class="badge" th:text="${#lists.size(gasShifts) + ' shifts'}">0 shifts</span></div><table><thead><tr><th>Shift</th><th>Status</th><th>Kg</th><th>USD</th><th>ZWG</th></tr></thead><tbody><tr th:each="s : ${gasShifts}"><td><strong th:text="${s.shiftNumber}">Shift</strong><small th:text="${s.openedAt != null ? #temporals.format(s.openedAt, 'dd MMM HH:mm') : ''}">Date</small></td><td><span class="badge" th:text="${s.status}">OPEN</span></td><td th:text="${s.totalKgSold + ' kg'}">0 kg</td><td th:text="${'USD ' + #numbers.formatDecimal(s.totalUsd, 1, 2)}">USD 0</td><td th:text="${'ZWG ' + #numbers.formatDecimal(s.totalZwg, 1, 2)}">ZWG 0</td></tr></tbody></table></div>
+      <div class="panel table-panel"><div class="toolbar"><h2>Stock Position</h2><span class="badge" th:text="${gasTotalKg + ' kg'}">0 kg</span></div><table><thead><tr><th>Tank</th><th>On Hand</th><th>Capacity</th><th>Reorder</th></tr></thead><tbody><tr th:each="t : ${gasTanks}"><td><strong th:text="${t.name}">Tank</strong></td><td th:text="${t.currentKg + ' kg'}">0 kg</td><td th:text="${t.capacityKg + ' kg'}">0 kg</td><td th:text="${t.reorderLevelKg + ' kg'}">0 kg</td></tr></tbody></table></div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

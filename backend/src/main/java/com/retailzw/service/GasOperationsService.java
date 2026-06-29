@@ -2,6 +2,7 @@ package com.retailzw.service;
 
 import com.retailzw.dto.request.CloseGasShiftRequest;
 import com.retailzw.dto.request.GasPriceRequest;
+import com.retailzw.dto.request.GasExpenseRequest;
 import com.retailzw.dto.request.GasRestockRequest;
 import com.retailzw.dto.request.GasSaleRequest;
 import com.retailzw.dto.request.GasTankRequest;
@@ -22,6 +23,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +35,20 @@ public class GasOperationsService {
     private final GasShiftRepository shifts;
     private final GasSaleRepository sales;
     private final GasRestockRepository restocks;
+    private final GasExpenseRepository expenses;
     private final TenantSubscriptionRepository subscriptions;
     private final SaasPlanRepository plans;
+
+    private static final List<BigDecimal> ZIMBABWE_LPG_WEIGHTS_KG = List.of(
+            new BigDecimal("1.000"),
+            new BigDecimal("2.000"),
+            new BigDecimal("3.000"),
+            new BigDecimal("5.000"),
+            new BigDecimal("9.000"),
+            new BigDecimal("14.000"),
+            new BigDecimal("19.000"),
+            new BigDecimal("48.000")
+    );
 
     public List<GasTank> tanks(Long tenantId, Long branchId) {
         requireGasBranch(tenantId, branchId);
@@ -162,6 +177,8 @@ public class GasOperationsService {
                 .unitPrice(unitPrice)
                 .total(total)
                 .currency(currency)
+                .paymentMethod(normalizePaymentMethod(request.getPaymentMethod()))
+                .paymentReference(blank(request.getPaymentReference()))
                 .offlineReceiptNumber(blank(request.getOfflineReceiptNumber()))
                 .build());
         shift.setTotalKgSold(nvl(shift.getTotalKgSold()).add(quantity));
@@ -181,15 +198,42 @@ public class GasOperationsService {
         GasTank tank = tanks.lockTank(tenantId, branchId, request.getTankId())
                 .orElseThrow(() -> new IllegalArgumentException("Gas tank not found for this branch."));
         BigDecimal quantity = nvl(request.getQuantityKg());
+        BigDecimal capacity = nvl(tank.getCapacityKg());
+        if (capacity.compareTo(BigDecimal.ZERO) > 0 && nvl(tank.getCurrentKg()).add(quantity).compareTo(capacity) > 0) {
+            throw new IllegalStateException("Restock would exceed " + tank.getName() + " capacity.");
+        }
         tank.setCurrentKg(nvl(tank.getCurrentKg()).add(quantity));
         tanks.save(tank);
+        BigDecimal unitCost = nvl(request.getUnitCost()).setScale(4, RoundingMode.HALF_UP);
+        BigDecimal totalCost = quantity.multiply(unitCost).setScale(2, RoundingMode.HALF_UP);
         return restocks.save(GasRestock.builder()
                 .tenantId(tenantId)
                 .branchId(branchId)
                 .tankId(tank.getId())
                 .quantityKg(quantity)
+                .currency(request.getCurrency() == null ? CurrencyCode.USD : request.getCurrency())
+                .unitCost(unitCost)
+                .totalCost(totalCost)
                 .supplierName(blank(request.getSupplierName()))
+                .supplierInvoice(blank(request.getSupplierInvoice()))
                 .notes(blank(request.getNotes()))
+                .createdBy(userId)
+                .build());
+    }
+
+    @Transactional
+    public GasExpense recordExpense(Long tenantId, Long userId, GasExpenseRequest request) {
+        Long branchId = request.getBranchId();
+        requireGasBranch(tenantId, branchId);
+        return expenses.save(GasExpense.builder()
+                .tenantId(tenantId)
+                .branchId(branchId)
+                .category(requiredText(request.getCategory(), "Expense category is required."))
+                .description(requiredText(request.getDescription(), "Expense description is required."))
+                .amount(nvl(request.getAmount()).setScale(2, RoundingMode.HALF_UP))
+                .currency(request.getCurrency() == null ? CurrencyCode.USD : request.getCurrency())
+                .paymentMethod(normalizePaymentMethod(request.getPaymentMethod()))
+                .reference(blank(request.getReference()))
                 .createdBy(userId)
                 .build());
     }
@@ -213,6 +257,53 @@ public class GasOperationsService {
         GasShift shift = currentShift(tenantId, branchId, cashierId);
         if (shift == null) return List.of();
         return sales.findByTenantIdAndBranchIdAndGasShiftIdOrderByCreatedAtDesc(tenantId, branchId, shift.getId());
+    }
+
+    public List<GasSale> sales(Long tenantId, Long branchId) {
+        requireGasBranch(tenantId, branchId);
+        return sales.findByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
+    }
+
+    public Page<GasShift> shifts(Long tenantId, Long branchId, Pageable pageable) {
+        requireGasBranch(tenantId, branchId);
+        return shifts.findByTenantIdAndBranchIdOrderByOpenedAtDesc(tenantId, branchId, pageable);
+    }
+
+    public GasDashboard dashboard(Long tenantId, Long branchId) {
+        requireGasBranch(tenantId, branchId);
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+        List<GasTank> branchTanks = tanks.findByTenantIdAndBranchIdOrderByNameAsc(tenantId, branchId);
+        List<GasSale> todayUsdSales = sales.findByTenantIdAndBranchIdAndCurrencyAndCreatedAtBetween(tenantId, branchId, CurrencyCode.USD, start, end);
+        List<GasSale> todayZwgSales = sales.findByTenantIdAndBranchIdAndCurrencyAndCreatedAtBetween(tenantId, branchId, CurrencyCode.ZWG, start, end);
+        List<GasRestock> todayUsdRestocks = restocks.findByTenantIdAndBranchIdAndCurrencyAndCreatedAtBetween(tenantId, branchId, CurrencyCode.USD, start, end);
+        List<GasRestock> todayZwgRestocks = restocks.findByTenantIdAndBranchIdAndCurrencyAndCreatedAtBetween(tenantId, branchId, CurrencyCode.ZWG, start, end);
+        List<GasExpense> todayUsdExpenses = expenses.findByTenantIdAndBranchIdAndCurrencyAndCreatedAtBetween(tenantId, branchId, CurrencyCode.USD, start, end);
+        List<GasExpense> todayZwgExpenses = expenses.findByTenantIdAndBranchIdAndCurrencyAndCreatedAtBetween(tenantId, branchId, CurrencyCode.ZWG, start, end);
+        BigDecimal soldKg = sum(todayUsdSales, GasSale::getQuantityKg).add(sum(todayZwgSales, GasSale::getQuantityKg));
+        BigDecimal revenueUsd = sum(todayUsdSales, GasSale::getTotal);
+        BigDecimal revenueZwg = sum(todayZwgSales, GasSale::getTotal);
+        BigDecimal restockCostUsd = sum(todayUsdRestocks, GasRestock::getTotalCost);
+        BigDecimal restockCostZwg = sum(todayZwgRestocks, GasRestock::getTotalCost);
+        BigDecimal expensesUsd = sum(todayUsdExpenses, GasExpense::getAmount);
+        BigDecimal expensesZwg = sum(todayZwgExpenses, GasExpense::getAmount);
+        List<GasTank> reorderTanks = branchTanks.stream()
+                .filter(tank -> nvl(tank.getReorderLevelKg()).compareTo(BigDecimal.ZERO) > 0)
+                .filter(tank -> nvl(tank.getCurrentKg()).compareTo(nvl(tank.getReorderLevelKg())) <= 0)
+                .toList();
+        return new GasDashboard(soldKg, revenueUsd, revenueZwg, restockCostUsd, restockCostZwg,
+                expensesUsd, expensesZwg, revenueUsd.subtract(restockCostUsd).subtract(expensesUsd),
+                revenueZwg.subtract(restockCostZwg).subtract(expensesZwg), reorderTanks, ZIMBABWE_LPG_WEIGHTS_KG);
+    }
+
+    public List<GasRestock> restocks(Long tenantId, Long branchId) {
+        requireGasBranch(tenantId, branchId);
+        return restocks.findByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
+    }
+
+    public List<GasExpense> expenses(Long tenantId, Long branchId) {
+        requireGasBranch(tenantId, branchId);
+        return expenses.findByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
     }
 
     @Transactional
@@ -268,4 +359,27 @@ public class GasOperationsService {
     private String blank(String value) {
         return value == null || value.isBlank() ? null : value.trim();
     }
+
+    private String normalizePaymentMethod(String value) {
+        String clean = blank(value);
+        return clean == null ? "CASH" : clean.toUpperCase().replace(' ', '_');
+    }
+
+    private <T> BigDecimal sum(List<T> rows, java.util.function.Function<T, BigDecimal> mapper) {
+        return rows.stream().map(mapper).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public record GasDashboard(
+            BigDecimal soldKgToday,
+            BigDecimal revenueUsdToday,
+            BigDecimal revenueZwgToday,
+            BigDecimal restockCostUsdToday,
+            BigDecimal restockCostZwgToday,
+            BigDecimal expensesUsdToday,
+            BigDecimal expensesZwgToday,
+            BigDecimal marginUsdToday,
+            BigDecimal marginZwgToday,
+            List<GasTank> reorderTanks,
+            List<BigDecimal> lpgWeightPresetsKg
+    ) {}
 }

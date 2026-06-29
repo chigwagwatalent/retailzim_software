@@ -7,33 +7,52 @@
   <script>
     document.documentElement.dataset.theme = localStorage.getItem('retailzw-theme') || 'light';
   </script>
-  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=16)}">
-  <link rel="stylesheet" th:href="@{/css/auth-clean.css}">
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=24)}">
+  <link rel="stylesheet" th:href="@{/css/auth-clean.css(v=6)}">
   <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
-  <script defer th:src="@{/js/retailzw.js(v=14)}"></script>
+  <script defer th:src="@{/js/retailzw.js(v=18)}"></script>
 </head>
 <body class="auth-shell signup-shell">
   <div class="auth-preloader" data-auth-preloader>
     <div class="auth-preloader-card">
-      <span class="brand-mark"><span></span></span>
+      <span class="auth-preloader-logo"><img th:src="@{/img/logo.png}" alt="RetailZW"></span>
       <strong>RetailZW</strong>
-      <small>Preparing signup</small>
+      <small>Preparing signup wizard</small>
       <i></i>
     </div>
   </div>
 
-  <form class="auth-card signup-card" method="post" th:action="@{/auth/signup}" onsubmit="this.classList.add('is-loading')">
-    <div class="auth-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
-    <div class="brand auth-brand"><span class="brand-mark"><span></span></span><span>RetailZW</span></div>
-    <div class="auth-copy">
-      <p>Launch your retail workspace</p>
-      <h1>Create your shop</h1>
-      <span>Minimal setup. Clean controls. Ready for real counters.</span>
+  <form class="auth-card signup-card signup-wizard" method="post" th:action="@{/auth/signup}" data-signup-wizard>
+    <div class="signup-hero">
+      <div class="auth-logo-center"><img th:src="@{/img/logo.png}" alt="RetailZW"></div>
+      <div class="auth-copy">
+        <p>Shop Command Centre</p>
+        <h1>Create your shop</h1>
+        <span>Five clean steps from package selection to payment.</span>
+      </div>
     </div>
+
+    <div class="signup-wizard-head" aria-label="Signup progress">
+      <div class="signup-stepper">
+        <button type="button" class="wizard-step is-active" data-wizard-jump="0"><span>1</span><strong>Package</strong></button>
+        <button type="button" class="wizard-step" data-wizard-jump="1"><span>2</span><strong>Modules</strong></button>
+        <button type="button" class="wizard-step" data-wizard-jump="2"><span>3</span><strong>Company</strong></button>
+        <button type="button" class="wizard-step" data-wizard-jump="3"><span>4</span><strong>Admin</strong></button>
+        <button type="button" class="wizard-step" data-wizard-jump="4"><span>5</span><strong>Payment</strong></button>
+      </div>
+      <div class="wizard-progress"><i data-wizard-progress></i></div>
+    </div>
+
     <div th:if="${message}" class="alert" th:text="${message}"></div>
 
-    <section class="signup-section">
-      <h2><i class="fa-solid fa-box-open"></i> Choose Package</h2>
+    <section class="signup-section signup-step-panel is-active" data-wizard-panel>
+      <div class="signup-section-title">
+        <span><i class="fa-solid fa-box-open"></i></span>
+        <div>
+          <h2>Choose Package</h2>
+          <p>Select the subscription that matches your branch, user and product capacity.</p>
+        </div>
+      </div>
       <div class="signup-plan-grid">
         <label class="signup-plan-card" th:each="p, iter : ${plans}">
           <input type="radio" name="planId" th:value="${p.id}" th:checked="${iter.index == 0}" required>
@@ -45,27 +64,40 @@
       </div>
     </section>
 
-    <section class="signup-section">
-      <h2><i class="fa-solid fa-shapes"></i> Business Modules</h2>
-      <div class="form-grid">
-        <label>Business Mode
+    <section class="signup-section signup-step-panel" data-wizard-panel hidden>
+      <div class="signup-section-title">
+        <span><i class="fa-solid fa-shapes"></i></span>
+        <div>
+          <h2>Business Modules</h2>
+          <p>Switch on the operating areas this business needs from day one.</p>
+        </div>
+      </div>
+      <div class="signup-module-layout">
+        <label class="signup-mode-card">Business Mode
           <select name="businessMode" required>
             <option value="SINGLE_MODULE">Single module</option>
             <option value="MIXED_MODULE">Mixed shop and gas</option>
           </select>
         </label>
-        <div class="form-full">
-          <span class="field-title">Select what this business runs</span>
-          <label class="check-row" th:each="m : ${businessModules}">
+        <div class="signup-module-grid">
+          <label class="signup-module-card" th:each="m : ${businessModules}">
             <input name="modules" type="checkbox" th:value="${m}" th:checked="${m.name() == 'SHOP_MODULE'}">
-            <span th:text="${m.displayName}">Retail Shop</span>
+            <span><i class="fa-solid fa-layer-group"></i></span>
+            <strong th:text="${m.displayName}">Retail Shop</strong>
+            <small>Enable this workspace after payment.</small>
           </label>
         </div>
       </div>
     </section>
 
-    <section class="signup-section">
-      <h2><i class="fa-solid fa-building"></i> Company Data</h2>
+    <section class="signup-section signup-step-panel" data-wizard-panel hidden>
+      <div class="signup-section-title">
+        <span><i class="fa-solid fa-building"></i></span>
+        <div>
+          <h2>Company Data</h2>
+          <p>These details appear on tenant records, receipts and billing reminders.</p>
+        </div>
+      </div>
       <div class="form-grid">
         <label>Company Name<input name="companyName" required placeholder="Harare Demo Retail"></label>
         <label>Main Email<input name="email" type="email" required placeholder="admin@shop.co.zw"></label>
@@ -75,14 +107,20 @@
         <label>Website<input name="website" placeholder="https://shop.co.zw"></label>
         <label>Registration Number<input name="registrationNumber" placeholder="Company reg number"></label>
         <label>VAT Number<input name="vatNumber" placeholder="VAT / tax number"></label>
-        <label style="grid-column:1/-1">Address<textarea name="address" placeholder="Street, suburb, city"></textarea></label>
-        <label style="grid-column:1/-1">Logo URL<input name="logoUrl" placeholder="https://.../logo.png"></label>
-        <label style="grid-column:1/-1">Receipt Footer<textarea name="receiptFooter" placeholder="Thank you for shopping with us."></textarea></label>
+        <label class="form-full">Address<textarea name="address" placeholder="Street, suburb, city"></textarea></label>
+        <label class="form-full">Logo URL<input name="logoUrl" placeholder="https://.../logo.png"></label>
+        <label class="form-full">Receipt Footer<textarea name="receiptFooter" placeholder="Thank you for shopping with us."></textarea></label>
       </div>
     </section>
 
-    <section class="signup-section">
-      <h2><i class="fa-solid fa-user-shield"></i> Head Office System User</h2>
+    <section class="signup-section signup-step-panel" data-wizard-panel hidden>
+      <div class="signup-section-title">
+        <span><i class="fa-solid fa-user-shield"></i></span>
+        <div>
+          <h2>Head Office Admin</h2>
+          <p>Create the first super admin account for the new shop workspace.</p>
+        </div>
+      </div>
       <div class="form-grid">
         <label>First Name<input name="adminFirstName" required></label>
         <label>Last Name<input name="adminLastName" required></label>
@@ -101,9 +139,54 @@
       </div>
     </section>
 
-    <div class="signup-actions">
-      <button class="btn btn-primary auth-submit" type="submit"><span><i class="fa-solid fa-credit-card"></i>Create Shop & Pay</span><i></i></button>
-      <a class="btn btn-light" th:href="@{/auth/shop/login}"><i class="fa-solid fa-arrow-left"></i>Back to Login</a>
+    <section class="signup-section signup-step-panel signup-payment-step" data-wizard-panel hidden>
+      <div class="signup-section-title">
+        <span><i class="fa-solid fa-credit-card"></i></span>
+        <div>
+          <h2>Payment & Review</h2>
+          <p>Confirm the setup. The next screen opens payment for the selected subscription.</p>
+        </div>
+      </div>
+      <div class="signup-review-grid">
+        <article>
+          <i class="fa-solid fa-box-open"></i>
+          <small>Package</small>
+          <strong data-review="package">Selected package</strong>
+          <span data-review="price">Payment will follow signup</span>
+        </article>
+        <article>
+          <i class="fa-solid fa-layer-group"></i>
+          <small>Modules</small>
+          <strong data-review="modules">Retail Shop</strong>
+          <span data-review="mode">Single module</span>
+        </article>
+        <article>
+          <i class="fa-solid fa-building"></i>
+          <small>Company</small>
+          <strong data-review="company">Company name</strong>
+          <span data-review="contact">Email and phone</span>
+        </article>
+        <article>
+          <i class="fa-solid fa-user-shield"></i>
+          <small>Admin</small>
+          <strong data-review="admin">Admin user</strong>
+          <span data-review="adminEmail">Admin email</span>
+        </article>
+      </div>
+      <div class="signup-payment-card">
+        <div>
+          <strong>Secure checkout after signup</strong>
+          <span>The system creates the tenant, opens subscription billing, then redirects you to complete payment.</span>
+        </div>
+        <i class="fa-solid fa-lock"></i>
+      </div>
+    </section>
+
+    <div class="signup-actions signup-wizard-actions">
+      <a class="btn btn-light" th:href="@{/auth/shop/login}" data-wizard-login><i class="fa-solid fa-arrow-left"></i>Back to Login</a>
+      <button class="btn btn-light" type="button" data-wizard-prev hidden><i class="fa-solid fa-chevron-left"></i>Back</button>
+      <button class="btn btn-primary" type="button" data-wizard-next>Continue<i class="fa-solid fa-chevron-right"></i></button>
+      <button class="btn btn-primary auth-submit" type="submit" data-wizard-submit hidden><span><i class="fa-solid fa-credit-card"></i>Create Shop & Pay</span><i></i></button>
     </div>
   </form>
 </body>

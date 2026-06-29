@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">RetailZW mark</title>
+  <defs>
+    <linearGradient id="g" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#09265B"/>
+      <stop offset=".55" stop-color="#1459B8"/>
+      <stop offset="1" stop-color="#12BDF0"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#g)"/>
+  <path d="M19 43V19h14.2c5.8 0 9.6 3.4 9.6 8.5 0 3.5-1.8 6.2-4.8 7.6L44.5 43h-8.3l-5.4-6.9h-4.3V43H19Zm7.5-13.1h5.9c1.8 0 2.9-1 2.9-2.5 0-1.6-1.1-2.5-2.9-2.5h-5.9v5Z" fill="#fff"/>
+  <path d="M43 22h7l-8 20h-7l8-20Z" fill="#55E6FF" opacity=".95"/>
+</svg>

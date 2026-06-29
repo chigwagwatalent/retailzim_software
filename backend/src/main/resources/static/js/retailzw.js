@@ -41,6 +41,7 @@ document.querySelectorAll('.theme-toggle i').forEach((icon) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  setupSignupWizard();
   enhanceForms();
 });
 
@@ -162,11 +163,141 @@ function enhanceForms() {
 
     form.addEventListener('submit', (event) => {
       if (form.dataset.asyncChat !== undefined) return;
-      if (validateForm(form)) return;
+      if (validateForm(form)) {
+        form.classList.add('is-loading');
+        return;
+      }
+      form.classList.remove('is-loading');
       event.preventDefault();
       event.stopPropagation();
     });
   });
+}
+
+function setupSignupWizard() {
+  document.querySelectorAll('[data-signup-wizard]').forEach((form) => {
+    if (form.dataset.wizardReady === 'true') return;
+    form.dataset.wizardReady = 'true';
+
+    const panels = Array.from(form.querySelectorAll('[data-wizard-panel]'));
+    const steps = Array.from(form.querySelectorAll('[data-wizard-jump]'));
+    const progress = form.querySelector('[data-wizard-progress]');
+    const prev = form.querySelector('[data-wizard-prev]');
+    const next = form.querySelector('[data-wizard-next]');
+    const submit = form.querySelector('[data-wizard-submit]');
+    const login = form.querySelector('[data-wizard-login]');
+    let current = 0;
+
+    const setStep = (index) => {
+      current = Math.max(0, Math.min(index, panels.length - 1));
+      panels.forEach((panel, panelIndex) => {
+        const active = panelIndex === current;
+        panel.hidden = !active;
+        panel.classList.toggle('is-active', active);
+      });
+      steps.forEach((step, stepIndex) => {
+        step.classList.toggle('is-active', stepIndex === current);
+        step.classList.toggle('is-complete', stepIndex < current);
+      });
+      if (progress) {
+        progress.style.width = `${((current + 1) / panels.length) * 100}%`;
+      }
+      if (prev) prev.hidden = current === 0;
+      if (login) login.hidden = current !== 0;
+      if (next) next.hidden = current === panels.length - 1;
+      if (submit) submit.hidden = current !== panels.length - 1;
+      updateSignupReview(form);
+      form.classList.remove('is-loading');
+      panels[current]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    const validatePanel = () => {
+      clearFormAlert(form);
+      const fields = Array.from(panels[current].querySelectorAll('input, select, textarea'));
+      const radioGroups = new Set();
+      let firstInvalid = null;
+
+      fields.forEach((field) => {
+        if (shouldSkipValidation(field)) return;
+        if (field.type === 'radio') {
+          if (!field.name || radioGroups.has(field.name)) return;
+          radioGroups.add(field.name);
+        }
+        const valid = validateField(field, form);
+        if (!valid && !firstInvalid) {
+          firstInvalid = field.type === 'radio' ? form.querySelector(`input[type="radio"][name="${cssName(field.name)}"]`) : field;
+        }
+      });
+
+      if (!firstInvalid) return true;
+      showFormAlert(form, 'Complete this step before continuing.');
+      firstInvalid.focus({ preventScroll: true });
+      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    };
+
+    next?.addEventListener('click', () => {
+      if (validatePanel()) setStep(current + 1);
+    });
+
+    prev?.addEventListener('click', () => setStep(current - 1));
+
+    steps.forEach((step) => {
+      step.addEventListener('click', () => {
+        const target = Number(step.dataset.wizardJump || 0);
+        if (target <= current) {
+          setStep(target);
+          return;
+        }
+        if (validatePanel()) setStep(Math.min(target, current + 1));
+      });
+    });
+
+    form.addEventListener('input', () => updateSignupReview(form));
+    form.addEventListener('change', () => updateSignupReview(form));
+    form.addEventListener('submit', (event) => {
+      if (current < panels.length - 1) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (validatePanel()) setStep(current + 1);
+        return;
+      }
+      if (!validatePanel()) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
+
+    setStep(0);
+  });
+}
+
+function updateSignupReview(form) {
+  const set = (name, value) => {
+    const target = form.querySelector(`[data-review="${name}"]`);
+    if (target) target.textContent = value || target.dataset.placeholder || '-';
+  };
+
+  const selectedPlan = form.querySelector('input[name="planId"]:checked')?.closest('.signup-plan-card');
+  const moduleLabels = Array.from(form.querySelectorAll('input[name="modules"]:checked'))
+    .map((input) => input.closest('label')?.querySelector('strong, span:last-child')?.textContent?.trim())
+    .filter(Boolean);
+  const mode = form.querySelector('[name="businessMode"]');
+  const selectedMode = mode?.selectedOptions?.[0]?.textContent?.trim();
+  const company = form.querySelector('[name="companyName"]')?.value?.trim();
+  const email = form.querySelector('[name="email"]')?.value?.trim();
+  const phone = form.querySelector('[name="phone"]')?.value?.trim();
+  const username = form.querySelector('[name="adminUsername"]')?.value?.trim();
+  const adminEmail = form.querySelector('[name="adminEmail"]')?.value?.trim() || email;
+
+  set('package', selectedPlan?.querySelector('strong')?.textContent?.trim() || 'Selected package');
+  set('price', selectedPlan?.querySelector('em')?.textContent?.trim() || 'Payment will follow signup');
+  set('modules', moduleLabels.join(', ') || 'Choose modules');
+  set('mode', selectedMode || 'Single module');
+  set('company', company || 'Company name');
+  set('contact', [email, phone].filter(Boolean).join(' - ') || 'Email and phone');
+  set('admin', username || 'Admin user');
+  set('adminEmail', adminEmail || 'Admin email');
 }
 
 function validateForm(form) {
@@ -311,7 +442,7 @@ function showFormAlert(form, message) {
   alert.className = 'form-alert alert-error';
   alert.setAttribute('role', 'alert');
   alert.textContent = message;
-  form.prepend(alert);
+  form.append(alert);
 }
 
 function clearFormAlert(form) {

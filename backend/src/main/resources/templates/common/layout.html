@@ -7,63 +7,72 @@
   <script>
     document.documentElement.dataset.theme = localStorage.getItem('retailzw-theme') || 'light';
   </script>
-  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=17)}">
-  <link rel="stylesheet" th:href="@{/css/billing.css(v=1)}">
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=23)}">
+  <link rel="stylesheet" th:href="@{/css/billing.css(v=2)}">
   <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
-  <script defer th:src="@{/js/retailzw.js(v=15)}"></script>
+  <script defer th:src="@{/js/retailzw.js(v=16)}"></script>
 </head>
 <body>
 <aside class="sidebar" th:fragment="shopSidebar(active)">
-  <div class="brand sidebar-brand">
-    <span class="brand-mark"><span></span></span><span>RetailZW</span>
+  <div class="tenant-logo-bar">
+    <a class="tenant-wordmark" th:href="@{/shop/dashboard}">
+      <img th:src="@{/img/logo.png}" alt="RetailZW">
+    </a>
   </div>
-  <a th:class="${active == 'dashboard' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/dashboard}">
-    <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+  <nav class="tenant-nav">
+    <div class="billing-lock-card" th:if="${billingAccessLocked}">
+      <i class="fa-solid fa-lock"></i>
+      <span><strong>Billing required</strong><small th:text="${billingLockMessage ?: 'Pay or renew to unlock all modules.'}">Pay or renew to unlock all modules.</small></span>
+    </div>
+    <a th:unless="${billingAccessLocked}" th:class="${active == 'dashboard' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/dashboard}"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+    <details th:unless="${billingAccessLocked == true or #lists.isEmpty(salesModules)}" class="tenant-nav-group" open>
+      <summary><i class="fa-solid fa-file-invoice-dollar"></i><span>Sales</span><i class="fa-solid fa-chevron-down"></i></summary>
+      <a th:each="m : ${salesModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+        <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+      </a>
+    </details>
+    <details th:unless="${billingAccessLocked == true or #lists.isEmpty(stockModules)}" class="tenant-nav-group" open>
+      <summary><i class="fa-solid fa-cube"></i><span>Inventory</span><i class="fa-solid fa-chevron-down"></i></summary>
+      <a th:each="m : ${stockModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="${moduleUrls.get(m) ?: '/shop/' + m}">
+        <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+      </a>
+    </details>
+    <details th:unless="${billingAccessLocked == true or #lists.isEmpty(gasModules)}" class="tenant-nav-group" open>
+      <summary><i class="fa-solid fa-gas-pump"></i><span>LPG Gas</span><i class="fa-solid fa-chevron-down"></i></summary>
+      <a th:each="m : ${gasModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="${moduleUrls.get(m) ?: '/shop/gas'}">
+        <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+      </a>
+    </details>
+    <details th:unless="${billingAccessLocked == true or #lists.isEmpty(peopleModules)}" class="tenant-nav-group" open>
+      <summary><i class="fa-solid fa-users"></i><span>People</span><i class="fa-solid fa-chevron-down"></i></summary>
+      <a th:each="m : ${peopleModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+        <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+      </a>
+    </details>
+    <details th:unless="${billingAccessLocked == true or #lists.isEmpty(financeModules)}" class="tenant-nav-group" open>
+      <summary><i class="fa-solid fa-cart-shopping"></i><span>Operations</span><i class="fa-solid fa-chevron-down"></i></summary>
+      <a th:each="m : ${financeModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+        <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+      </a>
+    </details>
+    <a th:class="${active == 'billing' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/billing}"><i class="fa-solid fa-credit-card"></i><span>Billing</span></a>
+    <details th:unless="${billingAccessLocked == true or #lists.isEmpty(systemModules)}" class="tenant-nav-group" open>
+      <summary><i class="fa-solid fa-gear"></i><span>System</span><i class="fa-solid fa-chevron-down"></i></summary>
+      <a th:each="m : ${systemModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
+        <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
+      </a>
+    </details>
+  </nav>
+  <a th:unless="${billingAccessLocked}" class="tenant-support-card" href="#support-chat">
+    <i class="fa-solid fa-headset"></i>
+    <span><strong>Support</strong><small><em></em>Online</small></span>
   </a>
-
-  <details class="nav-group" th:attr="open=${salesModules.contains(active)} ? 'open' : null">
-    <summary><i class="fa-solid fa-cash-register"></i><span>Sales Desk</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
-    <a th:each="m : ${salesModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
-      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
-    </a>
-  </details>
-
-  <details class="nav-group" th:attr="open=${stockModules.contains(active)} ? 'open' : null">
-    <summary><i class="fa-solid fa-boxes-stacked"></i><span>Stock Control</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
-    <a th:each="m : ${stockModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
-      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
-    </a>
-  </details>
-
-  <details class="nav-group" th:attr="open=${peopleModules.contains(active)} ? 'open' : null">
-    <summary><i class="fa-solid fa-users"></i><span>People</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
-    <a th:each="m : ${peopleModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
-      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
-    </a>
-  </details>
-
-  <details class="nav-group" th:attr="open=${financeModules.contains(active)} ? 'open' : null">
-    <summary><i class="fa-solid fa-chart-line"></i><span>Finance</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
-    <a th:each="m : ${financeModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
-      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
-    </a>
-  </details>
-
-  <a th:class="${active == 'billing' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/billing}">
-    <i class="fa-solid fa-credit-card"></i><span>Subscription</span>
-  </a>
-
-  <details class="nav-group" th:attr="open=${systemModules.contains(active)} ? 'open' : null">
-    <summary><i class="fa-solid fa-sliders"></i><span>System</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
-    <a th:each="m : ${systemModules}" th:class="${active == m ? 'nav-link active' : 'nav-link'}" th:href="@{'/shop/' + ${m}}">
-      <i th:class="${moduleIcons.get(m)}"></i><span th:text="${moduleLabels.get(m)}">Module</span>
-    </a>
-  </details>
 </aside>
 
 <aside class="sidebar" th:fragment="platformSidebar(active)">
   <div class="brand sidebar-brand">
-    <span class="brand-mark"><span></span></span><span>RetailZW SaaS</span>
+    <span class="brand-logo"><img th:src="@{/img/logo.png}" alt="RetailZW"></span>
+    <span class="brand-copy"><strong>RetailZW</strong><small>SaaS platform</small></span>
   </div>
   <details class="nav-group" open>
     <summary><i class="fa-solid fa-building-shield"></i><span>Platform</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
@@ -78,34 +87,26 @@
 </aside>
 
 <nav class="app-topbar" th:fragment="shopTopbar(title)">
-  <button class="back-button" type="button" onclick="history.back()" title="Back"><i class="fa-solid fa-chevron-left"></i></button>
-  <div class="topbar-actions">
-    <label class="topbar-search">
-      <input type="search" placeholder="Search">
+  <div class="tenant-top-left">
+    <button class="tenant-filter" type="button"><i class="fa-regular fa-building"></i><span th:text="${topbarBranchName ?: 'Head Office Branch'}">Head Office Branch</span><i class="fa-solid fa-chevron-down"></i></button>
+    <button class="tenant-filter" type="button"><i class="fa-regular fa-calendar"></i><span th:text="${topbarDateLabel ?: 'Today'}">Today</span></button>
+  </div>
+  <div class="topbar-actions tenant-top-actions">
+    <label class="topbar-search tenant-search">
+      <input type="search" placeholder="Search anything...">
       <i class="fa-solid fa-magnifying-glass"></i>
     </label>
-    <details class="quick-links">
-      <summary class="icon-button" title="Quick links"><i class="fa-solid fa-grip"></i></summary>
-      <div class="quick-menu">
-        <strong>Quick Links</strong>
-        <div class="quick-grid">
-          <a th:href="@{/shop/products}"><i class="fa-solid fa-box-open"></i></a>
-          <a th:href="@{/shop/inventory}"><i class="fa-solid fa-warehouse"></i></a>
-          <a th:href="@{/shop/categories}"><i class="fa-solid fa-layer-group"></i></a>
-          <a th:href="@{/shop/customers}"><i class="fa-solid fa-users"></i></a>
-          <a th:href="@{/shop/reports}"><i class="fa-solid fa-chart-line"></i></a>
-          <a th:href="@{/shop/company}"><i class="fa-solid fa-building"></i></a>
-        </div>
-      </div>
-    </details>
-    <button class="icon-button theme-toggle dotted" type="button" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
-    <a th:class="${unreadNotificationCount != null and unreadNotificationCount > 0 ? 'icon-button dotted has-badge' : 'icon-button dotted'}"
+    <a th:class="${unreadNotificationCount != null and unreadNotificationCount > 0 ? 'tenant-bell has-badge' : 'tenant-bell'}"
        th:href="@{/shop/notifications}" title="Notifications">
-      <i class="fa-solid fa-bell"></i><span th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
+      <i class="fa-regular fa-bell"></i><span th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">3</span>
     </a>
     <details class="account-menu">
-      <summary class="account-summary" title="Account menu">
-        <span class="avatar-chip" th:text="${currentUser != null ? currentUser.initials : 'U'}">U</span>
+      <summary class="tenant-account-summary" title="Account menu">
+        <span class="tenant-photo" th:text="${currentUser != null ? currentUser.initials : 'JM'}">JM</span>
+        <span class="tenant-account-copy">
+          <strong th:text="${currentUser != null ? currentUser.displayName : 'John Manager'}">John Manager</strong>
+          <small th:text="${currentUser != null ? currentUser.roleLabel : 'Super Admin'}">Super Admin</small>
+        </span>
         <i class="fa-solid fa-chevron-down"></i>
       </summary>
       <div class="account-dropdown">
@@ -117,8 +118,9 @@
             <small th:text="${currentUser != null ? currentUser.roleLabel + ' - ' + currentUser.branchLabel : ''}">Role</small>
           </div>
         </div>
-        <a th:href="@{/shop/users}"><i class="fa-regular fa-user"></i><span>Profile</span></a>
-        <a th:href="@{/shop/company}"><i class="fa-solid fa-building"></i><span>Company Profile</span></a>
+        <a th:unless="${billingAccessLocked}" th:href="@{/shop/users}"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+        <a th:unless="${billingAccessLocked}" th:href="@{/shop/company}"><i class="fa-solid fa-building"></i><span>Company Profile</span></a>
+        <a th:if="${billingAccessLocked}" th:href="@{/shop/billing}"><i class="fa-solid fa-credit-card"></i><span>Billing</span></a>
         <button class="theme-toggle account-action" type="button"><i class="fa-solid fa-moon"></i><span>Light / Dark Mode</span></button>
         <form method="post" th:action="@{/auth/shop/logout}">
           <button class="account-action danger" type="submit"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
@@ -126,7 +128,7 @@
       </div>
     </details>
   </div>
-  <div id="support-chat" class="support-widget chat-panel" th:attr="data-feed-url=@{/shop/support/chat/feed}">
+  <div th:unless="${billingAccessLocked}" id="support-chat" class="support-widget chat-panel" th:attr="data-feed-url=@{/shop/support/chat/feed}">
     <button class="support-fab" type="button" data-chat-toggle title="Live support">
       <i class="fa-solid fa-headset"></i>
       <span th:if="${supportUnreadCount != null and supportUnreadCount > 0}" th:text="${supportUnreadCount}">0</span>
@@ -155,7 +157,13 @@
 </nav>
 
 <nav class="app-topbar" th:fragment="platformTopbar(title)">
-  <button class="back-button" type="button" onclick="history.back()" title="Back"><i class="fa-solid fa-chevron-left"></i></button>
+  <div class="topbar-page">
+    <button class="back-button" type="button" onclick="history.back()" title="Back"><i class="fa-solid fa-chevron-left"></i></button>
+    <div>
+      <small>Platform</small>
+      <strong th:text="${title}">Dashboard</strong>
+    </div>
+  </div>
   <div class="topbar-actions">
     <label class="topbar-search">
       <input type="search" placeholder="Search">

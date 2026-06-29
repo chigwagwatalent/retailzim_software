@@ -214,6 +214,7 @@ class GasSale {
   final double unitPrice;
   final double total;
   final String currency;
+  final String paymentMethod;
 
   GasSale({
     required this.id,
@@ -222,6 +223,7 @@ class GasSale {
     required this.unitPrice,
     required this.total,
     required this.currency,
+    this.paymentMethod = 'CASH',
   });
 
   factory GasSale.fromJson(Map<String, dynamic> json) => GasSale(
@@ -231,6 +233,44 @@ class GasSale {
         unitPrice: _double(json['unitPrice']),
         total: _double(json['total']),
         currency: json['currency'] as String? ?? 'USD',
+        paymentMethod: json['paymentMethod']?.toString() ?? 'CASH',
+      );
+}
+
+class GasDashboard {
+  final double soldKgToday;
+  final double revenueUsdToday;
+  final double revenueZwgToday;
+  final double expensesUsdToday;
+  final double expensesZwgToday;
+  final double marginUsdToday;
+  final double marginZwgToday;
+  final List<double> lpgWeightPresetsKg;
+
+  GasDashboard({
+    required this.soldKgToday,
+    required this.revenueUsdToday,
+    required this.revenueZwgToday,
+    required this.expensesUsdToday,
+    required this.expensesZwgToday,
+    required this.marginUsdToday,
+    required this.marginZwgToday,
+    required this.lpgWeightPresetsKg,
+  });
+
+  factory GasDashboard.fromJson(Map<String, dynamic> json) => GasDashboard(
+        soldKgToday: _double(json['soldKgToday']),
+        revenueUsdToday: _double(json['revenueUsdToday']),
+        revenueZwgToday: _double(json['revenueZwgToday']),
+        expensesUsdToday: _double(json['expensesUsdToday']),
+        expensesZwgToday: _double(json['expensesZwgToday']),
+        marginUsdToday: _double(json['marginUsdToday']),
+        marginZwgToday: _double(json['marginZwgToday']),
+        lpgWeightPresetsKg: (json['lpgWeightPresetsKg'] as List<dynamic>? ??
+                const [1, 2, 3, 5, 9, 14, 19, 48])
+            .map(_double)
+            .where((v) => v > 0)
+            .toList(),
       );
 }
 

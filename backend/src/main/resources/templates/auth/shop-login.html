@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RetailZW Shop Admin</title>
-  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=16)}">
-  <link rel="stylesheet" th:href="@{/css/auth-clean.css}">
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=24)}">
+  <link rel="stylesheet" th:href="@{/css/auth-clean.css(v=5)}">
   <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
-  <script defer th:src="@{/js/retailzw.js}"></script>
+  <script defer th:src="@{/js/retailzw.js(v=17)}"></script>
 </head>
 <body class="auth-shell">
   <div class="auth-preloader" data-auth-preloader>
     <div class="auth-preloader-card">
-      <span class="brand-mark"><span></span></span>
+      <span class="auth-preloader-logo"><img th:src="@{/img/logo.png}" alt="RetailZW"></span>
       <strong>RetailZW</strong>
       <small>Opening retail workspace</small>
       <i></i>
@@ -20,8 +20,7 @@
   </div>
 
   <form class="auth-card login-card" method="post" th:action="@{/auth/shop/login}" onsubmit="this.classList.add('is-loading')">
-    <div class="auth-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
-    <div class="brand auth-brand"><span class="brand-mark"><span></span></span><span>RetailZW</span></div>
+    <div class="auth-logo-center"><img th:src="@{/img/logo.png}" alt="RetailZW"></div>
     <div class="auth-copy">
       <p>Shop command centre</p>
       <h1>Welcome back</h1>

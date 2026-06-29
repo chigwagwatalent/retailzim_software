@@ -3,12 +3,16 @@ package com.retailzw.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.retailzw.enums.CurrencyCode;
+import com.retailzw.enums.BusinessModule;
+import com.retailzw.enums.ModuleAccessStatus;
 import com.retailzw.model.SaasPlan;
 import com.retailzw.model.SmilePayCheckout;
 import com.retailzw.model.Tenant;
+import com.retailzw.model.TenantEnabledModule;
 import com.retailzw.model.TenantSubscription;
 import com.retailzw.repository.SaasPlanRepository;
 import com.retailzw.repository.SmilePayCheckoutRepository;
+import com.retailzw.repository.TenantEnabledModuleRepository;
 import com.retailzw.repository.TenantRepository;
 import com.retailzw.repository.TenantSubscriptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -48,6 +53,7 @@ public class SmilePayCheckoutService {
     private final TenantRepository tenants;
     private final SaasPlanRepository plans;
     private final TenantSubscriptionRepository tenantSubscriptions;
+    private final TenantEnabledModuleRepository tenantModules;
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient = HttpClient.newBuilder()
@@ -69,12 +75,18 @@ public class SmilePayCheckoutService {
     @Transactional
     public SmilePayCheckout createCheckout(Long tenantId) {
         Tenant tenant = tenants.findById(tenantId).orElseThrow();
-        SaasPlan plan = tenant.getPlanId() == null
-                ? null
-                : plans.findById(tenant.getPlanId()).orElse(null);
-        if (plan == null) {
+        if (tenant.getPlanId() == null) {
             throw new IllegalArgumentException("Choose a package before checkout.");
         }
+        return createCheckout(tenantId, tenant.getPlanId());
+    }
+
+    @Transactional
+    public SmilePayCheckout createCheckout(Long tenantId, Long planId) {
+        Tenant tenant = tenants.findById(tenantId).orElseThrow();
+        SaasPlan plan = plans.findById(planId)
+                .filter(candidate -> Boolean.TRUE.equals(candidate.getIsActive()))
+                .orElseThrow(() -> new IllegalArgumentException("Choose an active package before checkout."));
         requireConfigured();
 
         return checkouts
@@ -333,6 +345,7 @@ public class SmilePayCheckoutService {
         tenant.setSubscriptionStart(subscription.getStartsAt());
         tenant.setSubscriptionEnd(subscription.getEndsAt());
         tenants.save(tenant);
+        syncTenantModules(tenant.getId(), plan);
 
         checkout.setStatus(SmilePayCheckout.CheckoutStatus.PAID);
         checkout.setPaidAt(paidAt);
@@ -498,6 +511,30 @@ public class SmilePayCheckoutService {
         if (SaasPlan.BillingCycle.ANNUALLY.equals(cycle)) return start.plusYears(1);
         if (SaasPlan.BillingCycle.QUARTERLY.equals(cycle)) return start.plusMonths(3);
         return start.plusMonths(1);
+    }
+
+    private void syncTenantModules(Long tenantId, SaasPlan plan) {
+        List<BusinessModule> allowed = plan.allowedModuleList().stream()
+                .filter(module -> !BusinessModule.RESTAURANT_MODULE.equals(module))
+                .toList();
+        if (allowed.isEmpty()) {
+            allowed = List.of(BusinessModule.SHOP_MODULE);
+        }
+        for (BusinessModule module : allowed) {
+            TenantEnabledModule tenantModule = tenantModules.findByTenantIdAndModule(tenantId, module)
+                    .orElseGet(() -> TenantEnabledModule.builder()
+                            .tenantId(tenantId)
+                            .module(module)
+                            .build());
+            tenantModule.setStatus(ModuleAccessStatus.ENABLED);
+            tenantModules.save(tenantModule);
+        }
+        for (TenantEnabledModule existing : tenantModules.findByTenantId(tenantId)) {
+            if (!allowed.contains(existing.getModule())) {
+                existing.setStatus(ModuleAccessStatus.DISABLED);
+                tenantModules.save(existing);
+            }
+        }
     }
 
     private String paymentReference(SmilePayCheckout checkout, String providerReference) {

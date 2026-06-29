@@ -11,6 +11,7 @@ import com.retailzw.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -689,7 +690,7 @@ public class RetailOperationsService {
     }
 
     public List<Sale> recentSales(Long tenantId, Long branchId) {
-        return sales.findByTenantIdAndBranchId(tenantId, branchId, PageRequest.of(0, 25)).getContent();
+        return sales.findByTenantIdAndBranchId(tenantId, branchId, PageRequest.of(0, 25, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
     }
 
     private BigDecimal nvl(BigDecimal value) {

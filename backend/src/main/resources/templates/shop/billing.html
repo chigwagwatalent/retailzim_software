@@ -18,6 +18,14 @@
       </div>
     </section>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
+    <section th:if="${billingAccessLocked}" class="billing-lock-banner">
+      <i class="fa-solid fa-lock"></i>
+      <div>
+        <p>Modules locked</p>
+        <h2 th:text="${billingLockMessage ?: 'Pay or renew to unlock all sidebar modules.'}">Pay or renew to unlock all sidebar modules.</h2>
+        <span>After payment is confirmed, Dashboard, Sales, Inventory, People, Operations, and System modules reopen automatically.</span>
+      </div>
+    </section>
 
     <section class="billing-account-grid">
       <article class="panel billing-current-plan">
@@ -49,6 +57,42 @@
         </dl>
         <div class="billing-autopilot"><i class="fa-solid fa-envelope-circle-check"></i><span><strong>Billing reminders active</strong><small>We email before expiry and confirm successful payments.</small></span></div>
       </article>
+    </section>
+
+    <section class="panel billing-package-panel" style="margin-top:16px">
+      <div class="panel-title-row">
+        <div><p class="eyebrow">Change package</p><h2>Choose a subscription package</h2></div>
+      </div>
+      <div class="billing-plan-grid">
+        <article th:each="option : ${availablePlans}"
+                 th:class="${tenant.planId != null and tenant.planId == option.id ? 'billing-plan-card current' : 'billing-plan-card'}">
+          <div class="billing-plan-head">
+            <div>
+              <h3 th:text="${option.name}">Starter</h3>
+              <span th:text="${option.description ?: 'RetailZW subscription package'}">RetailZW subscription package</span>
+            </div>
+            <em th:if="${tenant.planId != null and tenant.planId == option.id}">Current</em>
+          </div>
+          <div class="billing-plan-price">
+            <strong th:text="${'USD ' + #numbers.formatDecimal(option.priceUsd, 1, 2)}">USD 0.00</strong>
+            <span th:text="${option.billingCycle.name().toLowerCase()}">monthly</span>
+          </div>
+          <div class="plan-limit-row">
+            <span><i class="fa-solid fa-store"></i><b th:text="${option.maxBranches}">1</b> branches</span>
+            <span><i class="fa-solid fa-users"></i><b th:text="${option.maxUsers}">5</b> users</span>
+            <span><i class="fa-solid fa-box"></i><b th:text="${option.maxProducts}">500</b> products</span>
+            <span th:if="${option.maxGasTanks != null and option.maxGasTanks > 0}"><i class="fa-solid fa-gas-pump"></i><b th:text="${option.maxGasTanks}">0</b> tanks</span>
+          </div>
+          <form method="post" th:action="@{/shop/billing/pay}">
+            <input type="hidden" name="planId" th:value="${option.id}">
+            <button class="btn" th:classappend="${tenant.planId != null and tenant.planId == option.id ? ' btn-light' : ' btn-primary'}" type="submit">
+              <i th:class="${tenant.planId != null and tenant.planId == option.id ? 'fa-solid fa-rotate' : 'fa-solid fa-arrow-up-right-dots'}"></i>
+              <span th:text="${tenant.planId != null and tenant.planId == option.id ? 'Renew current package' : 'Choose and pay'}">Choose and pay</span>
+            </button>
+          </form>
+        </article>
+      </div>
+      <div class="empty" th:if="${#lists.isEmpty(availablePlans)}">No active subscription packages are available.</div>
     </section>
 
     <section class="panel table-panel" style="margin-top:16px">

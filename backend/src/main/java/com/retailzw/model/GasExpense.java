@@ -8,12 +8,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "gas_restocks")
+@Table(name = "gas_expenses")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GasRestock {
+public class GasExpense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,33 +24,25 @@ public class GasRestock {
     @Column(name = "branch_id", nullable = false)
     private Long branchId;
 
-    @Column(name = "tank_id", nullable = false)
-    private Long tankId;
+    @Column(nullable = false, length = 80)
+    private String category;
 
-    @Column(name = "quantity_kg", nullable = false, precision = 12, scale = 3)
-    private BigDecimal quantityKg;
+    @Column(nullable = false, length = 255)
+    private String description;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 5)
+    private CurrencyCode currency;
+
+    @Column(name = "payment_method", nullable = false, length = 30)
     @Builder.Default
-    private CurrencyCode currency = CurrencyCode.USD;
+    private String paymentMethod = "CASH";
 
-    @Column(name = "unit_cost", nullable = false, precision = 12, scale = 4)
-    @Builder.Default
-    private BigDecimal unitCost = BigDecimal.ZERO;
-
-    @Column(name = "total_cost", nullable = false, precision = 12, scale = 2)
-    @Builder.Default
-    private BigDecimal totalCost = BigDecimal.ZERO;
-
-    @Column(name = "supplier_name", length = 120)
-    private String supplierName;
-
-    @Column(name = "supplier_invoice", length = 120)
-    private String supplierInvoice;
-
-    @Column(length = 500)
-    private String notes;
+    @Column(length = 120)
+    private String reference;
 
     @Column(name = "created_by")
     private Long createdBy;

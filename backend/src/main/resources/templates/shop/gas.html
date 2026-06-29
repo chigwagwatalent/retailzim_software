@@ -28,6 +28,8 @@
         </select>
       </form>
       <a class="btn btn-blue" href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Set Price</a>
+      <a class="btn btn-light" href="#modal-gas-restock"><i class="fa-solid fa-truck-droplet"></i>Receive Stock</a>
+      <a class="btn btn-light" href="#modal-gas-expense"><i class="fa-solid fa-receipt"></i>Expense</a>
       <a class="btn btn-primary" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
     </div>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
@@ -37,6 +39,28 @@
       <div class="metric-card metric-green"><span>Capacity</span><strong th:text="${gasCapacityKg + ' kg'}">0 kg</strong><div><em style="width:65%"></em></div><small>Total tank capacity</small></div>
       <div class="metric-card metric-orange"><span>Plan Limit</span><strong th:text="${maxGasTanks > 0 ? maxGasTanks : 'Unlimited'}">0</strong><div><em style="width:50%"></em></div><small>Allowed gas tanks</small></div>
       <div class="metric-card metric-red"><span>Open Shift</span><strong th:text="${currentGasShift != null ? currentGasShift.shiftNumber : 'None'}">None</strong><div><em style="width:40%"></em></div><small>For current user</small></div>
+      <div class="metric-card metric-blue"><span>Today USD</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.marginUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><div><em style="width:62%"></em></div><small>Sales less stock cost and expenses</small></div>
+      <div class="metric-card metric-green"><span>Today ZWG</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.marginZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><div><em style="width:62%"></em></div><small>Sales less stock cost and expenses</small></div>
+      <div class="metric-card metric-orange"><span>Kg Sold Today</span><strong th:text="${gasDashboard != null ? gasDashboard.soldKgToday + ' kg' : '0 kg'}">0 kg</strong><div><em style="width:55%"></em></div><small>Across USD and ZWG sales</small></div>
+      <div class="metric-card metric-red"><span>Reorder Alerts</span><strong th:text="${gasDashboard != null ? #lists.size(gasDashboard.reorderTanks) : 0}">0</strong><div><em style="width:45%"></em></div><small>Tanks at or below reorder kg</small></div>
+    </section>
+
+    <section class="panel table-panel" th:if="${gasDashboard != null && !#lists.isEmpty(gasDashboard.reorderTanks)}">
+      <div class="toolbar">
+        <h2>Reorder Watch</h2>
+        <span class="badge status-pending">Below LPG reorder level</span>
+      </div>
+      <table>
+        <thead><tr><th>Tank</th><th>On Hand</th><th>Reorder Level</th><th>Suggested Order</th></tr></thead>
+        <tbody>
+        <tr th:each="t : ${gasDashboard.reorderTanks}">
+          <td><strong th:text="${t.name}">Tank</strong><small th:text="${t.productName}">LPG Gas</small></td>
+          <td th:text="${t.currentKg + ' kg'}">0 kg</td>
+          <td th:text="${t.reorderLevelKg + ' kg'}">0 kg</td>
+          <td th:text="${(t.capacityKg ?: 0) - (t.currentKg ?: 0) + ' kg'}">0 kg</td>
+        </tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="panel table-panel">
@@ -76,14 +100,41 @@
         </table>
       </div>
       <div class="panel table-panel">
+        <div class="toolbar"><h2>Recent Restocks</h2><a class="btn btn-light" href="#modal-gas-restock"><i class="fa-solid fa-plus"></i>Receive</a></div>
+        <table>
+          <thead><tr><th>Supplier</th><th>Kg</th><th>Cost</th></tr></thead>
+          <tbody>
+          <tr th:each="r : ${gasRestocks}">
+            <td><strong th:text="${r.supplierName ?: 'Supplier'}">Supplier</strong><small th:text="${r.supplierInvoice ?: ''}">Invoice</small></td>
+            <td th:text="${r.quantityKg + ' kg'}">0 kg</td>
+            <td th:text="${r.currency + ' ' + #numbers.formatDecimal(r.totalCost, 1, 2)}">USD 0</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel table-panel">
         <div class="toolbar"><h2>Current Shift Sales</h2><span class="badge" th:text="${#lists.size(gasShiftSales) + ' sales'}">0 sales</span></div>
         <table>
-          <thead><tr><th>Receipt</th><th>Kg</th><th>Total</th></tr></thead>
+          <thead><tr><th>Receipt</th><th>Kg</th><th>Total</th><th>Paid By</th></tr></thead>
           <tbody>
           <tr th:each="s : ${gasShiftSales}">
             <td><strong th:text="${s.receiptNumber}">GAS</strong></td>
             <td th:text="${s.quantityKg}">0</td>
             <td th:text="${s.currency + ' ' + s.total}">USD 0</td>
+            <td><span class="badge" th:text="${s.paymentMethod}">CASH</span></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel table-panel">
+        <div class="toolbar"><h2>Gas Expenses</h2><a class="btn btn-light" href="#modal-gas-expense"><i class="fa-solid fa-plus"></i>Add</a></div>
+        <table>
+          <thead><tr><th>Category</th><th>Amount</th><th>Method</th></tr></thead>
+          <tbody>
+          <tr th:each="e : ${gasExpenses}">
+            <td><strong th:text="${e.category}">Expense</strong><small th:text="${e.description}">Description</small></td>
+            <td th:text="${e.currency + ' ' + #numbers.formatDecimal(e.amount, 1, 2)}">USD 0</td>
+            <td><span class="badge" th:text="${e.paymentMethod}">CASH</span></td>
           </tr>
           </tbody>
         </table>
@@ -125,6 +176,35 @@
         <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
         <label>Price per kg *<input name="pricePerKg" type="number" step="0.0001" min="0.0001" required placeholder="2.0000"></label>
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Price</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-gas-restock" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Receive LPG Stock</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/gas/restocks}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <label>Tank *<select name="tankId" required><option th:each="t : ${gasTanks}" th:value="${t.id}" th:text="${t.name + ' - ' + t.currentKg + ' kg'}">Tank</option></select></label>
+        <label>Quantity Kg *<input name="quantityKg" type="number" step="0.001" min="0.001" required placeholder="500.000"></label>
+        <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
+        <label>Unit Cost / kg<input name="unitCost" type="number" step="0.0001" min="0" value="0"></label>
+        <label>Supplier<input name="supplierName" placeholder="LPG supplier"></label>
+        <label>Invoice / Reference<input name="supplierInvoice" placeholder="Invoice number"></label>
+        <label class="span-2">Notes<input name="notes" placeholder="Truck delivery, dip reading, seal check"></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Stock</button></div>
+      </form>
+    </div></div>
+
+    <div id="modal-gas-expense" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Record Gas Expense</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/gas/expenses}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <label>Category *<input name="category" required placeholder="Transport, ZERA, Maintenance"></label>
+        <label>Amount *<input name="amount" type="number" step="0.01" min="0.01" required></label>
+        <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
+        <label>Payment Method<select name="paymentMethod"><option>CASH</option><option>ECOCASH</option><option>ZIPIT</option><option>SWIPE</option><option>BANK_TRANSFER</option></select></label>
+        <label>Reference<input name="reference" placeholder="Voucher or bank reference"></label>
+        <label class="span-2">Description *<input name="description" required placeholder="What this cost was for"></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Expense</button></div>
       </form>
     </div></div>
   </main>

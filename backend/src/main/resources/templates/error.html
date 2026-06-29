@@ -3,7 +3,7 @@
 <head th:replace="~{common/layout :: head('Error')}"></head>
 <body class="auth-shell">
   <main class="auth-card">
-    <div class="brand"><span class="brand-mark">RZ</span><span>RetailZW</span></div>
+    <div class="brand auth-brand"><span class="brand-logo"><img th:src="@{/img/logo.png}" alt="RetailZW"></span><span>RetailZW</span></div>
     <h1>Something needs attention</h1>
     <p th:text="${message ?: error ?: 'The page could not be rendered.'}">The page could not be rendered.</p>
     <a class="btn btn-primary" th:href="@{/shop/dashboard}">Back to shop dashboard</a>

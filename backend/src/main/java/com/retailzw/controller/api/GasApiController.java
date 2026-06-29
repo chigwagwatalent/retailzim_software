@@ -2,6 +2,7 @@ package com.retailzw.controller.api;
 
 import com.retailzw.dto.request.CloseGasShiftRequest;
 import com.retailzw.dto.request.GasPriceRequest;
+import com.retailzw.dto.request.GasExpenseRequest;
 import com.retailzw.dto.request.GasRestockRequest;
 import com.retailzw.dto.request.GasSaleRequest;
 import com.retailzw.dto.request.GasTankRequest;
@@ -30,6 +31,9 @@ public class GasApiController {
         payload.put("tanks", gas.tanks(current.tenantId(), branchId));
         payload.put("prices", gas.prices(current.tenantId(), branchId));
         payload.put("shiftSales", gas.shiftSales(current.tenantId(), branchId, current.userId()));
+        payload.put("dashboard", gas.dashboard(current.tenantId(), branchId));
+        payload.put("restocks", gas.restocks(current.tenantId(), branchId));
+        payload.put("expenses", gas.expenses(current.tenantId(), branchId));
         return ApiResponse.success(payload);
     }
 
@@ -71,6 +75,11 @@ public class GasApiController {
     @PostMapping("/restocks")
     public ApiResponse<?> restock(@Valid @RequestBody GasRestockRequest request) {
         return ApiResponse.success("Gas tank restocked", gas.restock(current.tenantId(), current.userId(), request));
+    }
+
+    @PostMapping("/expenses")
+    public ApiResponse<?> expense(@Valid @RequestBody GasExpenseRequest request) {
+        return ApiResponse.success("Gas expense recorded", gas.recordExpense(current.tenantId(), current.userId(), request));
     }
 
     @PostMapping("/tanks")

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Gas Expenses')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('gas-expenses')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Gas Expenses')}"></nav>
+    <section class="page-hero">
+      <div class="hero-title"><div class="hero-icon"><i class="fa-solid fa-receipt"></i></div><div><p>LPG cost control,</p><h1>Gas Expenses</h1></div></div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-dollar-sign"></i><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.expensesUsdToday, 1, 2) : '0.00'}">0.00</strong><span>USD today</span></div>
+        <div><i class="fa-solid fa-money-bill"></i><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.expensesZwgToday, 1, 2) : '0.00'}">0.00</strong><span>ZWG today</span></div>
+      </div>
+    </section>
+    <div class="page-toolbar">
+      <form method="get" th:action="@{/shop/gas/expenses}" class="inline-form"><select name="branchId" onchange="this.form.submit()"><option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option></select></form>
+      <a class="btn btn-primary" href="#modal-gas-expense"><i class="fa-solid fa-plus"></i>Add Expense</a>
+    </div>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+    <section class="panel table-panel">
+      <div class="toolbar"><h2>Expense Register</h2><span class="badge" th:text="${#lists.size(gasExpenses) + ' expenses'}">0 expenses</span></div>
+      <table>
+        <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>Payment</th><th>Reference</th><th>Date</th></tr></thead>
+        <tbody><tr th:each="e : ${gasExpenses}">
+          <td><strong th:text="${e.category}">Expense</strong></td>
+          <td th:text="${e.description}">Description</td>
+          <td><strong th:text="${e.currency + ' ' + #numbers.formatDecimal(e.amount, 1, 2)}">USD 0</strong></td>
+          <td><span class="badge" th:text="${e.paymentMethod}">CASH</span></td>
+          <td th:text="${e.reference ?: ''}">Ref</td>
+          <td th:text="${e.createdAt != null ? #temporals.format(e.createdAt, 'dd MMM yyyy HH:mm') : ''}">Date</td>
+        </tr></tbody>
+      </table>
+    </section>
+    <div id="modal-gas-expense" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Record Gas Expense</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/gas/expenses}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <input type="hidden" name="returnTo" value="/shop/gas/expenses">
+        <label>Category *<input name="category" required placeholder="Transport, ZERA, Maintenance"></label>
+        <label>Amount *<input name="amount" type="number" step="0.01" min="0.01" required></label>
+        <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
+        <label>Payment Method<select name="paymentMethod"><option>CASH</option><option>ECOCASH</option><option>ZIPIT</option><option>SWIPE</option><option>BANK_TRANSFER</option></select></label>
+        <label>Reference<input name="reference"></label>
+        <label class="span-2">Description *<input name="description" required></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Expense</button></div>
+      </form>
+    </div></div>
+  </main>
+</div>
+</body>
+</html>
