@@ -2,35 +2,85 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{common/layout :: head('SaaS Dashboard')}"></head>
 <body>
-<div class="app-shell">
+<div class="app-shell platform-shell">
   <aside th:replace="~{common/layout :: platformSidebar('dashboard')}"></aside>
   <main class="main">
     <nav th:replace="~{common/layout :: platformTopbar('SaaS Dashboard')}"></nav>
-    <section class="page-hero">
+    <section class="page-hero platform-dashboard-hero">
       <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-building-shield"></i></div>
+        <div class="hero-icon"><i class="fa-regular fa-square"></i></div>
         <div>
-          <p>Welcome back,</p>
           <h1>SaaS Dashboard</h1>
+          <p>Monitor shops, subscriptions, plans, and support from one command view.</p>
         </div>
       </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-store"></i><strong th:text="${totalTenants}">0</strong><span>Registered Shops</span></div>
-        <div><i class="fa-solid fa-receipt"></i><strong th:text="${#lists.size(plans)}">0</strong><span>Packages</span></div>
+      <div class="page-toolbar">
+        <a class="btn btn-light" th:href="@{/admin/subscriptions}">Export report</a>
+        <a class="btn btn-primary" th:href="@{/auth/signup}"><i class="fa-solid fa-plus"></i>Register Shop</a>
       </div>
     </section>
-    <div class="page-toolbar"><a class="btn btn-primary" th:href="@{/auth/signup}"><i class="fa-solid fa-user-plus"></i>Register Shop</a></div>
-    <section class="metric-grid">
-      <div class="metric-card metric-blue"><span>Total Shops</span><strong th:text="${totalTenants}">0</strong><div><em style="width:75%"></em></div><small>All tenants on platform</small></div>
-      <div class="metric-card metric-green"><span>Active Shops</span><strong th:text="${activeTenants}">0</strong><div><em style="width:60%"></em></div><small>Live subscriptions</small></div>
-      <div class="metric-card metric-red"><span>Pending Shops</span><strong th:text="${pendingTenants}">0</strong><div><em style="width:35%"></em></div><small>Awaiting approval</small></div>
-      <div class="metric-card metric-orange"><span>Plans</span><strong th:text="${#lists.size(plans)}">0</strong><div><em style="width:50%"></em></div><small>Subscription packages</small></div>
+
+    <section class="metric-grid platform-metrics">
+      <article class="metric-card metric-blue">
+        <header><span>Total Shops</span><i class="fa-regular fa-square"></i></header>
+        <strong th:text="${totalTenants}">0</strong>
+        <small>All tenants on platform</small>
+        <div><em style="width:74%"></em></div>
+      </article>
+      <article class="metric-card metric-green">
+        <header><span>Active Shops</span><i class="fa-solid fa-check"></i></header>
+        <strong th:text="${activeTenants}">0</strong>
+        <small>Live subscriptions</small>
+        <div><em style="width:82%"></em></div>
+      </article>
+      <article class="metric-card metric-red">
+        <header><span>Pending Shops</span><i class="fa-solid fa-exclamation"></i></header>
+        <strong th:text="${pendingTenants}">0</strong>
+        <small>Awaiting approval</small>
+        <div><em style="width:18%"></em></div>
+      </article>
+      <article class="metric-card metric-orange">
+        <header><span>Plans</span><i class="fa-solid fa-receipt"></i></header>
+        <strong th:text="${#lists.size(plans)}">0</strong>
+        <small>Subscription packages</small>
+        <div><em style="width:61%"></em></div>
+      </article>
     </section>
-    <section class="panel table-panel" style="margin-top:16px">
-      <h2>Recent Shops</h2>
-      <table><thead><tr><th>Code</th><th>Company</th><th>Email</th><th>Status</th><th>City</th></tr></thead>
-        <tbody><tr th:each="t : ${tenants}"><td th:text="${t.tenantCode}"></td><td th:text="${t.companyName}"></td><td th:text="${t.email}"></td><td><span class="badge" th:classappend="${' status-' + #strings.toLowerCase(t.status)}" th:text="${t.status}"></span></td><td th:text="${t.city}"></td></tr></tbody>
-      </table>
+
+    <section class="platform-dashboard-grid">
+      <div class="panel table-panel platform-table-panel">
+        <div class="panel-head">
+          <h2>Recent Shops</h2>
+          <span th:text="${totalTenants + ' registered tenants'}">0 registered tenants</span>
+        </div>
+        <table>
+          <thead>
+          <tr><th>Shop</th><th>Email</th><th>Status</th><th>City</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="t : ${tenants}">
+            <td class="shop-name"><strong th:text="${t.companyName}">Company</strong><span th:text="${t.tenantCode}">CODE</span></td>
+            <td th:text="${t.email}">email@example.com</td>
+            <td><span class="badge" th:classappend="${' status-' + #strings.toLowerCase(t.status)}" th:text="${t.status}">ACTIVE</span></td>
+            <td th:text="${t.city}">Harare</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="panel platform-today-panel">
+        <div class="panel-head">
+          <h2>Today</h2>
+          <span>Platform activity</span>
+        </div>
+        <div class="mini-stat"><span>Registered Shops</span><strong th:text="${totalTenants}">0</strong></div>
+        <div class="mini-stat"><span>Packages</span><strong th:text="${#lists.size(plans)}">0</strong></div>
+        <div class="activity-list">
+          <div class="activity-row"><i class="fa-solid fa-check"></i><div><strong>All tenants active</strong><span th:text="${pendingTenants == 0 ? 'No shop waiting for approval' : pendingTenants + ' shop(s) waiting for approval'}">No shop waiting for approval</span></div></div>
+          <div class="activity-row"><i class="fa-solid fa-receipt"></i><div><strong>Plans synced</strong><span>Subscription packages available</span></div></div>
+          <div class="activity-row"><i class="fa-solid fa-headset"></i><div><strong>Support stable</strong><span th:text="${supportUnreadCount == null || supportUnreadCount == 0 ? 'No urgent platform ticket' : supportUnreadCount + ' unread support message(s)'}">No urgent platform ticket</span></div></div>
+        </div>
+      </aside>
     </section>
   </main>
 </div>

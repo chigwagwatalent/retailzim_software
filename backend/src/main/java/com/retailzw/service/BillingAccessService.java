@@ -64,6 +64,10 @@ public class BillingAccessService {
         if (Tenant.TenantStatus.CANCELLED.equals(tenant.getStatus())) {
             return new BillingAccess(true, "This account is cancelled. Contact support to reactivate it.", 0, null);
         }
+        if (Tenant.TenantStatus.SUSPENDED.equals(tenant.getStatus())) {
+            return new BillingAccess(true, "This account is suspended. Pay or renew to unlock all modules.", 0,
+                    subscription == null ? null : subscription.getEndsAt());
+        }
         if (subscription == null) {
             return new BillingAccess(true, "Your account needs an active subscription before modules can open.", 0, null);
         }

@@ -24,6 +24,7 @@
     <div class="page-toolbar">
       <a class="btn btn-blue" th:href="@{/shop/inventory(branchId=${selectedBranchId})}"><i class="fa-solid fa-warehouse"></i>Open Inventory</a>
       <a class="btn btn-light" href="#modal-assign-product"><i class="fa-solid fa-link"></i>Assign Existing</a>
+      <a class="btn btn-light" href="#modal-import-products"><i class="fa-solid fa-file-import"></i>Import Excel</a>
       <a class="btn btn-primary" href="#modal-create-product"><i class="fa-solid fa-plus"></i>Add Product</a>
     </div>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
@@ -107,6 +108,15 @@
       <div th:replace="~{common/layout :: pagination(${productPage}, ${productPageLinks}, ${productPrevUrl}, ${productNextUrl})}"></div>
     </section>
 
+    <div id="modal-import-products" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Import Products to ' + selectedBranchName}">Import Products</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" enctype="multipart/form-data" th:action="@{/shop/products/import}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label style="grid-column:1/-1">Excel file<input name="file" type="file" accept=".xlsx" required></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-file-import"></i>Import Products</button></div>
+      </form>
+    </div></div>
+
     <div id="modal-create-product" class="modal"><div class="modal-content">
       <div class="modal-head"><h2>Add Product</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/products}" class="form-grid">
@@ -169,6 +179,7 @@
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Product</button></div>
       </form>
     </div></div>
+    <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>
 </div>
 </body>

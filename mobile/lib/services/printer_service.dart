@@ -17,6 +17,11 @@ import '../models/models.dart';
 /// Windows/Linux/macOS use system printer/PDF printing.
 /// Android/iOS use Bluetooth ESC/POS printing.
 class PrinterService {
+  static const double _thermalPaperWidthMm = 80;
+  static const double _thermalLeftMarginMm = 0;
+  static const double _thermalRightMarginMm = 18;
+  static const double _thermalVerticalMarginMm = 4;
+
   // ─── Singleton ────────────────────────────────────────────────────────────
   static final PrinterService _instance = PrinterService._internal();
   factory PrinterService() => _instance;
@@ -598,7 +603,7 @@ class PrinterService {
   PdfPageFormat _receiptPdfFormat(int itemCount) {
     final heightMm = (130 + (itemCount * 12)).clamp(180, 900).toDouble();
     return PdfPageFormat(
-      80 * PdfPageFormat.mm,
+      _thermalPaperWidthMm * PdfPageFormat.mm,
       heightMm * PdfPageFormat.mm,
       marginAll: 0,
     );
@@ -623,7 +628,12 @@ class PrinterService {
     document.addPage(
       pw.Page(
         pageFormat: _receiptPdfFormat(cartItems.length),
-        margin: const pw.EdgeInsets.all(14),
+        margin: pw.EdgeInsets.fromLTRB(
+          _thermalLeftMarginMm * PdfPageFormat.mm,
+          _thermalVerticalMarginMm * PdfPageFormat.mm,
+          _thermalRightMarginMm * PdfPageFormat.mm,
+          _thermalVerticalMarginMm * PdfPageFormat.mm,
+        ),
         build: (_) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.stretch,
           children: [
@@ -651,6 +661,7 @@ class PrinterService {
             pw.Center(
               child: pw.Text(
                 'RECEIPT #${_safeText(sale.receiptNumber)}',
+                textAlign: pw.TextAlign.center,
                 style: pw.TextStyle(
                   fontSize: 10,
                   fontWeight: pw.FontWeight.bold,
@@ -681,12 +692,16 @@ class PrinterService {
                           style: const pw.TextStyle(fontSize: 8),
                         ),
                       ),
-                      pw.SizedBox(width: 8),
-                      pw.Text(
-                        '$currency ${_fmt(amount)}',
-                        style: pw.TextStyle(
-                          fontSize: 8,
-                          fontWeight: pw.FontWeight.bold,
+                      pw.SizedBox(width: 3 * PdfPageFormat.mm),
+                      pw.SizedBox(
+                        width: 22 * PdfPageFormat.mm,
+                        child: pw.Text(
+                          '$currency ${_fmt(amount)}',
+                          textAlign: pw.TextAlign.right,
+                          style: pw.TextStyle(
+                            fontSize: 8,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -737,8 +752,16 @@ class PrinterService {
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
-          pw.Text(label, style: style),
-          pw.Text(value, style: style),
+          pw.Expanded(child: pw.Text(label, style: style)),
+          pw.SizedBox(width: 3 * PdfPageFormat.mm),
+          pw.SizedBox(
+            width: 26 * PdfPageFormat.mm,
+            child: pw.Text(
+              value,
+              textAlign: pw.TextAlign.right,
+              style: style,
+            ),
+          ),
         ],
       ),
     );
@@ -785,12 +808,7 @@ class PrinterService {
       );
     }
 
-    bytes.addAll(
-      gen.text(
-        '--------------------------------',
-        styles: const PosStyles(align: PosAlign.center),
-      ),
-    );
+    bytes.addAll(_separator(gen, paperSize));
 
     bytes.addAll(
       gen.text(
@@ -808,12 +826,7 @@ class PrinterService {
       );
     }
 
-    bytes.addAll(
-      gen.text(
-        '--------------------------------',
-        styles: const PosStyles(align: PosAlign.center),
-      ),
-    );
+    bytes.addAll(_separator(gen, paperSize));
 
     bytes.addAll(
       gen.text(
@@ -822,12 +835,7 @@ class PrinterService {
       ),
     );
 
-    bytes.addAll(
-      gen.text(
-        '--------------------------------',
-        styles: const PosStyles(align: PosAlign.center),
-      ),
-    );
+    bytes.addAll(_separator(gen, paperSize));
 
     bytes.addAll(gen.feed(1));
 
@@ -847,7 +855,7 @@ class PrinterService {
           ),
         ),
         PosColumn(
-          text: 'AMOUNT',
+          text: 'AMT',
           width: 4,
           styles: const PosStyles(
             bold: true,
@@ -861,7 +869,7 @@ class PrinterService {
       final name = _itemProductName(item);
       final qty = _itemQuantity(item).toStringAsFixed(0);
       final lineAmt = _fmt(_itemLineTotal(item) + _itemLineTax(item));
-      final truncated = name.length > 18 ? '${name.substring(0, 17)}.' : name;
+      final truncated = _fitText(name, paperSize == PaperSize.mm58 ? 14 : 22);
 
       bytes.addAll(
         gen.row([
@@ -872,7 +880,7 @@ class PrinterService {
             styles: const PosStyles(align: PosAlign.center),
           ),
           PosColumn(
-            text: '$currency $lineAmt',
+            text: _fitText(lineAmt, paperSize == PaperSize.mm58 ? 8 : 10),
             width: 4,
             styles: const PosStyles(align: PosAlign.right),
           ),
@@ -880,12 +888,7 @@ class PrinterService {
       );
     }
 
-    bytes.addAll(
-      gen.text(
-        '--------------------------------',
-        styles: const PosStyles(align: PosAlign.center),
-      ),
-    );
+    bytes.addAll(_separator(gen, paperSize));
 
     final tendered = sale.grandTotal + change;
 
@@ -900,7 +903,7 @@ class PrinterService {
           ),
         ),
         PosColumn(
-          text: '$currency ${_fmt(sale.grandTotal)}',
+          text: _fitText('$currency ${_fmt(sale.grandTotal)}', 14),
           width: 6,
           styles: const PosStyles(
             bold: true,
@@ -917,7 +920,7 @@ class PrinterService {
       gen.row([
         PosColumn(text: 'Tendered', width: 6),
         PosColumn(
-          text: '$currency ${_fmt(tendered)}',
+          text: _fitText('$currency ${_fmt(tendered)}', 14),
           width: 6,
           styles: const PosStyles(align: PosAlign.right),
         ),
@@ -933,7 +936,7 @@ class PrinterService {
             styles: const PosStyles(bold: true),
           ),
           PosColumn(
-            text: '$currency ${_fmt(change)}',
+            text: _fitText('$currency ${_fmt(change)}', 14),
             width: 6,
             styles: const PosStyles(
               bold: true,
@@ -944,12 +947,7 @@ class PrinterService {
       );
     }
 
-    bytes.addAll(
-      gen.text(
-        '--------------------------------',
-        styles: const PosStyles(align: PosAlign.center),
-      ),
-    );
+    bytes.addAll(_separator(gen, paperSize));
 
     bytes.addAll(gen.feed(1));
 
@@ -991,6 +989,22 @@ class PrinterService {
   }
 
   String _fmt(double value) => value.toStringAsFixed(2);
+
+  List<int> _separator(Generator gen, PaperSize paperSize) {
+    return gen.text(
+      paperSize == PaperSize.mm58
+          ? '------------------------------'
+          : '------------------------------------------',
+      styles: const PosStyles(align: PosAlign.left),
+    );
+  }
+
+  String _fitText(String value, int maxChars) {
+    final text = _safeText(value);
+    if (text.length <= maxChars) return text;
+    if (maxChars <= 1) return text.substring(0, maxChars);
+    return '${text.substring(0, maxChars - 1)}.';
+  }
 
   double _toDouble(Object? value) {
     if (value == null) return 0.0;

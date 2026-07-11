@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retail Zim UI Screenshot Source</title>
+  <style>
+    :root {
+      --ink: #071d3a;
+      --muted: #61728b;
+      --blue: #1155ff;
+      --cyan: #29c7e8;
+      --line: #d9e6f7;
+      --bg: #f4f8ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #eef5ff;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+    }
+    .stage {
+      width: 1200px;
+      height: 760px;
+      padding: 34px;
+      background: linear-gradient(135deg, #f8fbff, #e8f2ff);
+    }
+    .desktop {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 220px 1fr 360px;
+      overflow: hidden;
+      border: 1px solid #cfe0f6;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: 0 28px 70px rgba(7, 29, 58, .14);
+    }
+    .side {
+      padding: 24px;
+      color: #d8e8ff;
+      background: #071d3a;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      color: #fff;
+      font-weight: 900;
+    }
+    .mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      font-size: 13px;
+    }
+    .nav {
+      display: grid;
+      gap: 10px;
+    }
+    .nav span {
+      padding: 13px 14px;
+      border-radius: 13px;
+      color: #bed4f3;
+      font-weight: 800;
+    }
+    .nav .on {
+      color: #fff;
+      background: var(--blue);
+    }
+    .main {
+      padding: 24px;
+      background: #f7fbff;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .search {
+      flex: 1;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--muted);
+      background: #fff;
+      font-weight: 700;
+    }
+    .pill {
+      padding: 14px 16px;
+      border-radius: 14px;
+      color: #fff;
+      background: var(--blue);
+      font-weight: 900;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .product {
+      min-height: 144px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+    .product b,
+    .cart-item b,
+    .total b {
+      display: block;
+      font-size: 18px;
+    }
+    .product span,
+    .cart-item span,
+    .total span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .price {
+      margin-top: 28px;
+      color: var(--blue);
+      font-weight: 950;
+    }
+    .cart {
+      padding: 24px;
+      border-left: 1px solid var(--line);
+      background: #fff;
+    }
+    .cart h2 {
+      margin: 0 0 18px;
+      font-size: 28px;
+    }
+    .cart-list {
+      display: grid;
+      gap: 12px;
+    }
+    .cart-item,
+    .total {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #f8fbff;
+    }
+    .total {
+      margin-top: 22px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      border: 0;
+    }
+    .total span { color: #dceaff; }
+    .pay {
+      margin-top: 18px;
+      min-height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      color: #fff;
+      background: var(--ink);
+      font-weight: 950;
+    }
+    .phone-stage {
+      width: 430px;
+      height: 860px;
+      padding: 18px;
+      border: 10px solid #071d3a;
+      border-radius: 44px;
+      background: #f8fbff;
+      box-shadow: 0 28px 70px rgba(7, 29, 58, .24);
+    }
+    .phone-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .phone-top h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .status {
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--blue);
+      background: #eaf2ff;
+      font-weight: 900;
+      font-size: 12px;
+    }
+    .phone-search {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--muted);
+      background: #fff;
+      font-weight: 800;
+    }
+    .mobile-products {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .mobile-products .product {
+      min-height: 118px;
+    }
+    .mobile-cart {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .mobile-cart h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+    .mode-mobile .stage { display: none; }
+    .mode-desktop .phone-stage { display: none; }
+  </style>
+</head>
+<body class="mode-mobile">
+  <div class="stage">
+    <section class="desktop">
+      <aside class="side">
+        <div class="logo"><span class="mark">RZ</span><span>Retail Zim POS</span></div>
+        <div class="nav">
+          <span class="on">POS Checkout</span>
+          <span>Products</span>
+          <span>Sales</span>
+          <span>Shifts</span>
+          <span>Reports</span>
+          <span>Settings</span>
+        </div>
+      </aside>
+      <main class="main">
+        <div class="top">
+          <div class="search">Search or scan barcode...</div>
+          <div class="pill">Import Excel</div>
+        </div>
+        <div class="products">
+          <div class="product"><b>Bread</b><span>Bakery</span><div class="price">USD 1.00</div></div>
+          <div class="product"><b>Milk 1L</b><span>Dairy</span><div class="price">USD 1.35</div></div>
+          <div class="product"><b>Cooking Oil</b><span>Groceries</span><div class="price">USD 3.50</div></div>
+          <div class="product"><b>Rice 2kg</b><span>Staples</span><div class="price">USD 2.25</div></div>
+          <div class="product"><b>Sugar</b><span>Staples</span><div class="price">USD 1.80</div></div>
+          <div class="product"><b>Soap</b><span>Household</span><div class="price">USD 0.75</div></div>
+        </div>
+      </main>
+      <aside class="cart">
+        <h2>Current Sale</h2>
+        <div class="cart-list">
+          <div class="cart-item"><b>1 x Bread</b><span>USD 1.00</span></div>
+          <div class="cart-item"><b>2 x Milk 1L</b><span>USD 2.70</span></div>
+          <div class="cart-item"><b>1 x Cooking Oil</b><span>USD 3.50</span></div>
+        </div>
+        <div class="total"><span>Total due</span><b>USD 7.20</b></div>
+        <div class="pay">Complete Payment</div>
+      </aside>
+    </section>
+  </div>
+
+  <section class="phone-stage">
+    <div class="phone-top"><span class="mark">RZ</span><h1>Mobile POS</h1><span class="status">Online</span></div>
+    <div class="phone-search">Search product or scan barcode...</div>
+    <div class="mobile-products">
+      <div class="product"><b>Bread</b><span>USD 1.00</span></div>
+      <div class="product"><b>Milk</b><span>USD 1.35</span></div>
+      <div class="product"><b>Rice</b><span>USD 2.25</span></div>
+      <div class="product"><b>Oil</b><span>USD 3.50</span></div>
+    </div>
+    <div class="mobile-cart">
+      <h2>Cart</h2>
+      <div class="cart-list">
+        <div class="cart-item"><b>1 x Bread</b><span>USD 1.00</span></div>
+        <div class="cart-item"><b>1 x Oil</b><span>USD 3.50</span></div>
+      </div>
+      <div class="total"><span>Total due</span><b>USD 4.50</b></div>
+      <div class="pay">Pay Now</div>
+    </div>
+  </section>
+</body>
+</html>

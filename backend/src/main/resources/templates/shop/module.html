@@ -10,13 +10,14 @@
       <div class="hero-title">
         <div class="hero-icon"><i th:class="${moduleIcons.get(module)}"></i></div>
         <div>
-          <p>Welcome back,</p>
+          <p th:text="${selectedBranchName != null ? 'Branch: ' + selectedBranchName : 'Tenant Workspace'}">Tenant Workspace</p>
           <h1 th:text="${pageTitle}">Module</h1>
+          <span class="hero-subtitle">Simple tools for daily shop operations, branch records, and reporting.</span>
         </div>
       </div>
       <div class="hero-metrics">
-        <div><i class="fa-solid fa-truck-fast"></i><strong>USD 836k</strong><span>Overall Sales</span></div>
-        <div><i class="fa-solid fa-arrow-trend-up"></i><strong>ZWG 689M</strong><span>Overall Revenue</span></div>
+        <div><i class="fa-solid fa-store"></i><strong th:text="${selectedBranchName ?: 'All'}">Branch</strong><span>Current branch</span></div>
+        <div><i class="fa-solid fa-shield-check"></i><strong>READY</strong><span>Module status</span></div>
       </div>
     </section>
     <div class="page-toolbar">
@@ -181,6 +182,7 @@
         <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label><button class="btn btn-primary" type="submit">Apply Adjustment</button>
       </form>
     </div></div>
+    <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>
 </div>
 </body>

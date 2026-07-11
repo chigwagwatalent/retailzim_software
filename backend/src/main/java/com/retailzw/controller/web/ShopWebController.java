@@ -6,6 +6,7 @@ import com.retailzw.enums.BusinessModule;
 import com.retailzw.enums.GasTankStatus;
 import com.retailzw.enums.UserRole;
 import com.retailzw.dto.request.*;
+import com.retailzw.dto.response.ProductImportResult;
 import com.retailzw.model.*;
 import com.retailzw.repository.*;
 import com.retailzw.service.CurrentUserService;
@@ -16,6 +17,7 @@ import com.retailzw.service.InventoryIntelligenceService;
 import com.retailzw.service.NotificationService;
 import com.retailzw.service.PasswordResetService;
 import com.retailzw.service.PackageModuleAccessService;
+import com.retailzw.service.ProductImportService;
 import com.retailzw.service.PurchaseOrderService;
 import com.retailzw.service.RetailOperationsService;
 import com.retailzw.service.ReturnService;
@@ -25,9 +27,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
@@ -165,6 +169,7 @@ public class ShopWebController {
     private final PackageModuleAccessService packageModuleAccessService;
     private final CreditAndChangeService creditAndChangeService;
     private final InventoryIntelligenceService inventoryIntelligenceService;
+    private final ProductImportService productImportService;
     private final BorrowerRepository borrowerRepository;
     private final HeldChangeRepository heldChangeRepository;
     private final InventoryLotRepository inventoryLots;
@@ -508,6 +513,26 @@ public class ShopWebController {
             operations.createProduct(current.tenantId(), request, current.userId());
             redirect.addFlashAttribute("message", "Product saved and tied to " + branchById(current.tenantId()).get(targetBranch) + ".");
         } catch (IllegalArgumentException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+        }
+        return "redirect:/shop/products?branchId=" + targetBranch;
+    }
+
+    @PostMapping(value = "/shop/products/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String importProducts(@RequestParam("file") MultipartFile file,
+                                 @RequestParam(required = false) Long branchId,
+                                 RedirectAttributes redirect) {
+        Long targetBranch = selectedBranch(branchId);
+        try {
+            ProductImportResult result = productImportService.importProducts(current.tenantId(), targetBranch, current.userId(), file);
+            String message = "Imported products: " + result.getCreatedProducts() + " created, "
+                    + result.getUpdatedProducts() + " updated, "
+                    + result.getStockRowsUpdated() + " stock rows updated";
+            if (result.getSkippedRows() > 0) {
+                message += ", " + result.getSkippedRows() + " skipped. " + String.join(" ", result.getErrors());
+            }
+            redirect.addFlashAttribute("message", message);
+        } catch (RuntimeException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
         }
         return "redirect:/shop/products?branchId=" + targetBranch;
@@ -1413,6 +1438,23 @@ public class ShopWebController {
         boolean shopEnabled = enabledBusinessModules.contains(BusinessModule.SHOP_MODULE);
         boolean gasEnabled = enabledBusinessModules.contains(BusinessModule.GAS_MODULE);
         BillingAccessService.BillingAccess billingAccess = billingAccessService.evaluate(tenantId);
+        boolean tenantBillingOnly = billingAccess.locked();
+
+        model.addAttribute("tenantBillingOnly", tenantBillingOnly);
+        tenants.findById(tenantId).ifPresent(tenant -> {
+            model.addAttribute("tenantPackageName", tenant.getPlanId() == null
+                    ? "Starter"
+                    : plans.findById(tenant.getPlanId()).map(SaasPlan::getName).orElse("Package"));
+            model.addAttribute("tenantSubscriptionEnd", tenant.getSubscriptionEnd());
+            model.addAttribute("tenantStatus", tenant.getStatus());
+        });
+        model.addAttribute("tenantActiveBranchName", branchNames.getOrDefault(activeBranchId, "Main Shop"));
+        model.addAttribute("topbarBranchName", branchNames.getOrDefault(activeBranchId, "Head Office Branch"));
+        model.addAttribute("topbarDateLabel", LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy")));
+        model.addAttribute("moduleLabels", MODULE_LABELS);
+        model.addAttribute("moduleIcons", MODULE_ICONS);
+        model.addAttribute("moduleUrls", MODULE_URLS);
+
         if (billingAccess.locked()) {
             model.addAttribute("salesModules", List.of());
             model.addAttribute("stockModules", List.of());
@@ -1425,16 +1467,12 @@ public class ShopWebController {
             model.addAttribute("billingAccessLocked", true);
             model.addAttribute("billingLockMessage", billingAccess.message());
             model.addAttribute("billingOverdueDays", billingAccess.overdueDays());
-            model.addAttribute("topbarBranchName", branchNames.getOrDefault(activeBranchId, "Head Office Branch"));
-            model.addAttribute("topbarDateLabel", LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy")));
-            model.addAttribute("moduleLabels", MODULE_LABELS);
-            model.addAttribute("moduleIcons", MODULE_ICONS);
-            model.addAttribute("moduleUrls", MODULE_URLS);
             model.addAttribute("supportChatMessages", List.of());
             model.addAttribute("supportUnreadCount", 0L);
             return;
         }
 
+        model.addAttribute("billingAccessLocked", false);
         model.addAttribute("salesModules", shopEnabled ? SALES_MODULES : List.of());
         List<String> stockModules = new ArrayList<>();
         if (shopEnabled) {
@@ -1449,11 +1487,6 @@ public class ShopWebController {
                 ? List.of(BusinessModule.SHOP_MODULE)
                 : enabledBusinessModules);
         model.addAttribute("gasModuleEnabled", gasEnabled);
-        model.addAttribute("topbarBranchName", branchNames.getOrDefault(activeBranchId, "Head Office Branch"));
-        model.addAttribute("topbarDateLabel", LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy")));
-        model.addAttribute("moduleLabels", MODULE_LABELS);
-        model.addAttribute("moduleIcons", MODULE_ICONS);
-        model.addAttribute("moduleUrls", MODULE_URLS);
         model.addAttribute("supportChatMessages", chatMessages.findByTenantIdOrderByCreatedAtDesc(tenantId, PageRequest.of(0, 30)).stream()
                 .sorted(java.util.Comparator.comparing(TenantChatMessage::getCreatedAt))
                 .toList());

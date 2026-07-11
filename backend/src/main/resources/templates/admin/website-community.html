@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Website Community')}"></head>
+<body>
+<div class="app-shell platform-shell">
+  <aside th:replace="~{common/layout :: platformSidebar('community')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: platformTopbar('Website Community')}"></nav>
+
+    <section class="page-hero platform-dashboard-hero website-community-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-comments"></i></div>
+        <div>
+          <h1>Website Community</h1>
+          <p>Answer public questions, review community activity, and monitor front website visits.</p>
+        </div>
+      </div>
+      <form class="page-toolbar website-filter" method="get" th:action="@{/admin/website-community}">
+        <select name="status">
+          <option value="" th:selected="${selectedStatus == ''}">All statuses</option>
+          <option value="open" th:selected="${selectedStatus == 'open'}">Open</option>
+          <option value="answered" th:selected="${selectedStatus == 'answered'}">Answered</option>
+          <option value="solved" th:selected="${selectedStatus == 'solved'}">Solved</option>
+          <option value="featured" th:selected="${selectedStatus == 'featured'}">Featured</option>
+        </select>
+        <select name="days">
+          <option value="7" th:selected="${selectedDays == 7}">7 days</option>
+          <option value="30" th:selected="${selectedDays == 30}">30 days</option>
+          <option value="90" th:selected="${selectedDays == 90}">90 days</option>
+          <option value="365" th:selected="${selectedDays == 365}">365 days</option>
+        </select>
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-rotate"></i>Refresh</button>
+      </form>
+    </section>
+
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="metric-grid platform-metrics website-community-metrics">
+      <article class="metric-card metric-blue">
+        <header><span>Total visits</span><i class="fa-solid fa-chart-line"></i></header>
+        <strong th:text="${siteStats.metric('visits')}">0</strong>
+        <small>All tracked page visits</small>
+        <div><em style="width:76%"></em></div>
+      </article>
+      <article class="metric-card metric-green">
+        <header><span>Unique visitors</span><i class="fa-solid fa-users"></i></header>
+        <strong th:text="${siteStats.metric('unique_visitors')}">0</strong>
+        <small>Distinct visitor fingerprints</small>
+        <div><em style="width:64%"></em></div>
+      </article>
+      <article class="metric-card metric-orange">
+        <header><span>Community posts</span><i class="fa-solid fa-message"></i></header>
+        <strong th:text="${siteStats.metric('posts')}">0</strong>
+        <small>Questions and ideas</small>
+        <div><em style="width:52%"></em></div>
+      </article>
+      <article class="metric-card metric-red">
+        <header><span>Engagements</span><i class="fa-solid fa-heart"></i></header>
+        <strong th:text="${siteStats.metric('engagements')}">0</strong>
+        <small>Likes and replies</small>
+        <div><em style="width:38%"></em></div>
+      </article>
+    </section>
+
+    <section class="website-community-grid">
+      <div class="website-question-list">
+        <div class="panel-head website-section-head">
+          <div>
+            <h2>Customer Questions</h2>
+            <span th:text="${#lists.size(posts) + ' community item(s)'}">0 community items</span>
+          </div>
+          <a class="btn btn-light" href="https://retailzw.co.zw/community" target="_blank" rel="noopener">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>Open website
+          </a>
+        </div>
+
+        <article class="website-question-card" th:each="post : ${posts}">
+          <header>
+            <div class="member">
+              <div class="community-avatar" th:text="${post.initial()}">R</div>
+              <span>
+                <b th:text="${post.name}">Customer</b>
+                <small th:text="${post.shopTimeLabel()}">Shop</small>
+              </span>
+            </div>
+            <em th:class="${'status status-' + (post.status ?: 'open')}" th:text="${post.status}">open</em>
+          </header>
+          <h2 th:text="${post.category}">Question</h2>
+          <p th:text="${post.message}">Customer question</p>
+          <div class="website-post-meta">
+            <span><i class="fa-solid fa-thumbs-up"></i><b th:text="${post.safeLikes()}">0</b> likes</span>
+            <span><i class="fa-solid fa-reply"></i><b th:text="${post.safeReplies()}">0</b> replies</span>
+          </div>
+
+          <div class="website-answer-list" th:if="${!#lists.isEmpty(post.safeAnswers())}">
+            <div th:each="answer : ${post.safeAnswers()}">
+              <strong th:text="${answer.responder}">Retail Zim Support</strong>
+              <p th:text="${answer.answer}">Answer</p>
+              <small th:text="${answer.createdAt}">time</small>
+            </div>
+          </div>
+
+          <form class="website-answer-form" method="post" th:action="@{/admin/website-community/{id}/answer(id=${post.id})}">
+            <input type="hidden" name="responder" value="Retail Zim Support">
+            <select name="status">
+              <option value="answered">Mark answered</option>
+              <option value="solved">Mark solved</option>
+              <option value="featured">Mark featured</option>
+            </select>
+            <textarea name="answer" rows="3" required placeholder="Write the official answer that will appear on the public community page."></textarea>
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i>Publish Answer</button>
+          </form>
+        </article>
+
+        <div class="empty panel" th:if="${#lists.isEmpty(posts)}">
+          No website community posts were returned by the front website API.
+        </div>
+      </div>
+
+      <aside class="website-stats-side">
+        <section class="panel">
+          <div class="panel-head"><h2>Visits by Page</h2><span th:text="${selectedDays + ' days'}">30 days</span></div>
+          <div class="website-stat-list">
+            <article th:each="row : ${siteStats.byPage}">
+              <span th:text="${row.get('page')}">home</span>
+              <strong th:text="${row.get('visits')}">0</strong>
+            </article>
+            <div class="empty" th:if="${#lists.isEmpty(siteStats.byPage)}">No page visits yet.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><h2>Recent Visits</h2><span>Latest 25</span></div>
+          <div class="website-visit-list">
+            <article th:each="visit : ${siteStats.recent}">
+              <strong th:text="${visit.get('page')}">home</strong>
+              <span th:text="${visit.get('section') ?: 'page view'}">page view</span>
+              <small th:text="${visit.get('created_at')}">time</small>
+            </article>
+            <div class="empty" th:if="${#lists.isEmpty(siteStats.recent)}">No recent visits.</div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+</body>
+</html>

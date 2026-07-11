@@ -191,6 +191,19 @@ class ApiService {
 
   Future<List<Product>> refreshBranchProducts() => getProducts(page: 0);
 
+  Future<Map<String, dynamic>> importProductsExcel(String filePath) async {
+    await _ensureToken();
+    final request = http.MultipartRequest(
+      'POST',
+      await _uri('/api/products/import'),
+    );
+    request.headers['Authorization'] = 'Bearer $_token';
+    request.files.add(await http.MultipartFile.fromPath('file', filePath));
+    final streamed = await request.send().timeout(_timeout);
+    final response = await http.Response.fromStream(streamed);
+    return _decode(response);
+  }
+
   Future<List<Product>> refreshOpenShiftProducts() async {
     final session =
         await getActiveSession(keepLocalWhenServerHasNoSession: true);
@@ -342,6 +355,7 @@ class ApiService {
           if (session.branchId != null) 'branchId': session.branchId,
         };
       }
+      saleRequest = await _withResolvedItemPrices(saleRequest);
       final response = await http
           .post(
             await _uri('/api/sales'),
@@ -376,8 +390,8 @@ class ApiService {
 
   Future<Sale> _saveOffline(
       Map<String, dynamic> saleRequest, String uuid) async {
-    final request = await _withCachedSaleContext(
-        _saleRequestWithOfflineIdentity(saleRequest, uuid));
+    final request = await _withResolvedItemPrices(await _withCachedSaleContext(
+        _saleRequestWithOfflineIdentity(saleRequest, uuid)));
     final payload = _offlineSalePayload(request, uuid);
     await _offline.queueSale(request, uuid);
     await _offline.saveShiftSale(
@@ -735,8 +749,8 @@ class ApiService {
   Future<void> queueOfflineSale(Map<String, dynamic> saleData) async {
     final uuid =
         saleData['offlineReceiptNumber'] as String? ?? const Uuid().v4();
-    final request = await _withCachedSaleContext(
-        _saleRequestWithOfflineIdentity(saleData, uuid));
+    final request = await _withResolvedItemPrices(await _withCachedSaleContext(
+        _saleRequestWithOfflineIdentity(saleData, uuid)));
     await _offline.queueSale(request, uuid);
   }
 
@@ -793,6 +807,7 @@ class ApiService {
               fallbackBranchId != null)
             'branchId': fallbackBranchId,
         };
+        saleData = await _withResolvedItemPrices(saleData);
         final response = await http
             .post(
               await _uri('/api/sales'),
@@ -1188,6 +1203,54 @@ class ApiService {
       if (!hasBranch && cached?.branchId != null) 'branchId': cached!.branchId,
       if (!hasBranch && cached?.branchId == null && savedUser?.branchId != null)
         'branchId': savedUser!.branchId,
+    };
+  }
+
+  Future<Map<String, dynamic>> _withResolvedItemPrices(
+      Map<String, dynamic> saleRequest) async {
+    final rawItems = saleRequest['items'] as List<dynamic>? ?? const [];
+    if (rawItems.isEmpty) return saleRequest;
+
+    final cachedProducts = await _offline.getCachedProducts();
+    final productsById = <int, Map<String, dynamic>>{
+      for (final product in cachedProducts)
+        if (product['id'] is num) (product['id'] as num).toInt(): product,
+    };
+    final currency = saleRequest['currency']?.toString() ?? 'USD';
+
+    final items = rawItems.map((raw) {
+      if (raw is! Map) return raw;
+      final item = Map<String, dynamic>.from(raw);
+      final productId = (item['productId'] as num?)?.toInt();
+      final hasPrice =
+          item.containsKey('unitPrice') && item['unitPrice'] != null;
+      final quantity = _toDouble(item['quantity']);
+
+      if (!hasPrice) {
+        final product = productId == null ? null : productsById[productId];
+        final productPrice = product == null
+            ? null
+            : currency == 'ZWG'
+                ? product['sellingPriceZwg']
+                : product['sellingPriceUsd'];
+        final lineTotal = _toDouble(item['lineTotal']);
+        item['unitPrice'] = productPrice != null
+            ? _toDouble(productPrice)
+            : quantity > 0
+                ? lineTotal / quantity
+                : 0.0;
+      }
+
+      if (!item.containsKey('lineTotal') || item['lineTotal'] == null) {
+        item['lineTotal'] = quantity * _toDouble(item['unitPrice']) -
+            _toDouble(item['discountAmount']);
+      }
+      return item;
+    }).toList();
+
+    return {
+      ...saleRequest,
+      'items': items,
     };
   }
 

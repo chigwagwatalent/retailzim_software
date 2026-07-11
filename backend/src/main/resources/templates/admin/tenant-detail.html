@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{common/layout :: head(${tenant.companyName})}"></head>
 <body>
-<div class="app-shell">
+<div class="app-shell platform-shell">
   <aside th:replace="~{common/layout :: platformSidebar('tenants')}"></aside>
   <main class="main">
     <nav th:replace="~{common/layout :: platformTopbar(${tenant.companyName})}"></nav>

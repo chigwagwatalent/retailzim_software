@@ -1,44 +1,27 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RetailZW SaaS Admin</title>
-  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=24)}">
-  <link rel="stylesheet" th:href="@{/css/auth-clean.css(v=5)}">
-  <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
-  <script defer th:src="@{/js/retailzw.js(v=17)}"></script>
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=18)}">
 </head>
 <body class="auth-shell">
-  <div class="auth-preloader" data-auth-preloader>
-    <div class="auth-preloader-card">
-      <span class="auth-preloader-logo"><img th:src="@{/img/logo.png}" alt="RetailZW"></span>
-      <strong>RetailZW</strong>
-      <small>Loading platform portal</small>
-      <i></i>
-    </div>
-  </div>
-
   <form class="auth-card login-card" method="post" th:action="@{/auth/admin/login}" onsubmit="this.classList.add('is-loading')">
-    <div class="auth-logo-center"><img th:src="@{/img/logo.png}" alt="RetailZW"></div>
+    <div class="auth-logo-wrap">
+      <img class="auth-logo" th:src="@{/img/retail-zim-logo-transparent.png}" alt="Retail Zim">
+    </div>
     <div class="auth-copy">
-      <p>SaaS command centre</p>
       <h1>Platform sign in</h1>
-      <span>Manage tenants, subscriptions, billing and support.</span>
+      <span>Access your Retail Zim admin workspace.</span>
     </div>
     <div th:if="${param.error}" class="alert">Invalid platform login.</div>
-    <label class="auth-field">Username
-      <span class="auth-input-shell"><i class="fa-regular fa-user"></i><input name="username" autocomplete="username" required placeholder="platform admin"></span>
-    </label>
-    <label class="auth-field">Password
-      <span class="auth-input-shell">
-        <i class="fa-solid fa-key"></i>
-        <input id="adminLoginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Password">
-        <button class="auth-ghost-button" type="button" data-password-toggle="adminLoginPassword" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
-      </span>
-    </label>
+    <label>Username <input name="username" required></label>
+    <label>Password <input name="password" type="password" required></label>
     <button class="btn btn-primary auth-submit" type="submit"><span>Sign in</span><i></i></button>
-    <div class="auth-link-row"><a th:href="@{/auth/admin/forgot}">Forgot password?</a><a th:href="@{/auth/shop/login}">Shop portal</a></div>
+    <div class="auth-progress" aria-hidden="true"><span></span></div>
+    <small class="auth-loading-text">Signing in securely...</small>
+    <p class="auth-switch"><a th:href="@{/auth/admin/forgot}">Forgot password?</a></p>
   </form>
 </body>
 </html>

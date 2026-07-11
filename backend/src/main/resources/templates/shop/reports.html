@@ -276,6 +276,7 @@
         <table><tbody><tr th:each="entry : ${poByStatus}"><td th:text="${entry.key}">STATUS</td><td th:text="${entry.value}">0</td></tr></tbody></table>
       </div>
     </section>
+    <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>
 </div>
 </body>

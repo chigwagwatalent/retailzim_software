@@ -132,6 +132,11 @@ billing:
   reminder-cron: "0 0 8 * * *"
   grace-days: 3
 
+retailzim:
+  front-site:
+    base-url: ${RETAILZIM_FRONT_SITE_BASE_URL:https://retailzw.co.zw/}
+    api-key: ${RETAILZIM_FRONT_SITE_API_KEY:}
+
 logging:
   level:
     root: INFO

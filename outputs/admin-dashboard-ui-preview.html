@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retail Zim SaaS Dashboard Preview</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: #172033;
+      background: #f4f7fb;
+    }
+    .shell {
+      width: 1440px;
+      height: 900px;
+      position: relative;
+      display: grid;
+      grid-template-columns: 268px 1fr;
+      overflow: hidden;
+      background: #f4f7fb;
+    }
+    .sidebar {
+      background: #102344;
+      color: #dbeafe;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 64px;
+    }
+    .brand img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+      border-radius: 15px;
+      background: #fff;
+      padding: 5px;
+    }
+    .brand strong {
+      display: block;
+      color: #fff;
+      font-size: 22px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+    .brand span {
+      color: #9fb7db;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .nav-label {
+      color: #7894c3;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: 0 12px;
+    }
+    .nav {
+      display: grid;
+      gap: 7px;
+    }
+    .nav a {
+      height: 46px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      border-radius: 12px;
+      color: #c8d8f2;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .nav a.active {
+      background: #2563eb;
+      color: #fff;
+      box-shadow: 0 16px 34px rgba(37, 99, 235, .35);
+    }
+    .nav i {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(255,255,255,.1);
+      font-style: normal;
+      font-size: 14px;
+    }
+    .main {
+      display: grid;
+      grid-template-rows: 82px 1fr;
+      min-width: 0;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 0 34px;
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid #dde7f2;
+    }
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .icon-btn {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border: 1px solid #d2deec;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #1f3a64;
+      background: #fff;
+      font-weight: 900;
+    }
+    .icon-btn .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      min-width: 18px;
+      height: 18px;
+      border: 2px solid #fff;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: #ef4444;
+      font-size: 10px;
+      line-height: 1;
+    }
+    .crumb {
+      display: grid;
+      gap: 3px;
+    }
+    .crumb strong {
+      font-size: 15px;
+    }
+    .crumb span {
+      color: #74839a;
+      font-size: 12px;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .search {
+      width: 330px;
+      height: 44px;
+      display: grid;
+      grid-template-columns: 1fr 44px;
+      border: 1px solid #d2deec;
+      border-radius: 13px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .search span {
+      color: #7b8aa1;
+      display: flex;
+      align-items: center;
+      padding-left: 16px;
+      font-size: 14px;
+    }
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, #1fbad6, #2563eb);
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 12px 28px rgba(37,99,235,.26);
+    }
+    .content {
+      padding: 26px 34px 78px;
+      overflow: hidden;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .title-mark {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #e6fbff, #e9efff);
+      color: #2563eb;
+      font-size: 24px;
+      box-shadow: inset 0 0 0 1px #dbe7f6;
+    }
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+    .title p {
+      margin: 5px 0 0;
+      color: #64748b;
+      font-size: 15px;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #cfdced;
+      border-radius: 12px;
+      padding: 0 16px;
+      background: #fff;
+      color: #1f3a64;
+      font-weight: 850;
+      font-size: 14px;
+    }
+    .btn.primary {
+      border-color: #2563eb;
+      background: #2563eb;
+      color: #fff;
+      box-shadow: 0 15px 28px rgba(37, 99, 235, .24);
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .metric {
+      min-height: 126px;
+      border: 1px solid #dbe7f2;
+      border-radius: 18px;
+      background: #fff;
+      padding: 18px;
+      display: grid;
+      align-content: space-between;
+      box-shadow: 0 18px 44px rgba(15, 23, 42, .06);
+    }
+    .metric-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 850;
+    }
+    .metric-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-style: normal;
+      font-size: 18px;
+    }
+    .metric strong {
+      display: block;
+      color: #111827;
+      font-size: 38px;
+      line-height: 1;
+      margin-top: 16px;
+    }
+    .metric small {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .bar {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8eef7;
+      margin-top: 14px;
+    }
+    .bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+    }
+    .blue .metric-icon { background: #e5f0ff; color: #2563eb; }
+    .blue .bar span { width: 74%; background: #2563eb; }
+    .green .metric-icon { background: #dcfce7; color: #16a34a; }
+    .green .bar span { width: 82%; background: #16a34a; }
+    .rose .metric-icon { background: #ffe4e6; color: #e11d48; }
+    .rose .bar span { width: 18%; background: #e11d48; }
+    .amber .metric-icon { background: #fff4d7; color: #d97706; }
+    .amber .bar span { width: 61%; background: #d97706; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.55fr .85fr;
+      gap: 18px;
+    }
+    .panel {
+      border: 1px solid #dbe7f2;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 18px 44px rgba(15, 23, 42, .06);
+      overflow: hidden;
+    }
+    .panel-head {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom: 1px solid #e6edf6;
+    }
+    .panel-head strong {
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    .panel-head span {
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 750;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th {
+      height: 46px;
+      color: #64748b;
+      background: #f8fafc;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 0 18px;
+    }
+    td {
+      height: 58px;
+      border-top: 1px solid #edf2f7;
+      padding: 0 18px;
+      color: #26364f;
+      font-weight: 650;
+    }
+    .shop-name strong {
+      display: block;
+      color: #111827;
+      font-size: 14px;
+    }
+    .shop-name span {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .status {
+      display: inline-flex;
+      height: 28px;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0 10px;
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .side-panel {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+    .mini-stat {
+      border: 1px solid #e3ebf5;
+      border-radius: 14px;
+      padding: 16px;
+      background: #fbfdff;
+    }
+    .mini-stat span {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .mini-stat strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 24px;
+    }
+    .activity {
+      display: grid;
+      gap: 14px;
+    }
+    .activity-row {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    .dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #eef5ff;
+      color: #2563eb;
+      font-weight: 900;
+    }
+    .activity-row strong {
+      display: block;
+      color: #172033;
+      font-size: 13px;
+    }
+    .activity-row span {
+      color: #64748b;
+      font-size: 12px;
+    }
+    .footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 5;
+      height: 56px;
+      border-top: 1px solid #dbe7f2;
+      background: rgba(255,255,255,.94);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 34px 0 286px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 750;
+      box-shadow: 0 -14px 36px rgba(15, 23, 42, .07);
+    }
+    .footer::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 268px;
+      background: #102344;
+      border-right: 1px solid rgba(255,255,255,.08);
+    }
+    .footer::after {
+      content: "Retail Zim SaaS";
+      position: absolute;
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .footer strong {
+      color: #172033;
+    }
+    .footer nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 850;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="../backend/src/main/resources/static/img/retail-zim-logo-transparent.png" alt="Retail Zim">
+        <div>
+          <strong>Retail Zim</strong>
+          <span>SaaS Admin</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="nav-label">Platform</div>
+        <nav class="nav" aria-label="Platform navigation">
+          <a class="active" href="#"><i>●</i>Dashboard</a>
+          <a href="#"><i>▣</i>Tenant Shops</a>
+          <a href="#"><i>☎</i>Live Support</a>
+          <a href="#"><i>▤</i>Subscriptions</a>
+          <a href="#"><i>◎</i>Reports</a>
+          <a href="#"><i>⚙</i>Settings</a>
+        </nav>
+      </div>
+    </aside>
+
+    <section class="main">
+      <header class="topbar">
+        <div class="top-left">
+          <button class="icon-btn">‹</button>
+          <div class="crumb">
+            <strong>Admin workspace</strong>
+            <span>Platform overview and tenant operations</span>
+          </div>
+        </div>
+        <div class="top-actions">
+          <div class="search"><span>Search shops, plans, tickets</span><button class="icon-btn">⌕</button></div>
+          <button class="icon-btn">▦</button>
+          <button class="icon-btn">◐</button>
+          <button class="icon-btn">✉<span class="badge">2</span></button>
+          <button class="icon-btn">◔<span class="badge">4</span></button>
+          <div class="avatar">PA</div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="hero">
+          <div class="title">
+            <div class="title-mark">▣</div>
+            <div>
+              <h1>SaaS Dashboard</h1>
+              <p>Monitor shops, subscriptions, plans, and support from one command view.</p>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button class="btn">Export report</button>
+            <button class="btn primary">+ Register Shop</button>
+          </div>
+        </div>
+
+        <section class="metrics" aria-label="Platform metrics">
+          <article class="metric blue">
+            <div class="metric-head"><span>Total Shops</span><i class="metric-icon">▣</i></div>
+            <div><strong>3</strong><small>All tenants on platform</small><div class="bar"><span></span></div></div>
+          </article>
+          <article class="metric green">
+            <div class="metric-head"><span>Active Shops</span><i class="metric-icon">✓</i></div>
+            <div><strong>3</strong><small>Live subscriptions</small><div class="bar"><span></span></div></div>
+          </article>
+          <article class="metric rose">
+            <div class="metric-head"><span>Pending Shops</span><i class="metric-icon">!</i></div>
+            <div><strong>0</strong><small>Awaiting approval</small><div class="bar"><span></span></div></div>
+          </article>
+          <article class="metric amber">
+            <div class="metric-head"><span>Plans</span><i class="metric-icon">▤</i></div>
+            <div><strong>3</strong><small>Subscription packages</small><div class="bar"><span></span></div></div>
+          </article>
+        </section>
+
+        <section class="grid">
+          <div class="panel">
+            <div class="panel-head">
+              <strong>Recent Shops</strong>
+              <span>3 registered tenants</span>
+            </div>
+            <table>
+              <thead>
+                <tr><th>Shop</th><th>Email</th><th>Status</th><th>City</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="shop-name"><strong>Harare Demo Retail</strong><span>DEMO</span></td>
+                  <td>admin@demo.co.zw</td>
+                  <td><span class="status">ACTIVE</span></td>
+                  <td>Harare</td>
+                </tr>
+                <tr>
+                  <td class="shop-name"><strong>Midlands State University</strong><span>MIDLAN</span></td>
+                  <td>talentchigwagwa@gmail.com</td>
+                  <td><span class="status">ACTIVE</span></td>
+                  <td>Harare</td>
+                </tr>
+                <tr>
+                  <td class="shop-name"><strong>Connected Farmsgtvf</strong><span>CONNEC</span></td>
+                  <td>talentchigwftfvagwa@gmail.com</td>
+                  <td><span class="status">ACTIVE</span></td>
+                  <td>Harare</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <aside class="panel side-panel">
+            <div class="panel-head" style="height:auto;padding:0 0 14px;border:0;">
+              <strong>Today</strong>
+              <span>Platform activity</span>
+            </div>
+            <div class="mini-stat">
+              <span>Registered shops</span>
+              <strong>3</strong>
+            </div>
+            <div class="mini-stat">
+              <span>Packages</span>
+              <strong>3</strong>
+            </div>
+            <div class="activity">
+              <div class="activity-row"><div class="dot">✓</div><div><strong>All tenants active</strong><span>No shop waiting for approval</span></div></div>
+              <div class="activity-row"><div class="dot">▤</div><div><strong>Plans synced</strong><span>Subscription packages available</span></div></div>
+              <div class="activity-row"><div class="dot">☎</div><div><strong>Support stable</strong><span>No urgent platform ticket</span></div></div>
+            </div>
+          </aside>
+        </section>
+
+        <footer class="footer">
+          <span><strong>Retail Zim SaaS</strong> © 2026. Platform admin workspace.</span>
+          <nav aria-label="Footer links">
+            <a href="#">Support</a>
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+            <span>v1.0.0</span>
+          </nav>
+        </footer>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

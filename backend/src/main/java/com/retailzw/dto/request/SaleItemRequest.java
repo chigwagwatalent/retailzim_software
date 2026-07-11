@@ -13,7 +13,6 @@ public class SaleItemRequest {
     @Positive(message = "Quantity must be positive")
     private BigDecimal quantity;
 
-    @NotNull(message = "Unit price is required")
     private BigDecimal unitPrice;
 
     private BigDecimal discountAmount;

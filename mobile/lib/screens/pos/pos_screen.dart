@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,7 @@ class _PosScreenState extends State<PosScreen> {
   Timer? _barcodeDebounce;
   String? _notice;
   bool _loading = false;
+  bool _importing = false;
   bool _barcodeLookupRunning = false;
   String? _lastScannedBarcode;
   DateTime? _lastScanTime;
@@ -65,6 +67,43 @@ class _PosScreenState extends State<PosScreen> {
       if (mounted) context.read<AppProvider>().setOnline(false);
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _importProducts() async {
+    const excelType = XTypeGroup(
+      label: 'Excel workbooks',
+      extensions: <String>['xlsx'],
+    );
+    final file =
+        await openFile(acceptedTypeGroups: const <XTypeGroup>[excelType]);
+    if (file == null) return;
+    if (file.path.isEmpty) {
+      setState(() => _notice = 'Choose a saved .xlsx file from this device.');
+      return;
+    }
+
+    setState(() {
+      _importing = true;
+      _notice = null;
+    });
+    try {
+      final result = await _api.importProductsExcel(file.path);
+      await _loadProducts();
+      if (!mounted) return;
+      final created = (result['createdProducts'] as num?)?.toInt() ?? 0;
+      final updated = (result['updatedProducts'] as num?)?.toInt() ?? 0;
+      final stock = (result['stockRowsUpdated'] as num?)?.toInt() ?? 0;
+      final skipped = (result['skippedRows'] as num?)?.toInt() ?? 0;
+      setState(() {
+        _notice =
+            'Product import complete: $created created, $updated updated, $stock stock rows updated${skipped > 0 ? ', $skipped skipped' : ''}.';
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _notice = 'Product import failed: $e');
+    } finally {
+      if (mounted) setState(() => _importing = false);
     }
   }
 
@@ -323,6 +362,30 @@ class _PosScreenState extends State<PosScreen> {
                             },
                           )
                         : null,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Tooltip(
+                message: 'Import products from Excel',
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: (_loading || _importing) ? null : _importProducts,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0F766E),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: _importing
+                        ? const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
+                          )
+                        : const Icon(Icons.file_upload_rounded,
+                            color: Colors.white, size: 20),
                   ),
                 ),
               ),

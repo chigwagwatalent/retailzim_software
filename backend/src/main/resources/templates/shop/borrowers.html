@@ -114,6 +114,7 @@
       </table>
       <div class="empty" th:if="${#lists.isEmpty(borrowerTransactions.get(b.id))}">No account transactions yet.</div>
     </div></div>
+    <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>
 </div>
 </body>

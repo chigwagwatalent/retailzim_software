@@ -2,16 +2,20 @@ package com.retailzw.controller.api;
 
 import com.retailzw.dto.request.*;
 import com.retailzw.dto.response.ApiResponse;
+import com.retailzw.dto.response.ProductImportResult;
 import com.retailzw.model.*;
 import com.retailzw.repository.*;
 import com.retailzw.service.CurrentUserService;
 import com.retailzw.service.CreditAndChangeService;
 import com.retailzw.service.NotificationService;
+import com.retailzw.service.ProductImportService;
 import com.retailzw.service.RetailOperationsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -35,6 +39,7 @@ public class RetailApiController {
     private final NotificationRepository notifications;
     private final NotificationService notificationService;
     private final CreditAndChangeService creditAndChangeService;
+    private final ProductImportService productImportService;
 
     @GetMapping("/me")
     public ApiResponse<Map<String, Object>> me() {
@@ -89,6 +94,14 @@ public class RetailApiController {
     public ApiResponse<Product> createProduct(@Valid @RequestBody CreateProductRequest request) {
         request.setBranchId(selectedBranch(request.getBranchId()));
         return ApiResponse.success("Product created", operations.createProduct(current.tenantId(), request, current.userId()));
+    }
+
+    @PostMapping(value = "/products/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<ProductImportResult> importProducts(@RequestParam("file") MultipartFile file,
+                                                          @RequestParam(required = false) Long branchId) {
+        Long targetBranch = selectedBranch(branchId);
+        ProductImportResult result = productImportService.importProducts(current.tenantId(), targetBranch, current.userId(), file);
+        return ApiResponse.success("Products imported", result);
     }
 
     @GetMapping("/categories")

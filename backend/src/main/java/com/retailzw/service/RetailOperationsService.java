@@ -530,14 +530,15 @@ public class RetailOperationsService {
                     throw new IllegalArgumentException(product.getName() + " has only " + available + " available at this branch.");
                 }
             }
-            BigDecimal unitPrice = CurrencyCode.ZWG.equals(request.getCurrency()) ? product.getSellingPriceZwg() : product.getSellingPriceUsd();
+            BigDecimal unitPrice = nvl(CurrencyCode.ZWG.equals(request.getCurrency()) ? product.getSellingPriceZwg() : product.getSellingPriceUsd());
             if (line.getUnitPrice() != null) unitPrice = line.getUnitPrice();
             BigDecimal discount = nvl(line.getDiscountAmount());
             BigDecimal lineSubtotal = unitPrice.multiply(quantity).subtract(discount).setScale(2, RoundingMode.HALF_UP);
             BigDecimal lineTax = Boolean.TRUE.equals(product.getIsTaxable()) ? lineSubtotal.multiply(nvl(product.getTaxRate())).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
             subtotal = subtotal.add(lineSubtotal);
             tax = tax.add(lineTax);
-            BigDecimal lineCost = (CurrencyCode.ZWG.equals(request.getCurrency()) ? product.getCostPriceZwg() : product.getCostPriceUsd()).multiply(quantity);
+            BigDecimal costPrice = nvl(CurrencyCode.ZWG.equals(request.getCurrency()) ? product.getCostPriceZwg() : product.getCostPriceUsd());
+            BigDecimal lineCost = costPrice.multiply(quantity);
             cost = cost.add(lineCost);
 
             SaleItem item = SaleItem.builder()
@@ -548,7 +549,7 @@ public class RetailOperationsService {
                     .productBarcode(product.getBarcode())
                     .quantity(quantity)
                     .unitPrice(unitPrice)
-                    .costPrice(CurrencyCode.ZWG.equals(request.getCurrency()) ? product.getCostPriceZwg() : product.getCostPriceUsd())
+                    .costPrice(costPrice)
                     .discountAmount(discount)
                     .taxRate(product.getTaxRate())
                     .taxAmount(lineTax)

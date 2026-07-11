@@ -24,6 +24,10 @@ class _CashScreenState extends State<CashScreen> {
   final ApiService _api = ApiService();
   bool _busy = false;
   String? _message;
+  static const double _thermalPaperWidthMm = 80;
+  static const double _thermalLeftMarginMm = 0;
+  static const double _thermalRightMarginMm = 18;
+  static const double _thermalVerticalMarginMm = 4;
 
   @override
   void initState() {
@@ -312,12 +316,10 @@ class _CashScreenState extends State<CashScreen> {
                                           color: AppColors.primaryBlue,
                                           fontWeight: FontWeight.w900)),
                                   onTap: () async {
-                                    final confirmed =
-                                        await showDialog<bool>(
+                                    final confirmed = await showDialog<bool>(
                                       context: ctx,
                                       builder: (dialogCtx) => AlertDialog(
-                                        title:
-                                            const Text('Confirm collection'),
+                                        title: const Text('Confirm collection'),
                                         content: Text(
                                             'Pay ${formatCurrency(record.amount, record.currency)} to ${record.customerName}?'),
                                         actions: [
@@ -370,34 +372,61 @@ class _CashScreenState extends State<CashScreen> {
     }
     pdf.addPage(
       pw.Page(
-        pageFormat: PdfPageFormat.roll80,
+        pageFormat: _shiftReportFormat(productTotals.length),
+        margin: pw.EdgeInsets.fromLTRB(
+          _thermalLeftMarginMm * PdfPageFormat.mm,
+          _thermalVerticalMarginMm * PdfPageFormat.mm,
+          _thermalRightMarginMm * PdfPageFormat.mm,
+          _thermalVerticalMarginMm * PdfPageFormat.mm,
+        ),
         build: (_) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text('RetailZW Shift Report',
                 style:
                     pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-            pw.Text('Shift #${session.id}'),
-            pw.Text('Printed: ${DateTime.now()}'),
+            pw.Text('Shift #${session.id}',
+                style: const pw.TextStyle(fontSize: 10)),
+            pw.Text('Printed: ${DateTime.now()}',
+                style: const pw.TextStyle(fontSize: 10)),
             pw.Divider(),
-            pw.Text('Sales count: ${sales.length}'),
-            pw.Text('USD sales: ${usd.toStringAsFixed(2)}'),
-            pw.Text('ZWG sales: ${zwg.toStringAsFixed(2)}'),
+            pw.Text('Sales count: ${sales.length}',
+                style: const pw.TextStyle(fontSize: 10)),
+            pw.Text('USD sales: ${usd.toStringAsFixed(2)}',
+                style: const pw.TextStyle(fontSize: 10)),
+            pw.Text('ZWG sales: ${zwg.toStringAsFixed(2)}',
+                style: const pw.TextStyle(fontSize: 10)),
             pw.Divider(),
             pw.Text('Goods sold',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-            ...productTotals.entries
-                .map((e) => pw.Text('${e.key}: ${e.value.toStringAsFixed(0)}')),
+                style:
+                    pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold)),
+            ...productTotals.entries.map((e) => pw.Text(
+                '${e.key}: ${e.value.toStringAsFixed(0)}',
+                style: const pw.TextStyle(fontSize: 9))),
             pw.Divider(),
-            pw.Text('Expected register'),
-            pw.Text(
-                'USD ${(session.openingFloatUsd + usd).toStringAsFixed(2)}'),
-            pw.Text(
-                'ZWG ${(session.openingFloatZwg + zwg).toStringAsFixed(2)}'),
+            pw.Text('Expected register',
+                style:
+                    pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold)),
+            pw.Text('USD ${(session.openingFloatUsd + usd).toStringAsFixed(2)}',
+                style: const pw.TextStyle(fontSize: 10)),
+            pw.Text('ZWG ${(session.openingFloatZwg + zwg).toStringAsFixed(2)}',
+                style: const pw.TextStyle(fontSize: 10)),
           ],
         ),
       ),
     );
-    await Printing.layoutPdf(onLayout: (_) async => pdf.save());
+    await Printing.layoutPdf(
+      format: _shiftReportFormat(productTotals.length),
+      onLayout: (_) async => pdf.save(),
+    );
+  }
+
+  PdfPageFormat _shiftReportFormat(int productCount) {
+    final heightMm = (140 + (productCount * 6)).clamp(180, 900).toDouble();
+    return PdfPageFormat(
+      _thermalPaperWidthMm * PdfPageFormat.mm,
+      heightMm * PdfPageFormat.mm,
+      marginAll: 0,
+    );
   }
 }

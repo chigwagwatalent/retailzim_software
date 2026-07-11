@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retail Zim System Showcase Assets</title>
+  <style>
+    :root {
+      --blue: #1565c0;
+      --yellow: #ffd600;
+      --bg: #f4f8fd;
+      --ink: #1a1a2e;
+      --muted: #6b7280;
+      --line: #dde5ef;
+      --green: #0f766e;
+      --red: #c62828;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    .asset {
+      display: none;
+      overflow: hidden;
+      background: var(--bg);
+      border: 1px solid #cdd9e8;
+      box-shadow: 0 22px 64px rgba(22, 43, 76, .18);
+    }
+    body[data-type="desktop"] .desktop,
+    body[data-type="mobile"] .mobile,
+    body[data-type="admin"] .admin { display: block; }
+
+    .desktop {
+      width: 1180px;
+      height: 650px;
+      border-radius: 28px;
+    }
+    .desktop-shell {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 182px 1fr 500px;
+    }
+    .categories {
+      padding: 18px 14px 12px;
+      background: #f8fafc;
+      border-right: 1px solid var(--line);
+    }
+    .categories h3,
+    .cart h3 {
+      margin: 0 0 14px;
+      color: var(--ink);
+      font-size: 17px;
+      font-weight: 900;
+    }
+    .cat {
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 9px;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 850;
+    }
+    .cat.active {
+      color: #fff;
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+    .cat small {
+      display: block;
+      margin-top: 2px;
+      color: inherit;
+      opacity: .72;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .shortcut {
+      margin-top: 120px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .products {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      min-width: 0;
+      background: var(--bg);
+    }
+    .searchbar {
+      display: grid;
+      grid-template-columns: 1fr 44px 44px;
+      gap: 10px;
+      padding: 16px 18px 8px;
+    }
+    .search {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      border: 1px solid #e0e7ef;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 900;
+    }
+    .icon-btn.green { background: var(--green); }
+    .icon-btn.blue { background: var(--blue); }
+    .notice {
+      margin: 0 18px 8px;
+      padding: 10px 14px;
+      border: 1px solid #ffd65c;
+      border-radius: 10px;
+      background: #fff8e1;
+      color: #6b4e00;
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 18px 18px;
+    }
+    .product {
+      min-height: 124px;
+      padding: 13px;
+      border: 1px solid #e0e7ef;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 3px 10px rgba(26, 42, 74, .05);
+    }
+    .product b {
+      display: block;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.2;
+    }
+    .product small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .product strong {
+      display: block;
+      margin-top: 17px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .stock {
+      margin-top: 8px;
+      display: inline-flex;
+      padding: 4px 7px;
+      border-radius: 20px;
+      background: rgba(46,125,50,.12);
+      color: #2e7d32;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .cart {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background: #fff;
+      border-left: 1px solid var(--line);
+    }
+    .cart-head {
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 16px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .cart-head h3 { margin: 0; }
+    .badge {
+      display: inline-grid;
+      place-items: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 7px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .currency {
+      margin-left: auto;
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 8px;
+      background: #f0f4f8;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .currency span:first-child {
+      padding: 5px 8px;
+      border-radius: 6px;
+      color: #fff;
+      background: var(--blue);
+    }
+    .currency span:last-child { padding: 5px 8px; }
+    .cart-list {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 14px 16px;
+    }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #e0e7ef;
+      border-radius: 12px;
+      background: #f8fbff;
+    }
+    .cart-item b,
+    .cart-item small { display: block; }
+    .cart-item b { font-size: 13px; }
+    .cart-item small {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .qty {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .cart-total {
+      padding: 16px;
+      border-top: 1px solid #edf2f7;
+    }
+    .total-box {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 12px;
+      color: #fff;
+      background: var(--blue);
+    }
+    .total-box span { font-size: 11px; font-weight: 800; }
+    .total-box strong { font-size: 23px; }
+    .pay {
+      width: 100%;
+      margin-top: 12px;
+      min-height: 52px;
+      border: 0;
+      border-radius: 10px;
+      color: var(--blue);
+      background: var(--yellow);
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    .mobile {
+      width: 360px;
+      height: 760px;
+      border-radius: 36px;
+      border-width: 9px;
+      border-color: #0b1f35;
+      background: var(--bg);
+    }
+    .mobile-shell {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto auto;
+    }
+    .mobile-appbar {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px;
+      color: #fff;
+      background: var(--blue);
+    }
+    .mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: var(--blue);
+      background: var(--yellow);
+      font-size: 11px;
+      font-weight: 950;
+    }
+    .mobile-appbar h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .mobile-sync {
+      margin-left: auto;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.15);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .mobile .searchbar {
+      grid-template-columns: 1fr 42px;
+      padding: 12px;
+    }
+    .mobile .notice { display: none; }
+    .mobile .grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+      padding: 0 12px 12px;
+    }
+    .mobile .product {
+      min-height: 108px;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .mobile-cart {
+      padding: 12px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+    .mobile-cart h3 {
+      margin: 0 0 9px;
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .mobile-cart .cart-list {
+      padding: 0;
+      gap: 7px;
+    }
+    .mobile-cart .cart-item {
+      padding: 9px;
+      border-radius: 10px;
+    }
+    .mobile-cart .cart-total { padding: 9px 0 0; }
+    .mobile-cart .pay { min-height: 46px; }
+    .bottom-nav {
+      height: 62px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+    .bottom-nav span {
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .bottom-nav span:first-child { color: var(--blue); }
+
+    .admin {
+      width: 1180px;
+      height: 720px;
+      border-radius: 26px;
+      background: #f4f7fb;
+    }
+    .admin-shell {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 268px 1fr;
+    }
+    .admin-side {
+      padding: 24px 18px;
+      color: #dbeafe;
+      background: #102344;
+    }
+    .side-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .side-logo {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+    }
+    .side-brand strong { display: block; color: #fff; font-size: 22px; line-height: 1.05; }
+    .side-brand small { display: block; margin-top: 3px; color: #9fb7db; font-size: 11px; font-weight: 900; }
+    .side-link {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 7px;
+      padding: 0 14px;
+      border-radius: 12px;
+      color: #c8d8f2;
+      font-weight: 800;
+    }
+    .side-link.active { color: #fff; background: #2563eb; }
+    .admin-main { padding: 0 34px 34px; }
+    .admin-top {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 -34px 26px;
+      padding: 0 34px;
+      border-bottom: 1px solid #dbe7f2;
+      background: #fff;
+    }
+    .admin-title h1 { margin: 0; font-size: 31px; line-height: 1.08; }
+    .admin-title p { margin: 5px 0 0; color: #64748b; }
+    .admin-actions { display: flex; gap: 10px; }
+    .admin-btn {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 16px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid #cfdced;
+      color: #1f3a64;
+      font-weight: 850;
+    }
+    .admin-btn.primary { color: #fff; background: #2563eb; border-color: #2563eb; }
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .admin-card {
+      min-height: 116px;
+      display: grid;
+      align-content: space-between;
+      padding: 18px;
+      border: 1px solid #dbe7f2;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 18px 44px rgba(15,23,42,.06);
+    }
+    .admin-card span { color: #64748b; font-size: 13px; font-weight: 850; }
+    .admin-card strong { font-size: 38px; line-height: 1; }
+    .bar { height: 8px; border-radius: 999px; background: #e8eef7; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: #2563eb; }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1.55fr .85fr;
+      gap: 18px;
+    }
+    .table-panel {
+      overflow: hidden;
+      border: 1px solid #dbe7f2;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 18px 44px rgba(15,23,42,.06);
+    }
+    .panel-head {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom: 1px solid #e6edf6;
+    }
+    .panel-head h2 { margin: 0; font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { height: 42px; padding: 0 18px; color: #64748b; background: #f8fafc; font-size: 12px; text-align: left; }
+    td { height: 54px; padding: 0 18px; border-top: 1px solid #e6edf6; font-size: 14px; font-weight: 650; }
+    .status { padding: 5px 8px; border-radius: 999px; color: #15803d; background: #dcfce7; font-size: 11px; font-weight: 900; }
+    .today { display: grid; gap: 12px; padding: 16px; }
+    .mini { padding: 13px 16px; border: 1px solid #e3ebf5; border-radius: 14px; background: #fbfdff; }
+    .mini span { color: #64748b; font-size: 12px; font-weight: 900; }
+    .mini strong { display: block; margin-top: 6px; font-size: 22px; }
+  </style>
+</head>
+<body>
+  <section class="asset desktop">
+    <div class="desktop-shell">
+      <aside class="categories">
+        <h3>Categories</h3>
+        <div class="cat active"><span>All products<small>12 items</small></span><b>12</b></div>
+        <div class="cat"><span>Grocery<small>6 items</small></span><b>6</b></div>
+        <div class="cat"><span>Bakery<small>3 items</small></span><b>3</b></div>
+        <div class="cat"><span>Household<small>3 items</small></span><b>3</b></div>
+        <div class="shortcut">F2 search<br>F4 checkout<br>Esc clear search</div>
+      </aside>
+      <main class="products">
+        <div class="searchbar"><div class="search">Search products, SKU, barcode...</div><div class="icon-btn green">Up</div><div class="icon-btn blue">Sync</div></div>
+        <div class="notice">Product import complete: 14 created, 8 updated, 22 stock rows updated.</div>
+        <div class="grid">
+          <div class="product"><b>Bread</b><small>Bakery</small><strong>$1.00</strong><span class="stock">In stock 24</span></div>
+          <div class="product"><b>Milk 1L</b><small>Dairy</small><strong>$1.35</strong><span class="stock">In stock 18</span></div>
+          <div class="product"><b>Cooking Oil</b><small>Grocery</small><strong>$3.50</strong><span class="stock">In stock 10</span></div>
+          <div class="product"><b>Rice 2kg</b><small>Staples</small><strong>$2.25</strong><span class="stock">In stock 30</span></div>
+          <div class="product"><b>Sugar 2kg</b><small>Staples</small><strong>$1.80</strong><span class="stock">In stock 16</span></div>
+          <div class="product"><b>Soap</b><small>Household</small><strong>$0.75</strong><span class="stock">In stock 40</span></div>
+          <div class="product"><b>Maize Meal</b><small>Staples</small><strong>$4.20</strong><span class="stock">In stock 11</span></div>
+          <div class="product"><b>Eggs 30</b><small>Protein</small><strong>$5.50</strong><span class="stock">In stock 9</span></div>
+        </div>
+      </main>
+      <aside class="cart">
+        <div class="cart-head"><h3>Current Sale</h3><span class="badge">5</span><div class="currency"><span>USD</span><span>ZWG</span></div></div>
+        <div class="cart-list">
+          <div class="cart-item"><span><b>Bread</b><small>$1.00 each</small></span><span class="qty">- 1 +</span></div>
+          <div class="cart-item"><span><b>Milk 1L</b><small>$1.35 each</small></span><span class="qty">- 2 +</span></div>
+          <div class="cart-item"><span><b>Cooking Oil</b><small>$3.50 each</small></span><span class="qty">- 1 +</span></div>
+        </div>
+        <div class="cart-total"><div class="total-box"><span>Total due</span><strong>$7.20</strong></div><button class="pay">Checkout (F4)</button></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="asset mobile">
+    <div class="mobile-shell">
+      <div class="mobile-appbar"><div class="mark">RZ</div><h2>RetailZW POS</h2><span class="mobile-sync">Online</span></div>
+      <div class="searchbar"><div class="search">Search products...</div><div class="icon-btn blue">Go</div></div>
+      <div class="grid">
+        <div class="product"><b>Bread</b><small>Bakery</small><strong>$1.00</strong></div>
+        <div class="product"><b>Milk 1L</b><small>Dairy</small><strong>$1.35</strong></div>
+        <div class="product"><b>Cooking Oil</b><small>Grocery</small><strong>$3.50</strong></div>
+        <div class="product"><b>Rice 2kg</b><small>Staples</small><strong>$2.25</strong></div>
+      </div>
+      <div class="mobile-cart">
+        <h3>Current Sale</h3>
+        <div class="cart-list">
+          <div class="cart-item"><span><b>Bread</b><small>$1.00</small></span><span class="qty">1</span></div>
+          <div class="cart-item"><span><b>Cooking Oil</b><small>$3.50</small></span><span class="qty">1</span></div>
+        </div>
+        <div class="cart-total"><div class="total-box"><span>Total due</span><strong>$4.50</strong></div><button class="pay">Pay Now</button></div>
+      </div>
+      <nav class="bottom-nav"><span>P<br>POS</span><span>S<br>Sales</span><span>C<br>Cash</span><span>M<br>More</span></nav>
+    </div>
+  </section>
+
+  <section class="asset admin">
+    <div class="admin-shell">
+      <aside class="admin-side">
+        <div class="side-brand"><img class="side-logo" src="../frontwebsite/img/retailzim-logo-clean.png"><span><strong>Retail Zim</strong><small>SaaS</small></span></div>
+        <div class="side-link active">Dashboard</div>
+        <div class="side-link">Tenant Shops</div>
+        <div class="side-link">Live Support</div>
+        <div class="side-link">Subscriptions</div>
+      </aside>
+      <main class="admin-main">
+        <div class="admin-top"><div class="admin-title"><h1>SaaS Dashboard</h1><p>Monitor shops, subscriptions, plans, and support from one command view.</p></div><div class="admin-actions"><span class="admin-btn">Export report</span><span class="admin-btn primary">+ Register Shop</span></div></div>
+        <div class="metric-row">
+          <div class="admin-card"><span>Total Shops</span><strong>3</strong><small>All tenants on platform</small><div class="bar"><i style="width:74%"></i></div></div>
+          <div class="admin-card"><span>Active Shops</span><strong>3</strong><small>Live subscriptions</small><div class="bar"><i style="width:82%;background:#16a34a"></i></div></div>
+          <div class="admin-card"><span>Pending Shops</span><strong>0</strong><small>Awaiting approval</small><div class="bar"><i style="width:18%;background:#e11d48"></i></div></div>
+          <div class="admin-card"><span>Plans</span><strong>3</strong><small>Subscription packages</small><div class="bar"><i style="width:61%;background:#d97706"></i></div></div>
+        </div>
+        <div class="admin-grid">
+          <section class="table-panel"><div class="panel-head"><h2>Recent Shops</h2><span>3 registered tenants</span></div><table><thead><tr><th>Shop</th><th>Email</th><th>Status</th><th>City</th></tr></thead><tbody><tr><td>Harare Demo Retail</td><td>admin@demo.co.zw</td><td><span class="status">ACTIVE</span></td><td>Harare</td></tr><tr><td>Midlands State University</td><td>talentchigwagwa@gmail.com</td><td><span class="status">ACTIVE</span></td><td>Harare</td></tr><tr><td>Connected Farm</td><td>support@retailzw.co.zw</td><td><span class="status">ACTIVE</span></td><td>Kwekwe</td></tr></tbody></table></section>
+          <aside class="table-panel today"><div class="panel-head"><h2>Today</h2><span>Platform activity</span></div><div class="mini"><span>Registered Shops</span><strong>3</strong></div><div class="mini"><span>Packages</span><strong>3</strong></div><div class="mini"><span>Support</span><strong>Stable</strong></div></aside>
+        </div>
+      </main>
+    </div>
+  </section>
+  <script>
+    const type = new URLSearchParams(location.search).get('type') || 'desktop';
+    document.body.dataset.type = type;
+  </script>
+</body>
+</html>
