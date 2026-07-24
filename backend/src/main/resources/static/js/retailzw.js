@@ -42,6 +42,8 @@ document.querySelectorAll('.theme-toggle i').forEach((icon) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   setupSignupWizard();
+  setupShiftCloseForms();
+  openRequestedModal();
   enhanceForms();
 });
 
@@ -142,6 +144,75 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function openRequestedModal() {
+  const trigger = document.querySelector('[data-auto-open-modal]');
+  if (!trigger?.dataset.autoOpenModal) return;
+  if (document.querySelector(trigger.dataset.autoOpenModal)) {
+    window.location.hash = trigger.dataset.autoOpenModal;
+  }
+}
+
+function setupShiftCloseForms() {
+  document.querySelectorAll('[data-shift-close-form]').forEach((form) => {
+    if (form.dataset.shiftCloseReady === 'true') return;
+    form.dataset.shiftCloseReady = 'true';
+
+    const expectedUsd = parseMoney(form.dataset.expectedUsd);
+    const expectedZwg = parseMoney(form.dataset.expectedZwg);
+    const actualUsd = form.querySelector('input[name="actualUsd"]');
+    const actualZwg = form.querySelector('input[name="actualZwg"]');
+    const varianceUsd = form.querySelector('[data-variance-usd]');
+    const varianceZwg = form.querySelector('[data-variance-zwg]');
+    const reason = form.querySelector('[data-variance-reason]');
+    const note = form.querySelector('[data-variance-note]');
+    const varianceCards = Array.from(form.querySelectorAll('[data-variance-summary]'));
+
+    const refresh = () => {
+      const usd = parseMoney(actualUsd?.value) - expectedUsd;
+      const zwg = parseMoney(actualZwg?.value) - expectedZwg;
+      const hasVariance = Math.abs(usd) > 0.009 || Math.abs(zwg) > 0.009;
+
+      if (varianceUsd) varianceUsd.textContent = formatMoney('USD', usd);
+      if (varianceZwg) varianceZwg.textContent = formatMoney('ZWG', zwg);
+      varianceCards.forEach((card) => {
+        const value = card.contains(varianceUsd) ? usd : zwg;
+        card.classList.toggle('is-positive', value > 0.009);
+        card.classList.toggle('is-negative', value < -0.009);
+      });
+      if (reason) {
+        reason.required = hasVariance;
+        reason.setAttribute('aria-required', String(hasVariance));
+      }
+      if (note) note.hidden = !hasVariance;
+    };
+
+    actualUsd?.addEventListener('input', refresh);
+    actualZwg?.addEventListener('input', refresh);
+    form.addEventListener('submit', (event) => {
+      refresh();
+      const needsReason = reason?.required;
+      if (needsReason && !reason.value.trim()) {
+        event.preventDefault();
+        event.stopPropagation();
+        reason.focus();
+      }
+    });
+    refresh();
+  });
+}
+
+function parseMoney(value) {
+  const parsed = Number.parseFloat(String(value ?? '0').replace(',', '.'));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatMoney(currency, value) {
+  return `${currency} ${value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`;
+}
+
 function enhanceForms() {
   document.querySelectorAll('form').forEach((form) => {
     if (form.dataset.validationReady === 'true') return;
@@ -186,7 +257,45 @@ function setupSignupWizard() {
     const next = form.querySelector('[data-wizard-next]');
     const submit = form.querySelector('[data-wizard-submit]');
     const login = form.querySelector('[data-wizard-login]');
+    const moduleInputs = Array.from(form.querySelectorAll('input[name="modules"]'));
+    const planInputs = Array.from(form.querySelectorAll('input[name="planId"]'));
+    const businessMode = form.querySelector('[name="businessMode"]');
     let current = 0;
+
+    const syncModuleSelection = (changedModule) => {
+      const planCard = form.querySelector('input[name="planId"]:checked')?.closest('.signup-plan-card');
+      const allowed = new Set((planCard?.dataset.allowedModules || 'SHOP_MODULE')
+        .split(',').map((value) => value.trim()).filter(Boolean));
+      const allowsMixed = planCard?.dataset.allowMixed === 'true' && allowed.size > 1;
+      const mixedOption = businessMode?.querySelector('option[value="MIXED_MODULE"]');
+
+      if (mixedOption) mixedOption.disabled = !allowsMixed;
+      if (!allowsMixed && businessMode?.value === 'MIXED_MODULE') businessMode.value = 'SINGLE_MODULE';
+
+      moduleInputs.forEach((input) => {
+        const available = allowed.has(input.value);
+        input.disabled = !available;
+        input.closest('.signup-module-card')?.classList.toggle('is-unavailable', !available);
+        if (!available) input.checked = false;
+      });
+
+      if (businessMode?.value === 'SINGLE_MODULE') {
+        const checked = moduleInputs.filter((input) => input.checked && !input.disabled);
+        const keep = changedModule?.checked && !changedModule.disabled ? changedModule : checked[0];
+        checked.forEach((input) => { input.checked = input === keep; });
+      }
+
+      if (!moduleInputs.some((input) => input.checked && !input.disabled)) {
+        const fallback = moduleInputs.find((input) => input.value === 'SHOP_MODULE' && !input.disabled)
+          || moduleInputs.find((input) => !input.disabled);
+        if (fallback) fallback.checked = true;
+      }
+      updateSignupReview(form);
+    };
+
+    planInputs.forEach((input) => input.addEventListener('change', () => syncModuleSelection()));
+    businessMode?.addEventListener('change', () => syncModuleSelection());
+    moduleInputs.forEach((input) => input.addEventListener('change', () => syncModuleSelection(input)));
 
     const setStep = (index) => {
       current = Math.max(0, Math.min(index, panels.length - 1));
@@ -213,6 +322,12 @@ function setupSignupWizard() {
 
     const validatePanel = () => {
       clearFormAlert(form);
+      if (panels[current].querySelector('input[name="modules"]')
+          && !moduleInputs.some((input) => input.checked && !input.disabled)) {
+        showFormAlert(form, 'Select at least one business module.');
+        moduleInputs.find((input) => !input.disabled)?.focus({ preventScroll: true });
+        return false;
+      }
       const fields = Array.from(panels[current].querySelectorAll('input, select, textarea'));
       const radioGroups = new Set();
       let firstInvalid = null;
@@ -268,6 +383,7 @@ function setupSignupWizard() {
       }
     }, true);
 
+    syncModuleSelection();
     setStep(0);
   });
 }
@@ -453,3 +569,24 @@ function cssName(value) {
   if (window.CSS && CSS.escape) return CSS.escape(value || '');
   return String(value || '').replace(/["\\]/g, '\\$&');
 }
+
+document.addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-export-table]');
+  if (!trigger) return;
+  const table = document.querySelector(trigger.dataset.exportTable);
+  if (!table) return;
+
+  const csv = Array.from(table.rows).map((row) => Array.from(row.cells).map((cell) => {
+    const value = cell.innerText.replace(/\s+/g, ' ').trim().replace(/"/g, '""');
+    return `"${value}"`;
+  }).join(',')).join('\r\n');
+  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = trigger.dataset.exportName || 'retailzw-report.csv';
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+});

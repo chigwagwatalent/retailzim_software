@@ -6,61 +6,203 @@
   <aside th:replace="~{common/layout :: shopSidebar('change')}"></aside>
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Held Change')}"></nav>
-    <section class="page-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-coins"></i></div>
-        <div><p>Customer cash custody,</p><h1>Held Change</h1></div>
-      </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-hourglass-half"></i><strong th:text="${openChangeCount}">0</strong><span>Awaiting Collection</span></div>
-        <div><i class="fa-solid fa-receipt"></i><strong th:text="${changePage.totalElements}">0</strong><span>Filtered Records</span></div>
+
+    <section class="change-page">
+      <section class="change-hero">
+        <div class="change-hero-title">
+          <span class="change-hero-icon"><i class="fa-solid fa-coins"></i></span>
+          <div>
+            <p>Customer cash custody</p>
+            <h1>Held Change</h1>
+            <small>Track customer balances, payouts, and every change collection from one clean register.</small>
+          </div>
+        </div>
+        <div class="change-hero-actions">
+          <a class="btn btn-blue" href="#change-filter-panel">
+            <i class="fa-solid fa-magnifying-glass"></i>Find Collection
+          </a>
+        </div>
+      </section>
+
+      <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+      <section class="change-kpi-grid">
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-hourglass-half"></i></span>
+          <div>
+            <small>Awaiting Collection</small>
+            <strong th:text="${openChangeCount}">0</strong>
+            <em>Customers to pay out</em>
+          </div>
+        </article>
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-dollar-sign"></i></span>
+          <div>
+            <small>Total Held USD</small>
+            <strong th:text="${'USD ' + #numbers.formatDecimal(heldChangeUsd ?: 0, 1, 2)}">USD 0.00</strong>
+            <em>Open liability</em>
+          </div>
+        </article>
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-coins"></i></span>
+          <div>
+            <small>Total Held ZWG</small>
+            <strong th:text="${'ZWG ' + #numbers.formatDecimal(heldChangeZwg ?: 0, 1, 2)}">ZWG 0.00</strong>
+            <em>Open liability</em>
+          </div>
+        </article>
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-hand-holding-dollar"></i></span>
+          <div>
+            <small>Collected Today</small>
+            <strong th:text="${'USD ' + #numbers.formatDecimal(collectedTodayUsd ?: 0, 1, 2)}">USD 0.00</strong>
+            <em th:text="${'ZWG ' + #numbers.formatDecimal(collectedTodayZwg ?: 0, 1, 2)}">ZWG 0.00</em>
+          </div>
+        </article>
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-receipt"></i></span>
+          <div>
+            <small>Filtered Records</small>
+            <strong th:text="${filteredChangeCount}">0</strong>
+            <em th:text="${'USD ' + #numbers.formatDecimal(filteredChangeUsd ?: 0, 1, 2) + ' / ZWG ' + #numbers.formatDecimal(filteredChangeZwg ?: 0, 1, 2)}">USD 0.00 / ZWG 0.00</em>
+          </div>
+        </article>
+      </section>
+
+      <section id="change-filter-panel" class="change-filter-panel">
+        <div>
+          <h2>Search &amp; Filter</h2>
+          <p>Find a customer payout by reference, customer name, phone number, date, or status.</p>
+        </div>
+        <form method="get" th:action="@{/shop/change}" class="change-filter-form">
+          <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+          <label>Reference, customer, or phone
+            <input name="search" th:value="${changeSearch}" placeholder="CHG reference, customer name, or phone">
+          </label>
+          <label>From
+            <input type="date" name="from" th:value="${changeDateFrom}">
+          </label>
+          <label>To
+            <input type="date" name="to" th:value="${changeDateTo}">
+          </label>
+          <label>Status
+            <select name="status">
+              <option value="" th:selected="${changeStatus == null || changeStatus == ''}">All statuses</option>
+              <option value="OPEN" th:selected="${changeStatus == 'OPEN'}">Awaiting collection</option>
+              <option value="COLLECTED" th:selected="${changeStatus == 'COLLECTED'}">Collected</option>
+              <option value="CANCELLED" th:selected="${changeStatus == 'CANCELLED'}">Cancelled</option>
+            </select>
+          </label>
+          <div class="change-filter-actions">
+            <button class="btn btn-blue" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+            <a class="btn btn-light" th:href="@{/shop/change}"><i class="fa-solid fa-xmark"></i>Clear</a>
+          </div>
+        </form>
+      </section>
+
+      <section class="change-register-panel">
+        <div class="change-register-head">
+          <div>
+            <h2>Change Register</h2>
+            <p>Audited customer cash liability and payout history.</p>
+          </div>
+          <span class="badge">Audited cash liability</span>
+        </div>
+        <div class="change-table-wrap">
+          <table>
+            <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Customer</th>
+              <th>Sale Receipt</th>
+              <th>Amount</th>
+              <th>Created</th>
+              <th>Status</th>
+              <th>Collected By</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${changeRecords}">
+              <td>
+                <strong th:text="${c.referenceNumber}">CHG-000</strong>
+                <small th:text="${c.offlineReference != null ? c.offlineReference : 'Synced record'}">Synced record</small>
+              </td>
+              <td>
+                <strong th:text="${c.customerName}">Customer</strong>
+                <small th:text="${c.phone}">Phone</small>
+              </td>
+              <td th:text="${c.saleId != null ? '#' + c.saleId : '-'}">-</td>
+              <td>
+                <strong th:text="${c.currency + ' ' + #numbers.formatDecimal(c.amount ?: 0, 1, 2)}">USD 0.00</strong>
+              </td>
+              <td th:text="${#temporals.format(c.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+              <td>
+                <span th:class="${c.status.name() == 'OPEN' ? 'badge status-pending' : (c.status.name() == 'COLLECTED' ? 'badge status-active' : 'badge status-suspended')}"
+                      th:text="${c.status.name() == 'OPEN' ? 'AWAITING' : c.status}">OPEN</span>
+              </td>
+              <td th:text="${c.collectedBy != null ? '#' + c.collectedBy : '-'}">-</td>
+              <td>
+                <div class="action-row" th:if="${c.status.name() == 'OPEN'}">
+                  <a class="icon-button mini" th:href="${'#modal-collect-change-' + c.id}" title="Pay customer">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                  </a>
+                  <form method="post" th:action="@{'/shop/change/' + ${c.id} + '/cancel'}">
+                    <button class="icon-button mini danger" type="submit" title="Cancel record">
+                      <i class="fa-solid fa-ban"></i>
+                    </button>
+                  </form>
+                </div>
+                <span class="muted-text" th:unless="${c.status.name() == 'OPEN'}">No action</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="change-empty" th:if="${#lists.isEmpty(changeRecords)}">
+          <span><i class="fa-solid fa-coins"></i></span>
+          <strong>No held-change records match your filters.</strong>
+          <small>Clear the filters or search with a customer name, phone, or CHG reference.</small>
+        </div>
+        <div th:replace="~{common/layout :: pagination(${changePage}, ${changePageLinks}, ${changePrevUrl}, ${changeNextUrl})}"></div>
+      </section>
+
+      <div th:each="c : ${changeRecords}" th:id="${'modal-collect-change-' + c.id}" class="modal">
+        <div class="modal-content change-collect-modal">
+          <div class="modal-head">
+            <h2>Pay Held Change</h2>
+            <a class="close" href="#">&times;</a>
+          </div>
+          <div class="change-collect-summary">
+            <article>
+              <small>Reference</small>
+              <strong th:text="${c.referenceNumber}">CHG-000</strong>
+            </article>
+            <article>
+              <small>Customer</small>
+              <strong th:text="${c.customerName}">Customer</strong>
+            </article>
+            <article>
+              <small>Amount to pay</small>
+              <strong th:text="${c.currency + ' ' + #numbers.formatDecimal(c.amount ?: 0, 1, 2)}">USD 0.00</strong>
+            </article>
+            <article>
+              <small>Phone</small>
+              <strong th:text="${c.phone}">Phone</strong>
+            </article>
+          </div>
+          <p class="change-modal-note">Confirm only after the customer has received the cash at the counter.</p>
+          <form method="post" th:action="@{'/shop/change/' + ${c.id} + '/collect'}">
+            <div class="modal-actions">
+              <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-check"></i>Confirm Paid &amp; Collected
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </section>
-    <div class="page-toolbar">
-      <a class="btn btn-blue" href="#modal-search-change"><i class="fa-solid fa-magnifying-glass"></i>Find Collection</a>
-    </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
 
-    <section class="panel table-panel">
-      <div class="toolbar"><h2>Change Register</h2><span class="badge">Audited cash liability</span></div>
-      <table>
-        <thead><tr><th>Reference</th><th>Customer</th><th>Amount</th><th>Sale</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody>
-        <tr th:each="c : ${changeRecords}">
-          <td><strong th:text="${c.referenceNumber}">CHG</strong></td>
-          <td><strong th:text="${c.customerName}">Customer</strong><small th:text="${c.phone}">Phone</small></td>
-          <td><strong th:text="${c.currency + ' ' + c.amount}">USD 0</strong></td>
-          <td th:text="${c.saleId != null ? '#' + c.saleId : '-'}">-</td>
-          <td th:text="${#temporals.format(c.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
-          <td><span th:class="${c.status.name() == 'OPEN' ? 'badge status-pending' : (c.status.name() == 'COLLECTED' ? 'badge status-active' : 'badge status-suspended')}" th:text="${c.status}">OPEN</span></td>
-          <td><div class="action-row" th:if="${c.status.name() == 'OPEN'}">
-            <a class="icon-button mini" th:href="${'#modal-collect-change-' + c.id}" title="Collect"><i class="fa-solid fa-hand-holding-dollar"></i></a>
-            <form method="post" th:action="@{'/shop/change/' + ${c.id} + '/cancel'}"><button class="icon-button mini danger" type="submit" title="Cancel"><i class="fa-solid fa-ban"></i></button></form>
-          </div></td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="empty" th:if="${#lists.isEmpty(changeRecords)}">No held-change records match this filter.</div>
-      <div th:replace="~{common/layout :: pagination(${changePage}, ${changePageLinks}, ${changePrevUrl}, ${changeNextUrl})}"></div>
-    </section>
-
-    <div id="modal-search-change" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2>Find Change Collection</h2><a class="close" href="#">&times;</a></div>
-      <form method="get" th:action="@{/shop/change}" class="form-grid">
-        <label>Name, phone or reference<input name="search" th:value="${changeSearch}"></label>
-        <label>Status<select name="status"><option value="">All</option><option th:selected="${changeStatus == 'OPEN'}">OPEN</option><option th:selected="${changeStatus == 'COLLECTED'}">COLLECTED</option><option th:selected="${changeStatus == 'CANCELLED'}">CANCELLED</option></select></label>
-        <div class="modal-actions"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button></div>
-      </form>
-    </div></div>
-
-    <div th:each="c : ${changeRecords}" th:id="${'modal-collect-change-' + c.id}" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2>Confirm Collection</h2><a class="close" href="#">&times;</a></div>
-      <p><strong th:text="${c.customerName}">Customer</strong> is collecting <strong th:text="${c.currency + ' ' + c.amount}">USD 0</strong>.</p>
-      <p th:text="${'Phone: ' + c.phone + ' | Reference: ' + c.referenceNumber}">Details</p>
-      <form method="post" th:action="@{'/shop/change/' + ${c.id} + '/collect'}">
-        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-check"></i>Pay and Mark Collected</button></div>
-      </form>
-    </div></div>
     <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>
 </div>

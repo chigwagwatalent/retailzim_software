@@ -3,6 +3,7 @@ package com.retailzw.service;
 import com.retailzw.dto.request.CloseGasShiftRequest;
 import com.retailzw.dto.request.GasRestockRequest;
 import com.retailzw.dto.request.GasSaleRequest;
+import com.retailzw.dto.request.GasStockReconciliationRequest;
 import com.retailzw.dto.request.OpenGasShiftRequest;
 import com.retailzw.enums.BusinessModule;
 import com.retailzw.enums.CurrencyCode;
@@ -19,10 +20,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class GasOperationsServiceTest {
+public class GasOperationsServiceTest {
     private BranchRepository branches;
     private GasTankRepository tanks;
     private GasPriceRepository prices;
@@ -30,12 +32,13 @@ class GasOperationsServiceTest {
     private GasSaleRepository sales;
     private GasRestockRepository restocks;
     private GasExpenseRepository expenses;
+    private GasStockAdjustmentRepository stockAdjustments;
     private TenantSubscriptionRepository subscriptions;
     private SaasPlanRepository plans;
     private GasOperationsService service;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         branches = mock(BranchRepository.class);
         tanks = mock(GasTankRepository.class);
         prices = mock(GasPriceRepository.class);
@@ -43,13 +46,16 @@ class GasOperationsServiceTest {
         sales = mock(GasSaleRepository.class);
         restocks = mock(GasRestockRepository.class);
         expenses = mock(GasExpenseRepository.class);
+        stockAdjustments = mock(GasStockAdjustmentRepository.class);
         subscriptions = mock(TenantSubscriptionRepository.class);
         plans = mock(SaasPlanRepository.class);
-        service = new GasOperationsService(branches, tanks, prices, shifts, sales, restocks, expenses, subscriptions, plans);
+        service = new GasOperationsService(
+                branches, tanks, prices, shifts, sales, restocks, expenses,
+                stockAdjustments, subscriptions, plans);
     }
 
     @Test
-    void gasShiftSaleAndCloseUpdatesTankStockAndTotals() {
+    public void gasShiftSaleAndCloseUpdatesTankStockAndTotals() {
         Long tenantId = 1L;
         Long branchId = 2L;
         Long cashierId = 3L;
@@ -112,7 +118,7 @@ class GasOperationsServiceTest {
     }
 
     @Test
-    void restockIncreasesTankStock() {
+    public void restockIncreasesTankStock() {
         Long tenantId = 1L;
         Long branchId = 2L;
         Long userId = 3L;
@@ -134,5 +140,68 @@ class GasOperationsServiceTest {
 
         assertThat(tank.getCurrentKg()).isEqualByComparingTo("35.000");
         assertThat(restock.getQuantityKg()).isEqualByComparingTo("25.000");
+    }
+
+    @Test
+    public void reconciliationUpdatesPhysicalStockAndCreatesVarianceAudit() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        Long userId = 3L;
+        GasTank tank = GasTank.builder()
+                .id(10L).tenantId(tenantId).branchId(branchId).name("Main Tank").productName("LPG")
+                .capacityKg(new BigDecimal("100.000"))
+                .currentKg(new BigDecimal("50.000"))
+                .status(GasTankStatus.ACTIVE).build();
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+        when(tanks.lockTank(tenantId, branchId, tank.getId())).thenReturn(Optional.of(tank));
+        when(tanks.save(any(GasTank.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(stockAdjustments.save(any(GasStockAdjustment.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        GasStockReconciliationRequest request = new GasStockReconciliationRequest();
+        request.setBranchId(branchId);
+        request.setTankId(tank.getId());
+        request.setCountedKg(new BigDecimal("47.500"));
+        request.setReason("DIP_VARIANCE");
+        request.setNotes("Verified against morning dip reading");
+
+        GasStockAdjustment result = service.reconcileStock(tenantId, userId, request);
+
+        assertThat(tank.getCurrentKg()).isEqualByComparingTo("47.500");
+        assertThat(result.getQuantityBeforeKg()).isEqualByComparingTo("50.000");
+        assertThat(result.getCountedKg()).isEqualByComparingTo("47.500");
+        assertThat(result.getVarianceKg()).isEqualByComparingTo("-2.500");
+        assertThat(result.getReason()).isEqualTo("DIP_VARIANCE");
+        assertThat(result.getCreatedBy()).isEqualTo(userId);
+    }
+
+    @Test
+    public void reconciliationRejectsCountsAboveTankCapacity() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        GasTank tank = GasTank.builder()
+                .id(10L).tenantId(tenantId).branchId(branchId).name("Main Tank").productName("LPG")
+                .capacityKg(new BigDecimal("100.000"))
+                .currentKg(new BigDecimal("50.000"))
+                .status(GasTankStatus.ACTIVE).build();
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+        when(tanks.lockTank(tenantId, branchId, tank.getId())).thenReturn(Optional.of(tank));
+
+        GasStockReconciliationRequest request = new GasStockReconciliationRequest();
+        request.setBranchId(branchId);
+        request.setTankId(tank.getId());
+        request.setCountedKg(new BigDecimal("100.001"));
+        request.setReason("DIP_VARIANCE");
+
+        assertThatThrownBy(() -> service.reconcileStock(tenantId, 3L, request))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("capacity");
+        assertThat(tank.getCurrentKg()).isEqualByComparingTo("50.000");
+        verify(tanks, never()).save(any(GasTank.class));
+        verify(stockAdjustments, never()).save(any(GasStockAdjustment.class));
     }
 }

@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final ApiService _api = ApiService();
   late final SyncScheduler _syncScheduler = SyncScheduler(_api);
 
-  static const _tabs = [
+  static const _retailTabs = [
     _TabItem(
       label: 'POS',
       icon: Icons.point_of_sale_outlined,
@@ -50,10 +50,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     ),
   ];
 
+  static const _gasTabs = [
+    _TabItem(
+      label: 'Gas POS',
+      icon: Icons.local_gas_station_outlined,
+      activeIcon: Icons.local_gas_station,
+    ),
+    _TabItem(
+      label: 'More',
+      icon: Icons.grid_view_outlined,
+      activeIcon: Icons.grid_view,
+    ),
+  ];
+
+  List<_TabItem> _tabsFor(AppProvider provider) =>
+      provider.currentUser?.isGasBranch == true ? _gasTabs : _retailTabs;
+
   List<Widget> _screensFor(AppProvider provider) {
     final isGas = provider.currentUser?.isGasBranch == true;
+    if (isGas) {
+      return const [GasPosScreen(), MoreScreen()];
+    }
     return [
-      isGas ? const GasPosScreen() : const PosScreen(),
+      const PosScreen(),
       const SalesScreen(),
       const CashScreen(),
       const MoreScreen(),
@@ -99,6 +118,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _loadInitialData() async {
+    final provider = context.read<AppProvider>();
+    if (provider.currentUser?.isGasBranch == true) {
+      provider.clearSession();
+      try {
+        provider.setNotificationCount(await _api.getUnreadCount());
+        provider.setOnline(true);
+      } catch (_) {
+        provider.setOnline(false);
+      }
+      return;
+    }
+
     // ── Step 1: Restore from local SQLite immediately ─────────────────────────
     // This makes the app fully usable offline before the server even responds.
     // Without this, a cashier who restarts the app mid-shift loses their session.
@@ -154,6 +185,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _runQuietSync({bool refreshProductsAfterSync = true}) async {
+    if (context.read<AppProvider>().currentUser?.isGasBranch == true) return;
     try {
       await _api.syncOfflineSales();
       if (!mounted) return;
@@ -201,6 +233,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Widget _tabletLayout(AppProvider provider, dynamic session,
       {required bool isDesktop}) {
+    final tabs = _tabsFor(provider);
+    final isGas = provider.currentUser?.isGasBranch == true;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
@@ -211,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             onNotificationsTap: _openNotifications,
           ),
           // Session banner
-          if (session != null)
+          if (session != null && !isGas)
             _SessionBanner(
               session: session,
               onTap: () => setState(() => _currentIndex = 2),
@@ -223,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 // Navigation Rail
                 _SideRail(
                   currentIndex: _currentIndex,
-                  tabs: _tabs,
+                  tabs: tabs,
                   extended: false,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
@@ -245,6 +279,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   // ─── Phone layout: bottom navigation bar ───────────────────────────────────
 
   Widget _phoneLayout(AppProvider provider, dynamic session) {
+    final tabs = _tabsFor(provider);
+    final isGas = provider.currentUser?.isGasBranch == true;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -254,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         titleSpacing: 16,
         title: _logoAndUser(provider),
         actions: _appBarActions(provider),
-        bottom: session != null
+        bottom: session != null && !isGas
             ? PreferredSize(
                 preferredSize: const Size.fromHeight(32),
                 child: _SessionBanner(
@@ -278,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         elevation: 10,
         selectedLabelStyle:
             const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
-        items: _tabs
+        items: tabs
             .map((t) => BottomNavigationBarItem(
                   icon: Icon(t.icon),
                   activeIcon: Icon(t.activeIcon),
@@ -309,8 +345,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   fontSize: 13)),
         ),
         const SizedBox(width: 8),
-        const Text('RetailZW POS',
-            style: TextStyle(
+        Text(provider.currentUser?.isGasBranch == true ? 'RetailZW Gas POS' : 'RetailZW POS',
+            style: const TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 16,
                 color: Colors.white)),
@@ -424,8 +460,8 @@ class _TopBar extends StatelessWidget {
                       fontSize: 14)),
             ),
             const SizedBox(width: 10),
-            const Text('RetailZW POS',
-                style: TextStyle(
+            Text(provider.currentUser?.isGasBranch == true ? 'RetailZW Gas POS' : 'RetailZW POS',
+                style: const TextStyle(
                     color: AppColors.textDark,
                     fontWeight: FontWeight.w900,
                     fontSize: 18)),

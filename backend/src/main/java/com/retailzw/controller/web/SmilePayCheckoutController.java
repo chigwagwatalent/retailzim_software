@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -25,7 +26,14 @@ public class SmilePayCheckoutController {
         model.addAttribute("checkout", view.checkout());
         model.addAttribute("tenant", view.tenant());
         model.addAttribute("plan", view.plan());
-        model.addAttribute("paymentMethods", SmilePayCheckout.PaymentMethod.values());
+        model.addAttribute("planModules", view.plan().allowedModuleList());
+        model.addAttribute("paymentMethods", List.of(
+                SmilePayCheckout.PaymentMethod.ECOCASH,
+                SmilePayCheckout.PaymentMethod.ONEMONEY,
+                SmilePayCheckout.PaymentMethod.OMARI,
+                SmilePayCheckout.PaymentMethod.SMILECASH,
+                SmilePayCheckout.PaymentMethod.INNBUCKS,
+                SmilePayCheckout.PaymentMethod.CARD));
         return "checkout/smilepay";
     }
 

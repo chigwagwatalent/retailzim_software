@@ -87,6 +87,31 @@ public class CashSession {
     @Column(name = "closing_notes", columnDefinition = "TEXT")
     private String closingNotes;
 
+    @Column(name = "cash_collected")
+    @Builder.Default
+    private Boolean cashCollected = false;
+
+    @Column(name = "collected_cash_usd", precision = 15, scale = 2)
+    private BigDecimal collectedCashUsd;
+
+    @Column(name = "collected_cash_zwg", precision = 15, scale = 2)
+    private BigDecimal collectedCashZwg;
+
+    @Column(name = "collection_variance_usd", precision = 15, scale = 2)
+    private BigDecimal collectionVarianceUsd;
+
+    @Column(name = "collection_variance_zwg", precision = 15, scale = 2)
+    private BigDecimal collectionVarianceZwg;
+
+    @Column(name = "collection_notes", columnDefinition = "TEXT")
+    private String collectionNotes;
+
+    @Column(name = "collected_by_user_id")
+    private Long collectedByUserId;
+
+    @Column(name = "collected_at")
+    private LocalDateTime collectedAt;
+
     @PrePersist
     protected void onCreate() {
         if (openedAt == null) openedAt = LocalDateTime.now();

@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class PurchaseOrderServiceTest {
+public class PurchaseOrderServiceTest {
 
     private PurchaseOrderRepository purchaseOrders;
     private PurchaseOrderItemRepository purchaseOrderItems;
@@ -30,7 +30,7 @@ class PurchaseOrderServiceTest {
     private PurchaseOrderService service;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         purchaseOrders = mock(PurchaseOrderRepository.class);
         purchaseOrderItems = mock(PurchaseOrderItemRepository.class);
         inventory = mock(InventoryRepository.class);
@@ -46,7 +46,7 @@ class PurchaseOrderServiceTest {
     }
 
     @Test
-    void receivingGoodsIncreasesStockAndCreatesAuditRecords() {
+    public void receivingGoodsIncreasesStockAndCreatesAuditRecords() {
         PurchaseOrderItem line = PurchaseOrderItem.builder()
                 .id(51L).productId(101L)
                 .quantity(new BigDecimal("10"))
@@ -96,7 +96,7 @@ class PurchaseOrderServiceTest {
     }
 
     @Test
-    void receivingWithoutPositivePoLinesDoesNotCreateAGrn() {
+    public void receivingWithoutPositivePoLinesDoesNotCreateAGrn() {
         PurchaseOrderItem line = PurchaseOrderItem.builder()
                 .id(51L).productId(101L).quantity(BigDecimal.TEN)
                 .quantityReceived(BigDecimal.ZERO).build();
@@ -113,7 +113,7 @@ class PurchaseOrderServiceTest {
     }
 
     @Test
-    void approvalAddsOutstandingQuantityToStockOnOrder() {
+    public void approvalAddsOutstandingQuantityToStockOnOrder() {
         PurchaseOrderItem line = PurchaseOrderItem.builder()
                 .id(51L).productId(101L).quantity(new BigDecimal("6"))
                 .quantityReceived(BigDecimal.ZERO).build();
@@ -135,7 +135,7 @@ class PurchaseOrderServiceTest {
     }
 
     @Test
-    void cancellingOrderedPoReleasesOutstandingStockOnOrder() {
+    public void cancellingOrderedPoReleasesOutstandingStockOnOrder() {
         PurchaseOrderItem line = PurchaseOrderItem.builder()
                 .id(51L).productId(101L).quantity(BigDecimal.TEN)
                 .quantityReceived(new BigDecimal("3")).build();
@@ -156,7 +156,7 @@ class PurchaseOrderServiceTest {
     }
 
     @Test
-    void autoReorderCreatesTargetStockQuantityAndSkipsDuplicateOpenLines() {
+    public void autoReorderCreatesTargetStockQuantityAndSkipsDuplicateOpenLines() {
         Branch branch = Branch.builder().id(3L).tenantId(2L).branchCode("BR1").isActive(true).build();
         Supplier supplier = Supplier.builder().id(9L).tenantId(2L).name("Main Supplier").isActive(true).build();
         Product product = Product.builder().id(101L).tenantId(2L).name("Sugar").isActive(true)

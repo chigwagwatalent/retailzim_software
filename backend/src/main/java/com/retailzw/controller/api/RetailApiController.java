@@ -8,6 +8,7 @@ import com.retailzw.repository.*;
 import com.retailzw.service.CurrentUserService;
 import com.retailzw.service.CreditAndChangeService;
 import com.retailzw.service.NotificationService;
+import com.retailzw.service.PackageModuleAccessService;
 import com.retailzw.service.ProductImportService;
 import com.retailzw.service.RetailOperationsService;
 import jakarta.validation.Valid;
@@ -40,6 +41,7 @@ public class RetailApiController {
     private final NotificationService notificationService;
     private final CreditAndChangeService creditAndChangeService;
     private final ProductImportService productImportService;
+    private final PackageModuleAccessService packageModuleAccessService;
 
     @GetMapping("/me")
     public ApiResponse<Map<String, Object>> me() {
@@ -47,7 +49,8 @@ public class RetailApiController {
                 "tenantId", current.tenantId(),
                 "branchId", current.branchId(),
                 "userId", current.userId(),
-                "role", current.roleName()
+                "role", current.roleName(),
+                "enabledModules", packageModuleAccessService.syncAndGetEnabledModules(current.tenantId())
         ));
     }
 

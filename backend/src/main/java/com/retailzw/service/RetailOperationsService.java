@@ -469,6 +469,55 @@ public class RetailOperationsService {
     }
 
     @Transactional
+    public CashSession collectSessionMoneyAsAdmin(Long tenantId, Long branchId, Long adminUserId, CloseSessionRequest request) {
+        if (request.getSessionId() == null) {
+            throw new IllegalArgumentException("Enter the shift ID before collecting cash.");
+        }
+        CashSession session = cashSessions.findById(request.getSessionId())
+                .filter(cs -> cs.getTenantId().equals(tenantId))
+                .filter(cs -> cs.getBranchId().equals(branchId))
+                .orElseThrow(() -> new IllegalArgumentException("Shift was not found for this branch."));
+        if (CashSession.SessionStatus.OPEN.equals(session.getStatus())) {
+            throw new IllegalStateException("This shift is still open. The cashier must close it from the POS app first.");
+        }
+        if (Boolean.TRUE.equals(session.getCashCollected())) {
+            throw new IllegalStateException("Cash for this shift has already been collected.");
+        }
+
+        BigDecimal collectedUsd = nvl(request.getActualUsd());
+        BigDecimal collectedZwg = nvl(request.getActualZwg());
+        BigDecimal varianceUsd = collectedUsd.subtract(nvl(session.getExpectedCashUsd()));
+        BigDecimal varianceZwg = collectedZwg.subtract(nvl(session.getExpectedCashZwg()));
+        boolean hasVariance = varianceUsd.compareTo(BigDecimal.ZERO) != 0 || varianceZwg.compareTo(BigDecimal.ZERO) != 0;
+        if (hasVariance && (request.getClosingNotes() == null || request.getClosingNotes().isBlank())) {
+            throw new IllegalArgumentException("Enter a reason before confirming collected cash with a variance.");
+        }
+
+        session.setCashCollected(true);
+        session.setCollectedCashUsd(collectedUsd);
+        session.setCollectedCashZwg(collectedZwg);
+        session.setCollectionVarianceUsd(varianceUsd);
+        session.setCollectionVarianceZwg(varianceZwg);
+        session.setCollectionNotes(request.getClosingNotes());
+        session.setCollectedByUserId(adminUserId);
+        session.setCollectedAt(LocalDateTime.now());
+        CashSession saved = cashSessions.save(session);
+        log.info("Cash session collected tenant={} branch={} admin={} cashier={} session={} expectedUsd={} collectedUsd={} varianceUsd={} expectedZwg={} collectedZwg={} varianceZwg={}",
+                tenantId, branchId, adminUserId, saved.getCashierId(), saved.getId(),
+                saved.getExpectedCashUsd(), saved.getCollectedCashUsd(), saved.getCollectionVarianceUsd(),
+                saved.getExpectedCashZwg(), saved.getCollectedCashZwg(), saved.getCollectionVarianceZwg());
+        return saved;
+    }
+
+    @Transactional
+    public CashSession closeSessionAsAdmin(Long tenantId, Long branchId, CloseSessionRequest request) {
+        CashSession saved = collectSessionMoneyAsAdmin(tenantId, branchId, null, request);
+        log.info("Deprecated admin close flow used tenant={} branch={} cashier={} session={}",
+                tenantId, branchId, saved.getCashierId(), saved.getId());
+        return saved;
+    }
+
+    @Transactional
     public Sale completeSale(Long tenantId, Long branchId, Long cashierId, SaleRequest request) {
         final Long requestedBranchId = branchId;
         String offlineReceipt = clean(request.getOfflineReceiptNumber());
@@ -719,9 +768,6 @@ public class RetailOperationsService {
     }
 
     private void validateTenantModule(Long tenantId, BusinessModule module) {
-        if (BusinessModule.SHOP_MODULE.equals(module)) {
-            return;
-        }
         if (!tenantModules.existsByTenantIdAndModuleAndStatus(tenantId, module, ModuleAccessStatus.ENABLED)) {
             throw new IllegalArgumentException("This shop package does not include " + module.getDisplayName() + ".");
         }

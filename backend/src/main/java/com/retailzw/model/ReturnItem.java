@@ -26,7 +26,7 @@ public class ReturnItem {
     @Column(name = "product_name", nullable = false, length = 200)
     private String productName;
 
-    @Column(nullable = false, precision = 15, scale = 4)
+    @Column(name = "quantity_returned", nullable = false, precision = 15, scale = 4)
     private BigDecimal quantity;
 
     @Column(name = "unit_price", nullable = false, precision = 15, scale = 4)

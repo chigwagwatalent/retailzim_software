@@ -3,6 +3,7 @@ package com.retailzw.controller.web;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +29,7 @@ public class WebFormExceptionHandler {
             IllegalStateException.class,
             NoSuchElementException.class,
             DataIntegrityViolationException.class,
+            JpaSystemException.class,
             BindException.class,
             MethodArgumentNotValidException.class,
             ConstraintViolationException.class,
@@ -51,8 +53,8 @@ public class WebFormExceptionHandler {
                 || exception instanceof ConstraintViolationException) {
             return "Please check the highlighted form fields and try again.";
         }
-        if (exception instanceof DataIntegrityViolationException dataError) {
-            String message = rootMessage(dataError).toLowerCase();
+        if (exception instanceof DataIntegrityViolationException || exception instanceof JpaSystemException) {
+            String message = rootMessage(exception).toLowerCase();
             if (message.contains("cannot be null") || message.contains("not-null")) {
                 return "Please complete all required fields before saving.";
             }

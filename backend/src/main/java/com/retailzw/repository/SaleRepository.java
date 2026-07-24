@@ -26,6 +26,10 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     Optional<Sale> findByTenantIdAndOfflineReceiptNumber(Long tenantId, String offlineReceiptNumber);
 
     @EntityGraph(attributePaths = {"items"})
+    @Query("SELECT s FROM Sale s WHERE s.id = :id")
+    Optional<Sale> findWithItemsById(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = {"items"})
     Page<Sale> findByTenantIdAndBranchId(Long tenantId, Long branchId, Pageable pageable);
 
     List<Sale> findByTenantIdAndBranchIdAndCreatedAtBetween(Long tenantId, Long branchId,

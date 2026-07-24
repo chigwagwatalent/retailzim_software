@@ -1,12 +1,20 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{common/layout :: head('Error')}"></head>
-<body class="auth-shell">
-  <main class="auth-card">
-    <div class="brand auth-brand"><span class="brand-logo"><img th:src="@{/img/logo.png}" alt="RetailZW"></span><span>RetailZW</span></div>
+<body class="error-shell">
+  <main class="error-card">
+    <div class="error-brand">
+      <span><img th:src="@{/img/favicon.png}" alt="RetailZW"></span>
+      <strong>RetailZW</strong>
+    </div>
+    <div class="error-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <p class="error-eyebrow" th:text="${status != null ? 'Error ' + status : 'Page error'}">Page error</p>
     <h1>Something needs attention</h1>
-    <p th:text="${message ?: error ?: 'The page could not be rendered.'}">The page could not be rendered.</p>
-    <a class="btn btn-primary" th:href="@{/shop/dashboard}">Back to shop dashboard</a>
+    <p class="error-message" th:text="${message ?: error ?: 'The page could not be rendered.'}">The page could not be rendered.</p>
+    <div class="error-actions">
+      <a class="btn btn-primary" th:href="@{/shop/dashboard}"><i class="fa-solid fa-table-columns"></i>Shop dashboard</a>
+      <a class="btn btn-light" href="javascript:history.back()"><i class="fa-solid fa-arrow-left"></i>Go back</a>
+    </div>
   </main>
 </body>
 </html>

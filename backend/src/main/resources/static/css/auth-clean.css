@@ -836,6 +836,13 @@
   box-shadow: 0 16px 34px rgba(22, 142, 233, .12);
 }
 
+.signup-module-card.is-unavailable {
+  opacity: .46;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 .signup-module-card input {
   position: absolute;
   opacity: 0;

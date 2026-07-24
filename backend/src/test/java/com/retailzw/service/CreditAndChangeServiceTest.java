@@ -26,7 +26,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class CreditAndChangeServiceTest {
+public class CreditAndChangeServiceTest {
 
     private BorrowerRepository borrowers;
     private BorrowerTransactionRepository borrowerTransactions;
@@ -35,7 +35,7 @@ class CreditAndChangeServiceTest {
     private CreditAndChangeService service;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         borrowers = mock(BorrowerRepository.class);
         borrowerTransactions = mock(BorrowerTransactionRepository.class);
         heldChange = mock(HeldChangeRepository.class);
@@ -44,7 +44,7 @@ class CreditAndChangeServiceTest {
     }
 
     @Test
-    void creditSaleUpdatesBorrowerAndLinksSale() {
+    public void creditSaleUpdatesBorrowerAndLinksSale() {
         Borrower borrower = Borrower.builder()
                 .id(8L)
                 .tenantId(2L)
@@ -77,7 +77,7 @@ class CreditAndChangeServiceTest {
     }
 
     @Test
-    void creditSaleCannotExceedAvailableLimit() {
+    public void creditSaleCannotExceedAvailableLimit() {
         Borrower borrower = Borrower.builder()
                 .id(8L)
                 .tenantId(2L)
@@ -102,7 +102,7 @@ class CreditAndChangeServiceTest {
     }
 
     @Test
-    void holdingCashChangeAddsItToExpectedDrawerCash() {
+    public void holdingCashChangeAddsItToExpectedDrawerCash() {
         CashSession session = CashSession.builder()
                 .id(4L)
                 .expectedCashUsd(new BigDecimal("40.00"))

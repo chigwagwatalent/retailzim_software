@@ -1,5 +1,6 @@
 package com.retailzw.repository;
 
+import com.retailzw.enums.CurrencyCode;
 import com.retailzw.model.HeldChange;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface HeldChangeRepository extends JpaRepository<HeldChange, Long> {
@@ -31,6 +33,37 @@ public interface HeldChangeRepository extends JpaRepository<HeldChange, Long> {
                             @Param("status") HeldChange.Status status,
                             @Param("search") String search,
                             Pageable pageable);
+
+    @Query("select c from HeldChange c where c.tenantId = :tenantId and " +
+            "(:status is null or c.status = :status) and " +
+            "(:fromDate is null or c.createdAt >= :fromDate) and " +
+            "(:toDate is null or c.createdAt < :toDate) and " +
+            "(:search is null or lower(c.customerName) like lower(concat('%', :search, '%')) or " +
+            "lower(c.phone) like lower(concat('%', :search, '%')) or " +
+            "lower(c.referenceNumber) like lower(concat('%', :search, '%')) or " +
+            "lower(c.offlineReference) like lower(concat('%', :search, '%'))) order by c.createdAt desc")
+    Page<HeldChange> searchWithDates(@Param("tenantId") Long tenantId,
+                                      @Param("status") HeldChange.Status status,
+                                      @Param("search") String search,
+                                      @Param("fromDate") LocalDateTime fromDate,
+                                      @Param("toDate") LocalDateTime toDate,
+                                      Pageable pageable);
+
+    @Query("select coalesce(sum(c.amount), 0) from HeldChange c where c.tenantId = :tenantId and " +
+            "c.currency = :currency and " +
+            "(:status is null or c.status = :status) and " +
+            "(:fromDate is null or c.createdAt >= :fromDate) and " +
+            "(:toDate is null or c.createdAt < :toDate) and " +
+            "(:search is null or lower(c.customerName) like lower(concat('%', :search, '%')) or " +
+            "lower(c.phone) like lower(concat('%', :search, '%')) or " +
+            "lower(c.referenceNumber) like lower(concat('%', :search, '%')) or " +
+            "lower(c.offlineReference) like lower(concat('%', :search, '%')))")
+    java.math.BigDecimal sumSearchWithDates(@Param("tenantId") Long tenantId,
+                                            @Param("status") HeldChange.Status status,
+                                            @Param("search") String search,
+                                            @Param("fromDate") LocalDateTime fromDate,
+                                            @Param("toDate") LocalDateTime toDate,
+                                            @Param("currency") CurrencyCode currency);
 
     long countByTenantIdAndStatus(Long tenantId, HeldChange.Status status);
 }

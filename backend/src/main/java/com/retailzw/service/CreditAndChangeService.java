@@ -36,6 +36,20 @@ public class CreditAndChangeService {
         return heldChange.search(tenantId, status, clean(search), PageRequest.of(page, size));
     }
 
+    public Page<HeldChange> changeRecords(Long tenantId, HeldChange.Status status, String search,
+                                          LocalDateTime fromDate, LocalDateTime toDate, int page, int size) {
+        return heldChange.searchWithDates(tenantId, status, clean(search), fromDate, toDate, PageRequest.of(page, size));
+    }
+
+    public long changeRecordCount(Long tenantId, HeldChange.Status status) {
+        return heldChange.countByTenantIdAndStatus(tenantId, status);
+    }
+
+    public BigDecimal sumChangeRecords(Long tenantId, HeldChange.Status status, String search,
+                                       LocalDateTime fromDate, LocalDateTime toDate, CurrencyCode currency) {
+        return nvl(heldChange.sumSearchWithDates(tenantId, status, clean(search), fromDate, toDate, currency));
+    }
+
     public List<BorrowerTransaction> borrowerTransactions(Long tenantId, Long borrowerId) {
         return borrowerTransactions.findByTenantIdAndBorrowerIdOrderByCreatedAtDesc(
                 tenantId, borrowerId, PageRequest.of(0, 100));

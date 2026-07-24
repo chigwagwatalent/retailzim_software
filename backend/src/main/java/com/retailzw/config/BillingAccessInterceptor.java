@@ -53,11 +53,11 @@ public class BillingAccessInterceptor implements HandlerInterceptor {
     private boolean enforceApiModule(HttpServletResponse response,
                                      CustomUserDetails shopUser,
                                      String path) throws Exception {
-        if (path.startsWith("/api/gas/")) {
+        if (path.equals("/api/gas") || path.startsWith("/api/gas/")) {
             return packageModules.hasGas(shopUser.getTenantId())
                     || rejectApi(response, "Gas is not included in this subscription package.");
         }
-        if (path.equals("/api/me") || path.equals("/api/branches")) {
+        if (path.equals("/api/me") || path.equals("/api/branches") || path.startsWith("/api/notifications")) {
             packageModules.syncAndGetEnabledModules(shopUser.getTenantId());
             return true;
         }

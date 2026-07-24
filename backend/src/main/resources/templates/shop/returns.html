@@ -7,109 +7,244 @@
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Returns')}"></nav>
 
-    <section class="page-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-rotate-left"></i></div>
-        <div>
-          <p th:text="${'Viewing ' + selectedBranchName}">Viewing branch</p>
-          <h1>Returns</h1>
+    <section class="returns-page">
+      <section class="returns-hero">
+        <div class="returns-hero-title">
+          <span class="returns-hero-icon"><i class="fa-solid fa-rotate-left"></i></span>
+          <div>
+            <h1>Returns & Refunds</h1>
+            <p>Process receipt returns, approve refunds, and track refund value by branch.</p>
+            <span><i class="fa-solid fa-location-dot"></i><b th:text="${selectedBranchName}">Harare CBD</b></span>
+          </div>
         </div>
+        <div class="returns-hero-actions">
+          <a class="btn btn-primary" href="#modal-create-return"><i class="fa-solid fa-rotate-left"></i>New Return</a>
+          <a class="btn btn-light" href="#returnable-receipts"><i class="fa-solid fa-magnifying-glass"></i>Find Receipt</a>
+        </div>
+      </section>
+
+      <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+      <section class="returns-kpi-grid">
+        <article class="returns-kpi-card kpi-blue">
+          <span><i class="fa-solid fa-bag-shopping"></i></span>
+          <div>
+            <small>Returns Today</small>
+            <strong th:text="${summaryReturnCount}">0</strong>
+            <em>Matching the current filter</em>
+          </div>
+          <b style="width:62%"></b>
+        </article>
+        <article class="returns-kpi-card kpi-green">
+          <span><i class="fa-solid fa-dollar-sign"></i></span>
+          <div>
+            <small>USD Refunded</small>
+            <strong th:text="${#numbers.formatDecimal(summaryRefundUsd, 1, 2)}">0.00</strong>
+            <em>Cash, card, and credit refunds</em>
+          </div>
+          <b style="width:58%"></b>
+        </article>
+        <article class="returns-kpi-card kpi-orange">
+          <span><i class="fa-solid fa-coins"></i></span>
+          <div>
+            <small>ZWG Refunded</small>
+            <strong th:text="${#numbers.formatDecimal(summaryRefundZwg, 1, 2)}">0.00</strong>
+            <em>Local currency refunds</em>
+          </div>
+          <b style="width:48%"></b>
+        </article>
+        <article class="returns-kpi-card kpi-red">
+          <span><i class="fa-regular fa-clock"></i></span>
+          <div>
+            <small>Pending Approval</small>
+            <strong th:text="${approvalCount}">0</strong>
+            <em>Waiting manager review</em>
+          </div>
+          <b style="width:42%"></b>
+        </article>
+      </section>
+
+      <section class="returns-workspace-grid">
+        <div class="returns-panel returns-history-panel">
+          <div class="returns-panel-head">
+            <div>
+              <h2>Return History</h2>
+              <small>Search processed returns by branch, date, receipt, or return number.</small>
+            </div>
+            <a class="icon-button mini" th:href="@{/shop/returns(branchId=${selectedBranchId})}" title="Refresh"><i class="fa-solid fa-rotate"></i></a>
+          </div>
+
+          <form method="get" th:action="@{/shop/returns}" class="returns-filter-bar">
+            <label>Branch
+              <select name="branchId">
+                <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
+              </select>
+            </label>
+            <label>From<input type="date" name="from" th:value="${dateFrom}"></label>
+            <label>To<input type="date" name="to" th:value="${dateTo}"></label>
+            <label>Receipt / Return #<input name="search" placeholder="Search receipt or return #" th:value="${returnSearch}"></label>
+            <div class="returns-filter-actions">
+              <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+              <a class="btn btn-light" th:href="@{/shop/returns(branchId=${selectedBranchId})}"><i class="fa-solid fa-xmark"></i>Clear</a>
+            </div>
+          </form>
+
+          <div class="returns-table-wrap">
+            <table>
+              <thead><tr><th>Return</th><th>Original Sale</th><th>Cashier</th><th>Reason</th><th>Method</th><th>Items</th><th>Total</th><th>Status</th><th>Created</th></tr></thead>
+              <tbody>
+              <tr th:each="ret : ${returnList}">
+                <td><strong th:text="${ret.returnNumber}">RET</strong><small th:text="${ret.currency}">USD</small></td>
+                <td th:text="${ret.originalReceiptNumber}">Receipt</td>
+                <td th:text="${cashierById.get(ret.cashierId) ?: 'User #' + ret.cashierId}">Cashier</td>
+                <td th:text="${ret.reason}">Reason</td>
+                <td><span class="badge blue" th:text="${ret.refundMethod}">Method</span></td>
+                <td th:text="${#lists.size(ret.items)}">0</td>
+                <td><strong th:text="${#numbers.formatDecimal(ret.totalRefund, 1, 2)}">0.00</strong></td>
+                <td><span th:class="${ret.isApproved ? 'badge status-completed' : 'badge status-pending'}" th:text="${ret.isApproved ? 'APPROVED' : 'PENDING'}">Status</span></td>
+                <td th:text="${#temporals.format(ret.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="returns-empty" th:if="${#lists.isEmpty(returnList)}">
+              <span><i class="fa-solid fa-box-open"></i></span>
+              <strong>No returns found for the selected filters.</strong>
+              <p>Try adjusting your branch, date range, or receipt number.</p>
+            </div>
+            <div th:replace="~{common/layout :: pagination(${returnsPage}, ${returnPageLinks}, ${returnPrevUrl}, ${returnNextUrl})}"></div>
+          </div>
+        </div>
+
+        <aside class="returns-panel returns-workflow-panel">
+          <div class="returns-panel-head">
+            <div>
+              <h2>Return Workflow</h2>
+              <small>Keep every refund traceable from receipt to stock.</small>
+            </div>
+          </div>
+          <div class="returns-flow">
+            <article>
+              <span>1</span>
+              <div><strong>Verify receipt</strong><small>Find and validate the original sale.</small></div>
+              <em class="badge status-completed">Complete</em>
+            </article>
+            <article>
+              <span>2</span>
+              <div><strong>Select items</strong><small>Choose items to return and reason.</small></div>
+              <em class="badge status-completed">Complete</em>
+            </article>
+            <article>
+              <span>3</span>
+              <div><strong>Confirm refund method</strong><small>Select refund method and review amounts.</small></div>
+              <em class="badge blue">In progress</em>
+            </article>
+            <article>
+              <span>4</span>
+              <div><strong>Manager approval</strong><small>Approve exceptions and high-value returns.</small></div>
+              <em class="badge status-pending">Pending</em>
+            </article>
+            <article>
+              <span>5</span>
+              <div><strong>Stock restored</strong><small>Restock approved items automatically.</small></div>
+              <em class="badge status-pending">Pending</em>
+            </article>
+          </div>
+        </aside>
+      </section>
+
+      <section id="returnable-receipts" class="returns-panel returns-receipts-panel">
+        <div class="returns-panel-head">
+          <div>
+            <h2>Returnable Receipts</h2>
+            <small>Completed sales that can be selected for a new return.</small>
+          </div>
+          <span class="badge blue" th:text="${#lists.size(returnableSales) + ' receipts'}">0 receipts</span>
+        </div>
+        <div class="returns-table-wrap">
+          <table>
+            <thead><tr><th>Receipt</th><th>Cashier</th><th>Items</th><th>Currency</th><th>Total</th><th>Created</th><th>Action</th></tr></thead>
+            <tbody>
+            <tr th:each="sale : ${returnableSales}">
+              <td><strong th:text="${sale.receiptNumber}">Receipt</strong></td>
+              <td th:text="${cashierById.get(sale.cashierId) ?: 'User #' + sale.cashierId}">Cashier</td>
+              <td th:text="${#lists.size(sale.items)}">0</td>
+              <td><span class="badge blue" th:text="${sale.currency}">USD</span></td>
+              <td><strong th:text="${#numbers.formatDecimal(sale.grandTotal, 1, 2)}">0.00</strong></td>
+              <td th:text="${#temporals.format(sale.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+              <td><a class="btn btn-light" th:href="${'#modal-return-sale-' + sale.id}"><i class="fa-solid fa-rotate-left"></i>Return</a></td>
+            </tr>
+            </tbody>
+          </table>
+          <div class="returns-empty" th:if="${#lists.isEmpty(returnableSales)}">
+            <span><i class="fa-solid fa-receipt"></i></span>
+            <strong>No completed sales available.</strong>
+            <p>Completed sales will appear here when they are ready for return processing.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <div id="modal-create-return" class="modal"><div class="modal-content wide-modal returns-wizard-modal">
+      <div class="modal-head"><h2>New Return</h2><a class="close" href="#">&times;</a></div>
+      <div class="returns-wizard-steps">
+        <span class="is-active"><b>1</b>Find receipt</span>
+        <span><b>2</b>Select returned items</span>
+        <span><b>3</b>Confirm refund</span>
       </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-dollar-sign"></i><strong th:text="${'USD ' + #numbers.formatDecimal(summaryRefundUsd, 1, 2)}">USD 0.00</strong><span>Refunded</span></div>
-        <div><i class="fa-solid fa-coins"></i><strong th:text="${'ZWG ' + #numbers.formatDecimal(summaryRefundZwg, 1, 2)}">ZWG 0.00</strong><span>Refunded</span></div>
+      <div class="returns-wizard-search">
+        <label>Receipt or Return number<input placeholder="Enter receipt number"></label>
+        <a class="btn btn-light" href="#returnable-receipts"><i class="fa-solid fa-magnifying-glass"></i>Search</a>
       </div>
-    </section>
-
-    <div class="page-toolbar">
-      <a class="btn btn-primary" href="#modal-create-return"><i class="fa-solid fa-rotate-left"></i>New Return</a>
-    </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
-
-    <section class="metric-grid">
-      <div class="metric-card metric-blue"><span>Returns</span><strong th:text="${summaryReturnCount}">0</strong><div><em style="width:65%"></em></div><small>Matching the current filter</small></div>
-      <div class="metric-card metric-green"><span>USD Refunds</span><strong th:text="${#numbers.formatDecimal(summaryRefundUsd, 1, 2)}">0.00</strong><div><em style="width:58%"></em></div><small>Cash/card/store credits</small></div>
-      <div class="metric-card metric-orange"><span>ZWG Refunds</span><strong th:text="${#numbers.formatDecimal(summaryRefundZwg, 1, 2)}">0.00</strong><div><em style="width:48%"></em></div><small>Local currency refunds</small></div>
-      <div class="metric-card metric-red"><span>Approvals</span><strong th:text="${approvalCount}">0</strong><div><em style="width:36%"></em></div><small>Waiting manager review</small></div>
-    </section>
-
-    <section class="panel table-panel">
-      <div class="toolbar">
-        <h2>Return History</h2>
-        <form method="get" th:action="@{/shop/returns}" class="inline-filter">
-          <select name="branchId" onchange="this.form.submit()">
-            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
-          </select>
-          <input type="date" name="from" th:value="${dateFrom}">
-          <input type="date" name="to" th:value="${dateTo}">
-          <input name="search" placeholder="Return or receipt number" th:value="${returnSearch}">
-          <button class="btn btn-blue" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
-          <a class="btn btn-light" th:href="@{/shop/returns(branchId=${selectedBranchId})}"><i class="fa-solid fa-xmark"></i>Clear</a>
-        </form>
+      <div class="returns-wizard-receipts">
+        <article th:each="sale,iter : ${returnableSales}" th:if="${iter.index < 3}">
+          <div><strong th:text="${sale.receiptNumber}">BR11-20260712-1783892211226</strong><small th:text="${#temporals.format(sale.createdAt, 'dd MMM yyyy HH:mm')}">Date</small></div>
+          <span th:text="${sale.currency + ' ' + #numbers.formatDecimal(sale.grandTotal, 1, 2)}">USD 98.00</span>
+          <a class="btn btn-primary" th:href="${'#modal-return-sale-' + sale.id}">Select</a>
+        </article>
+        <div class="returns-empty compact" th:if="${#lists.isEmpty(returnableSales)}">No receipts available for returns.</div>
       </div>
-      <table>
-        <thead><tr><th>Return</th><th>Original Sale</th><th>Cashier</th><th>Reason</th><th>Method</th><th>Items</th><th>Total</th><th>Status</th><th>Created</th></tr></thead>
-        <tbody>
-        <tr th:each="ret : ${returnList}">
-          <td><strong th:text="${ret.returnNumber}">RET</strong><small th:text="${ret.currency}">USD</small></td>
-          <td th:text="${ret.originalReceiptNumber}">Receipt</td>
-          <td th:text="${cashierById.get(ret.cashierId) ?: 'User #' + ret.cashierId}">Cashier</td>
-          <td th:text="${ret.reason}">Reason</td>
-          <td th:text="${ret.refundMethod}">Method</td>
-          <td th:text="${#lists.size(ret.items)}">0</td>
-          <td><strong th:text="${#numbers.formatDecimal(ret.totalRefund, 1, 2)}">0.00</strong></td>
-          <td><span th:class="${ret.isApproved ? 'badge status-active' : 'badge status-pending'}" th:text="${ret.isApproved ? 'APPROVED' : 'PENDING'}">Status</span></td>
-          <td th:text="${#temporals.format(ret.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="empty" th:if="${#lists.isEmpty(returnList)}">No returns found for this branch/filter.</div>
-      <div th:replace="~{common/layout :: pagination(${returnsPage}, ${returnPageLinks}, ${returnPrevUrl}, ${returnNextUrl})}"></div>
-    </section>
-
-    <section class="panel table-panel">
-      <div class="toolbar"><h2>Returnable Receipts</h2><span class="badge" th:text="${#lists.size(returnableSales) + ' completed sales'}">0 sales</span></div>
-      <table>
-        <thead><tr><th>Receipt</th><th>Cashier</th><th>Items</th><th>Currency</th><th>Total</th><th>Created</th><th>Action</th></tr></thead>
-        <tbody>
-        <tr th:each="sale : ${returnableSales}">
-          <td><strong th:text="${sale.receiptNumber}">Receipt</strong></td>
-          <td th:text="${cashierById.get(sale.cashierId) ?: 'User #' + sale.cashierId}">Cashier</td>
-          <td th:text="${#lists.size(sale.items)}">0</td>
-          <td><span class="badge" th:text="${sale.currency}">USD</span></td>
-          <td th:text="${#numbers.formatDecimal(sale.grandTotal, 1, 2)}">0.00</td>
-          <td th:text="${#temporals.format(sale.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
-          <td><a class="btn btn-light" th:href="${'#modal-return-sale-' + sale.id}"><i class="fa-solid fa-rotate-left"></i>Return</a></td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="empty" th:if="${#lists.isEmpty(returnableSales)}">No completed sales currently available for return.</div>
-    </section>
-
-    <div id="modal-create-return" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2>Find Receipt</h2><a class="close" href="#">&times;</a></div>
-      <p class="empty">Choose a completed receipt in the Returnable Receipts table below. This protects branch stock and prevents returning products that were never sold.</p>
     </div></div>
 
-    <div th:each="sale : ${returnableSales}" th:id="${'modal-return-sale-' + sale.id}" class="modal"><div class="modal-content wide-modal">
+    <div th:each="sale : ${returnableSales}" th:id="${'modal-return-sale-' + sale.id}" class="modal"><div class="modal-content wide-modal returns-wizard-modal">
       <div class="modal-head"><h2 th:text="${'Return ' + sale.receiptNumber}">Return Sale</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{/shop/returns}" class="form-grid">
+      <form method="post" th:action="@{/shop/returns}" class="returns-return-form">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">
         <input type="hidden" name="originalReceiptNumber" th:value="${sale.receiptNumber}">
-        <label>Reason<select name="reason" required><option>DEFECTIVE</option><option>WRONG_ITEM</option><option>CUSTOMER_CHANGED_MIND</option><option>DAMAGED</option><option>EXPIRED</option><option>OVERCHARGED</option><option>OTHER</option></select></label>
-        <label>Refund Method<select name="refundMethod" required><option>CASH</option><option>CARD</option><option>ECOCASH</option><option>ONEMONEY</option><option>INNBUCKS</option><option>STORE_CREDIT</option><option>EXCHANGE</option></select></label>
-        <div class="table-wrap" style="grid-column:1/-1">
-          <table><thead><tr><th>Product</th><th>Sold</th><th>Qty To Return</th><th>Restock</th><th>Notes</th></tr></thead>
-            <tbody><tr th:each="item,iter : ${sale.items}">
+
+        <div class="returns-wizard-steps">
+          <span class="is-complete"><b>1</b>Receipt verified</span>
+          <span class="is-active"><b>2</b>Select returned items</span>
+          <span><b>3</b>Confirm refund</span>
+        </div>
+
+        <section class="returns-selected-sale">
+          <article><span>Receipt</span><strong th:text="${sale.receiptNumber}">Receipt</strong></article>
+          <article><span>Cashier</span><strong th:text="${cashierById.get(sale.cashierId) ?: 'User #' + sale.cashierId}">Cashier</strong></article>
+          <article><span>Total</span><strong th:text="${sale.currency + ' ' + #numbers.formatDecimal(sale.grandTotal, 1, 2)}">USD 0.00</strong></article>
+          <article><span>Items</span><strong th:text="${#lists.size(sale.items)}">0</strong></article>
+        </section>
+
+        <div class="returns-form-grid">
+          <label>Reason<select name="reason" required><option>DEFECTIVE</option><option>WRONG_ITEM</option><option>CUSTOMER_CHANGED_MIND</option><option>DAMAGED</option><option>EXPIRED</option><option>OVERCHARGED</option><option>OTHER</option></select></label>
+          <label>Refund Method<select name="refundMethod" required><option>CASH</option><option>CARD</option><option>ECOCASH</option><option>ONEMONEY</option><option>INNBUCKS</option><option>STORE_CREDIT</option><option>EXCHANGE</option></select></label>
+        </div>
+
+        <div class="returns-table-wrap">
+          <table>
+            <thead><tr><th>Product</th><th>Sold</th><th>Qty To Return</th><th>Restock</th><th>Notes</th></tr></thead>
+            <tbody>
+            <tr th:each="item,iter : ${sale.items}">
               <td><input type="hidden" th:name="${'items[' + iter.index + '].productId'}" th:value="${item.productId}"><strong th:text="${item.productName}">Product</strong><small th:text="${item.productSku}">SKU</small></td>
               <td th:text="${item.quantity}">0</td>
               <td><input th:name="${'items[' + iter.index + '].quantity'}" type="number" step="0.0001" min="0" th:max="${item.quantity}" value="0"></td>
               <td><select th:name="${'items[' + iter.index + '].restockItem'}"><option value="true">Yes</option><option value="false">No</option></select></td>
               <td><input th:name="${'items[' + iter.index + '].notes'}" placeholder="Condition"></td>
-            </tr></tbody>
+            </tr>
+            </tbody>
           </table>
         </div>
-        <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label>
+
+        <label class="returns-notes-field">Notes<textarea name="notes" placeholder="Optional return notes"></textarea></label>
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-rotate-left"></i>Process Return</button></div>
       </form>
     </div></div>

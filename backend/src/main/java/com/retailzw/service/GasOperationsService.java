@@ -5,6 +5,7 @@ import com.retailzw.dto.request.GasPriceRequest;
 import com.retailzw.dto.request.GasExpenseRequest;
 import com.retailzw.dto.request.GasRestockRequest;
 import com.retailzw.dto.request.GasSaleRequest;
+import com.retailzw.dto.request.GasStockReconciliationRequest;
 import com.retailzw.dto.request.GasTankRequest;
 import com.retailzw.dto.request.OpenGasShiftRequest;
 import com.retailzw.enums.BusinessModule;
@@ -36,6 +37,7 @@ public class GasOperationsService {
     private final GasSaleRepository sales;
     private final GasRestockRepository restocks;
     private final GasExpenseRepository expenses;
+    private final GasStockAdjustmentRepository stockAdjustments;
     private final TenantSubscriptionRepository subscriptions;
     private final SaasPlanRepository plans;
 
@@ -65,32 +67,50 @@ public class GasOperationsService {
         Long branchId = request.getBranchId();
         requireGasBranch(tenantId, branchId);
         enforceTankLimit(tenantId);
-        return tanks.save(GasTank.builder()
+        BigDecimal capacityKg = nvl(request.getCapacityKg());
+        BigDecimal currentKg = nvl(request.getCurrentKg());
+        BigDecimal reorderLevelKg = nvl(request.getReorderLevelKg());
+        validateTankLevels(capacityKg, currentKg, reorderLevelKg);
+        GasTank tank = tanks.save(GasTank.builder()
                 .tenantId(tenantId)
                 .branchId(branchId)
                 .name(requiredText(request.getName(), "Tank name is required."))
                 .productName(requiredText(request.getProductName(), "Product name is required."))
-                .capacityKg(nvl(request.getCapacityKg()))
-                .currentKg(nvl(request.getCurrentKg()))
-                .reorderLevelKg(nvl(request.getReorderLevelKg()))
+                .capacityKg(capacityKg)
+                .currentKg(currentKg)
+                .reorderLevelKg(reorderLevelKg)
                 .status(request.getStatus() == null ? GasTankStatus.ACTIVE : request.getStatus())
                 .build());
+        if (currentKg.compareTo(BigDecimal.ZERO) > 0) {
+            recordAdjustment(tank, BigDecimal.ZERO, currentKg, "OPENING_STOCK",
+                    "Opening tank quantity captured during setup.", null);
+        }
+        return tank;
     }
 
     @Transactional
     public GasTank updateTank(Long tenantId, Long tankId, GasTankRequest request) {
         Long branchId = request.getBranchId();
         requireGasBranch(tenantId, branchId);
-        GasTank tank = tanks.findById(tankId)
-                .filter(existing -> existing.getTenantId().equals(tenantId) && existing.getBranchId().equals(branchId))
+        GasTank tank = tanks.lockTank(tenantId, branchId, tankId)
                 .orElseThrow(() -> new IllegalArgumentException("Gas tank not found for this branch."));
+        BigDecimal quantityBefore = nvl(tank.getCurrentKg());
+        BigDecimal currentKg = request.getCurrentKg() == null ? quantityBefore : nvl(request.getCurrentKg());
+        BigDecimal capacityKg = nvl(request.getCapacityKg());
+        BigDecimal reorderLevelKg = nvl(request.getReorderLevelKg());
+        validateTankLevels(capacityKg, currentKg, reorderLevelKg);
         tank.setName(requiredText(request.getName(), "Tank name is required."));
         tank.setProductName(requiredText(request.getProductName(), "Product name is required."));
-        tank.setCapacityKg(nvl(request.getCapacityKg()));
-        tank.setCurrentKg(nvl(request.getCurrentKg()));
-        tank.setReorderLevelKg(nvl(request.getReorderLevelKg()));
+        tank.setCapacityKg(capacityKg);
+        tank.setCurrentKg(currentKg);
+        tank.setReorderLevelKg(reorderLevelKg);
         tank.setStatus(request.getStatus() == null ? GasTankStatus.ACTIVE : request.getStatus());
-        return tanks.save(tank);
+        GasTank saved = tanks.save(tank);
+        if (quantityBefore.compareTo(currentKg) != 0) {
+            recordAdjustment(saved, quantityBefore, currentKg, "TANK_CONFIGURATION_UPDATE",
+                    "Stock changed through the existing tank update API.", null);
+        }
+        return saved;
     }
 
     @Transactional
@@ -222,6 +242,32 @@ public class GasOperationsService {
     }
 
     @Transactional
+    public GasStockAdjustment reconcileStock(Long tenantId, Long userId,
+                                             GasStockReconciliationRequest request) {
+        Long branchId = request.getBranchId();
+        requireGasBranch(tenantId, branchId);
+        GasTank tank = tanks.lockTank(tenantId, branchId, request.getTankId())
+                .orElseThrow(() -> new IllegalArgumentException("Gas tank not found for this branch."));
+        BigDecimal quantityBefore = nvl(tank.getCurrentKg()).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal countedKg = nvl(request.getCountedKg()).setScale(3, RoundingMode.HALF_UP);
+        if (countedKg.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Counted gas stock cannot be negative.");
+        }
+        if (nvl(tank.getCapacityKg()).compareTo(BigDecimal.ZERO) > 0
+                && countedKg.compareTo(tank.getCapacityKg()) > 0) {
+            throw new IllegalStateException("Counted stock cannot exceed " + tank.getName() + " capacity.");
+        }
+        if (quantityBefore.compareTo(countedKg) == 0) {
+            throw new IllegalArgumentException("The counted stock matches the system quantity; no adjustment is required.");
+        }
+        tank.setCurrentKg(countedKg);
+        tanks.save(tank);
+        return recordAdjustment(tank, quantityBefore, countedKg,
+                requiredText(request.getReason(), "Reconciliation reason is required."),
+                blank(request.getNotes()), userId);
+    }
+
+    @Transactional
     public GasExpense recordExpense(Long tenantId, Long userId, GasExpenseRequest request) {
         Long branchId = request.getBranchId();
         requireGasBranch(tenantId, branchId);
@@ -306,6 +352,11 @@ public class GasOperationsService {
         return expenses.findByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
     }
 
+    public List<GasStockAdjustment> stockAdjustments(Long tenantId, Long branchId) {
+        requireGasBranch(tenantId, branchId);
+        return stockAdjustments.findTop50ByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
+    }
+
     @Transactional
     public void seedGasDefaults(Long tenantId, Long branchId) {
         requireGasBranch(tenantId, branchId);
@@ -343,6 +394,36 @@ public class GasOperationsService {
         if (maxTanks > 0 && tanks.countByTenantId(tenantId) >= maxTanks) {
             throw new IllegalStateException("Your package allows up to " + maxTanks + " gas tanks.");
         }
+    }
+
+    private void validateTankLevels(BigDecimal capacityKg, BigDecimal currentKg, BigDecimal reorderLevelKg) {
+        if (capacityKg.compareTo(BigDecimal.ZERO) < 0
+                || currentKg.compareTo(BigDecimal.ZERO) < 0
+                || reorderLevelKg.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Tank capacity and stock levels cannot be negative.");
+        }
+        if (capacityKg.compareTo(BigDecimal.ZERO) > 0 && currentKg.compareTo(capacityKg) > 0) {
+            throw new IllegalArgumentException("Current stock cannot exceed tank capacity.");
+        }
+        if (capacityKg.compareTo(BigDecimal.ZERO) > 0 && reorderLevelKg.compareTo(capacityKg) > 0) {
+            throw new IllegalArgumentException("Reorder level cannot exceed tank capacity.");
+        }
+    }
+
+    private GasStockAdjustment recordAdjustment(GasTank tank, BigDecimal quantityBefore,
+                                                BigDecimal countedKg, String reason,
+                                                String notes, Long userId) {
+        return stockAdjustments.save(GasStockAdjustment.builder()
+                .tenantId(tank.getTenantId())
+                .branchId(tank.getBranchId())
+                .tankId(tank.getId())
+                .quantityBeforeKg(quantityBefore.setScale(3, RoundingMode.HALF_UP))
+                .countedKg(countedKg.setScale(3, RoundingMode.HALF_UP))
+                .varianceKg(countedKg.subtract(quantityBefore).setScale(3, RoundingMode.HALF_UP))
+                .reason(reason.trim().toUpperCase().replace(' ', '_'))
+                .notes(notes)
+                .createdBy(userId)
+                .build());
     }
 
     private String requiredText(String value, String message) {

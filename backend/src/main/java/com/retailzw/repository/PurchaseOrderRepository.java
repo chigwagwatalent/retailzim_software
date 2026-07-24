@@ -25,6 +25,8 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
 
     Page<PurchaseOrder> findByTenantIdAndBranchId(Long tenantId, Long branchId, Pageable pageable);
 
+    List<PurchaseOrder> findAllByTenantIdAndBranchIdOrderByCreatedAtDesc(Long tenantId, Long branchId);
+
     List<PurchaseOrder> findByTenantIdAndSupplierId(Long tenantId, Long supplierId);
 
     boolean existsByPoNumber(String poNumber);

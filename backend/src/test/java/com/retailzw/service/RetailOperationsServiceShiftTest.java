@@ -31,13 +31,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class RetailOperationsServiceShiftTest {
+public class RetailOperationsServiceShiftTest {
 
     private CashSessionRepository cashSessions;
     private RetailOperationsService service;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         cashSessions = mock(CashSessionRepository.class);
         service = new RetailOperationsService(
                 mock(ProductRepository.class),
@@ -62,7 +62,7 @@ class RetailOperationsServiceShiftTest {
     }
 
     @Test
-    void closeSessionRequiresTheSignedInCashierToOwnTheShiftId() {
+    public void closeSessionRequiresTheSignedInCashierToOwnTheShiftId() {
         CloseSessionRequest request = new CloseSessionRequest();
         request.setSessionId(10L);
 
@@ -84,7 +84,7 @@ class RetailOperationsServiceShiftTest {
     }
 
     @Test
-    void closeSessionClosesOnlyTheRequestedOpenShift() {
+    public void closeSessionClosesOnlyTheRequestedOpenShift() {
         CloseSessionRequest request = new CloseSessionRequest();
         request.setSessionId(11L);
         request.setActualUsd(new BigDecimal("25.00"));

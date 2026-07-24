@@ -3,9 +3,9 @@ package com.retailzw.controller.web;
 import com.retailzw.dto.request.TenantSignUpRequest;
 import com.retailzw.enums.BusinessModule;
 import com.retailzw.enums.CurrencyCode;
-import com.retailzw.enums.ModuleAccessStatus;
 import com.retailzw.model.*;
 import com.retailzw.repository.*;
+import com.retailzw.service.PackageModuleAccessService;
 import com.retailzw.service.PlatformCommunicationService;
 import com.retailzw.service.EmailService;
 import com.retailzw.service.PasswordResetService;
@@ -46,7 +46,7 @@ public class PlatformAdminController {
     private final TenantRepository tenants;
     private final SaasPlanRepository plans;
     private final TenantSubscriptionRepository tenantSubscriptions;
-    private final TenantEnabledModuleRepository tenantModules;
+    private final PackageModuleAccessService packageModuleAccess;
     private final BranchRepository branches;
     private final ProductRepository products;
     private final UserRepository users;
@@ -265,6 +265,8 @@ public class PlatformAdminController {
         tenant.setStatus(request.getStatus() == null ? tenant.getStatus() : request.getStatus());
         tenant.setPlanId(request.getPlanId());
         tenants.save(tenant);
+        alignCurrentSubscriptionPlan(tenant.getId(), request.getPlanId());
+        packageModuleAccess.syncAndGetEnabledModules(tenant.getId());
         redirect.addFlashAttribute("message", "Tenant profile updated.");
         return "redirect:/admin/tenants/" + id;
     }
@@ -688,6 +690,7 @@ public class PlatformAdminController {
         plan.setGasReconciliationEnabled(gasReconciliationEnabled);
         plan.setIsActive(isActive);
         plans.save(plan);
+        packageModuleAccess.reconcileTenantsOnPlan(plan.getId());
         redirect.addFlashAttribute("message", "Package updated.");
         return "redirect:/admin/subscriptions";
     }
@@ -738,30 +741,21 @@ public class PlatformAdminController {
             tenant.setStatus(Tenant.TenantStatus.CANCELLED);
         }
         tenants.save(tenant);
-        plans.findById(planId).ifPresent(plan -> syncTenantModules(tenant.getId(), plan));
+        packageModuleAccess.syncAndGetEnabledModules(tenant.getId());
     }
 
-    private void syncTenantModules(Long tenantId, SaasPlan plan) {
-        List<BusinessModule> allowed = plan.allowedModuleList().stream()
-                .filter(module -> !BusinessModule.RESTAURANT_MODULE.equals(module))
-                .toList();
-        if (allowed.isEmpty()) {
-            allowed = List.of(BusinessModule.SHOP_MODULE);
+    private void alignCurrentSubscriptionPlan(Long tenantId, Long planId) {
+        if (planId == null) {
+            return;
         }
-        for (BusinessModule module : allowed) {
-            TenantEnabledModule tenantModule = tenantModules.findByTenantIdAndModule(tenantId, module)
-                    .orElseGet(() -> TenantEnabledModule.builder()
-                            .tenantId(tenantId)
-                            .module(module)
-                            .build());
-            tenantModule.setStatus(ModuleAccessStatus.ENABLED);
-            tenantModules.save(tenantModule);
-        }
-        for (TenantEnabledModule existing : tenantModules.findByTenantId(tenantId)) {
-            if (!allowed.contains(existing.getModule())) {
-                existing.setStatus(ModuleAccessStatus.DISABLED);
-                tenantModules.save(existing);
-            }
+        TenantSubscription subscription = tenantSubscriptions
+                .findByTenantIdAndStatus(tenantId, TenantSubscription.SubscriptionStatus.ACTIVE)
+                .or(() -> tenantSubscriptions.findByTenantIdAndStatus(
+                        tenantId, TenantSubscription.SubscriptionStatus.TRIAL))
+                .orElse(null);
+        if (subscription != null && !planId.equals(subscription.getPlanId())) {
+            subscription.setPlanId(planId);
+            tenantSubscriptions.save(subscription);
         }
     }
 

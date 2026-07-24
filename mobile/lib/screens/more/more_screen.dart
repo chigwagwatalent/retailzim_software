@@ -162,10 +162,12 @@ class MoreScreen extends StatelessWidget {
               ),
               const Divider(height: 1),
               ListTile(
-                leading: const Icon(Icons.store, color: AppColors.primaryBlue),
-                title: const Text('Zimbabwe retail mode'),
-                subtitle:
-                    const Text('Multi-currency, branch-aware POS workflows'),
+                leading: Icon(user?.isGasBranch == true ? Icons.local_gas_station : Icons.store,
+                    color: AppColors.primaryBlue),
+                title: Text(user?.isGasBranch == true ? 'Zimbabwe LPG gas mode' : 'Zimbabwe retail mode'),
+                subtitle: Text(user?.isGasBranch == true
+                    ? 'Gas shifts, kilogram pricing and tank-aware sales'
+                    : 'Multi-currency, branch-aware POS workflows'),
                 trailing: Icon(
                     provider.isOnline ? Icons.cloud_done : Icons.cloud_off),
               ),

@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class RetailOperationsInventoryTest {
+public class RetailOperationsInventoryTest {
 
     private ProductRepository products;
     private InventoryRepository inventory;
@@ -29,7 +29,7 @@ class RetailOperationsInventoryTest {
     private RetailOperationsService service;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         products = mock(ProductRepository.class);
         inventory = mock(InventoryRepository.class);
         inventoryTransactions = mock(InventoryTransactionRepository.class);
@@ -41,7 +41,7 @@ class RetailOperationsInventoryTest {
     }
 
     @Test
-    void adjustmentLocksStockAndWritesAdjustmentAndMovement() {
+    public void adjustmentLocksStockAndWritesAdjustmentAndMovement() {
         Branch branch = Branch.builder().id(3L).tenantId(2L).isActive(true).build();
         Product product = Product.builder().id(101L).tenantId(2L).name("Sugar").isActive(true).build();
         Inventory stock = Inventory.builder().id(8L).tenantId(2L).branchId(3L).productId(101L)
@@ -71,7 +71,7 @@ class RetailOperationsInventoryTest {
     }
 
     @Test
-    void zeroAdjustmentIsRejectedBeforeStockChanges() {
+    public void zeroAdjustmentIsRejectedBeforeStockChanges() {
         when(branches.findById(3L)).thenReturn(Optional.of(
                 Branch.builder().id(3L).tenantId(2L).isActive(true).build()));
 

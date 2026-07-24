@@ -44,6 +44,15 @@ public interface ReturnRepository extends JpaRepository<Return, Long> {
                                @Param("search") String search,
                                Pageable pageable);
 
+    @EntityGraph(attributePaths = {"items"})
+    @Query("SELECT r FROM Return r WHERE r.tenantId = :tenantId AND r.branchId = :branchId " +
+           "AND (:from IS NULL OR r.createdAt >= :from) " +
+           "AND (:to IS NULL OR r.createdAt < :to) ORDER BY r.createdAt DESC")
+    List<Return> searchReturnsList(@Param("tenantId") Long tenantId,
+                                   @Param("branchId") Long branchId,
+                                   @Param("from") LocalDateTime from,
+                                   @Param("to") LocalDateTime to);
+
     @Query("SELECT COALESCE(SUM(r.totalRefund), 0) FROM Return r WHERE r.tenantId = :tenantId " +
            "AND r.branchId = :branchId AND r.createdAt BETWEEN :from AND :to")
     BigDecimal sumRefunds(@Param("tenantId") Long tenantId,

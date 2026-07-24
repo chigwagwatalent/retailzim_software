@@ -4,23 +4,35 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Secure payment | RetailZW</title>
+  <link rel="icon" type="image/png" th:href="@{/img/favicon.png}">
   <link rel="stylesheet" th:href="@{/css/retailzw.css(v=18)}">
-  <link rel="stylesheet" th:href="@{/css/billing.css(v=2)}">
+  <link rel="stylesheet" th:href="@{/css/billing.css(v=3)}">
   <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
 </head>
 <body class="billing-checkout-shell">
 <main class="billing-checkout" th:attr="data-status-url=@{/checkout/smilepay/{ref}/status(ref=${checkout.orderReference})}">
   <header class="checkout-brand">
-    <div class="brand"><span class="brand-logo"><img th:src="@{/img/logo.png}" alt="RetailZW"></span><span>RetailZW</span></div>
-    <span class="secure-chip"><i class="fa-solid fa-lock"></i> Secure checkout</span>
+    <a class="checkout-logo" th:href="@{/auth/shop/login}" aria-label="Retail Zim home">
+      <img th:src="@{/img/retail-zim-logo-transparent.png}" alt="Retail Zim">
+    </a>
+
+    <ol class="checkout-progress" aria-label="Signup progress">
+      <li class="complete"><span><i class="fa-solid fa-check"></i></span><strong>Account created</strong></li>
+      <li class="active" aria-current="step"><span>2</span><strong>Choose payment</strong></li>
+      <li><span>3</span><strong>Activate shop</strong></li>
+    </ol>
+
+    <div class="checkout-security">
+      <i class="fa-solid fa-lock"></i>
+      <span><strong>Secure checkout</strong><small>Your data is protected</small></span>
+    </div>
   </header>
 
   <div class="checkout-layout">
     <section class="checkout-payment-panel">
       <div class="checkout-heading">
-        <p>Smile &amp; Pay Express</p>
-        <h1>Choose how to pay</h1>
-        <span>Fast approval without leaving RetailZW.</span>
+        <h1>Complete your subscription</h1>
+        <span>Choose a payment method to activate your Retail Zim workspace.</span>
       </div>
 
       <div class="alert" th:if="${message}" th:text="${message}"></div>
@@ -28,26 +40,27 @@
       <section class="checkout-recheck" th:if="${checkout.status.name() == 'FAILED'}">
         <div>
           <i class="fa-solid fa-triangle-exclamation"></i>
-          <span><strong>Payment not confirmed</strong><small>If the request appeared on your phone, check its status before trying again.</small></span>
+          <span><strong>Payment not confirmed</strong><small>Check its status before trying another payment.</small></span>
         </div>
-        <a class="btn btn-light"
-           th:href="@{/checkout/smilepay/{ref}/recheck(ref=${checkout.orderReference})}">
+        <a class="btn btn-light" th:href="@{/checkout/smilepay/{ref}/recheck(ref=${checkout.orderReference})}">
           <i class="fa-solid fa-rotate"></i>Check payment status
         </a>
       </section>
 
       <section class="payment-complete" th:if="${checkout.status.name() == 'PAID'}">
         <i class="fa-solid fa-circle-check"></i>
-        <h2>Payment confirmed</h2>
-        <p>Your subscription is active.</p>
-        <a class="btn btn-primary" th:href="@{/auth/shop/login}">Continue to RetailZW</a>
+        <p>Payment complete</p>
+        <h2>Your Retail Zim workspace is active</h2>
+        <span>Your subscription and selected modules are ready.</span>
+        <a class="btn btn-primary" th:href="@{/auth/shop/login}">Continue to Retail Zim<i class="fa-solid fa-arrow-right"></i></a>
       </section>
 
       <section class="payment-pending" th:if="${checkout.status.name() == 'PROCESSING'}" data-payment-pending>
         <div class="payment-loader"><i></i><span></span></div>
-        <h2>Confirming payment</h2>
-        <p th:text="${checkout.providerStatus ?: 'Approve the request, then keep this page open.'}">Approve the payment.</p>
-        <small>RetailZW will activate automatically after verification.</small>
+        <p>Secure verification</p>
+        <h2>Confirming your payment</h2>
+        <span th:text="${checkout.providerStatus ?: 'Approve the request, then keep this page open.'}">Approve the payment.</span>
+        <small>Retail Zim activates automatically after confirmation.</small>
       </section>
 
       <form class="express-payment-form"
@@ -55,28 +68,25 @@
             method="post"
             th:action="@{/checkout/smilepay/{ref}/initiate(ref=${checkout.orderReference})}"
             data-express-payment-form>
-        <div class="payment-method-grid">
+        <div class="payment-method-grid" role="radiogroup" aria-label="Payment method">
           <label class="payment-method-card" th:each="method, iter : ${paymentMethods}">
             <input type="radio" name="paymentMethod" th:value="${method}" th:checked="${iter.index == 0}" required>
             <span class="payment-logo">
-              <img th:src="@{'/img/payments/' + ${#strings.toLowerCase(method.name())} + '.svg'}"
-                   th:alt="${method.label + ' logo'}">
+              <img th:src="@{'/img/payments/' + ${#strings.toLowerCase(method.name())} + '.svg'}" th:alt="${method.label + ' logo'}">
             </span>
-            <span>
-              <strong th:text="${method.label}">Payment</strong>
-              <small th:text="${method.name() == 'CARD' ? 'Secure 3DS card payment' : (method.otpRequired ? 'Mobile number and OTP' : (method.mobileRequired ? 'Approval on your phone' : 'Approve in your app'))}">Express payment</small>
-            </span>
-            <i class="fa-solid fa-circle-check"></i>
+            <strong th:text="${method.label}">Payment</strong>
+            <small th:text="${method.name() == 'CARD' ? 'Debit or credit card' : (method.otpRequired ? 'Mobile number and OTP' : (method.mobileRequired ? 'Approve on your phone' : 'Approve in your app'))}">Express payment</small>
+            <i class="fa-solid fa-check"></i>
           </label>
         </div>
 
-        <div class="payment-fields" data-mobile-fields>
-          <label>Mobile number
-            <span class="checkout-input">
-              <i class="fa-solid fa-mobile-screen-button"></i>
-              <input name="mobile" inputmode="tel" autocomplete="tel" placeholder="077 123 4567">
-            </span>
-          </label>
+        <div class="payment-fields mobile-fields" data-mobile-fields>
+          <label for="checkout-mobile">Mobile number</label>
+          <div class="mobile-number-control">
+            <span class="checkout-country-prefix"><span aria-hidden="true">&#127487;&#127484;</span><b>+263</b><i class="fa-solid fa-chevron-down"></i></span>
+            <input id="checkout-mobile" name="mobile" inputmode="tel" autocomplete="tel" placeholder="77 123 4567">
+          </div>
+          <small class="field-hint"><i class="fa-solid fa-circle-info"></i>A payment request will be sent to this number</small>
         </div>
 
         <div class="payment-fields card-fields" data-card-fields hidden>
@@ -84,22 +94,26 @@
             <label>First name<input name="firstName" autocomplete="cc-given-name"></label>
             <label>Last name<input name="lastName" autocomplete="cc-family-name"></label>
             <label class="card-number-field">Card number
-              <span class="checkout-input">
-                <i class="fa-regular fa-credit-card"></i>
-                <input name="pan" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000">
-              </span>
+              <span class="checkout-input"><i class="fa-regular fa-credit-card"></i><input name="pan" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000"></span>
             </label>
             <label>Expiry month<input name="expMonth" inputmode="numeric" autocomplete="cc-exp-month" maxlength="2" placeholder="MM"></label>
             <label>Expiry year<input name="expYear" inputmode="numeric" autocomplete="cc-exp-year" maxlength="4" placeholder="YYYY"></label>
             <label>Security code<input name="securityCode" type="password" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="CVV"></label>
           </div>
-          <p class="card-security"><i class="fa-solid fa-shield-halved"></i> Card details go directly to Smile &amp; Pay and are never stored by RetailZW.</p>
+          <p class="card-security"><i class="fa-solid fa-shield-halved"></i>Card details go directly to Smile &amp; Pay and are never stored by Retail Zim.</p>
         </div>
 
         <button class="btn btn-primary checkout-pay-button" type="submit">
-          <span th:text="${'Pay USD ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">Pay USD 0.00</span>
+          <i class="fa-solid fa-lock"></i>
+          <span th:text="${'Pay ' + checkout.currency + ' ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">Pay USD 0.00</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
+
+        <div class="checkout-assurances" aria-label="Payment assurances">
+          <div><i class="fa-solid fa-lock"></i><span><strong>Encrypted checkout</strong><small>Bank-grade security</small></span></div>
+          <div><i class="fa-solid fa-credit-card"></i><span><strong>No card details stored</strong><small>100% safe &amp; private</small></span></div>
+          <div><i class="fa-solid fa-bolt"></i><span><strong>Instant activation</strong><small>Start using it right away</small></span></div>
+        </div>
       </form>
 
       <form class="otp-form"
@@ -113,29 +127,45 @@
           <span th:text="${'Sent to ' + checkout.customerMobile}">Sent to your phone</span>
         </div>
         <input name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="000000" required autofocus>
-        <button class="btn btn-primary" type="submit">Confirm payment</button>
+        <button class="btn btn-primary" type="submit">Confirm payment<i class="fa-solid fa-arrow-right"></i></button>
       </form>
     </section>
 
     <aside class="checkout-summary">
-      <div>
-        <span class="summary-label">Subscription</span>
-        <h2 th:text="${plan.name}">Plan</h2>
-        <p th:text="${plan.description}">Retail package</p>
+      <div class="summary-content">
+        <h2>Order summary</h2>
+        <div class="summary-plan">
+          <span th:text="${plan.code}">GROWTH</span>
+          <strong th:text="${plan.name + (#strings.endsWith(#strings.toLowerCase(plan.name), 'plan') ? '' : ' Plan')}">Growth Plan</strong>
+        </div>
+
+        <dl class="summary-details">
+          <div><dt><i class="fa-solid fa-shop"></i>Company</dt><dd th:text="${tenant.companyName}">Shop</dd></div>
+          <div><dt><i class="fa-regular fa-calendar"></i>Billing</dt><dd th:text="${#strings.capitalize(#strings.toLowerCase(plan.billingCycle.name()))}">Monthly</dd></div>
+          <div class="summary-modules"><dt><i class="fa-solid fa-cube"></i>Includes modules</dt><dd>
+            <span th:each="businessModule : ${planModules}">
+              <i th:class="${businessModule.name() == 'GAS_MODULE' ? 'fa-solid fa-fire-flame-simple' : 'fa-solid fa-cart-shopping'}"></i>
+              <b th:text="${businessModule.name() == 'GAS_MODULE' ? 'Gas Management' : 'Retail Shop'}">Retail Shop</b>
+            </span>
+          </dd></div>
+        </dl>
+
+        <div class="summary-pricing">
+          <div><span>Subscription</span><strong th:text="${checkout.currency + ' ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">USD 0.00</strong></div>
+          <div><span>Processing fee</span><strong th:text="${checkout.currency + ' 0.00'}">USD 0.00</strong></div>
+        </div>
+
+        <div class="checkout-total">
+          <span>Total due</span>
+          <strong th:text="${checkout.currency + ' ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">USD 0.00</strong>
+        </div>
+
+        <div class="checkout-trust">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Your workspace activates automatically after payment confirmation.</span>
+        </div>
       </div>
-      <dl>
-        <div><dt>Shop</dt><dd th:text="${tenant.companyName}">Shop</dd></div>
-        <div><dt>Billing</dt><dd th:text="${plan.billingCycle}">MONTHLY</dd></div>
-        <div><dt>Reference</dt><dd th:text="${checkout.orderReference}">RZW</dd></div>
-      </dl>
-      <div class="checkout-total">
-        <span>Total due</span>
-        <strong th:text="${'USD ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">USD 0.00</strong>
-      </div>
-      <div class="checkout-trust">
-        <i class="fa-solid fa-shield-halved"></i>
-        <span><strong>Protected payment</strong><small>Processed by Smile &amp; Pay, ZB Bank</small></span>
-      </div>
+      <footer class="summary-footer"><i class="fa-solid fa-lock"></i>Processed securely by <strong>Smile &amp; Pay</strong></footer>
     </aside>
   </div>
 </main>

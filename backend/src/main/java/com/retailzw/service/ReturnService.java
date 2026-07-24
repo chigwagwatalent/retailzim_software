@@ -37,6 +37,18 @@ public class ReturnService {
 
     public Return processReturn(Long tenantId, Long branchId, Long cashierId,
                                 CreateReturnRequest request) {
+        List<CreateReturnRequest.ReturnItemRequest> returnItems = request.getItems() == null
+                ? List.of()
+                : request.getItems().stream()
+                .filter(ri -> ri != null
+                        && ri.getProductId() != null
+                        && ri.getQuantity() != null
+                        && ri.getQuantity().compareTo(BigDecimal.ZERO) > 0)
+                .toList();
+        if (returnItems.isEmpty()) {
+            throw new IllegalArgumentException("Select at least one product quantity to return.");
+        }
+
         // 1. Find original sale
         Sale originalSale = sales.findByReceiptNumberAndTenantId(request.getOriginalReceiptNumber(), tenantId)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -61,7 +73,7 @@ public class ReturnService {
         // 4. Validate quantities don't exceed original
         List<SaleItem> originalItems = saleItems.findBySaleId(originalSale.getId());
         Map<Long, BigDecimal> alreadyReturned = returnedQuantities(tenantId, originalSale.getId());
-        for (CreateReturnRequest.ReturnItemRequest ri : request.getItems()) {
+        for (CreateReturnRequest.ReturnItemRequest ri : returnItems) {
             BigDecimal originalQty = originalItems.stream()
                     .filter(oi -> oi.getProductId().equals(ri.getProductId()))
                     .map(SaleItem::getQuantity)
@@ -84,7 +96,7 @@ public class ReturnService {
         String returnNumber = generateReturnNumber(branch.getBranchCode());
 
         // 6. Calculate total refund
-        BigDecimal totalRefund = request.getItems().stream()
+        BigDecimal totalRefund = returnItems.stream()
                 .map(ri -> {
                     SaleItem si = originalItems.stream()
                             .filter(oi -> oi.getProductId().equals(ri.getProductId()))
@@ -118,7 +130,7 @@ public class ReturnService {
 
         // 8. Create ReturnItems and restore inventory
         int totalPointsToReverse = 0;
-        for (CreateReturnRequest.ReturnItemRequest ri : request.getItems()) {
+        for (CreateReturnRequest.ReturnItemRequest ri : returnItems) {
             SaleItem si = originalItems.stream()
                     .filter(oi -> oi.getProductId().equals(ri.getProductId()))
                     .findFirst().orElse(null);

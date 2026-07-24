@@ -3,16 +3,12 @@ package com.retailzw.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.retailzw.enums.CurrencyCode;
-import com.retailzw.enums.BusinessModule;
-import com.retailzw.enums.ModuleAccessStatus;
 import com.retailzw.model.SaasPlan;
 import com.retailzw.model.SmilePayCheckout;
 import com.retailzw.model.Tenant;
-import com.retailzw.model.TenantEnabledModule;
 import com.retailzw.model.TenantSubscription;
 import com.retailzw.repository.SaasPlanRepository;
 import com.retailzw.repository.SmilePayCheckoutRepository;
-import com.retailzw.repository.TenantEnabledModuleRepository;
 import com.retailzw.repository.TenantRepository;
 import com.retailzw.repository.TenantSubscriptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +49,7 @@ public class SmilePayCheckoutService {
     private final TenantRepository tenants;
     private final SaasPlanRepository plans;
     private final TenantSubscriptionRepository tenantSubscriptions;
-    private final TenantEnabledModuleRepository tenantModules;
+    private final PackageModuleAccessService packageModuleAccess;
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient = HttpClient.newBuilder()
@@ -345,7 +341,7 @@ public class SmilePayCheckoutService {
         tenant.setSubscriptionStart(subscription.getStartsAt());
         tenant.setSubscriptionEnd(subscription.getEndsAt());
         tenants.save(tenant);
-        syncTenantModules(tenant.getId(), plan);
+        packageModuleAccess.syncAndGetEnabledModules(tenant.getId());
 
         checkout.setStatus(SmilePayCheckout.CheckoutStatus.PAID);
         checkout.setPaidAt(paidAt);
@@ -511,30 +507,6 @@ public class SmilePayCheckoutService {
         if (SaasPlan.BillingCycle.ANNUALLY.equals(cycle)) return start.plusYears(1);
         if (SaasPlan.BillingCycle.QUARTERLY.equals(cycle)) return start.plusMonths(3);
         return start.plusMonths(1);
-    }
-
-    private void syncTenantModules(Long tenantId, SaasPlan plan) {
-        List<BusinessModule> allowed = plan.allowedModuleList().stream()
-                .filter(module -> !BusinessModule.RESTAURANT_MODULE.equals(module))
-                .toList();
-        if (allowed.isEmpty()) {
-            allowed = List.of(BusinessModule.SHOP_MODULE);
-        }
-        for (BusinessModule module : allowed) {
-            TenantEnabledModule tenantModule = tenantModules.findByTenantIdAndModule(tenantId, module)
-                    .orElseGet(() -> TenantEnabledModule.builder()
-                            .tenantId(tenantId)
-                            .module(module)
-                            .build());
-            tenantModule.setStatus(ModuleAccessStatus.ENABLED);
-            tenantModules.save(tenantModule);
-        }
-        for (TenantEnabledModule existing : tenantModules.findByTenantId(tenantId)) {
-            if (!allowed.contains(existing.getModule())) {
-                existing.setStatus(ModuleAccessStatus.DISABLED);
-                tenantModules.save(existing);
-            }
-        }
     }
 
     private String paymentReference(SmilePayCheckout checkout, String providerReference) {

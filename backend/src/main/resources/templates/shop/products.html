@@ -7,105 +7,138 @@
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Products')}"></nav>
 
-    <section class="page-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-box-open"></i></div>
-        <div>
-          <p th:text="${'Viewing ' + selectedBranchName}">Viewing branch</p>
-          <h1>Branch Products</h1>
+    <section class="products-page">
+      <section class="products-hero">
+        <div class="products-hero-title">
+          <span class="products-hero-icon"><i class="fa-solid fa-cube"></i></span>
+          <div>
+            <p th:text="${'Viewing ' + selectedBranchName}">Viewing Harare CBD</p>
+            <h1>Branch Products</h1>
+            <small th:text="${'Manage catalogue, pricing, stock levels, and imports for ' + selectedBranchName + '.'}">Manage catalogue and stock.</small>
+          </div>
         </div>
+        <div class="products-hero-metrics">
+          <article><i class="fa-solid fa-boxes-stacked"></i><strong th:text="${branchProductCount}">0</strong><span>Products</span></article>
+          <article><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${lowStockProductCount}">0</strong><span>Low Stock</span></article>
+          <article><i class="fa-solid fa-dollar-sign"></i><strong th:text="${'USD ' + #numbers.formatDecimal(branchStockValueUsd ?: 0, 1, 2)}">USD 0.00</strong><span>Stock Value</span></article>
+        </div>
+      </section>
+
+      <div class="products-toolbar">
+        <a class="btn btn-light" th:href="@{/shop/inventory(branchId=${selectedBranchId})}"><i class="fa-solid fa-warehouse"></i>Open Inventory</a>
+        <a class="btn btn-light" href="#modal-assign-product"><i class="fa-solid fa-link"></i>Assign Existing</a>
+        <a class="btn btn-light success" href="#modal-import-products"><i class="fa-solid fa-cloud-arrow-up"></i>Import Excel</a>
+        <a class="btn btn-blue" href="#modal-create-product"><i class="fa-solid fa-plus"></i>Add Product</a>
       </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-boxes-stacked"></i><strong th:text="${productPage.totalElements}">0</strong><span>Products</span></div>
-        <div><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${lowStockProductCount}">0</strong><span>Low Stock</span></div>
-      </div>
-    </section>
 
-    <div class="page-toolbar">
-      <a class="btn btn-blue" th:href="@{/shop/inventory(branchId=${selectedBranchId})}"><i class="fa-solid fa-warehouse"></i>Open Inventory</a>
-      <a class="btn btn-light" href="#modal-assign-product"><i class="fa-solid fa-link"></i>Assign Existing</a>
-      <a class="btn btn-light" href="#modal-import-products"><i class="fa-solid fa-file-import"></i>Import Excel</a>
-      <a class="btn btn-primary" href="#modal-create-product"><i class="fa-solid fa-plus"></i>Add Product</a>
-    </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
+      <div th:if="${message}" class="alert" th:text="${message}"></div>
 
-    <section class="metric-grid">
-      <div class="metric-card metric-blue"><span>Branch Products</span><strong th:text="${branchProductCount}">0</strong><div><em style="width:75%"></em></div><small>Products enabled for this branch</small></div>
-      <div class="metric-card metric-green"><span>Active Products</span><strong th:text="${activeProductCount}">0</strong><div><em style="width:80%"></em></div><small>Available for sale</small></div>
-      <div class="metric-card metric-orange"><span>Branch</span><strong th:text="${selectedBranchName}">Branch</strong><div><em style="width:65%"></em></div><small>Stock display context</small></div>
-      <div class="metric-card metric-red"><span>Low Stock</span><strong th:text="${lowStockProductCount}">0</strong><div><em style="width:45%"></em></div><small>Below reorder level</small></div>
-    </section>
+      <section class="products-kpi-grid">
+        <article class="products-kpi-card">
+          <span><i class="fa-solid fa-bag-shopping"></i></span>
+          <div><small>Branch Products</small><strong th:text="${branchProductCount}">0</strong><em>Total products</em></div>
+        </article>
+        <article class="products-kpi-card">
+          <span class="green"><i class="fa-solid fa-circle-check"></i></span>
+          <div><small>Active Products</small><strong th:text="${activeProductCount}">0</strong><em>Available for sale</em></div>
+        </article>
+        <article class="products-kpi-card">
+          <span class="orange"><i class="fa-solid fa-triangle-exclamation"></i></span>
+          <div><small>Low Stock</small><strong th:text="${lowStockProductCount}">0</strong><em>Items to reorder</em></div>
+        </article>
+        <article class="products-kpi-card">
+          <span><i class="fa-solid fa-dollar-sign"></i></span>
+          <div><small>Stock Value USD</small><strong th:text="${'USD ' + #numbers.formatDecimal(branchStockValueUsd ?: 0, 1, 2)}">USD 0.00</strong><em>Total inventory value</em></div>
+        </article>
+        <article class="products-kpi-card">
+          <span><i class="fa-solid fa-coins"></i></span>
+          <div><small>Stock Value ZWG</small><strong th:text="${'ZWG ' + #numbers.formatDecimal(branchStockValueZwg ?: 0, 1, 2)}">ZWG 0.00</strong><em>Total inventory value</em></div>
+        </article>
+      </section>
 
-    <section class="panel filter-panel">
-      <form method="get" th:action="@{/shop/products}" class="filter-grid">
-        <label>Branch
-          <select name="branchId" onchange="this.form.submit()">
-            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
-          </select>
-        </label>
-        <label>Category
-          <select name="categoryId" onchange="this.form.submit()">
-            <option value="">All categories</option>
-            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}" th:selected="${c.id == selectedCategoryId}">Category</option>
-          </select>
-        </label>
-        <label>Search
-          <input name="search" th:value="${productSearch}" placeholder="Name, SKU or barcode">
-        </label>
-        <button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
-      </form>
-    </section>
+      <section class="products-filter-panel">
+        <form method="get" th:action="@{/shop/products}" class="products-filter-form">
+          <label>Branch
+            <select name="branchId" onchange="this.form.submit()">
+              <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
+            </select>
+          </label>
+          <label>Category
+            <select name="categoryId" onchange="this.form.submit()">
+              <option value="">All categories</option>
+              <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}" th:selected="${c.id == selectedCategoryId}">Category</option>
+            </select>
+          </label>
+          <label>Search
+            <input name="search" th:value="${productSearch}" placeholder="Search by name, SKU or barcode">
+          </label>
+          <div class="products-filter-actions">
+            <button class="btn btn-blue" type="submit"><i class="fa-solid fa-filter"></i>Apply Filters</button>
+            <a class="btn btn-light" th:href="@{/shop/products(branchId=${selectedBranchId})}"><i class="fa-solid fa-rotate-left"></i>Clear</a>
+          </div>
+        </form>
+      </section>
 
-    <section class="panel table-panel">
-      <div class="toolbar">
-        <h2 th:text="${'Products at ' + selectedBranchName}">Products</h2>
-        <span class="badge" th:text="${productPage.totalElements + ' products'}">0 products</span>
-      </div>
-      <table>
-        <thead><tr><th>Product</th><th>Category</th><th>Branch Stock</th><th>Total Stock</th><th>USD</th><th>ZWG</th><th>Tax</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody>
-        <tr th:each="p : ${productList}" th:with="stock=${selectedBranchStock.get(p.id)}, total=${totalStockByProduct.get(p.id)}">
-          <td>
-            <div class="user-cell">
-              <span class="product-avatar"><i class="fa-solid fa-box"></i></span>
-              <div>
-                <strong th:text="${p.name}">Product</strong>
-                <small th:text="${'SKU ' + (p.sku ?: 'N/A') + ' / Barcode ' + (p.barcode ?: 'N/A')}">SKU</small>
-                <small th:text="${p.description ?: 'No description'}">Description</small>
-              </div>
-            </div>
-          </td>
-          <td th:text="${p.category != null ? p.category.name : 'Uncategorised'}">Category</td>
-          <td>
-            <strong th:text="${stock != null ? stock.quantityOnHand : 0}">0</strong>
-            <small th:text="${'Reserved ' + (stock != null ? stock.quantityReserved : 0)}">Reserved</small>
-          </td>
-          <td th:text="${total ?: 0}">0</td>
-          <td><strong th:text="${'USD ' + p.sellingPriceUsd}">USD 0</strong><small th:text="${'Cost USD ' + p.costPriceUsd}">Cost</small></td>
-          <td><strong th:text="${'ZWG ' + p.sellingPriceZwg}">ZWG 0</strong><small th:text="${'Cost ZWG ' + p.costPriceZwg}">Cost</small></td>
-          <td th:text="${p.isTaxable ? p.taxRate + '%' : 'Exempt'}">Tax</td>
-          <td>
-            <span th:if="${p.isActive}" class="badge status-active">ACTIVE</span>
-            <span th:unless="${p.isActive}" class="badge status-suspended">INACTIVE</span>
-            <span th:if="${stock != null and p.reorderLevel != null and stock.quantityOnHand <= p.reorderLevel}" class="badge status-pending">LOW</span>
-          </td>
-          <td>
-            <div class="action-row">
-              <a class="icon-button mini" th:href="${'#modal-edit-product-' + p.id}" title="Edit"><i class="fa-solid fa-pen"></i></a>
-              <a class="icon-button mini" th:href="@{/shop/inventory(branchId=${selectedBranchId},search=${p.sku})}" title="View stock"><i class="fa-solid fa-warehouse"></i></a>
-              <form th:if="${!p.isActive}" method="post" th:action="@{'/shop/products/' + ${p.id} + '/activate'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="icon-button mini" type="submit" title="Activate"><i class="fa-solid fa-toggle-on"></i></button></form>
-              <form th:if="${p.isActive}" method="post" th:action="@{'/shop/products/' + ${p.id} + '/deactivate'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="icon-button mini danger" type="submit" title="Deactivate"><i class="fa-solid fa-toggle-off"></i></button></form>
-              <form method="post" th:action="@{'/shop/products/' + ${p.id} + '/unassign'}">
-                <input type="hidden" name="branchId" th:value="${selectedBranchId}">
-                <button class="icon-button mini danger" type="submit" title="Remove from this branch"><i class="fa-solid fa-unlink"></i></button>
-              </form>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="empty" th:if="${#lists.isEmpty(productList)}">No products found for this branch/filter.</div>
-      <div th:replace="~{common/layout :: pagination(${productPage}, ${productPageLinks}, ${productPrevUrl}, ${productNextUrl})}"></div>
+      <section class="products-table-panel">
+        <div class="products-table-head">
+          <div>
+            <h2 th:text="${'Products at ' + selectedBranchName}">Products at Harare CBD</h2>
+            <p>Manage stock visibility, prices, categories, and branch assignment.</p>
+          </div>
+          <span class="badge" th:text="${productPage.totalElements + ' products'}">0 products</span>
+        </div>
+        <div class="products-table-wrap">
+          <table>
+            <thead><tr><th>Product</th><th>Category</th><th>Branch Stock</th><th>Total Stock</th><th>USD Price</th><th>ZWG Price</th><th>Tax</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="p : ${productList}" th:with="stock=${selectedBranchStock.get(p.id)}, total=${totalStockByProduct.get(p.id)}, isLow=${stock != null and p.reorderLevel != null and stock.quantityOnHand <= p.reorderLevel}">
+              <td>
+                <div class="products-product-cell">
+                  <span class="products-product-image">
+                    <img th:if="${p.imageUrl != null and not #strings.isEmpty(p.imageUrl)}" th:src="${p.imageUrl}" th:alt="${p.name}">
+                    <i th:unless="${p.imageUrl != null and not #strings.isEmpty(p.imageUrl)}" class="fa-solid fa-box"></i>
+                  </span>
+                  <div>
+                    <strong th:text="${p.name}">Product</strong>
+                    <small th:text="${'SKU: ' + (p.sku ?: 'N/A')}">SKU</small>
+                    <small th:text="${'Barcode: ' + (p.barcode ?: 'N/A')}">Barcode</small>
+                  </div>
+                </div>
+              </td>
+              <td th:text="${p.category != null ? p.category.name : 'Uncategorised'}">Category</td>
+              <td><strong th:text="${stock != null ? #numbers.formatDecimal(stock.quantityOnHand ?: 0, 1, 4) : '0.0000'}">0</strong><small>units</small></td>
+              <td><strong th:text="${#numbers.formatDecimal(total ?: 0, 1, 4)}">0</strong><small>units</small></td>
+              <td><strong th:text="${'USD ' + #numbers.formatDecimal(p.sellingPriceUsd ?: 0, 1, 2)}">USD 0.00</strong><small th:text="${'Cost ' + #numbers.formatDecimal(p.costPriceUsd ?: 0, 1, 2)}">Cost</small></td>
+              <td><strong th:text="${'ZWG ' + #numbers.formatDecimal(p.sellingPriceZwg ?: 0, 1, 2)}">ZWG 0.00</strong><small th:text="${'Cost ' + #numbers.formatDecimal(p.costPriceZwg ?: 0, 1, 2)}">Cost</small></td>
+              <td th:text="${p.isTaxable ? #numbers.formatDecimal(p.taxRate ?: 0, 1, 2) + '%' : 'Exempt'}">Tax</td>
+              <td>
+                <span th:if="${p.isActive and !isLow}" class="badge status-active">ACTIVE</span>
+                <span th:if="${p.isActive and isLow}" class="badge status-pending">LOW STOCK</span>
+                <span th:unless="${p.isActive}" class="badge status-suspended">INACTIVE</span>
+              </td>
+              <td>
+                <div class="action-row">
+                  <a class="icon-button mini" th:href="${'#modal-edit-product-' + p.id}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                  <a class="icon-button mini" th:href="@{/shop/inventory(branchId=${selectedBranchId},search=${p.sku})}" title="View stock"><i class="fa-solid fa-warehouse"></i></a>
+                  <form th:if="${!p.isActive}" method="post" th:action="@{'/shop/products/' + ${p.id} + '/activate'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="icon-button mini" type="submit" title="Activate"><i class="fa-solid fa-toggle-on"></i></button></form>
+                  <form th:if="${p.isActive}" method="post" th:action="@{'/shop/products/' + ${p.id} + '/deactivate'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="icon-button mini danger" type="submit" title="Deactivate"><i class="fa-solid fa-toggle-off"></i></button></form>
+                  <form method="post" th:action="@{'/shop/products/' + ${p.id} + '/unassign'}">
+                    <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+                    <button class="icon-button mini danger" type="submit" title="Remove from this branch"><i class="fa-solid fa-unlink"></i></button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="products-empty" th:if="${#lists.isEmpty(productList)}">
+          <span><i class="fa-solid fa-box-open"></i></span>
+          <strong>No products found for this branch/filter.</strong>
+          <small>Clear filters or add products to start building this branch catalogue.</small>
+        </div>
+        <div th:replace="~{common/layout :: pagination(${productPage}, ${productPageLinks}, ${productPrevUrl}, ${productNextUrl})}"></div>
+      </section>
     </section>
 
     <div id="modal-import-products" class="modal"><div class="modal-content">

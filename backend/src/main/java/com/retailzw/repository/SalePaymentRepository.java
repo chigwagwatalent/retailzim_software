@@ -20,10 +20,11 @@ public interface SalePaymentRepository extends JpaRepository<SalePayment, Long> 
     BigDecimal sumCashBySaleAndCurrency(@Param("saleId") Long saleId,
                                         @Param("currency") CurrencyCode currency);
 
-    @Query("SELECT sp.paymentMethod, SUM(sp.amount) FROM SalePayment sp JOIN sp.sale s " +
+    @Query("SELECT sp.paymentMethod, sp.currency, SUM(sp.amount) FROM SalePayment sp JOIN sp.sale s " +
            "WHERE s.tenantId = :tenantId AND s.branchId = :branchId " +
-           "AND s.status = 'COMPLETED' AND s.createdAt BETWEEN :from AND :to " +
-           "GROUP BY sp.paymentMethod")
+           "AND s.status IN ('COMPLETED', 'PARTIAL_REFUND', 'REFUNDED') " +
+           "AND s.createdAt >= :from AND s.createdAt < :to " +
+           "GROUP BY sp.paymentMethod, sp.currency")
     List<Object[]> sumByPaymentMethod(@Param("tenantId") Long tenantId,
                                       @Param("branchId") Long branchId,
                                       @Param("from") LocalDateTime from,
@@ -32,7 +33,8 @@ public interface SalePaymentRepository extends JpaRepository<SalePayment, Long> 
     @Query("SELECT COALESCE(SUM(sp.amount), 0) FROM SalePayment sp JOIN sp.sale s " +
            "WHERE s.tenantId = :tenantId AND s.branchId = :branchId " +
            "AND sp.paymentMethod = 'CASH' AND sp.currency = :currency " +
-           "AND s.status = 'COMPLETED' AND s.createdAt BETWEEN :from AND :to")
+           "AND s.status IN ('COMPLETED', 'PARTIAL_REFUND', 'REFUNDED') " +
+           "AND s.createdAt >= :from AND s.createdAt < :to")
     BigDecimal sumCashCollected(@Param("tenantId") Long tenantId,
                                 @Param("branchId") Long branchId,
                                 @Param("currency") CurrencyCode currency,

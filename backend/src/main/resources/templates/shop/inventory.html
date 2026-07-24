@@ -7,82 +7,173 @@
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Inventory')}"></nav>
 
-    <section class="page-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-warehouse"></i></div>
-        <div>
-          <p th:text="${'Stock control for ' + selectedBranchName}">Branch stock</p>
-          <h1>Branch Inventory</h1>
+    <section class="inventory-page">
+      <section class="inventory-hero">
+        <div class="inventory-hero-title">
+          <span class="inventory-hero-icon"><i class="fa-solid fa-warehouse"></i></span>
+          <div>
+            <h1>Branch Inventory</h1>
+            <p th:text="${'Monitor stock levels, value, availability and replenishment for ' + selectedBranchName + '.'}">Monitor branch stock.</p>
+          </div>
         </div>
+        <div class="inventory-hero-metrics">
+          <article><i class="fa-solid fa-boxes-stacked"></i><strong th:text="${summaryTotalProducts}">0</strong><span>Stock Lines</span></article>
+          <article class="warning"><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${summaryLowStock}">0</strong><span>Low Stock</span></article>
+        </div>
+      </section>
+
+      <div class="inventory-toolbar">
+        <a class="btn btn-blue" th:href="@{/shop/products(branchId=${selectedBranchId})}"><i class="fa-solid fa-box-open"></i>Products</a>
+        <a class="btn btn-blue" href="#modal-adjust"><i class="fa-solid fa-plus"></i>Adjust Stock</a>
+        <a class="btn btn-light" th:href="@{/shop/suppliers}"><i class="fa-solid fa-truck-field"></i>Suppliers</a>
+        <a class="btn btn-light" th:href="@{/shop/purchasing(branchId=${selectedBranchId})}"><i class="fa-solid fa-truck-ramp-box"></i>Purchase &amp; Receive</a>
+        <button class="btn btn-light" type="button" onclick="window.print()"><i class="fa-solid fa-download"></i>Export</button>
       </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-boxes-stacked"></i><strong th:text="${summaryTotalProducts}">0</strong><span>Stock Lines</span></div>
-        <div><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${summaryLowStock}">0</strong><span>Low Stock</span></div>
-      </div>
-    </section>
 
-    <div class="page-toolbar">
-      <a class="btn btn-blue" th:href="@{/shop/products(branchId=${selectedBranchId})}"><i class="fa-solid fa-box-open"></i>Products</a>
-      <a class="btn btn-primary" href="#modal-adjust"><i class="fa-solid fa-plus-minus"></i>Adjust Stock</a>
-    </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
+      <div th:if="${message}" class="alert" th:text="${message}"></div>
 
-    <section class="metric-grid">
-      <div class="metric-card metric-blue"><span>Stock Lines</span><strong th:text="${summaryTotalProducts}">0</strong><div><em style="width:78%"></em></div><small th:text="${selectedBranchName}">Branch</small></div>
-      <div class="metric-card metric-green"><span>Value USD</span><strong th:text="${'USD ' + summaryValueUsd}">USD 0</strong><div><em style="width:70%"></em></div><small>Average cost valuation</small></div>
-      <div class="metric-card metric-orange"><span>Value ZWG</span><strong th:text="${'ZWG ' + summaryValueZwg}">ZWG 0</strong><div><em style="width:64%"></em></div><small>Average cost valuation</small></div>
-      <div class="metric-card metric-red"><span>Low Stock</span><strong th:text="${summaryLowStock}">0</strong><div><em style="width:42%"></em></div><small>Needs replenishment</small></div>
-    </section>
+      <section class="inventory-kpi-grid">
+        <article class="inventory-kpi-card">
+          <span><i class="fa-solid fa-cube"></i></span>
+          <div><small>Stock Lines</small><strong th:text="${summaryTotalProducts}">0</strong><em>Total stock items</em></div>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="green"><i class="fa-solid fa-dollar-sign"></i></span>
+          <div><small>Stock Value (USD)</small><strong class="value-green" th:text="${'USD ' + #numbers.formatDecimal(summaryValueUsd ?: 0, 1, 2)}">USD 0.00</strong><em>Total inventory value</em></div>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="green"><i class="fa-solid fa-coins"></i></span>
+          <div><small>Stock Value (ZWG)</small><strong class="value-green" th:text="${'ZWG ' + #numbers.formatDecimal(summaryValueZwg ?: 0, 1, 2)}">ZWG 0.00</strong><em>Total inventory value</em></div>
+        </article>
+        <article class="inventory-kpi-card">
+          <span><i class="fa-regular fa-bookmark"></i></span>
+          <div><small>Reserved</small><strong th:text="${#numbers.formatDecimal(summaryReserved ?: 0, 1, 2)}">0.00</strong><em>Reserved quantity</em></div>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="orange"><i class="fa-solid fa-triangle-exclamation"></i></span>
+          <div><small>Low Stock</small><strong th:text="${summaryLowStock}">0</strong><em>Below reorder level</em></div>
+        </article>
+        <article class="inventory-kpi-card">
+          <span><i class="fa-solid fa-file-invoice"></i></span>
+          <div><small>Open Purchase Orders</small><strong th:text="${openPurchaseOrderCount}">0</strong><em>Orders in progress</em></div>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="orange"><i class="fa-solid fa-boxes-packing"></i></span>
+          <div><small>Awaiting Receipt</small><strong th:text="${pendingReceivingCount}">0</strong><em>Approved or partly received</em></div>
+        </article>
+      </section>
 
-    <section class="panel filter-panel">
-      <form method="get" th:action="@{/shop/inventory}" class="filter-grid">
-        <label>Branch
-          <select name="branchId" onchange="this.form.submit()">
-            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
-          </select>
-        </label>
-        <label>Search stock
-          <input name="search" th:value="${inventorySearch}" placeholder="Product, SKU or barcode">
-        </label>
-        <button class="btn btn-blue" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
-      </form>
-    </section>
+      <section class="inventory-filter-panel">
+        <form method="get" th:action="@{/shop/inventory}" class="inventory-filter-form">
+          <label>Branch
+            <select name="branchId">
+              <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
+            </select>
+          </label>
+          <label>Stock Status
+            <select name="status">
+              <option value="" th:selected="${inventoryStatus == null or #strings.isEmpty(inventoryStatus)}">All statuses</option>
+              <option value="HEALTHY" th:selected="${inventoryStatus == 'HEALTHY'}">Healthy</option>
+              <option value="LOW_STOCK" th:selected="${inventoryStatus == 'LOW_STOCK'}">Low stock</option>
+            </select>
+          </label>
+          <label class="inventory-search-field">Search
+            <span><i class="fa-solid fa-magnifying-glass"></i><input name="search" th:value="${inventorySearch}" placeholder="Search by product, SKU or barcode..."></span>
+          </label>
+          <div class="inventory-filter-actions">
+            <button class="btn btn-blue" type="submit"><i class="fa-solid fa-filter"></i>Apply Filters</button>
+            <a class="btn btn-light" th:href="@{/shop/inventory(branchId=${selectedBranchId})}"><i class="fa-solid fa-rotate-left"></i>Clear</a>
+          </div>
+        </form>
+      </section>
 
-    <section class="panel table-panel">
-      <div class="toolbar">
-        <h2 th:text="${'Inventory at ' + selectedBranchName}">Inventory</h2>
-        <span class="badge" th:text="${inventoryPage.totalElements + ' stock lines'}">0 stock lines</span>
-      </div>
-      <table>
-        <thead><tr><th>Product</th><th>On Hand</th><th>Reserved</th><th>Available</th><th>On Order</th><th>Average Cost</th><th>Reorder</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody>
-        <tr th:each="item : ${inventoryItems}" th:with="p=${inventoryProductById.get(item.productId)}">
-          <td>
-            <div class="user-cell">
-              <span class="product-avatar"><i class="fa-solid fa-box"></i></span>
-              <div>
-                <strong th:text="${p != null ? p.name : 'Product #' + item.productId}">Product</strong>
-                <small th:text="${p != null ? 'SKU ' + (p.sku ?: 'N/A') + ' / Barcode ' + (p.barcode ?: 'N/A') : 'No product record'}">SKU</small>
-                <small th:text="${p != null && p.category != null ? p.category.name : 'Uncategorised'}">Category</small>
-              </div>
-            </div>
-          </td>
-          <td><strong th:text="${item.quantityOnHand ?: 0}">0</strong></td>
-          <td th:text="${item.quantityReserved ?: 0}">0</td>
-          <td th:text="${(item.quantityOnHand ?: 0) - (item.quantityReserved ?: 0)}">0</td>
-          <td th:text="${item.quantityOnOrder ?: 0}">0</td>
-          <td><strong th:text="${'USD ' + (item.averageCostUsd ?: 0)}">USD 0</strong><small th:text="${'ZWG ' + (item.averageCostZwg ?: 0)}">ZWG 0</small></td>
-          <td th:text="${p != null ? p.reorderLevel : 0}">0</td>
-          <td>
-            <span th:if="${p != null and p.reorderLevel != null and item.quantityOnHand <= p.reorderLevel}" class="badge status-pending">LOW STOCK</span>
-            <span th:unless="${p != null and p.reorderLevel != null and item.quantityOnHand <= p.reorderLevel}" class="badge status-active">OK</span>
-          </td>
-          <td><a class="icon-button mini" th:href="${'#modal-adjust-' + item.productId}" title="Adjust"><i class="fa-solid fa-plus-minus"></i></a></td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="empty" th:if="${#lists.isEmpty(inventoryItems)}">No inventory records found for this branch/filter.</div>
-      <div th:replace="~{common/layout :: pagination(${inventoryPage}, ${inventoryPageLinks}, ${inventoryPrevUrl}, ${inventoryNextUrl})}"></div>
+      <section class="inventory-table-panel">
+        <div class="inventory-table-head">
+          <h2 th:text="${'Inventory at ' + selectedBranchName}">Inventory at Harare CBD</h2>
+          <div>
+            <span class="badge" th:text="${inventoryPage.totalElements + ' stock lines'}">0 stock lines</span>
+            <button class="icon-button mini" type="button" onclick="window.print()" title="Export inventory"><i class="fa-solid fa-download"></i></button>
+          </div>
+        </div>
+        <div class="inventory-table-wrap">
+          <table>
+            <thead><tr><th>Product</th><th>On Hand</th><th>Reserved</th><th>Available</th><th>On Order</th><th>Average Cost</th><th>Reorder Level</th><th>Stock Health</th><th>Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="item : ${inventoryItems}" th:with="p=${inventoryProductById.get(item.productId)}, available=${(item.quantityOnHand ?: 0) - (item.quantityReserved ?: 0)}, low=${p != null and p.reorderLevel != null and (item.quantityOnHand ?: 0) <= p.reorderLevel}">
+              <td>
+                <div class="inventory-product-cell">
+                  <span class="inventory-product-image">
+                    <img th:if="${p != null and p.imageUrl != null and not #strings.isEmpty(p.imageUrl)}" th:src="${p.imageUrl}" th:alt="${p.name}">
+                    <i th:unless="${p != null and p.imageUrl != null and not #strings.isEmpty(p.imageUrl)}" class="fa-solid fa-box"></i>
+                  </span>
+                  <div>
+                    <strong th:text="${p != null ? p.name : 'Product #' + item.productId}">Product</strong>
+                    <small th:text="${p != null ? 'SKU ' + (p.sku ?: 'N/A') : 'SKU N/A'}">SKU</small>
+                    <small th:text="${p != null ? 'Barcode ' + (p.barcode ?: 'N/A') : 'Barcode N/A'}">Barcode</small>
+                  </div>
+                </div>
+              </td>
+              <td><strong th:text="${#numbers.formatDecimal(item.quantityOnHand ?: 0, 1, 2)}">0.00</strong></td>
+              <td th:text="${#numbers.formatDecimal(item.quantityReserved ?: 0, 1, 2)}">0.00</td>
+              <td><strong th:class="${low ? 'inventory-low-value' : 'inventory-available-value'}" th:text="${#numbers.formatDecimal(available, 1, 2)}">0.00</strong></td>
+              <td th:text="${#numbers.formatDecimal(item.quantityOnOrder ?: 0, 1, 2)}">0.00</td>
+              <td><strong th:text="${'USD ' + #numbers.formatDecimal(item.averageCostUsd ?: 0, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(item.averageCostZwg ?: 0, 1, 2)}">ZWG 0.00</small></td>
+              <td th:text="${#numbers.formatDecimal(p != null and p.reorderLevel != null ? p.reorderLevel : 0, 1, 2)}">0.00</td>
+              <td>
+                <span th:if="${low}" class="badge status-pending">Low stock</span>
+                <span th:unless="${low}" class="badge status-active">Healthy</span>
+              </td>
+              <td>
+                <div class="inventory-action-row">
+                  <a class="icon-button mini" th:href="${'#modal-adjust-' + item.productId}" title="Adjust stock"><i class="fa-solid fa-pen"></i></a>
+                  <a class="icon-button mini" th:href="@{/shop/products(branchId=${selectedBranchId})}" title="View products"><i class="fa-solid fa-ellipsis-vertical"></i></a>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="inventory-empty" th:if="${#lists.isEmpty(inventoryItems)}">
+          <span><i class="fa-solid fa-box-open"></i></span>
+          <strong>No inventory records found.</strong>
+          <small>Clear the filters or add products to this branch.</small>
+        </div>
+        <div th:replace="~{common/layout :: pagination(${inventoryPage}, ${inventoryPageLinks}, ${inventoryPrevUrl}, ${inventoryNextUrl})}"></div>
+      </section>
+
+      <section class="inventory-table-panel">
+        <div class="inventory-table-head">
+          <div>
+            <h2>Recent Stock Movements</h2>
+            <small>Sales, supplier receipts, returns, transfers, stocktakes and adjustments.</small>
+          </div>
+          <a class="btn btn-light" th:href="@{/shop/inventory-intelligence(branchId=${selectedBranchId})}">
+            <i class="fa-solid fa-right-left"></i>Transfers &amp; Counts
+          </a>
+        </div>
+        <div class="inventory-table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Product</th><th>Movement</th><th>Quantity</th><th>Before</th><th>After</th><th>Reference</th><th>Notes</th></tr></thead>
+            <tbody>
+            <tr th:each="movement : ${recentInventoryMovements}" th:with="p=${inventoryProductById.get(movement.productId)}">
+              <td th:text="${movement.createdAt != null ? #temporals.format(movement.createdAt, 'dd MMM yyyy HH:mm') : '-'}">Date</td>
+              <td><strong th:text="${p != null ? p.name : 'Product #' + movement.productId}">Product</strong><small th:text="${p != null ? p.sku : ''}">SKU</small></td>
+              <td><span class="badge" th:text="${#strings.replace(movement.type.name(), '_', ' ')}">ADJUSTMENT</span></td>
+              <td><strong th:class="${movement.quantity != null and movement.quantity < 0 ? 'inventory-low-value' : 'inventory-available-value'}" th:text="${#numbers.formatDecimal(movement.quantity ?: 0, 1, 2)}">0</strong></td>
+              <td th:text="${#numbers.formatDecimal(movement.quantityBefore ?: 0, 1, 2)}">0</td>
+              <td th:text="${#numbers.formatDecimal(movement.quantityAfter ?: 0, 1, 2)}">0</td>
+              <td><strong th:text="${movement.referenceType ?: '-'}">Reference</strong><small th:text="${movement.referenceId != null ? '#' + movement.referenceId : ''}">ID</small></td>
+              <td th:text="${movement.notes ?: '-'}">Notes</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="inventory-empty" th:if="${#lists.isEmpty(recentInventoryMovements)}">
+          <span><i class="fa-solid fa-clock-rotate-left"></i></span>
+          <strong>No stock movements recorded yet.</strong>
+          <small>Supplier receipts, sales and adjustments will appear here automatically.</small>
+        </div>
+      </section>
     </section>
 
     <div id="modal-adjust" class="modal"><div class="modal-content">
@@ -102,7 +193,7 @@
       <form method="post" th:action="@{/shop/inventory/adjust}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">
         <input type="hidden" name="productId" th:value="${item.productId}">
-        <label>Current On Hand<input th:value="${item.quantityOnHand}" readonly></label>
+        <label>Current On Hand<input th:value="${#numbers.formatDecimal(item.quantityOnHand ?: 0, 1, 2)}" readonly></label>
         <label>Quantity Change<input name="quantityChange" type="number" step="0.0001" required></label>
         <label>Reason<select name="reason"><option>DAMAGED</option><option>EXPIRED</option><option>THEFT</option><option>FOUND</option><option>WRITE_OFF</option><option>CORRECTION</option><option>OPENING_STOCK</option><option>OTHER</option></select></label>
         <label style="grid-column:1/-1">Notes<textarea name="notes"></textarea></label>

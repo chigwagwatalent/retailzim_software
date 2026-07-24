@@ -1,88 +1,229 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{common/layout :: head('Cash Drawer')}"></head>
+<head th:replace="~{common/layout :: head('Cash Collection')}"></head>
 <body>
 <div class="app-shell">
   <aside th:replace="~{common/layout :: shopSidebar('cash')}"></aside>
   <main class="main">
-    <nav th:replace="~{common/layout :: shopTopbar('Cash Drawer')}"></nav>
+    <nav th:replace="~{common/layout :: shopTopbar('Cash Collection')}"></nav>
 
-    <section class="page-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
-        <div>
-          <p th:text="${'Viewing ' + selectedBranchName}">Viewing branch</p>
-          <h1>Shift Management</h1>
-        </div>
-      </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-dollar-sign"></i><strong th:text="${'USD ' + #numbers.formatDecimal(expectedCashUsd, 1, 2)}">USD 0.00</strong><span>Expected cash</span></div>
-        <div><i class="fa-solid fa-coins"></i><strong th:text="${'ZWG ' + #numbers.formatDecimal(expectedCashZwg, 1, 2)}">ZWG 0.00</strong><span>Expected cash</span></div>
-      </div>
-    </section>
-
-    <div class="page-toolbar">
-      <a class="btn btn-primary" href="#modal-create-drawer"><i class="fa-solid fa-plus"></i>New Drawer</a>
-      <form method="get" th:action="@{/shop/cash}" class="inline-filter">
-        <select name="branchId" onchange="this.form.submit()">
-          <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
-        </select>
-      </form>
-    </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
-
-    <section class="metric-grid">
-      <div class="metric-card metric-blue"><span>Drawers</span><strong th:text="${#lists.size(drawerList)}">0</strong><div><em style="width:70%"></em></div><small>Total branch tills</small></div>
-      <div class="metric-card metric-green"><span>Active Drawers</span><strong th:text="${activeDrawerCount}">0</strong><div><em style="width:80%"></em></div><small>Available to cashiers</small></div>
-      <div class="metric-card metric-orange"><span>Open Shifts</span><strong th:text="${openSessionCount}">0</strong><div><em style="width:55%"></em></div><small>Cashiers currently selling</small></div>
-      <div class="metric-card metric-red"><span>Closed Shifts</span><strong th:text="${#lists.size(sessionList) - openSessionCount}">0</strong><div><em style="width:45%"></em></div><small>Archived register sessions</small></div>
-    </section>
-
-    <section class="grid branch-card-grid">
-      <div class="panel branch-card" th:each="drawer : ${drawerList}">
-        <div class="branch-card-head">
-          <span class="branch-badge"><i class="fa-solid fa-cash-register"></i></span>
+    <section class="cash-drawer-page shift-closing-page">
+      <section class="cash-hero">
+        <div class="cash-hero-title">
+          <span class="cash-hero-icon"><i class="fa-solid fa-hand-holding-dollar"></i></span>
           <div>
-            <h2 th:text="${drawer.name}">Till</h2>
-            <small th:text="${drawer.description ?: 'Branch cash drawer'}">Description</small>
+            <h1>Cash Collection</h1>
+            <p>Collect money from cashier-closed shifts, compare it to the shift printout, and record any variance.</p>
+            <span th:text="${selectedBranchName}">Harare CBD</span>
           </div>
-          <span th:class="${drawer.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${drawer.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
         </div>
-        <div class="branch-mini-stats">
-          <div><strong th:text="${drawerSessionCounts.get(drawer.id) ?: 0}">0</strong><span>Shifts</span></div>
-          <div><strong th:text="${drawerOpenSessionCounts.get(drawer.id) ?: 0}">0</strong><span>Open</span></div>
-          <div><strong th:text="${#temporals.format(drawer.createdAt, 'dd MMM')}">Date</strong><span>Created</span></div>
+        <div class="cash-hero-metrics">
+          <article>
+            <i class="fa-solid fa-dollar-sign"></i>
+            <strong th:text="${'USD ' + #numbers.formatDecimal(expectedCashUsd, 1, 2)}">USD 0.00</strong>
+            <span>Expected from uncollected shifts</span>
+          </article>
+          <article>
+            <i class="fa-solid fa-coins"></i>
+            <strong th:text="${'ZWG ' + #numbers.formatDecimal(expectedCashZwg, 1, 2)}">ZWG 0.00</strong>
+            <span>Expected from uncollected shifts</span>
+          </article>
         </div>
-        <div class="branch-actions">
-          <a class="btn btn-light" th:href="${'#modal-edit-drawer-' + drawer.id}"><i class="fa-solid fa-pen"></i>Edit</a>
-          <form th:if="${drawer.isActive}" method="post" th:action="@{'/shop/cash/drawers/' + ${drawer.id} + '/deactivate'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-toggle-off"></i>Deactivate</button></form>
-          <form th:if="${!drawer.isActive}" method="post" th:action="@{'/shop/cash/drawers/' + ${drawer.id} + '/activate'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-toggle-on"></i>Activate</button></form>
-        </div>
+      </section>
+
+      <div class="cash-toolbar">
+        <a class="btn btn-primary" href="#modal-collect-shift"><i class="fa-solid fa-hand-holding-dollar"></i>Collect Shift Money</a>
+        <form method="get" th:action="@{/shop/cash}" class="cash-branch-filter">
+          <select name="branchId" onchange="this.form.submit()">
+            <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
+          </select>
+        </form>
+        <a class="btn btn-light" th:href="@{/shop/reports(branchId=${selectedBranchId})}"><i class="fa-regular fa-chart-bar"></i>Open Shift Report</a>
       </div>
+
+      <div th:if="${message}" class="alert" th:text="${message}"></div>
+      <span th:if="${collectShiftPreview != null or collectShiftLookupMessage != null}" data-auto-open-modal="#modal-collect-shift"></span>
+
+      <section class="cash-kpi-grid">
+        <article class="cash-kpi-card">
+          <span><i class="fa-regular fa-clock"></i></span>
+          <div><small>Awaiting Collection</small><strong th:text="${uncollectedSessionCount}">0</strong><em>Closed by cashier, not collected</em></div>
+          <b style="width:68%"></b>
+        </article>
+        <article class="cash-kpi-card">
+          <span><i class="fa-solid fa-sack-dollar"></i></span>
+          <div><small>Pending USD</small><strong th:text="${#numbers.formatDecimal(expectedCashUsd, 1, 2)}">0.00</strong><em>Expected cash to collect</em></div>
+          <b style="width:82%"></b>
+        </article>
+        <article class="cash-kpi-card">
+          <span><i class="fa-solid fa-scale-balanced"></i></span>
+          <div><small>Collection Variance</small><strong th:text="${'USD ' + #numbers.formatDecimal(varianceUsd, 1, 2)}">USD 0.00</strong><em>Collected sessions on this view</em></div>
+          <b style="width:48%"></b>
+        </article>
+        <article class="cash-kpi-card">
+          <span><i class="fa-regular fa-circle-check"></i></span>
+          <div><small>Closed Shifts</small><strong th:text="${closedSessionCount}">0</strong><em>Cashier completed sessions</em></div>
+          <b style="width:56%"></b>
+        </article>
+      </section>
+
+      <section class="cash-main-grid shift-closing-grid">
+        <div class="cash-panel shift-close-panel">
+          <div class="cash-panel-head">
+            <div>
+              <h2>Cash Collection Desk</h2>
+              <small>Retrieve a cashier-closed shift, enter the money collected, then confirm the collection.</small>
+            </div>
+            <a class="btn btn-primary" href="#modal-collect-shift"><i class="fa-solid fa-magnifying-glass"></i>Retrieve Shift</a>
+          </div>
+          <div class="shift-close-steps">
+            <article>
+              <span>1</span>
+              <div><strong>Enter shift ID</strong><small>Use the shift number on the cashier's POS close printout.</small></div>
+            </article>
+            <article>
+              <span>2</span>
+              <div><strong>Collect money</strong><small>Record confirmed USD and ZWG received from the cashier.</small></div>
+            </article>
+            <article>
+              <span>3</span>
+              <div><strong>Confirm variance</strong><small>Any shortage or overage must have a reason before confirming collection.</small></div>
+            </article>
+          </div>
+          <div class="shift-live-summary">
+            <article><i class="fa-solid fa-dollar-sign"></i><strong th:text="${'USD ' + #numbers.formatDecimal(expectedCashUsd, 1, 2)}">USD 0.00</strong><span>Awaiting collection</span></article>
+            <article><i class="fa-solid fa-coins"></i><strong th:text="${'ZWG ' + #numbers.formatDecimal(expectedCashZwg, 1, 2)}">ZWG 0.00</strong><span>Awaiting collection</span></article>
+            <article><i class="fa-solid fa-chart-simple"></i><strong th:text="${lastCashSession != null ? '#' + lastCashSession.id : 'None'}">None</strong><span>Latest shift</span></article>
+          </div>
+        </div>
+
+        <div class="cash-panel shift-list-panel">
+          <div class="cash-panel-head">
+            <div>
+              <h2>Shifts Awaiting Collection</h2>
+              <small th:text="${uncollectedSessionCount + ' cashier-closed shifts for ' + selectedBranchName}">Awaiting collection</small>
+            </div>
+            <span class="badge blue" th:text="${uncollectedSessionCount + ' waiting'}">0 waiting</span>
+          </div>
+          <div class="cash-control-empty" th:if="${#lists.isEmpty(uncollectedSessions)}">
+            <span><i class="fa-regular fa-circle-check"></i></span>
+            <strong>No shifts waiting</strong>
+            <p>Cashiers have no closed shifts waiting for money collection.</p>
+          </div>
+          <div class="shift-collection-list" th:if="${!#lists.isEmpty(uncollectedSessions)}">
+            <article th:each="cashSession : ${uncollectedSessions}">
+              <span><i class="fa-solid fa-user-clock"></i></span>
+              <div>
+                <strong th:text="${cashierById.get(cashSession.cashierId) ?: 'User #' + cashSession.cashierId}">Cashier</strong>
+                <small th:text="${'Shift #' + cashSession.id + ' - ' + (drawerById.get(cashSession.drawerId) ?: 'Drawer #' + cashSession.drawerId)}">Shift</small>
+              </div>
+              <div>
+                <strong th:text="${'USD ' + #numbers.formatDecimal(cashSession.expectedCashUsd ?: 0, 1, 2)}">USD 0.00</strong>
+                <small th:text="${'ZWG ' + #numbers.formatDecimal(cashSession.expectedCashZwg ?: 0, 1, 2)}">ZWG 0.00</small>
+              </div>
+              <a class="btn btn-light" th:href="@{/shop/cash(branchId=${selectedBranchId},collectShiftId=${cashSession.id})}"><i class="fa-solid fa-hand-holding-dollar"></i>Collect</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="cash-panel cash-session-panel">
+        <div class="cash-panel-head">
+          <div>
+            <h2>Shift Audit Trail</h2>
+            <small>Cashier sessions, expected cash, collected cash, collection variance, and collection status.</small>
+          </div>
+          <span class="badge" th:text="${sessionPage.totalElements + ' sessions'}">0 sessions</span>
+        </div>
+        <div class="cash-session-table">
+          <table>
+            <thead><tr><th>Shift</th><th>Drawer</th><th>Cashier</th><th>Sales</th><th>Expected Cash</th><th>Collected Cash</th><th>Collection Variance</th><th>Status</th><th>Collected</th><th>Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="cashSession : ${sessionList}">
+              <td><strong th:text="${'#' + cashSession.id}">#1</strong><small th:text="${cashSession.closedAt == null ? 'Still open' : 'Closed ' + #temporals.format(cashSession.closedAt, 'dd MMM HH:mm')}">Closed</small></td>
+              <td th:text="${drawerById.get(cashSession.drawerId) ?: 'Drawer #' + cashSession.drawerId}">Till</td>
+              <td th:text="${cashierById.get(cashSession.cashierId) ?: 'User #' + cashSession.cashierId}">Cashier</td>
+              <td><strong th:text="${cashSession.totalTransactions}">0</strong><small th:text="${'USD ' + #numbers.formatDecimal(cashSession.totalSalesUsd ?: 0, 1, 2) + ' / ZWG ' + #numbers.formatDecimal(cashSession.totalSalesZwg ?: 0, 1, 2)}">Sales</small></td>
+              <td><span th:text="${'USD ' + #numbers.formatDecimal(cashSession.expectedCashUsd ?: 0, 1, 2)}">USD</span><small th:text="${'ZWG ' + #numbers.formatDecimal(cashSession.expectedCashZwg ?: 0, 1, 2)}">ZWG</small></td>
+              <td><span th:text="${cashSession.collectedCashUsd == null ? '-' : 'USD ' + #numbers.formatDecimal(cashSession.collectedCashUsd, 1, 2)}">USD</span><small th:text="${cashSession.collectedCashZwg == null ? '-' : 'ZWG ' + #numbers.formatDecimal(cashSession.collectedCashZwg, 1, 2)}">ZWG</small></td>
+              <td><span th:text="${cashSession.collectionVarianceUsd == null ? '-' : 'USD ' + #numbers.formatDecimal(cashSession.collectionVarianceUsd, 1, 2)}">USD</span><small th:text="${cashSession.collectionVarianceZwg == null ? '-' : 'ZWG ' + #numbers.formatDecimal(cashSession.collectionVarianceZwg, 1, 2)}">ZWG</small></td>
+              <td><span th:class="${cashSession.status.name() == 'OPEN' ? 'badge status-active' : (cashSession.cashCollected == true ? 'badge status-completed' : 'badge status-pending')}" th:text="${cashSession.status.name() == 'OPEN' ? 'OPEN' : (cashSession.cashCollected == true ? 'COLLECTED' : 'WAITING COLLECTION')}">WAITING</span></td>
+              <td th:text="${cashSession.collectedAt == null ? '-' : #temporals.format(cashSession.collectedAt, 'dd MMM yyyy HH:mm')}">Date</td>
+              <td>
+                <a th:if="${cashSession.status.name() == 'CLOSED' and cashSession.cashCollected != true}" class="icon-button mini" th:href="@{/shop/cash(branchId=${selectedBranchId},collectShiftId=${cashSession.id})}" title="Collect shift money"><i class="fa-solid fa-hand-holding-dollar"></i></a>
+                <a class="icon-button mini" th:href="${'#modal-shift-' + cashSession.id}" title="View shift details"><i class="fa-solid fa-chart-line"></i></a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <div class="cash-empty-state" th:if="${#lists.isEmpty(sessionList)}">
+            <span><i class="fa-solid fa-cash-register"></i></span>
+            <strong>No cash sessions yet</strong>
+            <p>Cashiers open shifts from the POS app.</p>
+          </div>
+          <div th:replace="~{common/layout :: pagination(${sessionPage}, ${sessionPageLinks}, ${sessionPrevUrl}, ${sessionNextUrl})}"></div>
+        </div>
+      </section>
     </section>
 
-    <section class="panel table-panel">
-      <div class="toolbar"><h2>Cash Sessions</h2><span class="badge" th:text="${sessionPage.totalElements + ' sessions'}">0 sessions</span></div>
-      <table>
-        <thead><tr><th>Session</th><th>Drawer</th><th>Cashier</th><th>Sales</th><th>Expected Cash</th><th>Actual Cash</th><th>Variance</th><th>Status</th><th>Opened</th><th>Actions</th></tr></thead>
-        <tbody>
-        <tr th:each="cashSession : ${sessionList}">
-          <td><strong th:text="${'#' + cashSession.id}">#1</strong><small th:text="${cashSession.closedAt == null ? 'Still open' : 'Closed ' + #temporals.format(cashSession.closedAt, 'dd MMM HH:mm')}">Closed</small></td>
-          <td th:text="${drawerById.get(cashSession.drawerId) ?: 'Drawer #' + cashSession.drawerId}">Till</td>
-          <td th:text="${cashierById.get(cashSession.cashierId) ?: 'User #' + cashSession.cashierId}">Cashier</td>
-          <td><strong th:text="${cashSession.totalTransactions}">0</strong><small th:text="${'USD ' + #numbers.formatDecimal(cashSession.totalSalesUsd ?: 0, 1, 2) + ' / ZWG ' + #numbers.formatDecimal(cashSession.totalSalesZwg ?: 0, 1, 2)}">Sales</small></td>
-          <td><span th:text="${'USD ' + #numbers.formatDecimal(cashSession.expectedCashUsd ?: 0, 1, 2)}">USD</span><small th:text="${'ZWG ' + #numbers.formatDecimal(cashSession.expectedCashZwg ?: 0, 1, 2)}">ZWG</small></td>
-          <td><span th:text="${cashSession.actualCashUsd == null ? '-' : 'USD ' + #numbers.formatDecimal(cashSession.actualCashUsd, 1, 2)}">USD</span><small th:text="${cashSession.actualCashZwg == null ? '-' : 'ZWG ' + #numbers.formatDecimal(cashSession.actualCashZwg, 1, 2)}">ZWG</small></td>
-          <td><span th:text="${cashSession.varianceUsd == null ? '-' : 'USD ' + #numbers.formatDecimal(cashSession.varianceUsd, 1, 2)}">USD</span><small th:text="${cashSession.varianceZwg == null ? '-' : 'ZWG ' + #numbers.formatDecimal(cashSession.varianceZwg, 1, 2)}">ZWG</small></td>
-          <td><span th:class="${cashSession.status.name() == 'OPEN' ? 'badge status-active' : 'badge status-completed'}" th:text="${cashSession.status}">OPEN</span></td>
-          <td th:text="${#temporals.format(cashSession.openedAt, 'dd MMM yyyy HH:mm')}">Date</td>
-          <td><a class="icon-button mini" th:href="${'#modal-shift-' + cashSession.id}" title="View shift details"><i class="fa-solid fa-chart-line"></i></a></td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="empty" th:if="${#lists.isEmpty(sessionList)}">No cash sessions yet. Cashiers open shifts from the Flutter app.</div>
-      <div th:replace="~{common/layout :: pagination(${sessionPage}, ${sessionPageLinks}, ${sessionPrevUrl}, ${sessionNextUrl})}"></div>
-    </section>
+    <div id="modal-collect-shift" class="modal"><div class="modal-content wide-modal shift-close-modal">
+      <div class="modal-head"><h2>Collect Shift Money</h2><a class="close" href="#">&times;</a></div>
+      <form method="get" th:action="@{/shop/cash}" class="shift-lookup-form">
+        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+        <label>Shift ID<input name="collectShiftId" type="number" min="1" required th:value="${collectShiftId}" placeholder="Enter cashier shift ID"></label>
+        <button class="btn btn-light" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Retrieve Shift</button>
+      </form>
+      <div th:if="${collectShiftLookupMessage}" class="alert" th:text="${collectShiftLookupMessage}"></div>
+
+      <section th:if="${collectShiftPreview != null}" class="shift-preview-card">
+        <div class="shift-preview-head">
+          <div>
+            <small>Closed by cashier, ready for collection</small>
+            <h3 th:text="${'Shift #' + collectShiftPreview.id}">Shift #1</h3>
+          </div>
+          <span class="badge status-pending">WAITING COLLECTION</span>
+        </div>
+        <div class="shift-preview-grid">
+          <article><span>Cashier</span><strong th:text="${cashierById.get(collectShiftPreview.cashierId) ?: 'User #' + collectShiftPreview.cashierId}">Cashier</strong></article>
+          <article><span>Drawer</span><strong th:text="${drawerById.get(collectShiftPreview.drawerId) ?: 'Drawer #' + collectShiftPreview.drawerId}">Drawer</strong></article>
+          <article><span>Closed</span><strong th:text="${collectShiftPreview.closedAt == null ? '-' : #temporals.format(collectShiftPreview.closedAt, 'dd MMM yyyy HH:mm')}">Date</strong></article>
+          <article><span>Transactions</span><strong th:text="${collectShiftPreview.totalTransactions}">0</strong></article>
+        </div>
+        <form method="post" th:action="@{/shop/cash/shifts/collect}" class="shift-close-form" data-shift-close-form
+              th:attr="data-expected-usd=${collectShiftPreview.expectedCashUsd ?: 0},data-expected-zwg=${collectShiftPreview.expectedCashZwg ?: 0}">
+          <input type="hidden" name="branchId" th:value="${selectedBranchId}">
+          <input type="hidden" name="sessionId" th:value="${collectShiftPreview.id}">
+          <div class="shift-money-grid">
+            <article class="shift-variance-card expected">
+              <span>Expected USD</span>
+              <strong th:text="${'USD ' + #numbers.formatDecimal(collectShiftPreview.expectedCashUsd ?: 0, 1, 2)}">USD 0.00</strong>
+            </article>
+            <article class="shift-variance-card expected">
+              <span>Expected ZWG</span>
+              <strong th:text="${'ZWG ' + #numbers.formatDecimal(collectShiftPreview.expectedCashZwg ?: 0, 1, 2)}">ZWG 0.00</strong>
+            </article>
+            <label>Collected USD confirmed<input name="actualUsd" type="number" min="0" step="0.01" required th:value="${collectShiftPreview.expectedCashUsd ?: 0}"></label>
+            <label>Collected ZWG confirmed<input name="actualZwg" type="number" min="0" step="0.01" required th:value="${collectShiftPreview.expectedCashZwg ?: 0}"></label>
+            <article class="shift-variance-card" data-variance-summary>
+              <span>Variance USD</span>
+              <strong data-variance-usd>USD 0.00</strong>
+            </article>
+            <article class="shift-variance-card" data-variance-summary>
+              <span>Variance ZWG</span>
+              <strong data-variance-zwg>ZWG 0.00</strong>
+            </article>
+          </div>
+          <label class="shift-reason-field">Variance reason / collection note
+            <textarea name="closingNotes" rows="3" data-variance-reason placeholder="Required when collected cash differs from expected cash."></textarea>
+          </label>
+          <p class="shift-reason-note" data-variance-note hidden><i class="fa-solid fa-triangle-exclamation"></i>A reason is required because this shift has a shortage or overage.</p>
+          <div class="modal-actions">
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-hand-holding-dollar"></i>Confirm Collection</button>
+            <a class="btn btn-light" href="#"><i class="fa-solid fa-xmark"></i>Cancel</a>
+          </div>
+        </form>
+      </section>
+    </div></div>
 
     <div th:each="cashSession : ${sessionList}" th:id="${'modal-shift-' + cashSession.id}" class="modal"><div class="modal-content wide-modal">
       <div class="modal-head"><h2 th:text="${'Shift #' + cashSession.id}">Shift</h2><a class="close" href="#">&times;</a></div>
@@ -116,26 +257,6 @@
         </table>
         <div class="empty" th:if="${#lists.isEmpty(salesBySession.get(cashSession.id))}">No sales were recorded in this shift.</div>
       </div>
-    </div></div>
-
-    <div id="modal-create-drawer" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2>New Cash Drawer</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{/shop/cash/drawers}" class="form-grid">
-        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
-        <label>Name<input name="name" required placeholder="Till 1"></label>
-        <label>Description<input name="description" placeholder="Front counter"></label>
-        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Drawer</button></div>
-      </form>
-    </div></div>
-
-    <div th:each="drawer : ${drawerList}" th:id="${'modal-edit-drawer-' + drawer.id}" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2 th:text="${'Edit ' + drawer.name}">Edit Drawer</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{'/shop/cash/drawers/' + ${drawer.id} + '/update'}" class="form-grid">
-        <input type="hidden" name="branchId" th:value="${selectedBranchId}">
-        <label>Name<input name="name" th:value="${drawer.name}" required></label>
-        <label>Description<input name="description" th:value="${drawer.description}"></label>
-        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Drawer</button></div>
-      </form>
     </div></div>
     <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>

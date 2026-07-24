@@ -1,6 +1,5 @@
 package com.retailzw.controller.web;
 
-
 import com.retailzw.enums.CurrencyCode;
 import com.retailzw.enums.BusinessModule;
 import com.retailzw.enums.GasTankStatus;
@@ -11,6 +10,7 @@ import com.retailzw.model.*;
 import com.retailzw.repository.*;
 import com.retailzw.service.CurrentUserService;
 import com.retailzw.service.CreditAndChangeService;
+import com.retailzw.service.FinanceReportCalculator;
 import com.retailzw.service.BillingAccessService;
 import com.retailzw.service.GasOperationsService;
 import com.retailzw.service.InventoryIntelligenceService;
@@ -73,7 +73,7 @@ public class ShopWebController {
 
     private static final Map<String, String> MODULE_LABELS = Map.ofEntries(
             Map.entry("sales", "Sales History"),
-            Map.entry("cash", "Cash Drawer"),
+            Map.entry("cash", "Cash Collection"),
             Map.entry("returns", "Returns"),
             Map.entry("products", "Products"),
             Map.entry("categories", "Categories"),
@@ -136,6 +136,7 @@ public class ShopWebController {
 
     private final CurrentUserService current;
     private final RetailOperationsService operations;
+    private final FinanceReportCalculator financeReportCalculator;
     private final ReturnService returnService;
     private final PurchaseOrderService purchaseOrderService;
     private final ProductRepository products;
@@ -150,6 +151,7 @@ public class ShopWebController {
     private final RoleRepository roles;
     private final InventoryRepository inventory;
     private final InventoryAdjustmentRepository adjustments;
+    private final InventoryTransactionRepository inventoryTransactions;
     private final PurchaseOrderRepository purchaseOrders;
     private final PurchaseOrderItemRepository purchaseOrderItems;
     private final GoodsReceivedNoteRepository goodsReceivedNotes;
@@ -226,6 +228,7 @@ public class ShopWebController {
         List<Branch> activeBranches = branches.findByTenantIdAndIsActiveTrue(tenantId);
         List<Inventory> branchStock = inventory.findByTenantIdAndBranchId(tenantId, branchId);
         List<Inventory> lowStockRows = inventory.findLowStockItems(tenantId, branchId);
+        List<User> tenantUsers = users.findByTenantId(tenantId);
         Map<Long, Product> productById = products.findByTenantIdAndIsActiveTrue(tenantId).stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
         DashboardMoney todayTotals = moneyTotals(tenantId, branchId, start, end);
@@ -249,6 +252,10 @@ public class ShopWebController {
         model.addAttribute("productCount", products.countByTenantIdAndIsActiveTrue(tenantId));
         model.addAttribute("customerCount", customers.countByTenantId(tenantId));
         model.addAttribute("branchCount", activeBranches.size());
+        model.addAttribute("activeCashierCount", tenantUsers.stream()
+                .filter(user -> Boolean.TRUE.equals(user.getIsActive()))
+                .filter(user -> hasRole(user, UserRole.CASHIER))
+                .count());
         model.addAttribute("todaySales", todayTotals);
         model.addAttribute("yesterdaySales", yesterdayTotals);
         model.addAttribute("salesVsYesterday", percentChange(todayTotals.usdRaw(), yesterdayTotals.usdRaw()));
@@ -326,6 +333,8 @@ public class ShopWebController {
                          @RequestParam(required = false) String to,
                          @RequestParam(required = false) String status,
                          @RequestParam(required = false) Long cashierId,
+                         @RequestParam(required = false) Long collectShiftId,
+                         @RequestParam(required = false) Long closeShiftId,
                          @RequestParam(defaultValue = "0") int page,
                          @RequestParam(defaultValue = "25") int size,
                          Model model) {
@@ -378,7 +387,7 @@ public class ShopWebController {
             return "shop/categories";
         }
         if ("inventory".equals(activeModule)) {
-            addInventoryManagementModel(model, tenantId, activeBranchId, search, currentPage, pageSize);
+            addInventoryManagementModel(model, tenantId, activeBranchId, search, status, currentPage, pageSize);
             return "shop/inventory";
         }
         if ("inventory-intelligence".equals(activeModule)) {
@@ -426,14 +435,38 @@ public class ShopWebController {
         }
         if ("change".equals(activeModule)) {
             HeldChange.Status changeStatus = parseEnum(status, HeldChange.Status.class);
-            var changePage = creditAndChangeService.changeRecords(tenantId, changeStatus, search, currentPage, pageSize);
+            LocalDateTime fromDate = parseDate(from, false);
+            LocalDateTime toDate = parseDate(to, true);
+            var changePage = creditAndChangeService.changeRecords(
+                    tenantId, changeStatus, search, fromDate, toDate, currentPage, pageSize);
+            LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+            LocalDateTime tomorrowStart = todayStart.plusDays(1);
             model.addAttribute("changePage", changePage);
             model.addAttribute("changeRecords", changePage.getContent());
             model.addAttribute("changeSearch", search);
             model.addAttribute("changeStatus", status);
-            model.addAttribute("openChangeCount", creditAndChangeService.changeRecords(
-                    tenantId, HeldChange.Status.OPEN, null, 0, 1).getTotalElements());
-            addPaginationModel(model, "change", changePage, "/shop/change", params("search", search, "status", status));
+            model.addAttribute("changeDateFrom", from);
+            model.addAttribute("changeDateTo", to);
+            model.addAttribute("openChangeCount", creditAndChangeService.changeRecordCount(tenantId, HeldChange.Status.OPEN));
+            model.addAttribute("filteredChangeCount", changePage.getTotalElements());
+            model.addAttribute("heldChangeUsd", creditAndChangeService.sumChangeRecords(
+                    tenantId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.USD));
+            model.addAttribute("heldChangeZwg", creditAndChangeService.sumChangeRecords(
+                    tenantId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.ZWG));
+            model.addAttribute("collectedTodayUsd", creditAndChangeService.sumChangeRecords(
+                    tenantId, HeldChange.Status.COLLECTED, null, todayStart, tomorrowStart, CurrencyCode.USD));
+            model.addAttribute("collectedTodayZwg", creditAndChangeService.sumChangeRecords(
+                    tenantId, HeldChange.Status.COLLECTED, null, todayStart, tomorrowStart, CurrencyCode.ZWG));
+            model.addAttribute("filteredChangeUsd", creditAndChangeService.sumChangeRecords(
+                    tenantId, changeStatus, search, fromDate, toDate, CurrencyCode.USD));
+            model.addAttribute("filteredChangeZwg", creditAndChangeService.sumChangeRecords(
+                    tenantId, changeStatus, search, fromDate, toDate, CurrencyCode.ZWG));
+            addPaginationModel(model, "change", changePage, "/shop/change", params(
+                    "search", search,
+                    "from", from,
+                    "to", to,
+                    "status", status
+            ));
             return "shop/change";
         }
         if ("suppliers".equals(activeModule)) {
@@ -449,7 +482,7 @@ public class ShopWebController {
             return "shop/sales";
         }
         if ("cash".equals(activeModule)) {
-            addCashDrawerModel(model, tenantId, activeBranchId, currentPage, pageSize);
+            addCashDrawerModel(model, tenantId, activeBranchId, collectShiftId != null ? collectShiftId : closeShiftId, currentPage, pageSize);
             return "shop/cash";
         }
         if ("returns".equals(activeModule)) {
@@ -1017,6 +1050,21 @@ public class ShopWebController {
         return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/restocking");
     }
 
+    @PostMapping("/shop/gas/stock/reconcile")
+    public String reconcileGasStock(@Valid @ModelAttribute GasStockReconciliationRequest request,
+                                    @RequestParam(required = false) String returnTo,
+                                    RedirectAttributes redirect) {
+        try {
+            GasStockAdjustment adjustment = gasOperations.reconcileStock(
+                    current.tenantId(), current.userId(), request);
+            redirect.addFlashAttribute("message", "Gas stock reconciled. Variance: "
+                    + adjustment.getVarianceKg() + " kg.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+        }
+        return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/tanks");
+    }
+
     @PostMapping("/shop/gas/expenses")
     public String recordGasExpense(@Valid @ModelAttribute GasExpenseRequest request,
                                    @RequestParam(required = false) String returnTo,
@@ -1133,6 +1181,29 @@ public class ShopWebController {
             redirect.addFlashAttribute("message", ex.getMessage());
         }
         return "redirect:/shop/cash?branchId=" + targetBranch;
+    }
+
+    @PostMapping("/shop/cash/shifts/collect")
+    public String collectShiftMoney(@Valid @ModelAttribute CloseSessionRequest request,
+                                    @RequestParam(required = false) Long branchId,
+                                    RedirectAttributes redirect) {
+        Long targetBranch = selectedBranch(branchId);
+        try {
+            CashSession saved = operations.collectSessionMoneyAsAdmin(current.tenantId(), targetBranch, current.userId(), request);
+            redirect.addFlashAttribute("message", "Money collected for shift #" + saved.getId() + ".");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+            String sessionParam = request.getSessionId() == null ? "" : "&collectShiftId=" + request.getSessionId();
+            return "redirect:/shop/cash?branchId=" + targetBranch + sessionParam;
+        }
+        return "redirect:/shop/cash?branchId=" + targetBranch;
+    }
+
+    @PostMapping("/shop/cash/shifts/close")
+    public String closeShiftFromCashDesk(@Valid @ModelAttribute CloseSessionRequest request,
+                                         @RequestParam(required = false) Long branchId,
+                                         RedirectAttributes redirect) {
+        return collectShiftMoney(request, branchId, redirect);
     }
 
     @PostMapping("/shop/returns")
@@ -1442,9 +1513,13 @@ public class ShopWebController {
 
         model.addAttribute("tenantBillingOnly", tenantBillingOnly);
         tenants.findById(tenantId).ifPresent(tenant -> {
-            model.addAttribute("tenantPackageName", tenant.getPlanId() == null
+            String packageName = tenant.getPlanId() == null
                     ? "Starter"
-                    : plans.findById(tenant.getPlanId()).map(SaasPlan::getName).orElse("Package"));
+                    : plans.findById(tenant.getPlanId()).map(SaasPlan::getName).orElse("Package");
+            model.addAttribute("tenantPackageName", packageName);
+            model.addAttribute("tenantPackageLabel", packageName.toLowerCase().endsWith("plan")
+                    ? packageName
+                    : packageName + " Plan");
             model.addAttribute("tenantSubscriptionEnd", tenant.getSubscriptionEnd());
             model.addAttribute("tenantStatus", tenant.getStatus());
         });
@@ -1464,6 +1539,7 @@ public class ShopWebController {
             model.addAttribute("systemModules", List.of());
             model.addAttribute("enabledBusinessModules", List.of());
             model.addAttribute("gasModuleEnabled", false);
+            model.addAttribute("shopModuleEnabled", false);
             model.addAttribute("billingAccessLocked", true);
             model.addAttribute("billingLockMessage", billingAccess.message());
             model.addAttribute("billingOverdueDays", billingAccess.overdueDays());
@@ -1483,10 +1559,9 @@ public class ShopWebController {
         model.addAttribute("peopleModules", shopEnabled ? PEOPLE_MODULES : (gasEnabled ? List.of("users") : List.of()));
         model.addAttribute("financeModules", shopEnabled ? FINANCE_MODULES : List.of());
         model.addAttribute("systemModules", shopEnabled ? SYSTEM_MODULES : List.of());
-        model.addAttribute("enabledBusinessModules", enabledBusinessModules.isEmpty()
-                ? List.of(BusinessModule.SHOP_MODULE)
-                : enabledBusinessModules);
+        model.addAttribute("enabledBusinessModules", enabledBusinessModules);
         model.addAttribute("gasModuleEnabled", gasEnabled);
+        model.addAttribute("shopModuleEnabled", shopEnabled);
         model.addAttribute("supportChatMessages", chatMessages.findByTenantIdOrderByCreatedAtDesc(tenantId, PageRequest.of(0, 30)).stream()
                 .sorted(java.util.Comparator.comparing(TenantChatMessage::getCreatedAt))
                 .toList());
@@ -1639,6 +1714,12 @@ public class ShopWebController {
         model.addAttribute("activeProductCount", productList.stream().filter(p -> Boolean.TRUE.equals(p.getIsActive())).count());
         model.addAttribute("lowStockProductCount", productList.stream().filter(p -> isLowStock(p, selectedBranchStock.get(p.getId()))).count());
         model.addAttribute("branchProductCount", branchStockRows.size());
+        model.addAttribute("branchStockValueUsd", branchStockRows.stream()
+                .map(stock -> nvl(stock.getQuantityOnHand()).multiply(nvl(stock.getAverageCostUsd())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("branchStockValueZwg", branchStockRows.stream()
+                .map(stock -> nvl(stock.getQuantityOnHand()).multiply(nvl(stock.getAverageCostZwg())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     private void addCategoryManagementModel(Model model, Long tenantId, String search, int page, int size) {
@@ -1666,10 +1747,12 @@ public class ShopWebController {
         model.addAttribute("emptyCategoryCount", categoryList.stream().filter(c -> !productCounts.containsKey(c.getId())).count());
     }
 
-    private void addInventoryManagementModel(Model model, Long tenantId, Long selectedBranchId, String search, int page, int size) {
+    private void addInventoryManagementModel(Model model, Long tenantId, Long selectedBranchId, String search,
+                                             String status, int page, int size) {
         Map<Long, Product> productById = products.findByTenantIdAndIsActiveTrue(tenantId).stream()
                 .collect(java.util.stream.Collectors.toMap(Product::getId, p -> p));
         String cleanSearch = search == null || search.isBlank() ? null : search.toLowerCase();
+        String cleanStatus = status == null || status.isBlank() ? null : status.toUpperCase();
         List<Inventory> branchInventory = inventory.findByTenantIdAndBranchId(tenantId, selectedBranchId).stream()
                 .filter(item -> productById.containsKey(item.getProductId()))
                 .filter(item -> {
@@ -1679,6 +1762,12 @@ public class ShopWebController {
                     return contains(product.getName(), cleanSearch)
                             || contains(product.getSku(), cleanSearch)
                             || contains(product.getBarcode(), cleanSearch);
+                })
+                .filter(item -> {
+                    if (cleanStatus == null || "ALL".equals(cleanStatus)) return true;
+                    boolean lowStock = isLowStock(productById.get(item.getProductId()), item);
+                    return "LOW_STOCK".equals(cleanStatus) ? lowStock
+                            : !"HEALTHY".equals(cleanStatus) || !lowStock;
                 })
                 .toList();
         List<Product> branchProductOptions = inventory.findBranchProductStock(tenantId, selectedBranchId, null, null).stream()
@@ -1690,20 +1779,41 @@ public class ShopWebController {
         model.addAttribute("inventoryPage", inventoryPage);
         addPaginationModel(model, "inventory", inventoryPage, "/shop/inventory", params(
                 "branchId", selectedBranchId,
-                "search", search
+                "search", search,
+                "status", status
         ));
         model.addAttribute("inventoryProductById", productById);
         model.addAttribute("branchProductOptions", branchProductOptions);
         model.addAttribute("inventorySearch", search);
+        model.addAttribute("inventoryStatus", status);
         model.addAttribute("selectedBranchName", branchById(tenantId).get(selectedBranchId));
         model.addAttribute("summaryTotalProducts", branchInventory.size());
         model.addAttribute("summaryLowStock", branchInventory.stream().filter(item -> isLowStock(productById.get(item.getProductId()), item)).count());
+        model.addAttribute("summaryReserved", branchInventory.stream()
+                .map(item -> nvl(item.getQuantityReserved()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
         model.addAttribute("summaryValueUsd", branchInventory.stream()
                 .map(item -> nvl(item.getQuantityOnHand()).multiply(nvl(item.getAverageCostUsd())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
         model.addAttribute("summaryValueZwg", branchInventory.stream()
                 .map(item -> nvl(item.getQuantityOnHand()).multiply(nvl(item.getAverageCostZwg())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
+        List<InventoryTransaction> recentMovements = inventoryTransactions
+                .findByTenantIdAndBranchId(tenantId, selectedBranchId, PageRequest.of(0, 20))
+                .getContent();
+        List<PurchaseOrder> branchOrders = purchaseOrders
+                .findAllByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, selectedBranchId);
+        model.addAttribute("recentInventoryMovements", recentMovements);
+        model.addAttribute("pendingReceivingCount", branchOrders.stream()
+                .filter(order -> order.getStatus() == PurchaseOrder.PoStatus.APPROVED
+                        || order.getStatus() == PurchaseOrder.PoStatus.ORDERED
+                        || order.getStatus() == PurchaseOrder.PoStatus.PARTIAL)
+                .count());
+        model.addAttribute("openPurchaseOrderCount", branchOrders.stream()
+                .filter(order -> order.getStatus() != PurchaseOrder.PoStatus.RECEIVED
+                        && order.getStatus() != PurchaseOrder.PoStatus.CANCELLED
+                        && order.getStatus() != PurchaseOrder.PoStatus.REJECTED)
+                .count());
     }
 
     private void addSalesHistoryModel(Model model, Long tenantId, Long selectedBranchId, String search,
@@ -1795,10 +1905,12 @@ public class ShopWebController {
                 .toList();
     }
 
-    private void addCashDrawerModel(Model model, Long tenantId, Long selectedBranchId, int page, int size) {
+    private void addCashDrawerModel(Model model, Long tenantId, Long selectedBranchId, Long collectShiftId, int page, int size) {
         List<CashDrawer> drawerList = drawers.findByTenantIdAndBranchId(tenantId, selectedBranchId);
         Page<CashSession> sessionPage = cashSessions.findByTenantIdAndBranchId(tenantId, selectedBranchId, pageRequest(page, size));
         List<CashSession> sessionList = sessionPage.getContent();
+        List<CashSession> openSessions = cashSessions.findAllByTenantIdAndBranchIdAndStatus(tenantId, selectedBranchId, CashSession.SessionStatus.OPEN);
+        List<CashSession> uncollectedSessions = cashSessions.findUncollectedClosedSessions(tenantId, selectedBranchId);
         Map<Long, List<CashMovement>> movementsBySession = new HashMap<>();
         Map<Long, List<Sale>> salesBySession = new HashMap<>();
         Map<Long, Long> completedSalesBySession = new HashMap<>();
@@ -1831,7 +1943,8 @@ public class ShopWebController {
         model.addAttribute("sessionList", sessionList);
         model.addAttribute("sessionPage", sessionPage);
         addPaginationModel(model, "session", sessionPage, "/shop/cash", params("branchId", selectedBranchId));
-        model.addAttribute("openSessions", sessionList.stream().filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus())).toList());
+        model.addAttribute("openSessions", openSessions);
+        model.addAttribute("uncollectedSessions", uncollectedSessions);
         model.addAttribute("movementsBySession", movementsBySession);
         model.addAttribute("salesBySession", salesBySession);
         model.addAttribute("completedSalesBySession", completedSalesBySession);
@@ -1851,9 +1964,34 @@ public class ShopWebController {
                 .filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus()))
                 .collect(java.util.stream.Collectors.groupingBy(CashSession::getDrawerId, java.util.stream.Collectors.counting())));
         model.addAttribute("activeDrawerCount", drawerList.stream().filter(drawer -> Boolean.TRUE.equals(drawer.getIsActive())).count());
-        model.addAttribute("openSessionCount", sessionList.stream().filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus())).count());
-        model.addAttribute("expectedCashUsd", sessionList.stream().filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus())).map(CashSession::getExpectedCashUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
-        model.addAttribute("expectedCashZwg", sessionList.stream().filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus())).map(CashSession::getExpectedCashZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("openSessionCount", (long) openSessions.size());
+        model.addAttribute("uncollectedSessionCount", (long) uncollectedSessions.size());
+        model.addAttribute("expectedCashUsd", uncollectedSessions.stream().map(CashSession::getExpectedCashUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("expectedCashZwg", uncollectedSessions.stream().map(CashSession::getExpectedCashZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("closedSessionCount", sessionList.stream().filter(session -> CashSession.SessionStatus.CLOSED.equals(session.getStatus())).count());
+        model.addAttribute("collectedCashUsd", sessionList.stream().map(CashSession::getCollectedCashUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("collectedCashZwg", sessionList.stream().map(CashSession::getCollectedCashZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("varianceUsd", sessionList.stream().map(CashSession::getCollectionVarianceUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("varianceZwg", sessionList.stream().map(CashSession::getCollectionVarianceZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("lastCashSession", sessionList.stream()
+                .filter(session -> session.getOpenedAt() != null)
+                .max(Comparator.comparing(CashSession::getOpenedAt))
+                .orElse(null));
+        model.addAttribute("collectShiftId", collectShiftId);
+        if (collectShiftId != null) {
+            cashSessions.findById(collectShiftId)
+                    .filter(session -> session.getTenantId().equals(tenantId))
+                    .filter(session -> session.getBranchId().equals(selectedBranchId))
+                    .ifPresentOrElse(session -> {
+                        if (CashSession.SessionStatus.OPEN.equals(session.getStatus())) {
+                            model.addAttribute("collectShiftLookupMessage", "Shift #" + collectShiftId + " is still open. The cashier must close it from the POS app first.");
+                        } else if (Boolean.TRUE.equals(session.getCashCollected())) {
+                            model.addAttribute("collectShiftLookupMessage", "Shift #" + collectShiftId + " has already been collected.");
+                        } else {
+                            model.addAttribute("collectShiftPreview", session);
+                        }
+                    }, () -> model.addAttribute("collectShiftLookupMessage", "Shift #" + collectShiftId + " was not found for this branch."));
+        }
     }
 
     private void addReturnsModel(Model model, Long tenantId, Long selectedBranchId, String search, String from, String to, int page, int size) {
@@ -1948,62 +2086,87 @@ public class ShopWebController {
         final LocalDateTime reportFrom = fromDate;
         final LocalDateTime reportTo = toDate;
 
-        List<Sale> periodSales = sales.searchSales(tenantId, selectedBranchId, reportFrom, reportTo, null, null, null, PageRequest.of(0, 1000)).getContent();
-        List<Sale> completedSales = periodSales.stream().filter(sale -> Sale.SaleStatus.COMPLETED.equals(sale.getStatus())).toList();
+        List<Sale> periodSales = sales.searchSalesList(tenantId, selectedBranchId, reportFrom, reportTo, null, null, null);
         long periodDays = Math.max(1, ChronoUnit.DAYS.between(reportFrom.toLocalDate(), reportTo.toLocalDate()));
         LocalDateTime previousFrom = reportFrom.minusDays(periodDays);
-        List<Sale> previousSales = sales.searchSales(tenantId, selectedBranchId, previousFrom, reportFrom, Sale.SaleStatus.COMPLETED, null, null, PageRequest.of(0, 1000)).getContent();
-        List<Return> periodReturns = returns.searchReturns(tenantId, selectedBranchId, reportFrom, reportTo, null, PageRequest.of(0, 1000)).getContent();
+        List<Sale> previousSales = sales.searchSalesList(tenantId, selectedBranchId, previousFrom, reportFrom, null, null, null);
+        List<Return> periodReturns = returns.searchReturnsList(tenantId, selectedBranchId, reportFrom, reportTo);
+        List<Return> previousReturns = returns.searchReturnsList(tenantId, selectedBranchId, previousFrom, reportFrom);
+        Map<Long, Sale> originalSalesById = returnOriginSales(periodReturns, previousReturns);
+        List<Sale> completedSales = financeReportCalculator.reportableSales(periodSales);
+        List<Return> recognizedReturns = financeReportCalculator.reportableReturns(periodReturns);
+        var financeTotals = financeReportCalculator.calculate(periodSales, periodReturns, originalSalesById);
+        var previousFinanceTotals = financeReportCalculator.calculate(previousSales, previousReturns, originalSalesById);
+        var usdTotals = financeTotals.usd();
+        var zwgTotals = financeTotals.zwg();
         List<Inventory> branchInventory = inventory.findByTenantIdAndBranchId(tenantId, selectedBranchId);
-        List<CashSession> branchSessions = cashSessions.findByTenantIdAndBranchId(tenantId, selectedBranchId, PageRequest.of(0, 1000)).getContent();
+        List<CashSession> branchSessions = cashSessions.findAllByTenantIdAndBranchIdOrderByOpenedAtDesc(tenantId, selectedBranchId);
         List<CashSession> periodSessions = branchSessions.stream()
                 .filter(session -> session.getOpenedAt() != null && !session.getOpenedAt().isBefore(reportFrom) && session.getOpenedAt().isBefore(reportTo))
                 .toList();
-        List<PurchaseOrder> branchOrders = purchaseOrders.findByTenantIdAndBranchId(tenantId, selectedBranchId, PageRequest.of(0, 1000)).getContent();
+        List<PurchaseOrder> branchOrders = purchaseOrders.findAllByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, selectedBranchId);
         List<PurchaseOrder> periodOrders = branchOrders.stream()
                 .filter(order -> order.getCreatedAt() != null && !order.getCreatedAt().isBefore(reportFrom) && order.getCreatedAt().isBefore(reportTo))
                 .toList();
 
-        BigDecimal revenueUsd = sumSales(completedSales, CurrencyCode.USD, Sale::getGrandTotal);
-        BigDecimal revenueZwg = sumSales(completedSales, CurrencyCode.ZWG, Sale::getGrandTotal);
-        BigDecimal cogsUsd = sumSales(completedSales, CurrencyCode.USD, Sale::getTotalCost);
-        BigDecimal cogsZwg = sumSales(completedSales, CurrencyCode.ZWG, Sale::getTotalCost);
-        BigDecimal grossProfitUsd = sumSales(completedSales, CurrencyCode.USD, Sale::getGrossProfit);
-        BigDecimal grossProfitZwg = sumSales(completedSales, CurrencyCode.ZWG, Sale::getGrossProfit);
-        BigDecimal discountsUsd = sumSales(completedSales, CurrencyCode.USD, Sale::getDiscountAmount);
-        BigDecimal discountsZwg = sumSales(completedSales, CurrencyCode.ZWG, Sale::getDiscountAmount);
-        BigDecimal taxUsd = sumSales(completedSales, CurrencyCode.USD, Sale::getTaxAmount);
-        BigDecimal taxZwg = sumSales(completedSales, CurrencyCode.ZWG, Sale::getTaxAmount);
-        BigDecimal refundsUsd = sumReturns(periodReturns, CurrencyCode.USD);
-        BigDecimal refundsZwg = sumReturns(periodReturns, CurrencyCode.ZWG);
-        BigDecimal netSalesUsd = revenueUsd.subtract(refundsUsd).max(BigDecimal.ZERO);
-        BigDecimal netSalesZwg = revenueZwg.subtract(refundsZwg).max(BigDecimal.ZERO);
-        BigDecimal previousRevenueUsd = sumSales(previousSales, CurrencyCode.USD, Sale::getGrandTotal);
-        BigDecimal previousProfitUsd = sumSales(previousSales, CurrencyCode.USD, Sale::getGrossProfit);
-        BigDecimal averageBasketUsd = completedSales.stream().filter(sale -> CurrencyCode.USD.equals(sale.getCurrency()))
-                .map(Sale::getGrandTotal).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal revenueUsd = usdTotals.grossSales();
+        BigDecimal revenueZwg = zwgTotals.grossSales();
+        BigDecimal cogsUsd = usdTotals.netCogs();
+        BigDecimal cogsZwg = zwgTotals.netCogs();
+        BigDecimal grossProfitUsd = usdTotals.grossProfit();
+        BigDecimal grossProfitZwg = zwgTotals.grossProfit();
+        BigDecimal discountsUsd = usdTotals.discounts();
+        BigDecimal discountsZwg = zwgTotals.discounts();
+        BigDecimal taxUsd = usdTotals.taxCollected();
+        BigDecimal taxZwg = zwgTotals.taxCollected();
+        BigDecimal refundsUsd = usdTotals.refunds();
+        BigDecimal refundsZwg = zwgTotals.refunds();
+        BigDecimal netSalesUsd = usdTotals.netSales();
+        BigDecimal netSalesZwg = zwgTotals.netSales();
+        BigDecimal previousRevenueUsd = previousFinanceTotals.usd().netSales();
+        BigDecimal previousProfitUsd = previousFinanceTotals.usd().grossProfit();
+        BigDecimal averageBasketUsd = netSalesUsd;
         long usdSalesCount = completedSales.stream().filter(sale -> CurrencyCode.USD.equals(sale.getCurrency())).count();
         averageBasketUsd = usdSalesCount == 0 ? BigDecimal.ZERO : averageBasketUsd.divide(BigDecimal.valueOf(usdSalesCount), 2, RoundingMode.HALF_UP);
-        BigDecimal profitMarginUsd = percent(grossProfitUsd, revenueUsd);
-        BigDecimal netProfitUsd = grossProfitUsd.subtract(discountsUsd).subtract(refundsUsd).max(BigDecimal.ZERO);
-        BigDecimal netProfitZwg = grossProfitZwg.subtract(discountsZwg).subtract(refundsZwg).max(BigDecimal.ZERO);
-        BigDecimal revenueChangePct = percent(revenueUsd.subtract(previousRevenueUsd), previousRevenueUsd);
+        BigDecimal profitMarginUsd = usdTotals.grossMargin();
+        BigDecimal netMarginUsd = usdTotals.netMargin();
+        BigDecimal netProfitUsd = usdTotals.netProfit();
+        BigDecimal netProfitZwg = zwgTotals.netProfit();
+        BigDecimal revenueChangePct = percent(netSalesUsd.subtract(previousRevenueUsd), previousRevenueUsd);
         BigDecimal profitChangePct = percent(grossProfitUsd.subtract(previousProfitUsd), previousProfitUsd);
 
         BigDecimal cashCollectedUsd = salePayments.sumCashCollected(tenantId, selectedBranchId, CurrencyCode.USD, reportFrom, reportTo);
         BigDecimal cashCollectedZwg = salePayments.sumCashCollected(tenantId, selectedBranchId, CurrencyCode.ZWG, reportFrom, reportTo);
+        BigDecimal cashRefundsUsd = recognizedReturns.stream()
+                .filter(ret -> Return.RefundMethod.CASH.equals(ret.getRefundMethod()))
+                .filter(ret -> CurrencyCode.USD.equals(ret.getCurrency()))
+                .map(Return::getTotalRefund).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal cashRefundsZwg = recognizedReturns.stream()
+                .filter(ret -> Return.RefundMethod.CASH.equals(ret.getRefundMethod()))
+                .filter(ret -> CurrencyCode.ZWG.equals(ret.getCurrency()))
+                .map(Return::getTotalRefund).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal netCashMovementUsd = cashCollectedUsd.subtract(cashRefundsUsd);
+        BigDecimal netCashMovementZwg = cashCollectedZwg.subtract(cashRefundsZwg);
         BigDecimal openExpectedCashUsd = periodSessions.stream()
                 .filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus()))
                 .map(CashSession::getExpectedCashUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal openExpectedCashZwg = periodSessions.stream()
                 .filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus()))
                 .map(CashSession::getExpectedCashZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal countedCashUsd = periodSessions.stream().map(CashSession::getActualCashUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal countedCashZwg = periodSessions.stream().map(CashSession::getActualCashZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal countedCashUsd = periodSessions.stream()
+                .map(session -> Boolean.TRUE.equals(session.getCashCollected()) ? session.getCollectedCashUsd() : session.getActualCashUsd())
+                .filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal countedCashZwg = periodSessions.stream()
+                .map(session -> Boolean.TRUE.equals(session.getCashCollected()) ? session.getCollectedCashZwg() : session.getActualCashZwg())
+                .filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal cashAtHandUsd = countedCashUsd.add(openExpectedCashUsd);
         BigDecimal cashAtHandZwg = countedCashZwg.add(openExpectedCashZwg);
-        BigDecimal varianceUsd = periodSessions.stream().map(CashSession::getVarianceUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal varianceZwg = periodSessions.stream().map(CashSession::getVarianceZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal varianceUsd = periodSessions.stream()
+                .map(session -> Boolean.TRUE.equals(session.getCashCollected()) ? session.getCollectionVarianceUsd() : session.getVarianceUsd())
+                .filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal varianceZwg = periodSessions.stream()
+                .map(session -> Boolean.TRUE.equals(session.getCashCollected()) ? session.getCollectionVarianceZwg() : session.getVarianceZwg())
+                .filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal inventoryValueUsd = branchInventory.stream()
                 .map(item -> nvl(item.getQuantityOnHand()).multiply(nvl(item.getAverageCostUsd())))
@@ -2011,20 +2174,24 @@ public class ShopWebController {
         BigDecimal inventoryValueZwg = branchInventory.stream()
                 .map(item -> nvl(item.getQuantityOnHand()).multiply(nvl(item.getAverageCostZwg())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal openPoUsd = branchOrders.stream()
-                .filter(order -> !PurchaseOrder.PoStatus.RECEIVED.equals(order.getStatus()))
-                .filter(order -> !PurchaseOrder.PoStatus.CANCELLED.equals(order.getStatus()))
+        Set<PurchaseOrder.PoStatus> commitmentStatuses = Set.of(
+                PurchaseOrder.PoStatus.APPROVED,
+                PurchaseOrder.PoStatus.ORDERED,
+                PurchaseOrder.PoStatus.PARTIAL
+        );
+        List<PurchaseOrder> openCommitments = branchOrders.stream()
+                .filter(order -> commitmentStatuses.contains(order.getStatus()))
+                .toList();
+        BigDecimal openPoUsd = openCommitments.stream()
                 .map(PurchaseOrder::getTotalUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal openPoZwg = branchOrders.stream()
-                .filter(order -> !PurchaseOrder.PoStatus.RECEIVED.equals(order.getStatus()))
-                .filter(order -> !PurchaseOrder.PoStatus.CANCELLED.equals(order.getStatus()))
+        BigDecimal openPoZwg = openCommitments.stream()
                 .map(PurchaseOrder::getTotalZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal netPositionUsd = cashAtHandUsd.add(inventoryValueUsd).subtract(openPoUsd);
         BigDecimal netPositionZwg = cashAtHandZwg.add(inventoryValueZwg).subtract(openPoZwg);
 
         Map<String, BigDecimal> paymentMethodTotals = new LinkedHashMap<>();
         for (Object[] row : salePayments.sumByPaymentMethod(tenantId, selectedBranchId, reportFrom, reportTo)) {
-            paymentMethodTotals.put(String.valueOf(row[0]), row[1] == null ? BigDecimal.ZERO : (BigDecimal) row[1]);
+            paymentMethodTotals.put(row[0] + " " + row[1], row[2] == null ? BigDecimal.ZERO : (BigDecimal) row[2]);
         }
         Map<String, Long> salesByStatus = new LinkedHashMap<>();
         for (Sale.SaleStatus saleStatus : Sale.SaleStatus.values()) {
@@ -2037,9 +2204,9 @@ public class ShopWebController {
 
         Map<Long, Product> productById = products.findByTenantIdAndIsActiveTrue(tenantId).stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity(), (a, b) -> a));
-        List<ProductPerformance> productPerformance = productPerformance(completedSales).stream()
+        List<ProductPerformance> productPerformance = productPerformance(completedSales, recognizedReturns, originalSalesById).stream()
                 .sorted(Comparator.comparing(ProductPerformance::getProfitUsd).reversed()
-                        .thenComparing(ProductPerformance::getRevenueUsd).reversed())
+                        .thenComparing(Comparator.comparing(ProductPerformance::getRevenueUsd).reversed()))
                 .limit(10)
                 .toList();
         List<ProductPerformance> slowMovers = branchInventory.stream()
@@ -2054,8 +2221,8 @@ public class ShopWebController {
                 .sorted(Comparator.comparing(ProductPerformance::getQuantity).reversed())
                 .limit(8)
                 .toList();
-        List<TrendPoint> dailyTrend = dailyTrend(completedSales, reportFrom.toLocalDate(), reportTo.toLocalDate());
-        BigDecimal trendMax = dailyTrend.stream().map(TrendPoint::getRevenueUsd).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        List<TrendPoint> dailyTrend = dailyTrend(completedSales, recognizedReturns, reportFrom.toLocalDate(), reportTo.toLocalDate());
+        BigDecimal trendMax = dailyTrend.stream().map(TrendPoint::getRevenueUsd).map(BigDecimal::abs).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
         dailyTrend.forEach(point -> point.setPercent(barPercent(point.getRevenueUsd(), trendMax)));
         List<TrendPoint> hourlyTrend = hourlyTrend(completedSales);
         BigDecimal hourlyMax = hourlyTrend.stream().map(TrendPoint::getRevenueUsd).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
@@ -2068,13 +2235,18 @@ public class ShopWebController {
                             .filter(sale -> session.getId().equals(sale.getCashSessionId()))
                             .toList();
                     BigDecimal sessionRevenueUsd = sumSales(sessionSales, CurrencyCode.USD, Sale::getGrandTotal);
-                    BigDecimal sessionProfitUsd = sumSales(sessionSales, CurrencyCode.USD, Sale::getGrossProfit);
+                    BigDecimal sessionProfitUsd = sumSales(sessionSales, CurrencyCode.USD, Sale::getSubtotal)
+                            .subtract(sumSales(sessionSales, CurrencyCode.USD, Sale::getTotalCost));
                     BigDecimal sessionRevenueZwg = sumSales(sessionSales, CurrencyCode.ZWG, Sale::getGrandTotal);
-                    BigDecimal sessionProfitZwg = sumSales(sessionSales, CurrencyCode.ZWG, Sale::getGrossProfit);
-                    BigDecimal sessionVarianceUsd = nvl(session.getVarianceUsd());
+                    BigDecimal sessionProfitZwg = sumSales(sessionSales, CurrencyCode.ZWG, Sale::getSubtotal)
+                            .subtract(sumSales(sessionSales, CurrencyCode.ZWG, Sale::getTotalCost));
+                    BigDecimal sessionVarianceUsd = Boolean.TRUE.equals(session.getCashCollected())
+                            ? nvl(session.getCollectionVarianceUsd()) : nvl(session.getVarianceUsd());
+                    BigDecimal sessionVarianceZwg = Boolean.TRUE.equals(session.getCashCollected())
+                            ? nvl(session.getCollectionVarianceZwg()) : nvl(session.getVarianceZwg());
                     return new ShiftReportRow(session.getId(), cashierNames.getOrDefault(session.getCashierId(), "Cashier " + session.getCashierId()),
                             session.getStatus().name(), sessionSales.size(), sessionRevenueUsd, sessionRevenueZwg,
-                            sessionProfitUsd, sessionProfitZwg, sessionVarianceUsd, nvl(session.getVarianceZwg()),
+                            sessionProfitUsd, sessionProfitZwg, sessionVarianceUsd, sessionVarianceZwg,
                             session.getOpenedAt(), session.getClosedAt());
                 })
                 .sorted(Comparator.comparing(ShiftReportRow::getOpenedAt, Comparator.nullsLast(Comparator.reverseOrder())))
@@ -2098,6 +2270,24 @@ public class ShopWebController {
                 .map(HeldChange::getAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal heldChangeZwg = openChange.stream().filter(change -> CurrencyCode.ZWG.equals(change.getCurrency()))
                 .map(HeldChange::getAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal currentAssetsUsd = cashAtHandUsd.add(inventoryValueUsd).add(borrowerOutstandingUsd);
+        BigDecimal currentAssetsZwg = cashAtHandZwg.add(inventoryValueZwg).add(borrowerOutstandingZwg);
+        BigDecimal currentLiabilitiesUsd = openPoUsd.add(heldChangeUsd);
+        BigDecimal currentLiabilitiesZwg = openPoZwg.add(heldChangeZwg);
+        netPositionUsd = currentAssetsUsd.subtract(currentLiabilitiesUsd);
+        netPositionZwg = currentAssetsZwg.subtract(currentLiabilitiesZwg);
+        BigDecimal currentRatioUsd = currentLiabilitiesUsd.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
+                : currentAssetsUsd.divide(currentLiabilitiesUsd, 2, RoundingMode.HALF_UP);
+        BigDecimal cashCoverageUsd = currentLiabilitiesUsd.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.valueOf(100)
+                : percent(cashAtHandUsd, currentLiabilitiesUsd);
+        BigDecimal liabilityExposureUsd = currentAssetsUsd.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
+                : percent(currentLiabilitiesUsd, currentAssetsUsd);
+        boolean hasCurrentLiabilitiesUsd = currentLiabilitiesUsd.compareTo(BigDecimal.ZERO) > 0;
+        String financialHealth = netPositionUsd.compareTo(BigDecimal.ZERO) >= 0 && cashCoverageUsd.compareTo(BigDecimal.valueOf(50)) >= 0
+                ? "Healthy" : netPositionUsd.compareTo(BigDecimal.ZERO) >= 0 ? "Watch" : "At risk";
         List<InventoryLot> expiringLots = inventoryLots.findByTenantIdAndBranchIdAndExpiryDateBeforeAndStatus(
                 tenantId, selectedBranchId, LocalDate.now().plusDays(30), InventoryLot.Status.AVAILABLE);
         long openVarianceCount = varianceInvestigations.countByTenantIdAndBranchIdAndStatus(tenantId, selectedBranchId, StockVarianceInvestigation.Status.OPEN);
@@ -2111,12 +2301,16 @@ public class ShopWebController {
         model.addAttribute("dateTo", reportTo.minusDays(1).toLocalDate().toString());
         model.addAttribute("completedSales", completedSales);
         model.addAttribute("reportSalesCount", completedSales.size());
-        model.addAttribute("reportReturnCount", periodReturns.size());
+        model.addAttribute("reportReturnCount", recognizedReturns.size());
         model.addAttribute("reportPoCount", periodOrders.size());
         model.addAttribute("revenueUsd", revenueUsd);
         model.addAttribute("revenueZwg", revenueZwg);
         model.addAttribute("cogsUsd", cogsUsd);
         model.addAttribute("cogsZwg", cogsZwg);
+        model.addAttribute("grossCogsUsd", usdTotals.grossCogs());
+        model.addAttribute("grossCogsZwg", zwgTotals.grossCogs());
+        model.addAttribute("returnedCogsUsd", usdTotals.returnedCogs());
+        model.addAttribute("returnedCogsZwg", zwgTotals.returnedCogs());
         model.addAttribute("grossProfitUsd", grossProfitUsd);
         model.addAttribute("grossProfitZwg", grossProfitZwg);
         model.addAttribute("discountsUsd", discountsUsd);
@@ -2129,12 +2323,19 @@ public class ShopWebController {
         model.addAttribute("netSalesZwg", netSalesZwg);
         model.addAttribute("netProfitUsd", netProfitUsd);
         model.addAttribute("netProfitZwg", netProfitZwg);
+        model.addAttribute("operatingExpensesUsd", usdTotals.operatingExpenses());
+        model.addAttribute("operatingExpensesZwg", zwgTotals.operatingExpenses());
         model.addAttribute("averageBasketUsd", averageBasketUsd);
         model.addAttribute("profitMarginUsd", profitMarginUsd);
+        model.addAttribute("netMarginUsd", netMarginUsd);
         model.addAttribute("revenueChangePct", revenueChangePct);
         model.addAttribute("profitChangePct", profitChangePct);
         model.addAttribute("cashCollectedUsd", cashCollectedUsd);
         model.addAttribute("cashCollectedZwg", cashCollectedZwg);
+        model.addAttribute("cashRefundsUsd", cashRefundsUsd);
+        model.addAttribute("cashRefundsZwg", cashRefundsZwg);
+        model.addAttribute("netCashMovementUsd", netCashMovementUsd);
+        model.addAttribute("netCashMovementZwg", netCashMovementZwg);
         model.addAttribute("cashAtHandUsd", cashAtHandUsd);
         model.addAttribute("cashAtHandZwg", cashAtHandZwg);
         model.addAttribute("varianceUsd", varianceUsd);
@@ -2143,8 +2344,19 @@ public class ShopWebController {
         model.addAttribute("inventoryValueZwg", inventoryValueZwg);
         model.addAttribute("openPoUsd", openPoUsd);
         model.addAttribute("openPoZwg", openPoZwg);
+        model.addAttribute("openCommitmentCount", openCommitments.size());
+        model.addAttribute("openCommitments", openCommitments.stream().limit(20).toList());
         model.addAttribute("netPositionUsd", netPositionUsd);
         model.addAttribute("netPositionZwg", netPositionZwg);
+        model.addAttribute("currentAssetsUsd", currentAssetsUsd);
+        model.addAttribute("currentAssetsZwg", currentAssetsZwg);
+        model.addAttribute("currentLiabilitiesUsd", currentLiabilitiesUsd);
+        model.addAttribute("currentLiabilitiesZwg", currentLiabilitiesZwg);
+        model.addAttribute("currentRatioUsd", currentRatioUsd);
+        model.addAttribute("cashCoverageUsd", cashCoverageUsd);
+        model.addAttribute("liabilityExposureUsd", liabilityExposureUsd);
+        model.addAttribute("hasCurrentLiabilitiesUsd", hasCurrentLiabilitiesUsd);
+        model.addAttribute("financialHealth", financialHealth);
         model.addAttribute("openCashSessionCount", periodSessions.stream().filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus())).count());
         model.addAttribute("closedCashSessionCount", periodSessions.stream().filter(session -> CashSession.SessionStatus.CLOSED.equals(session.getStatus())).count());
         model.addAttribute("paymentMethodTotals", paymentMethodTotals);
@@ -2198,7 +2410,18 @@ public class ShopWebController {
         return labels;
     }
 
-    private List<ProductPerformance> productPerformance(List<Sale> completedSales) {
+    private Map<Long, Sale> returnOriginSales(List<Return> currentReturns, List<Return> previousReturns) {
+        return java.util.stream.Stream.concat(currentReturns.stream(), previousReturns.stream())
+                .map(Return::getOriginalSaleId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(sales::findWithItemsById)
+                .flatMap(java.util.Optional::stream)
+                .collect(Collectors.toMap(Sale::getId, Function.identity(), (first, ignored) -> first));
+    }
+
+    private List<ProductPerformance> productPerformance(List<Sale> completedSales, List<Return> recognizedReturns,
+                                                        Map<Long, Sale> originalSalesById) {
         Map<Long, ProductPerformance> rows = new LinkedHashMap<>();
         for (Sale sale : completedSales) {
             for (SaleItem item : sale.getItems()) {
@@ -2206,7 +2429,7 @@ public class ShopWebController {
                         new ProductPerformance(id, item.getProductName(), item.getProductSku(), BigDecimal.ZERO,
                                 BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
                 BigDecimal quantity = nvl(item.getQuantity());
-                BigDecimal revenue = nvl(item.getLineTotal());
+                BigDecimal revenue = nvl(item.getUnitPrice()).multiply(quantity).subtract(nvl(item.getDiscountAmount()));
                 BigDecimal cost = nvl(item.getCostPrice()).multiply(quantity);
                 BigDecimal profit = revenue.subtract(cost);
                 row.addQuantity(quantity);
@@ -2217,10 +2440,38 @@ public class ShopWebController {
                 }
             }
         }
+        for (Return ret : recognizedReturns) {
+            Sale originalSale = originalSalesById.get(ret.getOriginalSaleId());
+            if (originalSale == null) continue;
+            for (ReturnItem returnedItem : ret.getItems()) {
+                SaleItem originalItem = originalSale.getItems().stream()
+                        .filter(item -> returnedItem.getProductId().equals(item.getProductId()))
+                        .findFirst()
+                        .orElse(null);
+                String name = originalItem == null ? returnedItem.getProductName() : originalItem.getProductName();
+                String sku = originalItem == null ? "" : originalItem.getProductSku();
+                ProductPerformance row = rows.computeIfAbsent(returnedItem.getProductId(), id ->
+                        new ProductPerformance(id, name, sku, BigDecimal.ZERO,
+                                BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
+                BigDecimal quantity = nvl(returnedItem.getQuantity());
+                BigDecimal refund = nvl(returnedItem.getRefundAmount());
+                BigDecimal returnedCost = originalItem == null
+                        ? BigDecimal.ZERO
+                        : nvl(originalItem.getCostPrice()).multiply(quantity);
+                row.addQuantity(quantity.negate());
+                BigDecimal profitReversal = refund.subtract(returnedCost).negate();
+                if (CurrencyCode.USD.equals(ret.getCurrency())) {
+                    row.addUsd(refund.negate(), profitReversal);
+                } else {
+                    row.addZwg(refund.negate(), profitReversal);
+                }
+            }
+        }
         return new ArrayList<>(rows.values());
     }
 
-    private List<TrendPoint> dailyTrend(List<Sale> completedSales, LocalDate from, LocalDate toExclusive) {
+    private List<TrendPoint> dailyTrend(List<Sale> completedSales, List<Return> recognizedReturns,
+                                        LocalDate from, LocalDate toExclusive) {
         Map<LocalDate, TrendPoint> trend = new LinkedHashMap<>();
         LocalDate cursor = from;
         while (cursor.isBefore(toExclusive)) {
@@ -2231,8 +2482,13 @@ public class ShopWebController {
             if (sale.getCreatedAt() == null) continue;
             TrendPoint point = trend.get(sale.getCreatedAt().toLocalDate());
             if (point != null) {
-                point.addSale(CurrencyCode.USD.equals(sale.getCurrency()) ? nvl(sale.getGrandTotal()) : BigDecimal.ZERO);
+                point.addSale(CurrencyCode.USD.equals(sale.getCurrency()) ? nvl(sale.getSubtotal()) : BigDecimal.ZERO);
             }
+        }
+        for (Return ret : recognizedReturns) {
+            if (ret.getCreatedAt() == null || !CurrencyCode.USD.equals(ret.getCurrency())) continue;
+            TrendPoint point = trend.get(ret.getCreatedAt().toLocalDate());
+            if (point != null) point.addAdjustment(nvl(ret.getTotalRefund()).negate());
         }
         return new ArrayList<>(trend.values());
     }
@@ -2322,7 +2578,8 @@ public class ShopWebController {
         if (max == null || max.compareTo(BigDecimal.ZERO) <= 0) {
             return 0;
         }
-        return Math.max(4, value.multiply(BigDecimal.valueOf(100)).divide(max, 0, RoundingMode.HALF_UP).intValue());
+        if (value == null || value.compareTo(BigDecimal.ZERO) == 0) return 0;
+        return Math.max(4, value.abs().multiply(BigDecimal.valueOf(100)).divide(max, 0, RoundingMode.HALF_UP).intValue());
     }
 
     private String blank(String value) {
@@ -2620,6 +2877,7 @@ public class ShopWebController {
         List<GasSale> shiftSales = List.of();
         List<GasSale> allGasSales = List.of();
         List<GasRestock> gasRestocks = List.of();
+        List<GasStockAdjustment> gasStockAdjustments = List.of();
         List<GasExpense> gasExpenses = List.of();
         Page<GasShift> gasShiftPage = Page.empty();
         GasOperationsService.GasDashboard gasDashboard = null;
@@ -2631,6 +2889,7 @@ public class ShopWebController {
             shiftSales = gasOperations.shiftSales(tenantId, gasBranchId, current.userId());
             allGasSales = gasOperations.sales(tenantId, gasBranchId);
             gasRestocks = gasOperations.restocks(tenantId, gasBranchId);
+            gasStockAdjustments = gasOperations.stockAdjustments(tenantId, gasBranchId);
             gasExpenses = gasOperations.expenses(tenantId, gasBranchId);
             gasShiftPage = gasOperations.shifts(tenantId, gasBranchId, PageRequest.of(0, 50));
             gasDashboard = gasOperations.dashboard(tenantId, gasBranchId);
@@ -2656,6 +2915,7 @@ public class ShopWebController {
         model.addAttribute("gasPrices", gasPrices);
         model.addAttribute("allGasSales", allGasSales);
         model.addAttribute("gasRestocks", gasRestocks);
+        model.addAttribute("gasStockAdjustments", gasStockAdjustments);
         model.addAttribute("gasExpenses", gasExpenses);
         model.addAttribute("gasShifts", gasShiftPage.getContent());
         model.addAttribute("gasDashboard", gasDashboard);
@@ -2947,6 +3207,10 @@ public class ShopWebController {
             saleCount++;
         }
 
+        public void addAdjustment(BigDecimal amount) {
+            revenueUsd = revenueUsd.add(amount == null ? BigDecimal.ZERO : amount);
+        }
+
         public String getLabel() { return label; }
         public BigDecimal getRevenueUsd() { return revenueUsd; }
         public int getSaleCount() { return saleCount; }
@@ -2986,7 +3250,7 @@ public class ShopWebController {
         public void addUsd(BigDecimal revenue, BigDecimal profit) {
             revenueUsd = revenueUsd.add(revenue == null ? BigDecimal.ZERO : revenue);
             profitUsd = profitUsd.add(profit == null ? BigDecimal.ZERO : profit);
-            marginUsd = revenueUsd.compareTo(BigDecimal.ZERO) == 0
+            marginUsd = revenueUsd.compareTo(BigDecimal.ZERO) <= 0
                     ? BigDecimal.ZERO
                     : profitUsd.multiply(BigDecimal.valueOf(100)).divide(revenueUsd, 1, RoundingMode.HALF_UP);
         }

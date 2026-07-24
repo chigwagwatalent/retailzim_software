@@ -29,7 +29,12 @@ public interface CashSessionRepository extends JpaRepository<CashSession, Long> 
 
     Page<CashSession> findByTenantIdAndBranchId(Long tenantId, Long branchId, Pageable pageable);
 
+    List<CashSession> findAllByTenantIdAndBranchIdOrderByOpenedAtDesc(Long tenantId, Long branchId);
+
     List<CashSession> findAllByTenantIdAndBranchIdAndStatus(Long tenantId, Long branchId, CashSession.SessionStatus status);
+
+    @Query("SELECT cs FROM CashSession cs WHERE cs.tenantId = :tenantId AND cs.branchId = :branchId AND cs.status = 'CLOSED' AND (cs.cashCollected = false OR cs.cashCollected IS NULL) ORDER BY cs.closedAt DESC, cs.openedAt DESC")
+    List<CashSession> findUncollectedClosedSessions(@Param("tenantId") Long tenantId, @Param("branchId") Long branchId);
 
     List<CashSession> findByDrawerIdAndStatus(Long drawerId, CashSession.SessionStatus status);
 }

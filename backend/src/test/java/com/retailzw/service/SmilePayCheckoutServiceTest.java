@@ -8,7 +8,6 @@ import com.retailzw.model.Tenant;
 import com.retailzw.model.TenantSubscription;
 import com.retailzw.repository.SaasPlanRepository;
 import com.retailzw.repository.SmilePayCheckoutRepository;
-import com.retailzw.repository.TenantEnabledModuleRepository;
 import com.retailzw.repository.TenantRepository;
 import com.retailzw.repository.TenantSubscriptionRepository;
 import com.sun.net.httpserver.HttpServer;
@@ -27,10 +26,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class SmilePayCheckoutServiceTest {
+public class SmilePayCheckoutServiceTest {
 
     @Test
-    void providerServerErrorIsReconciledInsteadOfShownAsInitiationFailure() throws Exception {
+    public void providerServerErrorIsReconciledInsteadOfShownAsInitiationFailure() throws Exception {
         HttpServer provider = HttpServer.create(new InetSocketAddress(0), 0);
         provider.createContext("/payments/express-checkout/ecocash", exchange -> {
             byte[] response = "{\"message\":\"Internal Server Error\"}"
@@ -48,10 +47,10 @@ class SmilePayCheckoutServiceTest {
             TenantRepository tenants = mock(TenantRepository.class);
             SaasPlanRepository plans = mock(SaasPlanRepository.class);
             TenantSubscriptionRepository subscriptions = mock(TenantSubscriptionRepository.class);
-            TenantEnabledModuleRepository tenantModules = mock(TenantEnabledModuleRepository.class);
+            PackageModuleAccessService packageModuleAccess = mock(PackageModuleAccessService.class);
             EmailService email = mock(EmailService.class);
             SmilePayCheckoutService service = new SmilePayCheckoutService(
-                    checkouts, tenants, plans, subscriptions, tenantModules, email, new ObjectMapper());
+                    checkouts, tenants, plans, subscriptions, packageModuleAccess, email, new ObjectMapper());
 
             Tenant tenant = Tenant.builder()
                     .id(7L)
@@ -104,7 +103,7 @@ class SmilePayCheckoutServiceTest {
     }
 
     @Test
-    void successfulPaymentInvoiceIsGeneratedAsPdf() {
+    public void successfulPaymentInvoiceIsGeneratedAsPdf() {
         EmailService email = new EmailService();
         Tenant tenant = Tenant.builder()
                 .companyName("Test Shop")

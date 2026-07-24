@@ -5,6 +5,7 @@ import com.retailzw.dto.request.GasPriceRequest;
 import com.retailzw.dto.request.GasExpenseRequest;
 import com.retailzw.dto.request.GasRestockRequest;
 import com.retailzw.dto.request.GasSaleRequest;
+import com.retailzw.dto.request.GasStockReconciliationRequest;
 import com.retailzw.dto.request.GasTankRequest;
 import com.retailzw.dto.request.OpenGasShiftRequest;
 import com.retailzw.dto.response.ApiResponse;
@@ -33,6 +34,7 @@ public class GasApiController {
         payload.put("shiftSales", gas.shiftSales(current.tenantId(), branchId, current.userId()));
         payload.put("dashboard", gas.dashboard(current.tenantId(), branchId));
         payload.put("restocks", gas.restocks(current.tenantId(), branchId));
+        payload.put("stockAdjustments", gas.stockAdjustments(current.tenantId(), branchId));
         payload.put("expenses", gas.expenses(current.tenantId(), branchId));
         return ApiResponse.success(payload);
     }
@@ -75,6 +77,12 @@ public class GasApiController {
     @PostMapping("/restocks")
     public ApiResponse<?> restock(@Valid @RequestBody GasRestockRequest request) {
         return ApiResponse.success("Gas tank restocked", gas.restock(current.tenantId(), current.userId(), request));
+    }
+
+    @PostMapping("/stock/reconcile")
+    public ApiResponse<?> reconcileStock(@Valid @RequestBody GasStockReconciliationRequest request) {
+        return ApiResponse.success("Gas stock reconciled",
+                gas.reconcileStock(current.tenantId(), current.userId(), request));
     }
 
     @PostMapping("/expenses")

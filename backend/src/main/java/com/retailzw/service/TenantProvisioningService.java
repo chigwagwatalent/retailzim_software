@@ -100,10 +100,12 @@ public class TenantProvisioningService {
                 .isActive(true)
                 .build());
 
-        uoms.save(UnitOfMeasure.builder().tenantId(tenant.getId()).name("Each").abbreviation("EA").isDecimal(false).build());
+        if (selectedModules.contains(BusinessModule.SHOP_MODULE)) {
+            uoms.save(UnitOfMeasure.builder().tenantId(tenant.getId()).name("Each").abbreviation("EA").isDecimal(false).build());
+            categories.save(ProductCategory.builder().tenantId(tenant.getId()).name("Groceries").code("GROC").description("Daily retail goods").isActive(true).sortOrder(1).build());
+            drawers.save(CashDrawer.builder().tenantId(tenant.getId()).branchId(branch.getId()).name("Till 1").description("Default till").isActive(true).build());
+        }
         uoms.save(UnitOfMeasure.builder().tenantId(tenant.getId()).name("Kilogram").abbreviation("KG").isDecimal(true).build());
-        categories.save(ProductCategory.builder().tenantId(tenant.getId()).name("Groceries").code("GROC").description("Daily retail goods").isActive(true).sortOrder(1).build());
-        drawers.save(CashDrawer.builder().tenantId(tenant.getId()).branchId(branch.getId()).name("Till 1").description("Default till").isActive(true).build());
         for (BusinessModule module : selectedModules) {
             tenantModules.save(TenantEnabledModule.builder()
                     .tenantId(tenant.getId())
@@ -144,21 +146,35 @@ public class TenantProvisioningService {
     }
 
     private List<BusinessModule> selectedModules(TenantSignUpRequest request, SaasPlan plan) {
-        List<BusinessModule> requested = request.getModules() == null || request.getModules().isEmpty()
-                ? List.of(BusinessModule.SHOP_MODULE)
-                : request.getModules().stream().distinct().toList();
-        List<BusinessModule> allowed = plan == null ? List.of(BusinessModule.SHOP_MODULE) : plan.allowedModuleList();
-        List<BusinessModule> selected = requested.stream().filter(allowed::contains).toList();
-        if (selected.isEmpty()) {
-            selected = List.of(BusinessModule.SHOP_MODULE);
+        if (plan == null) {
+            throw new IllegalArgumentException("Select a valid subscription package.");
         }
-        if (selected.contains(BusinessModule.RESTAURANT_MODULE)) {
-            selected = selected.stream().filter(module -> !BusinessModule.RESTAURANT_MODULE.equals(module)).toList();
+        List<BusinessModule> requested = request.getModules() == null
+                ? List.of()
+                : request.getModules().stream()
+                        .filter(java.util.Objects::nonNull)
+                        .filter(module -> !BusinessModule.RESTAURANT_MODULE.equals(module))
+                        .distinct()
+                        .toList();
+        if (requested.isEmpty()) {
+            throw new IllegalArgumentException("Select at least one business module.");
         }
-        if (selected.isEmpty()) {
-            selected = List.of(BusinessModule.SHOP_MODULE);
+        List<BusinessModule> allowed = plan.allowedModuleList().stream()
+                .filter(module -> !BusinessModule.RESTAURANT_MODULE.equals(module))
+                .distinct()
+                .toList();
+        List<BusinessModule> unavailable = requested.stream().filter(module -> !allowed.contains(module)).toList();
+        if (!unavailable.isEmpty()) {
+            throw new IllegalArgumentException(unavailable.get(0).getDisplayName()
+                    + " is not available on the selected package.");
         }
-        return selected;
+        if (requested.size() > 1 && !Boolean.TRUE.equals(plan.getAllowMixedModules())) {
+            throw new IllegalArgumentException("The selected package supports one business module only.");
+        }
+        if (TenantBusinessMode.SINGLE_MODULE.equals(request.getBusinessMode()) && requested.size() > 1) {
+            throw new IllegalArgumentException("Single module mode requires one business module.");
+        }
+        return requested;
     }
 }
 

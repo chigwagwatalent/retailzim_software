@@ -54,7 +54,8 @@
         </div>
       </div>
       <div class="signup-plan-grid">
-        <label class="signup-plan-card" th:each="p, iter : ${plans}">
+        <label class="signup-plan-card" th:each="p, iter : ${plans}"
+               th:attr="data-allowed-modules=${p.allowedModules},data-allow-mixed=${p.allowMixedModules}">
           <input type="radio" name="planId" th:value="${p.id}" th:checked="${iter.index == 0}" required>
           <strong th:text="${p.name}">Plan</strong>
           <span th:text="${p.description}">Description</span>
@@ -80,9 +81,9 @@
           </select>
         </label>
         <div class="signup-module-grid">
-          <label class="signup-module-card" th:each="m : ${businessModules}">
+          <label class="signup-module-card" th:each="m : ${businessModules}" th:attr="data-business-module=${m.name()}">
             <input name="modules" type="checkbox" th:value="${m}" th:checked="${m.name() == 'SHOP_MODULE'}">
-            <span><i class="fa-solid fa-layer-group"></i></span>
+            <span><i th:class="${m.name() == 'GAS_MODULE' ? 'fa-solid fa-gas-pump' : 'fa-solid fa-store'}"></i></span>
             <strong th:text="${m.displayName}">Retail Shop</strong>
             <small>Enable this workspace after payment.</small>
           </label>
