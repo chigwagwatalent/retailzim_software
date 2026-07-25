@@ -35,7 +35,7 @@ public class SecurityConfig {
     public SecurityFilterChain platformAdminFilterChain(HttpSecurity http) throws Exception {
         http
             .securityMatcher("/admin/**", "/auth/admin/**", "/auth/signup", "/checkout/**")
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/checkout/smilepay/webhook"))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/admin/**", "/auth/signup", "/checkout/**").permitAll()
                 .anyRequest().hasRole("SAAS_ADMIN")
@@ -63,7 +63,6 @@ public class SecurityConfig {
     public SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
         http
             .securityMatcher("/shop/**", "/auth/shop/**")
-            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/shop/**").permitAll()
                 .anyRequest().hasAnyRole("SUPER_ADMIN", "ACCOUNTANT")
@@ -71,7 +70,7 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/auth/shop/login")
                 .loginProcessingUrl("/auth/shop/login")
-                .defaultSuccessUrl("/shop/dashboard", true)
+                .defaultSuccessUrl("/shop/dashboard", false)
                 .failureUrl("/auth/shop/login?error=true")
                 .permitAll()
             )

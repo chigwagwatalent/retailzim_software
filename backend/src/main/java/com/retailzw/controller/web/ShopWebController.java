@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -166,6 +167,7 @@ public class ShopWebController {
     private final NotificationService notificationService;
     private final PasswordResetService passwordResetService;
     private final TenantSubscriptionRepository tenantSubscriptions;
+    private final SubscriptionPaymentRepository subscriptionPayments;
     private final SmilePayCheckoutService smilePayCheckoutService;
     private final BillingAccessService billingAccessService;
     private final PackageModuleAccessService packageModuleAccessService;
@@ -277,7 +279,9 @@ public class ShopWebController {
     }
 
     @GetMapping("/shop/billing")
-    public String billing(Model model) {
+    public String billing(
+            @RequestParam(defaultValue = "0") int billingPage,
+            Model model) {
         Long tenantId = current.tenantId();
         Tenant tenant = tenants.findById(tenantId).orElseThrow();
         SaasPlan plan = tenant.getPlanId() == null
@@ -298,30 +302,226 @@ public class ShopWebController {
                 .sorted(java.util.Comparator.comparing(TenantSubscription::getCreatedAt,
                         java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder())))
                 .toList();
+        Page<SubscriptionPayment> paymentHistory = subscriptionPayments
+                .findByTenantIdOrderByConfirmedAtDesc(
+                        tenantId,
+                        PageRequest.of(Math.max(0, billingPage), DEFAULT_PAGE_SIZE));
         model.addAttribute("subscriptionHistory", subscriptionHistory);
-        model.addAttribute("subscriptionPlanNames", subscriptionHistory.stream()
-                .map(TenantSubscription::getPlanId)
+        model.addAttribute("subscriptionPlanNames", java.util.stream.Stream.concat(
+                        subscriptionHistory.stream().map(TenantSubscription::getPlanId),
+                        paymentHistory.stream().map(SubscriptionPayment::getPlanId))
                 .filter(java.util.Objects::nonNull)
                 .distinct()
                 .collect(java.util.stream.Collectors.toMap(
                         java.util.function.Function.identity(),
                         planId -> plans.findById(planId).map(SaasPlan::getName).orElse("Package " + planId))));
+        model.addAttribute("paymentHistory", paymentHistory);
         addNavigationModel(model);
         return "shop/billing";
     }
 
     @PostMapping("/shop/billing/pay")
     public String paySubscription(@RequestParam(required = false) Long planId,
-                                  RedirectAttributes redirect) {
-        try {
-            SmilePayCheckout checkout = planId == null
-                    ? smilePayCheckoutService.createCheckout(current.tenantId())
-                    : smilePayCheckoutService.createCheckout(current.tenantId(), planId);
-            return "redirect:/checkout/smilepay/" + checkout.getOrderReference();
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            redirect.addFlashAttribute("message", ex.getMessage());
+                                   RedirectAttributes redirect) {
+        Tenant tenant = tenants.findById(current.tenantId()).orElseThrow();
+        Long selectedPlanId = planId == null ? tenant.getPlanId() : planId;
+        if (selectedPlanId == null) {
+            redirect.addFlashAttribute("message", "Choose a package before renewal.");
             return "redirect:/shop/billing";
         }
+        return "redirect:/shop/billing/renew?planId=" + selectedPlanId;
+    }
+
+    @GetMapping("/shop/billing/renew")
+    public String renewalBuilder(
+            @RequestParam(required = false) Long planId,
+            Model model) {
+        Long tenantId = current.tenantId();
+        Tenant tenant = tenants.findById(tenantId).orElseThrow();
+        Long selectedPlanId = planId == null ? tenant.getPlanId() : planId;
+        SaasPlan selectedPlan = selectedPlanId == null
+                ? plans.findByIsActiveTrue().stream().findFirst().orElse(null)
+                : plans.findById(selectedPlanId)
+                        .filter(candidate -> Boolean.TRUE.equals(candidate.getIsActive()))
+                        .orElse(null);
+        if (selectedPlan == null) {
+            throw new IllegalArgumentException("No active subscription package is available.");
+        }
+        List<Integer> allowedMonths = smilePayCheckoutService.allowedRenewalMonths(selectedPlan);
+        Map<Integer, BigDecimal> renewalTotals = allowedMonths.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        months -> smilePayCheckoutService.renewalAmount(selectedPlan, months),
+                        (left, right) -> left,
+                        LinkedHashMap::new));
+        model.addAttribute("module", "billing");
+        model.addAttribute("tenant", tenant);
+        model.addAttribute("availablePlans", plans.findByIsActiveTrue());
+        model.addAttribute("selectedPlan", selectedPlan);
+        model.addAttribute("allowedMonths", allowedMonths);
+        model.addAttribute("renewalTotals", renewalTotals);
+        model.addAttribute("subscription", tenantSubscriptions
+                .findByTenantIdAndStatus(tenantId, TenantSubscription.SubscriptionStatus.ACTIVE)
+                .orElse(null));
+        addNavigationModel(model);
+        return "shop/billing-renewal";
+    }
+
+    @PostMapping("/shop/billing/renew")
+    public String createRenewal(
+            @RequestParam Long planId,
+            @RequestParam int billingMonths,
+            RedirectAttributes redirect) {
+        try {
+            SmilePayCheckout checkout = smilePayCheckoutService.createRenewalCheckout(
+                    current.tenantId(),
+                    planId,
+                    billingMonths,
+                    current.userId());
+            return "redirect:/shop/billing/renew/" + checkout.getOrderReference();
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+            return "redirect:/shop/billing/renew?planId=" + planId;
+        }
+    }
+
+    @GetMapping("/shop/billing/renew/{orderReference}")
+    public String renewalCheckout(
+            @PathVariable String orderReference,
+            Model model) {
+        var view = smilePayCheckoutService.renewalCheckoutView(orderReference, current.tenantId());
+        model.addAttribute("module", "billing");
+        model.addAttribute("checkout", view.checkout());
+        model.addAttribute("tenant", view.tenant());
+        model.addAttribute("selectedPlan", view.plan());
+        model.addAttribute("planModules", view.plan().allowedModuleList());
+        model.addAttribute("paymentMethods", paymentMethods());
+        addNavigationModel(model);
+        return "shop/billing-renewal";
+    }
+
+    @PostMapping("/shop/billing/renew/{orderReference}/initiate")
+    public Object initiateRenewal(
+            @PathVariable String orderReference,
+            @RequestParam SmilePayCheckout.PaymentMethod paymentMethod,
+            @RequestParam(required = false) String mobile,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String pan,
+            @RequestParam(required = false) String expMonth,
+            @RequestParam(required = false) String expYear,
+            @RequestParam(required = false) String securityCode,
+            RedirectAttributes redirect) {
+        try {
+            smilePayCheckoutService.requireRenewalCheckout(orderReference, current.tenantId());
+            Map<String, String> card = new LinkedHashMap<>();
+            card.put("firstName", firstName);
+            card.put("lastName", lastName);
+            card.put("pan", pan);
+            card.put("expMonth", expMonth);
+            card.put("expYear", expYear);
+            card.put("securityCode", securityCode);
+            var result = smilePayCheckoutService.initiateExpress(
+                    orderReference, paymentMethod, mobile, card);
+            if (result.redirectHtml() != null && !result.redirectHtml().isBlank()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.TEXT_HTML)
+                        .body(result.redirectHtml());
+            }
+            if (result.requiresOtp()) {
+                redirect.addFlashAttribute("message",
+                        result.message() == null ? "Enter the OTP sent to your phone." : result.message());
+                return "redirect:/shop/billing/renew/" + orderReference + "?otp=true";
+            }
+            redirect.addFlashAttribute("message",
+                    result.message() == null
+                            ? "Payment started. Approve it and keep this page open."
+                            : result.message());
+            return "redirect:/shop/billing/renew/" + orderReference + "?pending=true";
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+            return "redirect:/shop/billing/renew/" + orderReference;
+        }
+    }
+
+    @PostMapping("/shop/billing/renew/{orderReference}/confirm-otp")
+    public String confirmRenewalOtp(
+            @PathVariable String orderReference,
+            @RequestParam String otp,
+            RedirectAttributes redirect) {
+        try {
+            smilePayCheckoutService.requireRenewalCheckout(orderReference, current.tenantId());
+            var result = smilePayCheckoutService.confirmOtp(orderReference, otp);
+            if (SmilePayCheckout.CheckoutStatus.PAID.equals(result.checkout().getStatus())) {
+                redirect.addFlashAttribute("message", "Renewal payment confirmed.");
+                return "redirect:/shop/billing?renewal=success";
+            }
+            redirect.addFlashAttribute("message", "OTP accepted. We are confirming the payment.");
+            return "redirect:/shop/billing/renew/" + orderReference + "?pending=true";
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+            return "redirect:/shop/billing/renew/" + orderReference + "?otp=true";
+        }
+    }
+
+    @GetMapping("/shop/billing/renew/{orderReference}/status")
+    @ResponseBody
+    public Map<String, Object> renewalStatus(@PathVariable String orderReference) {
+        smilePayCheckoutService.requireRenewalCheckout(orderReference, current.tenantId());
+        SmilePayCheckout checkout = smilePayCheckoutService.checkoutState(orderReference);
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("status", checkout.getStatus());
+        payload.put("providerStatus", checkout.getProviderStatus());
+        payload.put("paid", SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus()));
+        payload.put("redirectUrl", SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus())
+                ? "/shop/billing?renewal=success"
+                : null);
+        return payload;
+    }
+
+    @GetMapping("/shop/billing/renew/{orderReference}/recheck")
+    public String recheckRenewal(
+            @PathVariable String orderReference,
+            RedirectAttributes redirect) {
+        try {
+            smilePayCheckoutService.requireRenewalCheckout(orderReference, current.tenantId());
+            SmilePayCheckout checkout = smilePayCheckoutService.verifyAndApply(orderReference);
+            if (SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus())) {
+                redirect.addFlashAttribute("message", "Renewal confirmed and access extended.");
+                return "redirect:/shop/billing?renewal=success";
+            }
+            redirect.addFlashAttribute("message",
+                    SmilePayCheckout.CheckoutStatus.PROCESSING.equals(checkout.getStatus())
+                            ? "The payment is still being verified."
+                            : "Payment has not been confirmed. Retry only if no money was deducted.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", "Payment status is temporarily unavailable.");
+        }
+        return "redirect:/shop/billing/renew/" + orderReference;
+    }
+
+    @GetMapping("/shop/billing/renew/return")
+    public String renewalReturn(
+            @RequestParam String orderReference,
+            RedirectAttributes redirect) {
+        smilePayCheckoutService.requireRenewalCheckout(orderReference, current.tenantId());
+        SmilePayCheckout checkout = smilePayCheckoutService.verifyAndApply(orderReference);
+        if (SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus())) {
+            redirect.addFlashAttribute("message", "Renewal payment received and access extended.");
+            return "redirect:/shop/billing?renewal=success";
+        }
+        redirect.addFlashAttribute("message", "Payment is still being confirmed.");
+        return "redirect:/shop/billing/renew/" + orderReference + "?pending=true";
+    }
+
+    @GetMapping("/shop/billing/renew/cancel")
+    public String cancelRenewal(
+            @RequestParam String orderReference,
+            RedirectAttributes redirect) {
+        smilePayCheckoutService.requireRenewalCheckout(orderReference, current.tenantId());
+        smilePayCheckoutService.cancel(orderReference);
+        redirect.addFlashAttribute("message", "Renewal payment cancelled.");
+        return "redirect:/shop/billing/renew/" + orderReference;
     }
 
     @GetMapping("/shop/{module}")
@@ -2639,6 +2839,16 @@ public class ShopWebController {
 
     private String money(BigDecimal value) {
         return nvl(value).setScale(2, RoundingMode.HALF_UP).toPlainString();
+    }
+
+    private List<SmilePayCheckout.PaymentMethod> paymentMethods() {
+        return List.of(
+                SmilePayCheckout.PaymentMethod.ECOCASH,
+                SmilePayCheckout.PaymentMethod.ONEMONEY,
+                SmilePayCheckout.PaymentMethod.OMARI,
+                SmilePayCheckout.PaymentMethod.SMILECASH,
+                SmilePayCheckout.PaymentMethod.INNBUCKS,
+                SmilePayCheckout.PaymentMethod.CARD);
     }
 
     private String quantity(BigDecimal value) {

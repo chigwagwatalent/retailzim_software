@@ -52,4 +52,15 @@ public class GasShift {
     @Column(name = "total_zwg", precision = 12, scale = 2)
     @Builder.Default
     private BigDecimal totalZwg = BigDecimal.ZERO;
+
+    @Column(name = "total_transactions", nullable = false)
+    @Builder.Default
+    private Integer totalTransactions = 0;
+
+    @Column(name = "closing_variance_kg", precision = 12, scale = 3)
+    private BigDecimal closingVarianceKg;
+
+    @Version
+    @Column(nullable = false)
+    private long version;
 }

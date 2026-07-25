@@ -47,6 +47,7 @@ public class BillingAccessInterceptor implements HandlerInterceptor {
     private boolean isBillingAllowed(String path) {
         return path.equals("/shop/billing")
                 || path.equals("/shop/billing/pay")
+                || path.startsWith("/shop/billing/renew")
                 || path.startsWith("/api/auth/");
     }
 

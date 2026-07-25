@@ -51,5 +51,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByTenantIdAndBarcode(Long tenantId, String barcode);
 
     boolean existsByTenantIdAndSku(Long tenantId, String sku);
+
+    @Query("SELECT p.tenantId, COUNT(p) FROM Product p WHERE p.tenantId IN :tenantIds AND p.isActive = true GROUP BY p.tenantId")
+    List<Object[]> countActiveByTenantIds(@Param("tenantIds") List<Long> tenantIds);
 }
 

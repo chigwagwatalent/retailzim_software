@@ -25,6 +25,10 @@ public class HeldChange {
     private Long cashSessionId;
     @Column(name = "sale_id")
     private Long saleId;
+    @Column(name = "gas_sale_id")
+    private Long gasSaleId;
+    @Column(name = "gas_shift_id")
+    private Long gasShiftId;
     @Column(name = "reference_number", nullable = false, length = 60)
     private String referenceNumber;
     @Column(name = "customer_name", nullable = false, length = 200)

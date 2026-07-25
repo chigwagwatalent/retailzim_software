@@ -18,6 +18,8 @@
       </div>
     </section>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
+    <div th:if="${param.renewal != null and param.renewal[0] == 'success'}"
+         class="alert status-active">Renewal confirmed. Your subscription period has been extended.</div>
     <section th:if="${billingAccessLocked}" class="billing-lock-banner">
       <i class="fa-solid fa-lock"></i>
       <div>
@@ -42,9 +44,11 @@
           <span><i class="fa-solid fa-users"></i><b th:text="${plan.maxUsers}">5</b> users</span>
           <span><i class="fa-solid fa-box"></i><b th:text="${plan.maxProducts}">500</b> products</span>
         </div>
-        <form method="post" th:action="@{/shop/billing/pay}">
-          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-bolt"></i>Pay or renew now</button>
-        </form>
+        <a class="btn btn-primary"
+           th:if="${plan != null}"
+           th:href="@{/shop/billing/renew(planId=${plan.id})}">
+          <i class="fa-solid fa-bolt"></i>Renew in dashboard
+        </a>
       </article>
 
       <article class="panel billing-status-panel">
@@ -83,13 +87,12 @@
             <span><i class="fa-solid fa-box"></i><b th:text="${option.maxProducts}">500</b> products</span>
             <span th:if="${option.maxGasTanks != null and option.maxGasTanks > 0}"><i class="fa-solid fa-gas-pump"></i><b th:text="${option.maxGasTanks}">0</b> tanks</span>
           </div>
-          <form method="post" th:action="@{/shop/billing/pay}">
-            <input type="hidden" name="planId" th:value="${option.id}">
-            <button class="btn" th:classappend="${tenant.planId != null and tenant.planId == option.id ? ' btn-light' : ' btn-primary'}" type="submit">
+          <a th:href="@{/shop/billing/renew(planId=${option.id})}"
+             class="btn"
+             th:classappend="${tenant.planId != null and tenant.planId == option.id ? ' btn-light' : ' btn-primary'}">
               <i th:class="${tenant.planId != null and tenant.planId == option.id ? 'fa-solid fa-rotate' : 'fa-solid fa-arrow-up-right-dots'}"></i>
               <span th:text="${tenant.planId != null and tenant.planId == option.id ? 'Renew current package' : 'Choose and pay'}">Choose and pay</span>
-            </button>
-          </form>
+          </a>
         </article>
       </div>
       <div class="empty" th:if="${#lists.isEmpty(availablePlans)}">No active subscription packages are available.</div>
@@ -100,16 +103,25 @@
       <table>
         <thead><tr><th>Package</th><th>Status</th><th>Period</th><th>Amount</th><th>Reference</th></tr></thead>
         <tbody>
-        <tr th:each="record : ${subscriptionHistory}">
+        <tr th:each="record : ${paymentHistory.content}">
           <td th:text="${subscriptionPlanNames.get(record.planId) ?: 'Package'}">Plan</td>
-          <td><span class="badge" th:classappend="${record.status.name() == 'ACTIVE' ? ' status-active' : ' status-suspended'}" th:text="${record.status}">ACTIVE</span></td>
-          <td th:text="${#temporals.format(record.startsAt, 'dd MMM yyyy') + ' - ' + (record.endsAt != null ? #temporals.format(record.endsAt, 'dd MMM yyyy') : 'Open')}">Period</td>
-          <td th:text="${record.currency + ' ' + #numbers.formatDecimal(record.amountPaid ?: 0, 1, 2)}">USD 0.00</td>
-          <td th:text="${record.paymentReference ?: '--'}">--</td>
+          <td><span class="badge status-active">PAID</span></td>
+          <td th:text="${(record.previousPeriodEnd != null ? #temporals.format(record.previousPeriodEnd, 'dd MMM yyyy') : 'New') + ' - ' + #temporals.format(record.newPeriodEnd, 'dd MMM yyyy')}">Period</td>
+          <td th:text="${record.currency + ' ' + #numbers.formatDecimal(record.totalAmount, 1, 2)}">USD 0.00</td>
+          <td th:text="${record.providerReference ?: record.orderReference}">--</td>
         </tr>
         </tbody>
       </table>
-      <div class="empty" th:if="${#lists.isEmpty(subscriptionHistory)}">No subscription payments yet.</div>
+      <div class="empty" th:if="${paymentHistory.empty}">No subscription payments yet.</div>
+      <div class="pagination" th:if="${paymentHistory.totalPages > 1}">
+        <a class="btn btn-light"
+           th:if="${paymentHistory.hasPrevious()}"
+           th:href="@{/shop/billing(billingPage=${paymentHistory.number - 1})}">Previous</a>
+        <span th:text="${'Page ' + (paymentHistory.number + 1) + ' of ' + paymentHistory.totalPages}">Page</span>
+        <a class="btn btn-light"
+           th:if="${paymentHistory.hasNext()}"
+           th:href="@{/shop/billing(billingPage=${paymentHistory.number + 1})}">Next</a>
+      </div>
     </section>
     <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>

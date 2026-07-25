@@ -1,36 +1,40 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{common/layout :: head('Tenant Shops')}"></head>
+<head th:replace="~{common/layout :: head('Shop Management')}"></head>
 <body>
 <div class="app-shell platform-shell">
   <aside th:replace="~{common/layout :: platformSidebar('tenants')}"></aside>
   <main class="main">
-    <nav th:replace="~{common/layout :: platformTopbar('Tenant Shops')}"></nav>
+    <nav th:replace="~{common/layout :: platformTopbar('Shop Management')}"></nav>
 
     <section class="page-hero tenant-hero">
       <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-building-shield"></i></div>
+        <div class="hero-icon"><i class="fa-solid fa-shop-lock"></i></div>
         <div>
-          <p>SaaS command center</p>
-          <h1>Tenant Management</h1>
+          <p>Account operations</p>
+          <h1>Shop Management</h1>
+          <span class="hero-subtitle">Review registrations, manage access, and communicate with every Retail Zim shop.</span>
         </div>
       </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-building"></i><strong th:text="${tenantPage.totalElements}">0</strong><span>Filtered Shops</span></div>
-        <div><i class="fa-solid fa-circle-check"></i><strong th:text="${#lists.size(plans)}">0</strong><span>Plans</span></div>
+      <div class="tenant-hero-actions">
+        <a class="btn btn-light" href="#modal-announcement"><i class="fa-solid fa-bullhorn"></i>Send announcement</a>
+        <a class="btn btn-primary" th:href="@{/auth/signup}"><i class="fa-solid fa-plus"></i>Register shop</a>
       </div>
     </section>
 
-    <div class="page-toolbar">
-      <a class="btn btn-light" href="#modal-announcement"><i class="fa-solid fa-bullhorn"></i>Send Announcement</a>
-      <a class="btn btn-primary" th:href="@{/auth/signup}"><i class="fa-solid fa-user-plus"></i>Register Shop</a>
-    </div>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
 
-    <section class="panel tenant-console">
+    <section class="tenant-kpi-grid">
+      <article><span class="tenant-kpi-icon blue"><i class="fa-solid fa-store"></i></span><div><small>Total shops</small><strong th:text="${totalTenants}">0</strong><em>All registered accounts</em></div></article>
+      <article><span class="tenant-kpi-icon green"><i class="fa-solid fa-circle-check"></i></span><div><small>Active shops</small><strong th:text="${activeTenants}">0</strong><em>Operating subscriptions</em></div></article>
+      <article><span class="tenant-kpi-icon amber"><i class="fa-solid fa-hourglass-half"></i></span><div><small>Pending approval</small><strong th:text="${pendingTenants}">0</strong><em>Awaiting review</em></div></article>
+      <article><span class="tenant-kpi-icon violet"><i class="fa-solid fa-layer-group"></i></span><div><small>Packages</small><strong th:text="${#lists.size(plans)}">0</strong><em>Subscription options</em></div></article>
+    </section>
+
+    <section class="panel tenant-console tenant-filter-panel">
       <form method="get" th:action="@{/admin/tenants}" class="tenant-filter-grid">
-        <label>Search
-          <input name="search" th:value="${search}" placeholder="Shop, code or email">
+        <label class="tenant-search-field">Search shops
+          <span><i class="fa-solid fa-magnifying-glass"></i><input name="search" th:value="${search}" placeholder="Company, code or email"></span>
         </label>
         <label>Status
           <select name="status">
@@ -44,7 +48,7 @@
             <option th:each="p : ${plans}" th:value="${p.id}" th:text="${p.name}" th:selected="${p.id == selectedPlanId}">Package</option>
           </select>
         </label>
-        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply filters</button>
       </form>
     </section>
 
@@ -52,54 +56,70 @@
       <div class="panel table-panel">
         <div class="panel-title-row">
           <div>
-            <p class="eyebrow">Operating view</p>
-            <h2>Tenant Shops</h2>
+            <p class="eyebrow">Account directory</p>
+            <h2>Registered Shops</h2>
           </div>
           <span class="badge status-active" th:text="${tenantPage.totalElements + ' records'}">0 records</span>
         </div>
-        <table>
-          <thead>
-          <tr><th>Shop</th><th>Package</th><th>Footprint</th><th>Status</th><th>Actions</th></tr>
-          </thead>
-          <tbody>
-          <tr th:each="t : ${tenants}">
-            <td>
-              <strong th:text="${t.companyName}">Shop</strong>
-              <small class="table-muted" th:text="${t.tenantCode + ' / ' + t.email}">Code</small>
-            </td>
-            <td th:text="${tenantPlanNames.get(t.id)}">Plan</td>
-            <td>
-              <strong th:text="${tenantBranchCounts.get(t.id) + ' branches'}">0 branches</strong>
-              <small class="table-muted" th:text="${tenantUserCounts.get(t.id) + ' users / ' + tenantProductCounts.get(t.id) + ' products'}">0 users</small>
-            </td>
-            <td><span class="badge" th:classappend="${' status-' + #strings.toLowerCase(t.status)}" th:text="${t.status}">ACTIVE</span></td>
-            <td class="mobile-tabs">
-              <a class="btn btn-blue btn-compact" th:href="@{/admin/tenants/{id}(id=${t.id})}"><i class="fa-solid fa-chart-line"></i>View</a>
-              <a class="btn btn-light btn-compact" th:href="${'#modal-tenant-' + t.id}"><i class="fa-solid fa-pen"></i>Edit</a>
-              <form th:action="@{'/admin/tenants/' + ${t.id} + '/activate'}" method="post"><button class="btn btn-light btn-compact" type="submit">Activate</button></form>
-              <form th:action="@{'/admin/tenants/' + ${t.id} + '/suspend'}" method="post"><button class="btn btn-light btn-compact" type="submit">Suspend</button></form>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="tenant-directory-table">
+            <thead>
+            <tr><th class="check-cell"><input type="checkbox" aria-label="Select all shops"></th><th>Shop</th><th>Subscription</th><th>Footprint</th><th>Status</th><th>Last activity</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${tenants}">
+              <td class="check-cell"><input type="checkbox" th:attr="aria-label=${'Select ' + t.companyName}"></td>
+              <td>
+                <span class="shop-table-name"><b th:text="${#strings.substring(t.companyName, 0, 1)}">S</b><span><strong th:text="${t.companyName}">Shop</strong><small class="table-muted" th:text="${t.tenantCode + ' · ' + t.email}">Code</small></span></span>
+              </td>
+              <td><strong th:text="${tenantPlanNames.get(t.id)}">Plan</strong><small class="table-muted" th:text="${t.subscriptionEnd != null ? 'Renews ' + #temporals.format(t.subscriptionEnd, 'dd MMM yyyy') : 'No renewal date'}">Renews</small></td>
+              <td>
+                <strong th:text="${tenantBranchCounts.get(t.id) + (tenantBranchCounts.get(t.id) == 1 ? ' branch' : ' branches')}">0 branches</strong>
+                <small class="table-muted" th:text="${tenantUserCounts.get(t.id) + ' users · ' + tenantProductCounts.get(t.id) + ' products'}">0 users</small>
+              </td>
+              <td><span class="badge" th:classappend="${' status-' + #strings.toLowerCase(t.status)}" th:text="${t.status}">ACTIVE</span></td>
+              <td><strong th:text="${t.updatedAt != null ? #temporals.format(t.updatedAt, 'dd MMM yyyy') : '—'}">Date</strong><small class="table-muted" th:text="${t.updatedAt != null ? #temporals.format(t.updatedAt, 'HH:mm') : ''}">Time</small></td>
+              <td>
+                <details class="row-actions">
+                  <summary title="Shop actions"><i class="fa-solid fa-ellipsis"></i></summary>
+                  <div>
+                    <a th:href="@{/admin/tenants/{id}(id=${t.id})}"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open workspace</a>
+                    <a th:href="${'#modal-tenant-' + t.id}"><i class="fa-solid fa-pen"></i>Edit details</a>
+                    <form th:action="@{'/admin/tenants/' + ${t.id} + '/activate'}" method="post"><button type="submit"><i class="fa-solid fa-circle-check"></i>Activate shop</button></form>
+                    <form th:action="@{'/admin/tenants/' + ${t.id} + '/suspend'}" method="post"><button class="danger-link" type="submit"><i class="fa-solid fa-circle-pause"></i>Suspend shop</button></form>
+                  </div>
+                </details>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(tenants)}"><td colspan="7"><p class="empty">No shops match these filters.</p></td></tr>
+            </tbody>
+          </table>
+        </div>
         <div th:replace="~{common/layout :: pagination(${tenantPage}, ${tenantPageLinks}, ${tenantPrevUrl}, ${tenantNextUrl})}"></div>
       </div>
 
-      <aside class="panel tenant-side-panel">
-        <div class="panel-title-row">
-          <div>
-            <p class="eyebrow">Broadcast history</p>
-            <h2>Recent Announcements</h2>
+      <aside class="tenant-operations-rail">
+        <section class="panel tenant-side-panel">
+          <div class="panel-title-row">
+            <div><p class="eyebrow">Broadcast history</p><h2>Announcements</h2></div>
+            <a href="#modal-announcement" title="New announcement"><i class="fa-solid fa-plus"></i></a>
           </div>
-        </div>
-        <div class="announcement-list">
-          <article th:each="a : ${announcements}">
-            <strong th:text="${a.subject}">Subject</strong>
-            <span th:text="${a.audienceSummary}">Audience</span>
-            <small th:text="${a.recipientCount + ' shops / ' + a.notificationSentCount + ' notifications / ' + a.emailSentCount + ' emails'}">0 sent</small>
-          </article>
-          <p class="empty" th:if="${#lists.isEmpty(announcements)}">No announcements sent yet.</p>
-        </div>
+          <div class="announcement-list">
+            <article th:each="a : ${announcements}">
+              <span class="rail-icon"><i class="fa-solid fa-bullhorn"></i></span><div><strong th:text="${a.subject}">Subject</strong><span th:text="${a.audienceSummary}">Audience</span><small th:text="${a.recipientCount + ' recipients'}">0 sent</small></div>
+            </article>
+            <p class="empty" th:if="${#lists.isEmpty(announcements)}">No announcements sent yet.</p>
+          </div>
+        </section>
+        <section class="panel tenant-side-panel">
+          <div class="panel-title-row"><div><p class="eyebrow">Account signals</p><h2>Recent Activity</h2></div></div>
+          <div class="tenant-activity-list">
+            <article th:each="t : ${recentTenantActivity}">
+              <span class="activity-dot"></span>
+              <div><strong th:text="${t.companyName}">Shop</strong><small th:text="${'Account updated · ' + (t.updatedAt != null ? #temporals.format(t.updatedAt, 'dd MMM HH:mm') : 'not available')}">Updated</small></div>
+            </article>
+          </div>
+        </section>
       </aside>
     </section>
 
@@ -137,7 +157,7 @@
     </div></div>
 
     <div th:each="t : ${tenants}" th:id="${'modal-tenant-' + t.id}" class="modal"><div class="modal-content modal-wide">
-      <div class="modal-head"><h2 th:text="${'Edit Tenant - ' + t.companyName}">Edit Tenant</h2><a class="close" href="#">&times;</a></div>
+      <div class="modal-head"><h2 th:text="${'Edit Shop - ' + t.companyName}">Edit Shop</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/admin/tenants/{id}/edit(id=${t.id})}" class="form-grid">
         <label>Company<input name="companyName" th:value="${t.companyName}" required></label>
         <label>Email<input name="email" type="email" th:value="${t.email}" required></label>
@@ -150,7 +170,7 @@
         <label>Registration<input name="registrationNumber" th:value="${t.registrationNumber}"></label>
         <label>VAT<input name="vatNumber" th:value="${t.vatNumber}"></label>
         <label style="grid-column:1/-1">Address<textarea name="address" th:text="${t.address}"></textarea></label>
-        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Tenant</button></div>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Shop</button></div>
       </form>
     </div></div>
   </main>

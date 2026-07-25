@@ -53,4 +53,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> searchUsers(@Param("tenantId") Long tenantId, @Param("search") String search, Pageable pageable);
 
     List<User> findByTenantIdAndIsActive(Long tenantId, Boolean isActive);
+
+    @Query("SELECT u.tenantId, COUNT(u) FROM User u WHERE u.tenantId IN :tenantIds GROUP BY u.tenantId")
+    List<Object[]> countByTenantIds(@Param("tenantIds") List<Long> tenantIds);
 }

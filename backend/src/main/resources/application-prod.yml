@@ -3,9 +3,9 @@ spring:
     name: RetailZW SaaS Platform
 
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/retail_zw_v?useSSL=false&serverTimezone=Africa/Harare&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true}
-    username: ${DB_USERNAME:espus}
-    password: ${DB_PASSWORD:@cHigwagwa1t@}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/retail_zw?useSSL=false&serverTimezone=Africa/Harare&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:cHigwagwa1t}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 50
@@ -130,11 +130,6 @@ billing:
   reminder-days: ${BILLING_REMINDER_DAYS:14,7,3,1,0,-1,-3}
   reminder-cron: "${BILLING_REMINDER_CRON:0 0 8 * * *}"
   grace-days: ${BILLING_GRACE_DAYS:3}
-
-retailzim:
-  front-site:
-    base-url: ${RETAILZIM_FRONT_SITE_BASE_URL:https://retailzw.co.zw/}
-    api-key: ${RETAILZIM_FRONT_SITE_API_KEY:}
 
 logging:
   level:

@@ -12,13 +12,14 @@
         <div class="hero-icon"><i class="fa-solid fa-brain"></i></div>
         <div>
           <p>Billing intelligence</p>
-          <h1>Subscriptions</h1>
+          <h1>Subscriptions &amp; Plans</h1>
+          <span class="hero-subtitle">Monitor recurring revenue, renewal risk, packages, and account billing.</span>
         </div>
       </div>
       <div class="hero-metrics">
         <div><i class="fa-solid fa-sack-dollar"></i><strong th:text="${'USD ' + monthlyRevenueUsd}">USD 0.00</strong><span>Monthly recurring</span></div>
         <div><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${intelligenceAlerts}">0</strong><span>Signals</span></div>
-        <div><i class="fa-solid fa-store"></i><strong th:text="${allTenantCount}">0</strong><span>Tenant shops</span></div>
+        <div><i class="fa-solid fa-store"></i><strong th:text="${allTenantCount}">0</strong><span>Registered shops</span></div>
       </div>
     </section>
 
@@ -48,7 +49,7 @@
       <article class="subscription-command-card metric-red">
         <span>ARPA</span>
         <strong th:text="${'USD ' + averageRevenueUsd}">USD 0.00</strong>
-        <small th:text="${'ZWG ' + averageRevenueZwg + ' per active tenant'}">ZWG 0.00 per active tenant</small>
+        <small th:text="${'ZWG ' + averageRevenueZwg + ' per active shop'}">ZWG 0.00 per active shop</small>
       </article>
     </section>
 
@@ -71,10 +72,10 @@
           </div>
           <div class="plan-intel-meter">
             <div><em th:style="${'width:' + planSharePercent.get(p.id) + '%'}"></em></div>
-            <span th:text="${planSharePercent.get(p.id) + '% tenant mix'}">0% tenant mix</span>
+            <span th:text="${planSharePercent.get(p.id) + '% shop mix'}">0% shop mix</span>
           </div>
           <dl>
-            <div><dt>Tenants</dt><dd th:text="${planTenantCounts.get(p.id)}">0</dd></div>
+            <div><dt>Shops</dt><dd th:text="${planTenantCounts.get(p.id)}">0</dd></div>
             <div><dt>MRR</dt><dd th:text="${'USD ' + planRevenueUsd.get(p.id)}">USD 0.00</dd></div>
             <div><dt>Limits</dt><dd th:text="${p.maxBranches + ' branches / ' + p.maxUsers + ' users'}">0 branches</dd></div>
           </dl>
@@ -114,7 +115,7 @@
     <section id="billing-queue" class="panel table-panel billing-queue-panel" style="margin-top:16px">
       <div class="panel-title-row">
         <div>
-          <p class="eyebrow">Tenant intelligence</p>
+          <p class="eyebrow">Shop intelligence</p>
           <h2>Billing Queue</h2>
         </div>
         <div class="queue-summary">
@@ -175,10 +176,10 @@
     <div id="modal-subscription" class="modal"><div class="modal-content">
       <div class="modal-head"><h2>New Subscription</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/admin/subscriptions}" class="form-grid">
-        <label>Tenant
+        <label>Shop
           <select name="tenantId" required>
-            <option value="">Choose tenant</option>
-            <option th:each="t : ${tenantOptions}" th:value="${t.id}" th:text="${t.companyName + ' · ' + t.tenantCode}">Tenant</option>
+            <option value="">Choose shop</option>
+            <option th:each="t : ${tenantOptions}" th:value="${t.id}" th:text="${t.companyName + ' · ' + t.tenantCode}">Shop</option>
           </select>
         </label>
         <label>Package
@@ -224,7 +225,7 @@
             <span th:text="${m.displayName}">Retail Shop</span>
           </label>
         </div>
-        <label class="check-row"><input name="allowMixedModules" type="checkbox" value="true"> Allow mixed module tenants</label>
+        <label class="check-row"><input name="allowMixedModules" type="checkbox" value="true"> Allow mixed-module shops</label>
         <label class="check-row"><input name="gasReconciliationEnabled" type="checkbox" value="true"> Gas reconciliation</label>
         <label style="grid-column:1/-1">Description<textarea name="description"></textarea></label>
         <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Save Package</button></div>
@@ -280,7 +281,7 @@
             <span th:text="${m.displayName}">Retail Shop</span>
           </label>
         </div>
-        <label class="check-row"><input name="allowMixedModules" type="checkbox" value="true" th:checked="${p.allowMixedModules}"> Allow mixed module tenants</label>
+        <label class="check-row"><input name="allowMixedModules" type="checkbox" value="true" th:checked="${p.allowMixedModules}"> Allow mixed-module shops</label>
         <label class="check-row"><input name="gasReconciliationEnabled" type="checkbox" value="true" th:checked="${p.gasReconciliationEnabled}"> Gas reconciliation</label>
         <label class="check-row"><input name="isActive" type="checkbox" value="true" th:checked="${p.isActive}"> Active package</label>
         <label style="grid-column:1/-1">Description<textarea name="description" th:text="${p.description}"></textarea></label>

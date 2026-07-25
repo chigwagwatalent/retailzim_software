@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "gas_sales")
@@ -52,6 +54,17 @@ public class GasSale {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal total;
 
+    @Column(name = "amount_received", precision = 12, scale = 2)
+    private BigDecimal amountReceived;
+
+    @Column(name = "change_due", nullable = false, precision = 12, scale = 2)
+    @Builder.Default
+    private BigDecimal changeDue = BigDecimal.ZERO;
+
+    @Column(name = "change_held", nullable = false)
+    @Builder.Default
+    private Boolean changeHeld = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 5)
     private CurrencyCode currency;
@@ -71,8 +84,26 @@ public class GasSale {
     @Column(name = "offline_receipt_number", length = 100)
     private String offlineReceiptNumber;
 
+    @Column(name = "offline_created_at")
+    private LocalDateTime offlineCreatedAt;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Version
+    @Column(nullable = false)
+    private long version;
+
+    @Transient
+    @Builder.Default
+    private List<GasSaleTankAllocation> tankAllocations = new ArrayList<>();
+
+    @Transient
+    @Builder.Default
+    private List<GasSalePayment> payments = new ArrayList<>();
+
+    @Transient
+    private HeldChange heldChange;
 
     @PrePersist
     protected void onCreate() {

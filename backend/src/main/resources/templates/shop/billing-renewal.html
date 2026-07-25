@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Renew subscription')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('billing')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Renew subscription')}"></nav>
+
+    <section class="page-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+        <div><p>Account billing</p><h1>Renew subscription</h1></div>
+      </div>
+      <div class="hero-metrics">
+        <div><i class="fa-solid fa-layer-group"></i><strong th:text="${selectedPlan.name}">Plan</strong><span>Selected package</span></div>
+        <div th:if="${checkout != null}"><i class="fa-solid fa-calendar-days"></i><strong th:text="${checkout.billingMonths}">1</strong><span>Months</span></div>
+      </div>
+    </section>
+
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section th:if="${checkout == null}" class="renewal-builder">
+      <article class="panel">
+        <div class="panel-title-row">
+          <div>
+            <p class="eyebrow">Step 1 of 2</p>
+            <h2>Choose package and renewal period</h2>
+          </div>
+          <a class="btn btn-light" th:href="@{/shop/billing}">Back to billing</a>
+        </div>
+
+        <div class="billing-plan-grid">
+          <article th:each="option : ${availablePlans}"
+                   th:class="${option.id == selectedPlan.id ? 'billing-plan-card current' : 'billing-plan-card'}">
+            <div class="billing-plan-head">
+              <div>
+                <h3 th:text="${option.name}">Plan</h3>
+                <span th:text="${option.description ?: 'RetailZW subscription package'}">Package</span>
+              </div>
+              <em th:if="${option.id == selectedPlan.id}">Selected</em>
+            </div>
+            <div class="billing-plan-price">
+              <strong th:text="${'USD ' + #numbers.formatDecimal(option.priceUsd, 1, 2)}">USD 0.00</strong>
+              <span th:text="${option.billingCycle.name().toLowerCase()}">monthly</span>
+            </div>
+            <a class="btn"
+               th:classappend="${option.id == selectedPlan.id ? ' btn-light' : ' btn-primary'}"
+               th:href="@{/shop/billing/renew(planId=${option.id})}"
+               th:text="${option.id == selectedPlan.id ? 'Selected' : 'Choose package'}">Choose</a>
+          </article>
+        </div>
+      </article>
+
+      <article class="panel renewal-period-panel">
+        <form method="post" th:action="@{/shop/billing/renew}" data-renewal-builder>
+          <input type="hidden" name="planId" th:value="${selectedPlan.id}">
+          <div>
+            <p class="eyebrow">Renewal duration</p>
+            <h2>How many months do you want?</h2>
+            <p>Your total and new access period are calculated before payment.</p>
+          </div>
+          <label>
+            Number of months
+            <select name="billingMonths" required data-renewal-months>
+              <option th:each="months : ${allowedMonths}"
+                      th:value="${months}"
+                      th:attr="data-total=${renewalTotals.get(months)}"
+                      th:text="${months + (months == 1 ? ' month — USD ' : ' months — USD ') + #numbers.formatDecimal(renewalTotals.get(months), 1, 2)}">
+                1 month
+              </option>
+            </select>
+          </label>
+          <div class="renewal-quote">
+            <span>Total due</span>
+            <strong data-renewal-total
+                    th:text="${'USD ' + #numbers.formatDecimal(renewalTotals.get(allowedMonths[0]), 1, 2)}">USD 0.00</strong>
+            <small>No automatic renewal. You control every payment.</small>
+          </div>
+          <button class="btn btn-primary" type="submit">
+            Continue to payment<i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </article>
+    </section>
+
+    <section th:if="${checkout != null}"
+             class="billing-checkout renewal-dashboard-checkout"
+             th:attr="data-status-url=@{/shop/billing/renew/{ref}/status(ref=${checkout.orderReference})}">
+      <div class="checkout-layout">
+        <section class="checkout-payment-panel">
+          <div class="checkout-heading">
+            <p class="eyebrow">Step 2 of 2</p>
+            <h1>Choose payment method</h1>
+            <span>Your session stays inside the authenticated RetailZW dashboard.</span>
+          </div>
+
+          <section class="checkout-recheck" th:if="${checkout.status.name() == 'FAILED'}">
+            <div>
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span><strong>Payment not confirmed</strong><small>Check status before trying again.</small></span>
+            </div>
+            <a class="btn btn-light"
+               th:href="@{/shop/billing/renew/{ref}/recheck(ref=${checkout.orderReference})}">
+              Check payment status
+            </a>
+          </section>
+
+          <section class="payment-complete" th:if="${checkout.status.name() == 'PAID'}">
+            <i class="fa-solid fa-circle-check"></i>
+            <p>Renewal complete</p>
+            <h2>Your subscription has been extended</h2>
+            <span th:text="${'Access is active until ' + #temporals.format(checkout.newPeriodEnd, 'dd MMM yyyy')}">Access extended</span>
+            <a class="btn btn-primary" th:href="@{/shop/billing}">Return to billing</a>
+          </section>
+
+          <section class="payment-pending"
+                   th:if="${checkout.status.name() == 'PROCESSING'}"
+                   data-payment-pending>
+            <div class="payment-loader"><i></i><span></span></div>
+            <p>Secure verification</p>
+            <h2>Confirming renewal payment</h2>
+            <span th:text="${checkout.providerStatus ?: 'Approve the request, then keep this page open.'}">Approve payment.</span>
+          </section>
+
+          <form class="express-payment-form"
+                th:if="${checkout.status.name() != 'PAID' and checkout.status.name() != 'PROCESSING' and checkout.status.name() != 'AWAITING_OTP'}"
+                method="post"
+                th:action="@{/shop/billing/renew/{ref}/initiate(ref=${checkout.orderReference})}"
+                data-express-payment-form>
+            <div class="payment-method-grid" role="radiogroup" aria-label="Payment method">
+              <label class="payment-method-card" th:each="method, iter : ${paymentMethods}">
+                <input type="radio" name="paymentMethod" th:value="${method}" th:checked="${iter.index == 0}" required>
+                <span class="payment-logo">
+                  <img th:src="@{'/img/payments/' + ${#strings.toLowerCase(method.name())} + '.svg'}" th:alt="${method.label + ' logo'}">
+                </span>
+                <strong th:text="${method.label}">Payment</strong>
+                <small th:text="${method.name() == 'CARD' ? 'Debit or credit card' : (method.otpRequired ? 'Mobile number and OTP' : (method.mobileRequired ? 'Approve on your phone' : 'Approve in your app'))}">Express payment</small>
+                <i class="fa-solid fa-check"></i>
+              </label>
+            </div>
+
+            <div class="payment-fields mobile-fields" data-mobile-fields>
+              <label for="renewal-mobile">Mobile number</label>
+              <div class="mobile-number-control">
+                <span class="checkout-country-prefix"><span aria-hidden="true">&#127487;&#127484;</span><b>+263</b></span>
+                <input id="renewal-mobile" name="mobile" inputmode="tel" autocomplete="tel" placeholder="77 123 4567">
+              </div>
+            </div>
+
+            <div class="payment-fields card-fields" data-card-fields hidden>
+              <div class="form-grid">
+                <label>First name<input name="firstName" autocomplete="cc-given-name"></label>
+                <label>Last name<input name="lastName" autocomplete="cc-family-name"></label>
+                <label class="card-number-field">Card number<input name="pan" inputmode="numeric" autocomplete="cc-number" maxlength="23"></label>
+                <label>Expiry month<input name="expMonth" inputmode="numeric" autocomplete="cc-exp-month" maxlength="2" placeholder="MM"></label>
+                <label>Expiry year<input name="expYear" inputmode="numeric" autocomplete="cc-exp-year" maxlength="4" placeholder="YYYY"></label>
+                <label>Security code<input name="securityCode" type="password" inputmode="numeric" autocomplete="cc-csc" maxlength="4"></label>
+              </div>
+              <p class="card-security"><i class="fa-solid fa-shield-halved"></i>Card details are not stored by RetailZW.</p>
+            </div>
+
+            <button class="btn btn-primary checkout-pay-button" type="submit">
+              <i class="fa-solid fa-lock"></i>
+              <span th:text="${'Pay ' + checkout.currency + ' ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">Pay USD 0.00</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </form>
+
+          <form class="otp-form"
+                th:if="${checkout.status.name() == 'AWAITING_OTP'}"
+                method="post"
+                th:action="@{/shop/billing/renew/{ref}/confirm-otp(ref=${checkout.orderReference})}">
+            <div class="otp-icon"><i class="fa-solid fa-message"></i></div>
+            <div>
+              <p>Verification code</p>
+              <h2 th:text="${checkout.paymentMethod.label + ' OTP'}">Payment OTP</h2>
+              <span th:text="${'Sent to ' + checkout.customerMobile}">Sent to your phone</span>
+            </div>
+            <input name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" required autofocus>
+            <button class="btn btn-primary" type="submit">Confirm renewal</button>
+          </form>
+        </section>
+
+        <aside class="checkout-summary">
+          <div class="summary-content">
+            <h2>Renewal summary</h2>
+            <div class="summary-plan">
+              <span th:text="${selectedPlan.code}">PLAN</span>
+              <strong th:text="${selectedPlan.name}">Plan</strong>
+            </div>
+            <dl class="summary-details">
+              <div><dt>Company</dt><dd th:text="${tenant.companyName}">Shop</dd></div>
+              <div><dt>Duration</dt><dd th:text="${checkout.billingMonths + (checkout.billingMonths == 1 ? ' month' : ' months')}">1 month</dd></div>
+              <div><dt>Current access</dt><dd th:text="${checkout.previousPeriodEnd != null ? #temporals.format(checkout.previousPeriodEnd, 'dd MMM yyyy') : 'New subscription'}">Date</dd></div>
+              <div><dt>New access</dt><dd th:text="${#temporals.format(checkout.newPeriodEnd, 'dd MMM yyyy')}">Date</dd></div>
+            </dl>
+            <div class="summary-pricing">
+              <div><span>Package price</span><strong th:text="${checkout.currency + ' ' + #numbers.formatDecimal(checkout.unitPrice, 1, 2)}">USD 0.00</strong></div>
+              <div><span>Processing fee</span><strong>USD 0.00</strong></div>
+            </div>
+            <div class="checkout-total">
+              <span>Total due</span>
+              <strong th:text="${checkout.currency + ' ' + #numbers.formatDecimal(checkout.amount, 1, 2)}">USD 0.00</strong>
+            </div>
+            <a class="btn btn-light" th:href="@{/shop/billing/renew(planId=${selectedPlan.id})}">Change duration</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <footer th:replace="~{common/layout :: shopFooter}"></footer>
+  </main>
+</div>
+
+<script>
+(() => {
+  const builder = document.querySelector('[data-renewal-builder]');
+  if (builder) {
+    const select = builder.querySelector('[data-renewal-months]');
+    const total = builder.querySelector('[data-renewal-total]');
+    const updateQuote = () => {
+      const option = select.options[select.selectedIndex];
+      total.textContent = `USD ${Number(option.dataset.total || 0).toFixed(2)}`;
+    };
+    select.addEventListener('change', updateQuote);
+    updateQuote();
+  }
+
+  const form = document.querySelector('[data-express-payment-form]');
+  const root = document.querySelector('.renewal-dashboard-checkout');
+  const pending = document.querySelector('[data-payment-pending]');
+  if (form) {
+    const mobileFields = form.querySelector('[data-mobile-fields]');
+    const cardFields = form.querySelector('[data-card-fields]');
+    const mobileInput = form.querySelector('input[name="mobile"]');
+    const radios = [...form.querySelectorAll('input[name="paymentMethod"]')];
+    const updatePaymentFields = () => {
+      const method = radios.find(radio => radio.checked)?.value;
+      const card = method === 'CARD';
+      const mobile = ['ECOCASH', 'SMILECASH', 'OMARI', 'ONEMONEY'].includes(method);
+      cardFields.hidden = !card;
+      mobileFields.hidden = !mobile;
+      mobileInput.required = mobile;
+      cardFields.querySelectorAll('input').forEach(input => input.required = card);
+    };
+    radios.forEach(radio => radio.addEventListener('change', updatePaymentFields));
+    form.addEventListener('submit', () => {
+      const button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      button.querySelector('span').textContent = 'Starting secure payment...';
+    });
+    updatePaymentFields();
+  }
+
+  if (pending && root?.dataset.statusUrl) {
+    let attempts = 0;
+    const poll = async () => {
+      attempts++;
+      try {
+        const response = await fetch(root.dataset.statusUrl, {headers: {'Accept': 'application/json'}});
+        if (response.ok) {
+          const result = await response.json();
+          if (result.paid && result.redirectUrl) {
+            window.location.assign(result.redirectUrl);
+            return;
+          }
+          if (['FAILED', 'CANCELLED'].includes(result.status)) {
+            window.location.reload();
+            return;
+          }
+        }
+      } catch (_) {}
+      if (attempts < 60) window.setTimeout(poll, 5000);
+    };
+    window.setTimeout(poll, 2500);
+  }
+})();
+</script>
+</body>
+</html>

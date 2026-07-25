@@ -7,138 +7,103 @@
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Gas Control')}"></nav>
 
-    <section class="page-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-gas-pump"></i></div>
+    <section class="gas-command">
+      <div class="gas-command-title">
         <div>
-          <p>LPG operations,</p>
-          <h1>Gas Control</h1>
+          <span class="gas-eyebrow">LPG OPERATIONS</span>
+          <h1>Gas Operations</h1>
         </div>
+        <form method="get" th:action="@{/shop/gas}">
+          <label class="gas-branch-picker"><i class="fa-solid fa-building-columns"></i>
+            <select name="branchId" onchange="this.form.submit()">
+              <option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Head Office</option>
+            </select>
+          </label>
+        </form>
+        <span th:class="${gasDashboard != null && gasDashboard.openShiftCount > 0 ? 'gas-live-pill' : 'gas-live-pill off'}">
+          <i class="fa-solid fa-circle"></i>
+          <span th:text="${gasDashboard != null ? gasDashboard.openShiftCount + ' shift' + (gasDashboard.openShiftCount == 1 ? '' : 's') + ' open' : 'No open shifts'}">No open shifts</span>
+        </span>
       </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-database"></i><strong th:text="${gasTankCount}">0</strong><span>Tanks</span></div>
-        <div><i class="fa-solid fa-scale-balanced"></i><strong th:text="${gasTotalKg}">0</strong><span>Kg available</span></div>
+      <div class="gas-command-actions">
+        <details class="gas-actions-menu">
+          <summary><i class="fa-solid fa-gear"></i> Operational actions <i class="fa-solid fa-chevron-down"></i></summary>
+          <div>
+            <a href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Set selling price</a>
+            <a href="#modal-gas-restock"><i class="fa-solid fa-truck-droplet"></i>Receive LPG stock</a>
+            <a href="#modal-gas-expense"><i class="fa-solid fa-receipt"></i>Record expense</a>
+            <a href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add gas tank</a>
+          </div>
+        </details>
+        <a class="btn btn-primary gas-pos-button" href="/shop/gas/sales"><i class="fa-solid fa-calculator"></i> Open Gas POS</a>
       </div>
     </section>
-
-    <div class="page-toolbar">
-      <form method="get" th:action="@{/shop/gas}" class="inline-form">
-        <select name="branchId" onchange="this.form.submit()">
-          <option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option>
-        </select>
-      </form>
-      <a class="btn btn-blue" href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Set Price</a>
-      <a class="btn btn-light" href="#modal-gas-restock"><i class="fa-solid fa-truck-droplet"></i>Receive Stock</a>
-      <a class="btn btn-light" href="#modal-gas-expense"><i class="fa-solid fa-receipt"></i>Expense</a>
-      <a class="btn btn-primary" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
-    </div>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
 
-    <section class="metric-grid">
-      <div class="metric-card metric-blue"><span>Current Stock</span><strong th:text="${gasTotalKg + ' kg'}">0 kg</strong><div><em style="width:72%"></em></div><small>Total LPG on hand</small></div>
-      <div class="metric-card metric-green"><span>Capacity</span><strong th:text="${gasCapacityKg + ' kg'}">0 kg</strong><div><em style="width:65%"></em></div><small>Total tank capacity</small></div>
-      <div class="metric-card metric-orange"><span>Plan Limit</span><strong th:text="${maxGasTanks > 0 ? maxGasTanks : 'Unlimited'}">0</strong><div><em style="width:50%"></em></div><small>Allowed gas tanks</small></div>
-      <div class="metric-card metric-red"><span>Open Shift</span><strong th:text="${currentGasShift != null ? currentGasShift.shiftNumber : 'None'}">None</strong><div><em style="width:40%"></em></div><small>For current user</small></div>
-      <div class="metric-card metric-blue"><span>Today USD</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.marginUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><div><em style="width:62%"></em></div><small>Sales less stock cost and expenses</small></div>
-      <div class="metric-card metric-green"><span>Today ZWG</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.marginZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><div><em style="width:62%"></em></div><small>Sales less stock cost and expenses</small></div>
-      <div class="metric-card metric-orange"><span>Kg Sold Today</span><strong th:text="${gasDashboard != null ? gasDashboard.soldKgToday + ' kg' : '0 kg'}">0 kg</strong><div><em style="width:55%"></em></div><small>Across USD and ZWG sales</small></div>
-      <div class="metric-card metric-red"><span>Reorder Alerts</span><strong th:text="${gasDashboard != null ? #lists.size(gasDashboard.reorderTanks) : 0}">0</strong><div><em style="width:45%"></em></div><small>Tanks at or below reorder kg</small></div>
+    <section class="gas-kpis">
+      <article><span class="gas-kpi-icon blue"><i class="fa-solid fa-dollar-sign"></i></span><div><small>Today's sales</small><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.revenueUsdToday,1,2) : 'USD 0.00'}">USD 0.00</strong><em>Confirmed transactions</em></div></article>
+      <article><span class="gas-kpi-icon green"><i class="fa-solid fa-fire-flame-simple"></i></span><div><small>Gas sold today</small><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.soldKgToday,1,2) + ' kg' : '0.00 kg'}">0.00 kg</strong><em>Across all payment methods</em></div></article>
+      <article><span class="gas-kpi-icon purple"><i class="fa-solid fa-arrow-trend-up"></i></span><div><small>Gross margin</small><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.marginUsdToday,1,2) : 'USD 0.00'}">USD 0.00</strong><em>Sales less stock cost &amp; expenses</em></div></article>
+      <article><span class="gas-kpi-icon orange"><i class="fa-solid fa-receipt"></i></span><div><small>Transactions</small><strong th:text="${gasDashboard != null ? gasDashboard.transactionCountToday : 0}">0</strong><em>Completed today</em></div></article>
     </section>
 
-    <section class="panel table-panel" th:if="${gasDashboard != null && !#lists.isEmpty(gasDashboard.reorderTanks)}">
-      <div class="toolbar">
-        <h2>Reorder Watch</h2>
-        <span class="badge status-pending">Below LPG reorder level</span>
+    <section class="gas-stock-hero panel">
+      <div class="gas-stock-main">
+        <div class="gas-section-heading"><h2>Current LPG stock</h2><span th:if="${gasDashboard != null && !#lists.isEmpty(gasDashboard.reorderTanks)}" class="gas-warning"><i class="fa-solid fa-triangle-exclamation"></i> Reorder required</span></div>
+        <div class="gas-stock-readout">
+          <div class="gas-stock-ring" th:style="${gasDashboard != null && gasDashboard.totalCapacityKg > 0 ? '--stock-percent:' + (gasDashboard.currentStockKg * 100 / gasDashboard.totalCapacityKg) : '--stock-percent:0'}">
+            <span th:text="${gasDashboard != null && gasDashboard.totalCapacityKg > 0 ? #numbers.formatDecimal(gasDashboard.currentStockKg * 100 / gasDashboard.totalCapacityKg,1,1) + '%' : '0%'}">0%</span>
+            <small>available</small>
+          </div>
+          <div><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.currentStockKg,1,3) + ' kg' : '0.000 kg'}">0 kg</strong><span th:text="${gasDashboard != null ? 'of ' + #numbers.formatDecimal(gasDashboard.totalCapacityKg,1,3) + ' kg' : 'of 0 kg'}">of 0 kg</span><div class="gas-stock-line"><i th:style="${gasDashboard != null && gasDashboard.totalCapacityKg > 0 ? 'width:' + (gasDashboard.currentStockKg * 100 / gasDashboard.totalCapacityKg) + '%' : 'width:0%'}"></i></div></div>
+        </div>
       </div>
-      <table>
-        <thead><tr><th>Tank</th><th>On Hand</th><th>Reorder Level</th><th>Suggested Order</th></tr></thead>
-        <tbody>
-        <tr th:each="t : ${gasDashboard.reorderTanks}">
-          <td><strong th:text="${t.name}">Tank</strong><small th:text="${t.productName}">LPG Gas</small></td>
-          <td th:text="${t.currentKg + ' kg'}">0 kg</td>
-          <td th:text="${t.reorderLevelKg + ' kg'}">0 kg</td>
-          <td th:text="${(t.capacityKg ?: 0) - (t.currentKg ?: 0) + ' kg'}">0 kg</td>
-        </tr>
-        </tbody>
-      </table>
+      <div class="gas-stock-stat"><i class="fa-solid fa-coins"></i><span>Stock value</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.stockValueUsd,1,2) : 'USD 0.00'}">USD 0.00</strong></div>
+      <div class="gas-stock-stat"><i class="fa-solid fa-tag"></i><span>Selling price</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.sellingPriceUsd,1,2) + ' /kg' : 'Not set'}">Not set</strong><a href="#modal-gas-price">Update price</a></div>
+      <div class="gas-stock-stat warning"><i class="fa-solid fa-triangle-exclamation"></i><span>Reorder at</span><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.aggregateReorderLevelKg,1,3) + ' kg' : '0 kg'}">0 kg</strong><a href="#modal-gas-restock">Receive stock</a></div>
     </section>
 
-    <section class="panel table-panel">
-      <div class="toolbar">
-        <h2>Gas Tanks</h2>
-        <span class="badge" th:text="${gasTankCount + ' tanks'}">0 tanks</span>
+    <section class="gas-tanks panel">
+      <div class="gas-section-heading"><div><span class="gas-eyebrow">LIVE INVENTORY</span><h2>Tanks in operation</h2></div><a href="#modal-gas-tank">Manage tanks <i class="fa-solid fa-arrow-right"></i></a></div>
+      <div class="gas-tank-grid">
+        <article th:each="t : ${gasTanks}" class="gas-tank-card">
+          <div class="gas-cylinder"><i class="fa-solid fa-gas-pump"></i></div>
+          <div class="gas-tank-data">
+            <div><h3 th:text="${t.name}">Tank A</h3><span th:class="${gasDashboard != null && gasDashboard.inUseTankIds.contains(t.id) ? 'gas-tank-status in-use' : 'gas-tank-status'}"><i class="fa-solid fa-circle"></i><span th:text="${gasDashboard != null && gasDashboard.inUseTankIds.contains(t.id) ? 'IN USE' : 'AVAILABLE'}">AVAILABLE</span></span></div>
+            <p><strong th:text="${#numbers.formatDecimal(t.currentKg ?: 0,1,3)}">0</strong><span th:text="${' / ' + #numbers.formatDecimal(t.capacityKg ?: 0,1,3) + ' kg'}">/ 0 kg</span><b th:text="${t.capacityKg != null && t.capacityKg > 0 ? #numbers.formatDecimal((t.currentKg ?: 0) * 100 / t.capacityKg,1,0) + '%' : '0%'}">0%</b></p>
+            <div class="gas-tank-progress"><i th:style="${t.capacityKg != null && t.capacityKg > 0 ? 'width:' + ((t.currentKg ?: 0) * 100 / t.capacityKg) + '%' : 'width:0%'}"></i></div>
+            <dl>
+              <div><dt>Gross weight</dt><dd th:text="${#numbers.formatDecimal(t.currentGrossWeightKg,1,3) + ' kg'}">0 kg</dd></div>
+              <div><dt>Tare weight</dt><dd th:text="${#numbers.formatDecimal(t.tareWeightKg ?: 0,1,3) + ' kg'}">0 kg</dd></div>
+              <div><dt>Net LPG</dt><dd th:text="${#numbers.formatDecimal(t.currentKg ?: 0,1,3) + ' kg'}">0 kg</dd></div>
+            </dl>
+          </div>
+          <a class="gas-tank-edit" th:href="${'#modal-gas-tank-' + t.id}" title="Edit tank"><i class="fa-solid fa-pen"></i></a>
+        </article>
+        <div class="empty" th:if="${#lists.isEmpty(gasTanks)}">No LPG tanks configured for this branch.</div>
       </div>
-      <table>
-        <thead><tr><th>Tank</th><th>Product</th><th>On Hand</th><th>Capacity</th><th>Reorder</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody>
-        <tr th:each="t : ${gasTanks}">
-          <td><strong th:text="${t.name}">Tank</strong></td>
-          <td th:text="${t.productName}">LPG Gas</td>
-          <td><strong th:text="${t.currentKg + ' kg'}">0 kg</strong></td>
-          <td th:text="${(t.capacityKg ?: 0) + ' kg'}">0 kg</td>
-          <td th:text="${(t.reorderLevelKg ?: 0) + ' kg'}">0 kg</td>
-          <td><span th:class="${t.status.name() == 'ACTIVE' ? 'badge status-active' : 'badge status-suspended'}" th:text="${t.status}">ACTIVE</span></td>
-          <td><a class="icon-button mini" th:href="${'#modal-gas-tank-' + t.id}" title="Edit"><i class="fa-solid fa-pen"></i></a></td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="empty" th:if="${#lists.isEmpty(gasTanks)}">No gas tanks yet. Add a tank for this branch.</div>
     </section>
 
-    <section class="grid two-col">
-      <div class="panel table-panel">
-        <div class="toolbar"><h2>Active Prices</h2><a class="btn btn-light" href="#modal-gas-price"><i class="fa-solid fa-pen"></i>Update</a></div>
-        <table>
-          <thead><tr><th>Currency</th><th>Price / kg</th><th>Created</th></tr></thead>
-          <tbody>
-          <tr th:each="p : ${gasPrices}">
-            <td><span class="badge" th:text="${p.currency}">USD</span></td>
-            <td><strong th:text="${p.pricePerKg}">0</strong></td>
-            <td th:text="${p.createdAt != null ? #temporals.format(p.createdAt, 'dd MMM yyyy HH:mm') : ''}">Date</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="panel table-panel">
-        <div class="toolbar"><h2>Recent Restocks</h2><a class="btn btn-light" href="#modal-gas-restock"><i class="fa-solid fa-plus"></i>Receive</a></div>
-        <table>
-          <thead><tr><th>Supplier</th><th>Kg</th><th>Cost</th></tr></thead>
-          <tbody>
-          <tr th:each="r : ${gasRestocks}">
-            <td><strong th:text="${r.supplierName ?: 'Supplier'}">Supplier</strong><small th:text="${r.supplierInvoice ?: ''}">Invoice</small></td>
-            <td th:text="${r.quantityKg + ' kg'}">0 kg</td>
-            <td th:text="${r.currency + ' ' + #numbers.formatDecimal(r.totalCost, 1, 2)}">USD 0</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="panel table-panel">
-        <div class="toolbar"><h2>Current Shift Sales</h2><span class="badge" th:text="${#lists.size(gasShiftSales) + ' sales'}">0 sales</span></div>
-        <table>
-          <thead><tr><th>Receipt</th><th>Kg</th><th>Total</th><th>Paid By</th></tr></thead>
-          <tbody>
-          <tr th:each="s : ${gasShiftSales}">
-            <td><strong th:text="${s.receiptNumber}">GAS</strong></td>
-            <td th:text="${s.quantityKg}">0</td>
-            <td th:text="${s.currency + ' ' + s.total}">USD 0</td>
-            <td><span class="badge" th:text="${s.paymentMethod}">CASH</span></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="panel table-panel">
-        <div class="toolbar"><h2>Gas Expenses</h2><a class="btn btn-light" href="#modal-gas-expense"><i class="fa-solid fa-plus"></i>Add</a></div>
-        <table>
-          <thead><tr><th>Category</th><th>Amount</th><th>Method</th></tr></thead>
-          <tbody>
-          <tr th:each="e : ${gasExpenses}">
-            <td><strong th:text="${e.category}">Expense</strong><small th:text="${e.description}">Description</small></td>
-            <td th:text="${e.currency + ' ' + #numbers.formatDecimal(e.amount, 1, 2)}">USD 0</td>
-            <td><span class="badge" th:text="${e.paymentMethod}">CASH</span></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
+    <section class="gas-insights">
+      <article class="panel gas-trend">
+        <div class="gas-section-heading"><h2>Sales trend (USD)</h2><span>Today</span></div>
+        <div class="gas-bars">
+          <div th:each="point : ${gasDashboard != null ? gasDashboard.hourlyRevenue : {}}" th:class="${point.hour % 2 == 0 ? 'show-label' : ''}" th:style="${'--bar:' + (point.usd > 0 ? 20 + (point.usd * 80 / (gasDashboard.revenueUsdToday > 0 ? gasDashboard.revenueUsdToday : point.usd)) : 3)}"><i></i><small th:text="${#numbers.formatInteger(point.hour,2) + ':00'}">00:00</small></div>
+        </div>
+      </article>
+      <article class="panel gas-payment-mix">
+        <div class="gas-section-heading"><h2>Payment mix</h2><a href="/shop/gas/sales">View sales</a></div>
+        <ul>
+          <li th:each="mix,stat : ${gasDashboard != null ? gasDashboard.paymentMix : {}}"><i th:class="${'mix-' + (stat.index % 4)}"></i><span th:text="${#strings.replace(mix.paymentMethod,'_',' ')}">Cash</span><strong th:text="${mix.currency + ' ' + #numbers.formatDecimal(mix.amount,1,2)}">USD 0.00</strong></li>
+          <li th:if="${gasDashboard == null || #lists.isEmpty(gasDashboard.paymentMix)}" class="empty">No payments recorded today.</li>
+        </ul>
+      </article>
+      <article class="panel gas-activity">
+        <div class="gas-section-heading"><h2>Alerts &amp; activity</h2><a href="/shop/gas/inventory">View all</a></div>
+        <div th:each="t : ${gasDashboard != null ? gasDashboard.reorderTanks : {}}" class="gas-activity-row warning"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Low stock alert</strong><span th:text="${t.name + ' has ' + #numbers.formatDecimal(t.currentKg,1,3) + ' kg remaining.'}">Tank is below reorder level.</span></div></div>
+        <div th:each="r,stat : ${gasRestocks}" th:if="${stat.index < 2}" class="gas-activity-row"><i class="fa-solid fa-truck-droplet"></i><div><strong>Delivery received</strong><span th:text="${#numbers.formatDecimal(r.quantityKg,1,3) + ' kg received from ' + (r.supplierName ?: 'supplier')}">Stock received</span></div></div>
+        <div th:if="${(gasDashboard == null || #lists.isEmpty(gasDashboard.reorderTanks)) && #lists.isEmpty(gasRestocks)}" class="empty">No operational alerts.</div>
+      </article>
     </section>
 
     <div id="modal-gas-tank" class="modal"><div class="modal-content">
@@ -148,6 +113,8 @@
         <label>Tank Name *<input name="name" required placeholder="Main LPG Tank"></label>
         <label>Product *<input name="productName" required value="LPG Gas"></label>
         <label>Capacity Kg *<input name="capacityKg" type="number" step="0.001" min="0" required value="0"></label>
+        <label>Empty / tare Kg *<input name="tareWeightKg" type="number" step="0.001" min="0" required value="0"></label>
+        <label>Full gross Kg *<input name="fullGrossWeightKg" type="number" step="0.001" min="0" required value="0"></label>
         <label>Current Kg *<input name="currentKg" type="number" step="0.001" min="0" required value="0"></label>
         <label>Reorder Kg *<input name="reorderLevelKg" type="number" step="0.001" min="0" required value="0"></label>
         <label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}">ACTIVE</option></select></label>
@@ -162,6 +129,8 @@
         <label>Tank Name *<input name="name" required th:value="${t.name}"></label>
         <label>Product *<input name="productName" required th:value="${t.productName}"></label>
         <label>Capacity Kg *<input name="capacityKg" type="number" step="0.001" min="0" required th:value="${t.capacityKg}"></label>
+        <label>Empty / tare Kg *<input name="tareWeightKg" type="number" step="0.001" min="0" required th:value="${t.tareWeightKg ?: 0}"></label>
+        <label>Full gross Kg *<input name="fullGrossWeightKg" type="number" step="0.001" min="0" required th:value="${t.fullGrossWeightKg ?: (t.tareWeightKg ?: 0) + (t.capacityKg ?: 0)}"></label>
         <label>Current Kg *<input name="currentKg" type="number" step="0.001" min="0" required th:value="${t.currentKg}"></label>
         <label>Reorder Kg *<input name="reorderLevelKg" type="number" step="0.001" min="0" required th:value="${t.reorderLevelKg}"></label>
         <label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}" th:selected="${t.status == s}">ACTIVE</option></select></label>

@@ -16,6 +16,8 @@ class CheckoutUiContractTest {
             "src/main/resources/static/css/billing.css");
     private static final Path CONTROLLER = Path.of(
             "src/main/java/com/retailzw/controller/web/SmilePayCheckoutController.java");
+    private static final Path RENEWAL_TEMPLATE = Path.of(
+            "src/main/resources/templates/shop/billing-renewal.html");
 
     @Test
     void checkoutKeepsApprovedLayoutAndPaymentFlowHooks() throws IOException {
@@ -63,5 +65,23 @@ class CheckoutUiContractTest {
                 .contains("@media (max-width: 600px)")
                 .contains(".payment-method-grid")
                 .contains(".checkout-summary");
+    }
+
+    @Test
+    void signupAndRenewalUseDifferentCheckoutContracts() throws IOException {
+        String signup = Files.readString(TEMPLATE);
+        String renewal = Files.readString(RENEWAL_TEMPLATE);
+
+        assertThat(signup)
+                .contains("checkout.accessToken")
+                .contains("Activate shop")
+                .doesNotContain("/shop/billing/renew/{ref}/initiate");
+        assertThat(renewal)
+                .contains("How many months do you want?")
+                .contains("/shop/billing/renew/{ref}/initiate")
+                .contains("result.redirectUrl")
+                .contains("Return to billing")
+                .contains("data-renewal-months")
+                .contains("data-express-payment-form");
     }
 }

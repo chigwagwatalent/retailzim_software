@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('System Accounting')}"></head>
+<body>
+<div class="app-shell platform-shell">
+  <aside th:replace="~{common/layout :: platformSidebar('accounting')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: platformTopbar('System Accounting')}"></nav>
+
+    <section class="page-hero accounting-hero">
+      <div class="hero-title">
+        <div class="hero-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <div>
+          <p>Financial command center</p>
+          <h1>Accounting Overview</h1>
+          <span class="hero-subtitle">Confirmed subscription revenue, operating expenses, and net performance in one audited view.</span>
+        </div>
+      </div>
+      <form class="period-picker" method="get" th:action="@{/admin/accounting}">
+        <label>Reporting month
+          <input type="month" name="month" th:value="${selectedMonth}">
+        </label>
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-arrow-right"></i>View</button>
+      </form>
+    </section>
+
+    <nav th:replace="~{common/layout :: accountingTabs('overview')}"></nav>
+
+    <div class="accounting-integrity-note">
+      <i class="fa-solid fa-shield-check"></i>
+      <span><strong>Ledger integrity:</strong> gross revenue includes confirmed payment records only. USD and ZWG are reported separately.</span>
+    </div>
+
+    <section class="currency-summary-grid">
+      <article class="currency-summary-card">
+        <header><span class="currency-flag">USD</span><div><strong>US Dollar</strong><small th:text="${selectedMonth}">2026-07</small></div></header>
+        <div class="financial-kpis">
+          <div><span>Gross revenue</span><strong th:text="${'$ ' + #numbers.formatDecimal(usdSummary.grossRevenue, 1, 2)}">$ 0.00</strong><small th:text="${usdSummary.paymentCount + ' confirmed payments'}">0 payments</small></div>
+          <div><span>Expenses</span><strong class="expense-value" th:text="${'$ ' + #numbers.formatDecimal(usdSummary.expenses, 1, 2)}">$ 0.00</strong><small th:text="${usdSummary.expenseCount + ' posted expenses'}">0 expenses</small></div>
+          <div class="net-kpi"><span>Net revenue</span><strong th:text="${'$ ' + #numbers.formatDecimal(usdSummary.netRevenue, 1, 2)}">$ 0.00</strong><small th:text="${#numbers.formatDecimal(usdSummary.marginPercent, 1, 1) + '% margin'}">0% margin</small></div>
+        </div>
+      </article>
+
+      <article class="currency-summary-card zwg-card">
+        <header><span class="currency-flag">ZWG</span><div><strong>Zimbabwe Gold</strong><small th:text="${selectedMonth}">2026-07</small></div></header>
+        <div class="financial-kpis">
+          <div><span>Gross revenue</span><strong th:text="${'ZWG ' + #numbers.formatDecimal(zwgSummary.grossRevenue, 1, 2)}">ZWG 0.00</strong><small th:text="${zwgSummary.paymentCount + ' confirmed payments'}">0 payments</small></div>
+          <div><span>Expenses</span><strong class="expense-value" th:text="${'ZWG ' + #numbers.formatDecimal(zwgSummary.expenses, 1, 2)}">ZWG 0.00</strong><small th:text="${zwgSummary.expenseCount + ' posted expenses'}">0 expenses</small></div>
+          <div class="net-kpi"><span>Net revenue</span><strong th:text="${'ZWG ' + #numbers.formatDecimal(zwgSummary.netRevenue, 1, 2)}">ZWG 0.00</strong><small th:text="${#numbers.formatDecimal(zwgSummary.marginPercent, 1, 1) + '% margin'}">0% margin</small></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="accounting-overview-grid">
+      <article class="panel table-panel accounting-trend-panel">
+        <div class="panel-title-row">
+          <div><p class="eyebrow">12-month performance</p><h2>Monthly Revenue Trend</h2></div>
+          <span class="ledger-badge"><i class="fa-solid fa-lock"></i>Confirmed ledger</span>
+        </div>
+        <div class="table-scroll">
+          <table class="accounting-table">
+            <thead><tr><th>Month</th><th>USD Gross</th><th>USD Expenses</th><th>USD Net</th><th>ZWG Gross</th><th>ZWG Expenses</th><th>ZWG Net</th></tr></thead>
+            <tbody>
+            <tr th:each="row : ${overview.trend}" th:classappend="${row.key == selectedMonth.toString() ? ' current-period' : ''}">
+              <td><strong th:text="${row.label}">Jul 2026</strong></td>
+              <td th:text="${'$ ' + #numbers.formatDecimal(row.usd.grossRevenue, 1, 2)}">$ 0.00</td>
+              <td class="expense-value" th:text="${'$ ' + #numbers.formatDecimal(row.usd.expenses, 1, 2)}">$ 0.00</td>
+              <td class="net-value" th:text="${'$ ' + #numbers.formatDecimal(row.usd.netRevenue, 1, 2)}">$ 0.00</td>
+              <td th:text="${'ZWG ' + #numbers.formatDecimal(row.zwg.grossRevenue, 1, 2)}">ZWG 0.00</td>
+              <td class="expense-value" th:text="${'ZWG ' + #numbers.formatDecimal(row.zwg.expenses, 1, 2)}">ZWG 0.00</td>
+              <td class="net-value" th:text="${'ZWG ' + #numbers.formatDecimal(row.zwg.netRevenue, 1, 2)}">ZWG 0.00</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="accounting-quick-panel">
+        <a class="accounting-action-card" th:href="@{/admin/accounting/payments(month=${selectedMonth})}">
+          <span><i class="fa-solid fa-circle-check"></i></span>
+          <div><strong>Confirmed Payments</strong><small>Inspect immutable payment evidence</small></div>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a class="accounting-action-card" th:href="@{/admin/accounting/expenses(month=${selectedMonth})}">
+          <span><i class="fa-solid fa-receipt"></i></span>
+          <div><strong>Manage Expenses</strong><small>Post, edit, and audit operating costs</small></div>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <div class="accounting-policy-card">
+          <i class="fa-solid fa-scale-balanced"></i>
+          <strong>Accounting policy</strong>
+          <p>Payments cannot be manually created here. A payment appears only after gateway confirmation.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="accounting-recent-grid">
+      <article class="panel table-panel">
+        <div class="panel-title-row"><div><p class="eyebrow">Revenue evidence</p><h2>Recent Confirmed Payments</h2></div><a th:href="@{/admin/accounting/payments(month=${selectedMonth})}">View all</a></div>
+        <div class="compact-ledger-list">
+          <article th:each="payment : ${recentPayments}">
+            <span class="ledger-icon success"><i class="fa-solid fa-check"></i></span>
+            <div><strong th:text="${paymentTenantNames.get(payment.tenantId) ?: 'Shop #' + payment.tenantId}">Shop</strong><small th:text="${payment.orderReference}">Reference</small></div>
+            <div class="ledger-amount"><strong th:text="${payment.currency.name() + ' ' + #numbers.formatDecimal(payment.totalAmount, 1, 2)}">USD 0.00</strong><small th:text="${#temporals.format(payment.confirmedAt, 'dd MMM, HH:mm')}">Date</small></div>
+          </article>
+          <p class="empty" th:if="${#lists.isEmpty(recentPayments)}">No confirmed payments in this month.</p>
+        </div>
+      </article>
+      <article class="panel table-panel">
+        <div class="panel-title-row"><div><p class="eyebrow">Operating costs</p><h2>Recent Expenses</h2></div><a th:href="@{/admin/accounting/expenses(month=${selectedMonth})}">View all</a></div>
+        <div class="compact-ledger-list">
+          <article th:each="expense : ${recentExpenses}">
+            <span class="ledger-icon expense"><i class="fa-solid fa-receipt"></i></span>
+            <div><strong th:text="${expense.description}">Expense</strong><small th:text="${expense.category.label}">Category</small></div>
+            <div class="ledger-amount"><strong th:text="${expense.currency.name() + ' ' + #numbers.formatDecimal(expense.amount, 1, 2)}">USD 0.00</strong><small th:text="${#temporals.format(expense.incurredOn, 'dd MMM yyyy')}">Date</small></div>
+          </article>
+          <p class="empty" th:if="${#lists.isEmpty(recentExpenses)}">No posted expenses in this month.</p>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>
+</body>
+</html>

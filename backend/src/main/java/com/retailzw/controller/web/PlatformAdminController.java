@@ -125,26 +125,19 @@ public class PlatformAdminController {
         addNavigationModel(model);
         List<SaasPlan> planList = plans.findAll();
         Map<Long, SaasPlan> planById = planList.stream().collect(Collectors.toMap(SaasPlan::getId, Function.identity()));
-        List<Tenant> filteredTenants = tenants.findAll().stream()
-                .filter(t -> search == null || search.isBlank()
-                        || containsIgnoreCase(t.getCompanyName(), search)
-                        || containsIgnoreCase(t.getEmail(), search)
-                        || containsIgnoreCase(t.getTenantCode(), search))
-                .filter(t -> status == null || status.equals(t.getStatus()))
-                .filter(t -> planId == null || planId.equals(t.getPlanId()))
-                .sorted(Comparator.comparing(Tenant::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
-                .toList();
-        Page<Tenant> tenantPage = pageList(filteredTenants, page, size);
+        String normalizedSearch = search == null || search.isBlank() ? null : search.trim();
+        Page<Tenant> tenantPage = tenants.findTenants(normalizedSearch, status, planId, pageRequest(page, size));
         Map<Long, String> tenantPlanNames = new HashMap<>();
-        Map<Long, Long> tenantUserCounts = new HashMap<>();
-        Map<Long, Long> tenantBranchCounts = new HashMap<>();
-        Map<Long, Long> tenantProductCounts = new HashMap<>();
+        List<Long> tenantIds = tenantPage.getContent().stream().map(Tenant::getId).toList();
+        Map<Long, Long> tenantUserCounts = countMap(tenantIds.isEmpty() ? List.of() : users.countByTenantIds(tenantIds));
+        Map<Long, Long> tenantBranchCounts = countMap(tenantIds.isEmpty() ? List.of() : branches.countByTenantIds(tenantIds));
+        Map<Long, Long> tenantProductCounts = countMap(tenantIds.isEmpty() ? List.of() : products.countActiveByTenantIds(tenantIds));
         tenantPage.getContent().forEach(t -> {
             SaasPlan plan = tenantPlan(planById, t);
             tenantPlanNames.put(t.getId(), plan == null ? "No package" : plan.getName());
-            tenantUserCounts.put(t.getId(), (long) users.findByTenantId(t.getId()).size());
-            tenantBranchCounts.put(t.getId(), branches.countByTenantId(t.getId()));
-            tenantProductCounts.put(t.getId(), products.countByTenantIdAndIsActiveTrue(t.getId()));
+            tenantUserCounts.putIfAbsent(t.getId(), 0L);
+            tenantBranchCounts.putIfAbsent(t.getId(), 0L);
+            tenantProductCounts.putIfAbsent(t.getId(), 0L);
         });
         model.addAttribute("tenants", tenantPage.getContent());
         model.addAttribute("tenantPage", tenantPage);
@@ -159,6 +152,10 @@ public class PlatformAdminController {
         model.addAttribute("tenantBranchCounts", tenantBranchCounts);
         model.addAttribute("tenantProductCounts", tenantProductCounts);
         model.addAttribute("announcements", announcements.findAllByOrderByCreatedAtDesc(PageRequest.of(0, 5)));
+        model.addAttribute("totalTenants", tenants.count());
+        model.addAttribute("activeTenants", tenants.countByStatus(Tenant.TenantStatus.ACTIVE));
+        model.addAttribute("pendingTenants", tenants.countByStatus(Tenant.TenantStatus.PENDING));
+        model.addAttribute("recentTenantActivity", tenantPage.getContent().stream().limit(5).toList());
         model.addAttribute("signup", new TenantSignUpRequest());
         return "admin/tenants";
     }
@@ -364,8 +361,8 @@ public class PlatformAdminController {
     public String signup(@Valid @ModelAttribute("signup") TenantSignUpRequest request, RedirectAttributes redirect) {
         try {
             Tenant tenant = provisioning.signUp(request);
-            var checkout = smilePayCheckoutService.createCheckout(tenant.getId());
-            return "redirect:/checkout/smilepay/" + checkout.getOrderReference();
+            var checkout = smilePayCheckoutService.createSignupCheckout(tenant.getId());
+            return "redirect:/checkout/smilepay/" + checkout.getAccessToken();
         } catch (IllegalArgumentException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
         } catch (IllegalStateException ex) {
@@ -390,8 +387,8 @@ public class PlatformAdminController {
     @PostMapping("/admin/subscriptions/tenants/{id}/checkout")
     public String openTenantCheckout(@PathVariable Long id, RedirectAttributes redirect) {
         try {
-            var checkout = smilePayCheckoutService.createCheckout(id);
-            return "redirect:/checkout/smilepay/" + checkout.getOrderReference();
+            var checkout = smilePayCheckoutService.createSignupCheckout(id);
+            return "redirect:/checkout/smilepay/" + checkout.getAccessToken();
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
             return "redirect:/admin/subscriptions#billing-queue";
@@ -791,6 +788,12 @@ public class PlatformAdminController {
 
     private BigDecimal safeMoney(BigDecimal value) {
         return value == null ? BigDecimal.ZERO : value;
+    }
+
+    private Map<Long, Long> countMap(List<Object[]> rows) {
+        Map<Long, Long> counts = new HashMap<>();
+        rows.forEach(row -> counts.put(((Number) row[0]).longValue(), ((Number) row[1]).longValue()));
+        return counts;
     }
 
     private String packageInsight(SaasPlan plan, long tenantCount, long activeTenantCount) {

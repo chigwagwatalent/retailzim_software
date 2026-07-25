@@ -82,7 +82,7 @@ public class GlobalModelAttributes {
 
         static UserMenuDetails fromSaasAdmin(SaasAdmin admin) {
             String displayName = joinName(admin.getFirstName(), admin.getLastName(), admin.getUsername());
-            return new UserMenuDetails(displayName, admin.getEmail(), initials(admin.getFirstName(), admin.getLastName(), admin.getUsername()), "SaaS Admin", "Platform");
+            return new UserMenuDetails(displayName, admin.getEmail(), initials(admin.getFirstName(), admin.getLastName(), admin.getUsername()), "System Admin", "Platform");
         }
 
         private static String joinName(String firstName, String lastName, String fallback) {

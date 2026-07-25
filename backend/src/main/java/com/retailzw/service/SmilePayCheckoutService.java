@@ -5,10 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.retailzw.enums.CurrencyCode;
 import com.retailzw.model.SaasPlan;
 import com.retailzw.model.SmilePayCheckout;
+import com.retailzw.model.PaymentNotificationOutbox;
+import com.retailzw.model.SubscriptionPayment;
 import com.retailzw.model.Tenant;
 import com.retailzw.model.TenantSubscription;
 import com.retailzw.repository.SaasPlanRepository;
 import com.retailzw.repository.SmilePayCheckoutRepository;
+import com.retailzw.repository.PaymentNotificationOutboxRepository;
+import com.retailzw.repository.SubscriptionPaymentRepository;
 import com.retailzw.repository.TenantRepository;
 import com.retailzw.repository.TenantSubscriptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -49,8 +54,9 @@ public class SmilePayCheckoutService {
     private final TenantRepository tenants;
     private final SaasPlanRepository plans;
     private final TenantSubscriptionRepository tenantSubscriptions;
+    private final SubscriptionPaymentRepository subscriptionPayments;
+    private final PaymentNotificationOutboxRepository paymentNotifications;
     private final PackageModuleAccessService packageModuleAccess;
-    private final EmailService emailService;
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(15))
@@ -70,31 +76,138 @@ public class SmilePayCheckoutService {
 
     @Transactional
     public SmilePayCheckout createCheckout(Long tenantId) {
+        return createSignupCheckout(tenantId);
+    }
+
+    @Transactional
+    public SmilePayCheckout createSignupCheckout(Long tenantId) {
         Tenant tenant = tenants.findById(tenantId).orElseThrow();
         if (tenant.getPlanId() == null) {
             throw new IllegalArgumentException("Choose a package before checkout.");
         }
-        return createCheckout(tenantId, tenant.getPlanId());
+        return createSignupCheckout(tenantId, tenant.getPlanId());
     }
 
     @Transactional
     public SmilePayCheckout createCheckout(Long tenantId, Long planId) {
+        return createSignupCheckout(tenantId, planId);
+    }
+
+    @Transactional
+    public SmilePayCheckout createSignupCheckout(Long tenantId, Long planId) {
         Tenant tenant = tenants.findById(tenantId).orElseThrow();
-        SaasPlan plan = plans.findById(planId)
-                .filter(candidate -> Boolean.TRUE.equals(candidate.getIsActive()))
-                .orElseThrow(() -> new IllegalArgumentException("Choose an active package before checkout."));
+        SaasPlan plan = activePlan(planId);
+        return createCheckout(
+                tenant,
+                plan,
+                SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION,
+                cycleMonths(plan),
+                null);
+    }
+
+    @Transactional
+    public SmilePayCheckout createRenewalCheckout(
+            Long tenantId,
+            Long planId,
+            int billingMonths,
+            Long createdByUserId) {
+        Tenant tenant = tenants.findById(tenantId).orElseThrow();
+        SaasPlan plan = activePlan(planId);
+        validateRenewalMonths(plan, billingMonths);
+        SmilePayCheckout.CheckoutPurpose purpose = plan.getId().equals(tenant.getPlanId())
+                ? SmilePayCheckout.CheckoutPurpose.SUBSCRIPTION_RENEWAL
+                : SmilePayCheckout.CheckoutPurpose.PLAN_CHANGE;
+        return createCheckout(tenant, plan, purpose, billingMonths, createdByUserId);
+    }
+
+    @Transactional
+    public SmilePayCheckout createRenewalCheckout(Long tenantId) {
+        Tenant tenant = tenants.findById(tenantId).orElseThrow();
+        if (tenant.getPlanId() == null) {
+            throw new IllegalArgumentException("Choose a package before checkout.");
+        }
+        SaasPlan plan = activePlan(tenant.getPlanId());
+        return createRenewalCheckout(tenantId, plan.getId(), cycleMonths(plan), null);
+    }
+
+    public List<Integer> allowedRenewalMonths(SaasPlan plan) {
+        int cycleMonths = cycleMonths(plan);
+        return List.of(1, 3, 6, 12, 24).stream()
+                .filter(months -> months >= cycleMonths && months % cycleMonths == 0)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public RenewalQuote quoteRenewal(Long tenantId, Long planId, int billingMonths) {
+        Tenant tenant = tenants.findById(tenantId).orElseThrow();
+        SaasPlan plan = activePlan(planId);
+        validateRenewalMonths(plan, billingMonths);
+        BigDecimal unitPrice = safeMoney(plan.getPriceUsd());
+        BigDecimal total = renewalAmount(plan, billingMonths);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime previousEnd = tenantSubscriptions
+                .findByTenantIdAndStatus(tenantId, TenantSubscription.SubscriptionStatus.ACTIVE)
+                .map(TenantSubscription::getEndsAt)
+                .orElse(null);
+        boolean samePlan = plan.getId().equals(tenant.getPlanId());
+        LocalDateTime startsAt = samePlan && previousEnd != null && previousEnd.isAfter(now)
+                ? previousEnd
+                : now;
+        return new RenewalQuote(
+                plan,
+                billingMonths,
+                unitPrice,
+                total,
+                previousEnd,
+                startsAt.plusMonths(billingMonths),
+                samePlan
+                        ? SmilePayCheckout.CheckoutPurpose.SUBSCRIPTION_RENEWAL
+                        : SmilePayCheckout.CheckoutPurpose.PLAN_CHANGE);
+    }
+
+    public BigDecimal renewalAmount(SaasPlan plan, int billingMonths) {
+        validateRenewalMonths(plan, billingMonths);
+        return safeMoney(plan.getPriceUsd())
+                .multiply(BigDecimal.valueOf(billingMonths))
+                .divide(BigDecimal.valueOf(cycleMonths(plan)), 2, RoundingMode.HALF_UP);
+    }
+
+    private SmilePayCheckout createCheckout(
+            Tenant tenant,
+            SaasPlan plan,
+            SmilePayCheckout.CheckoutPurpose purpose,
+            int billingMonths,
+            Long createdByUserId) {
         requireConfigured();
+        BigDecimal unitPrice = safeMoney(plan.getPriceUsd());
+        BigDecimal total = renewalAmount(plan, billingMonths);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime currentEnd = tenantSubscriptions
+                .findByTenantIdAndStatus(tenant.getId(), TenantSubscription.SubscriptionStatus.ACTIVE)
+                .map(TenantSubscription::getEndsAt)
+                .orElse(null);
+        LocalDateTime projectedStart = SmilePayCheckout.CheckoutPurpose.SUBSCRIPTION_RENEWAL.equals(purpose)
+                && currentEnd != null
+                && currentEnd.isAfter(now)
+                ? currentEnd
+                : now;
 
         return checkouts
-                .findFirstByTenantIdAndPlanIdAndStatusInOrderByCreatedAtDesc(
-                        tenantId, plan.getId(), REUSABLE_STATUSES)
+                .findFirstByTenantIdAndPlanIdAndCheckoutPurposeAndBillingMonthsAndStatusInOrderByCreatedAtDesc(
+                        tenant.getId(), plan.getId(), purpose, billingMonths, REUSABLE_STATUSES)
                 .filter(existing -> existing.getExpiresAt() == null
                         || existing.getExpiresAt().isAfter(LocalDateTime.now()))
                 .orElseGet(() -> checkouts.save(SmilePayCheckout.builder()
                         .tenantId(tenant.getId())
                         .planId(plan.getId())
+                        .checkoutPurpose(purpose)
+                        .billingMonths(billingMonths)
+                        .unitPrice(unitPrice)
+                        .previousPeriodEnd(currentEnd)
+                        .newPeriodEnd(projectedStart.plusMonths(billingMonths))
+                        .createdByUserId(createdByUserId)
                         .orderReference(newOrderReference(tenant.getId()))
-                        .amount(safeMoney(plan.getPriceUsd()))
+                        .amount(total)
                         .currency(CurrencyCode.USD)
                         .status(SmilePayCheckout.CheckoutStatus.PENDING)
                         .expiresAt(LocalDateTime.now().plusHours(24))
@@ -107,6 +220,49 @@ public class SmilePayCheckoutService {
         Tenant tenant = tenants.findById(checkout.getTenantId()).orElseThrow();
         SaasPlan plan = plans.findById(checkout.getPlanId()).orElseThrow();
         return new CheckoutView(checkout, tenant, plan);
+    }
+
+    @Transactional(readOnly = true)
+    public CheckoutView signupCheckoutView(String accessToken) {
+        SmilePayCheckout checkout = checkouts.findByAccessToken(accessToken)
+                .orElseThrow(() -> new IllegalArgumentException("Checkout not found."));
+        requirePurpose(checkout, SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION);
+        return checkoutView(checkout.getOrderReference());
+    }
+
+    @Transactional(readOnly = true)
+    public CheckoutView renewalCheckoutView(String orderReference, Long tenantId) {
+        SmilePayCheckout checkout = checkout(orderReference);
+        requireTenant(checkout, tenantId);
+        if (SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION.equals(checkout.getCheckoutPurpose())) {
+            throw new IllegalArgumentException("This is an account activation checkout.");
+        }
+        return checkoutView(orderReference);
+    }
+
+    @Transactional(readOnly = true)
+    public SmilePayCheckout requireSignupCheckout(String accessToken) {
+        SmilePayCheckout checkout = checkouts.findByAccessToken(accessToken)
+                .orElseThrow(() -> new IllegalArgumentException("Checkout not found."));
+        requirePurpose(checkout, SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION);
+        return checkout;
+    }
+
+    @Transactional(readOnly = true)
+    public SmilePayCheckout requireSignupOrderReference(String orderReference) {
+        SmilePayCheckout checkout = checkout(orderReference);
+        requirePurpose(checkout, SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION);
+        return checkout;
+    }
+
+    @Transactional(readOnly = true)
+    public SmilePayCheckout requireRenewalCheckout(String orderReference, Long tenantId) {
+        SmilePayCheckout checkout = checkout(orderReference);
+        requireTenant(checkout, tenantId);
+        if (SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION.equals(checkout.getCheckoutPurpose())) {
+            throw new IllegalArgumentException("This is an account activation checkout.");
+        }
+        return checkout;
     }
 
     @Transactional
@@ -151,6 +307,7 @@ public class SmilePayCheckoutService {
             checkout.setRawResponse(ex.safeResponse());
             checkout.setProviderStatus(INITIATION_PENDING);
             checkout.setStatus(SmilePayCheckout.CheckoutStatus.PROCESSING);
+            checkout.setNextCheckAt(LocalDateTime.now().plusSeconds(10));
             SmilePayCheckout saved = checkouts.save(checkout);
             log.warn("Smile & Pay initiation needs reconciliation order={} method={} status={}",
                     orderReference, method, ex.statusCode());
@@ -167,6 +324,7 @@ public class SmilePayCheckoutService {
         checkout.setStatus(method.isOtpRequired()
                 ? SmilePayCheckout.CheckoutStatus.AWAITING_OTP
                 : SmilePayCheckout.CheckoutStatus.PROCESSING);
+        checkout.setNextCheckAt(LocalDateTime.now().plusSeconds(5));
         SmilePayCheckout saved = checkouts.save(checkout);
 
         String redirectHtml = method == SmilePayCheckout.PaymentMethod.CARD
@@ -207,6 +365,7 @@ public class SmilePayCheckoutService {
         checkout.setRawResponse(toJson(response));
         checkout.setProviderStatus(firstString(response, "status", "transactionStatus", "responseMessage", "message"));
         checkout.setStatus(SmilePayCheckout.CheckoutStatus.PROCESSING);
+        checkout.setNextCheckAt(LocalDateTime.now().plusSeconds(3));
         checkouts.save(checkout);
 
         SmilePayCheckout verified = verifyAndApply(orderReference);
@@ -221,7 +380,7 @@ public class SmilePayCheckoutService {
     public SmilePayCheckout verifyAndApply(String orderReference) {
         SmilePayCheckout checkout = checkout(orderReference);
         if (SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus())) {
-            sendInvoiceIfNeeded(checkout);
+            queueInvoiceIfNeeded(checkout, null);
             return checkout;
         }
         requireConfigured();
@@ -233,6 +392,7 @@ public class SmilePayCheckoutService {
                 throw ex;
             }
             checkout.setLastCheckedAt(LocalDateTime.now());
+            checkout.setNextCheckAt(LocalDateTime.now().plusSeconds(30));
             checkout.setRawResponse(ex.safeResponse());
             if (!SmilePayCheckout.CheckoutStatus.AWAITING_OTP.equals(checkout.getStatus())) {
                 checkout.setStatus(SmilePayCheckout.CheckoutStatus.PROCESSING);
@@ -247,7 +407,7 @@ public class SmilePayCheckoutService {
         checkout.setProviderStatus(firstString(response, "status", "transactionStatus", "paymentStatus", "message"));
         checkout.setLastCheckedAt(LocalDateTime.now());
         if (isSuccessful(response)) {
-            return activatePaidCheckout(checkout, checkout.getProviderReference());
+            return activatePaidCheckout(checkout.getOrderReference(), checkout.getProviderReference());
         }
         if (isFailed(response)) {
             if (INITIATION_PENDING.equals(previousProviderStatus) && isWithinFailureGrace(checkout)) {
@@ -255,9 +415,13 @@ public class SmilePayCheckoutService {
                 checkout.setStatus(SmilePayCheckout.CheckoutStatus.PROCESSING);
             } else {
                 checkout.setStatus(SmilePayCheckout.CheckoutStatus.FAILED);
+                checkout.setNextCheckAt(null);
             }
         } else if (!SmilePayCheckout.CheckoutStatus.AWAITING_OTP.equals(checkout.getStatus())) {
             checkout.setStatus(SmilePayCheckout.CheckoutStatus.PROCESSING);
+            checkout.setNextCheckAt(LocalDateTime.now().plusSeconds(15));
+        } else {
+            checkout.setNextCheckAt(LocalDateTime.now().plusSeconds(15));
         }
         return checkouts.save(checkout);
     }
@@ -286,35 +450,47 @@ public class SmilePayCheckoutService {
         SmilePayCheckout checkout = checkout(orderReference);
         if (!SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus())) {
             checkout.setStatus(SmilePayCheckout.CheckoutStatus.CANCELLED);
+            checkout.setNextCheckAt(null);
         }
         return checkouts.save(checkout);
     }
 
     public String checkoutUrl(SmilePayCheckout checkout) {
-        return cleanBaseUrl() + "/checkout/smilepay/" + checkout.getOrderReference();
+        if (SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION.equals(checkout.getCheckoutPurpose())) {
+            return cleanBaseUrl() + "/checkout/smilepay/" + checkout.getAccessToken();
+        }
+        return cleanBaseUrl() + "/shop/billing/renew/" + checkout.getOrderReference();
     }
 
-    private SmilePayCheckout activatePaidCheckout(SmilePayCheckout checkout, String paymentReference) {
+    private SmilePayCheckout activatePaidCheckout(String orderReference, String providerReference) {
+        SmilePayCheckout checkout = checkouts.findLockedByOrderReference(orderReference)
+                .orElseThrow(() -> new IllegalArgumentException("Checkout not found."));
         if (SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus())) {
+            queueInvoiceIfNeeded(checkout, null);
             return checkout;
         }
-        Tenant tenant = tenants.findById(checkout.getTenantId()).orElseThrow();
+        Tenant tenant = tenants.findLockedById(checkout.getTenantId()).orElseThrow();
         SaasPlan plan = plans.findById(checkout.getPlanId()).orElseThrow();
         LocalDateTime paidAt = LocalDateTime.now();
         LocalDateTime periodStart = paidAt;
+        LocalDateTime previousPeriodEnd = null;
+        int billingMonths = checkout.getBillingMonths() == null
+                ? cycleMonths(plan)
+                : checkout.getBillingMonths();
         TenantSubscription subscription;
 
         var active = tenantSubscriptions.findByTenantIdAndStatus(
                 tenant.getId(), TenantSubscription.SubscriptionStatus.ACTIVE);
         if (active.isPresent() && active.get().getPlanId().equals(plan.getId())) {
             subscription = active.get();
+            previousPeriodEnd = subscription.getEndsAt();
             periodStart = subscription.getEndsAt() != null && subscription.getEndsAt().isAfter(paidAt)
                     ? subscription.getEndsAt()
                     : paidAt;
-            subscription.setEndsAt(addBillingCycle(periodStart, plan.getBillingCycle()));
+            subscription.setEndsAt(periodStart.plusMonths(billingMonths));
             subscription.setCurrency(checkout.getCurrency());
             subscription.setAmountPaid(checkout.getAmount());
-            subscription.setPaymentReference(paymentReference(checkout, paymentReference));
+            subscription.setPaymentReference(paymentReference(checkout, providerReference));
             subscription.setNotes("Renewed by Smile & Pay " + checkout.getOrderReference());
             subscription = tenantSubscriptions.save(subscription);
         } else {
@@ -328,10 +504,10 @@ public class SmilePayCheckoutService {
                     .planId(plan.getId())
                     .status(TenantSubscription.SubscriptionStatus.ACTIVE)
                     .startsAt(periodStart)
-                    .endsAt(addBillingCycle(periodStart, plan.getBillingCycle()))
+                    .endsAt(periodStart.plusMonths(billingMonths))
                     .currency(checkout.getCurrency())
                     .amountPaid(checkout.getAmount())
-                    .paymentReference(paymentReference(checkout, paymentReference))
+                    .paymentReference(paymentReference(checkout, providerReference))
                     .notes("Activated by Smile & Pay " + checkout.getOrderReference())
                     .build());
         }
@@ -346,27 +522,53 @@ public class SmilePayCheckoutService {
         checkout.setStatus(SmilePayCheckout.CheckoutStatus.PAID);
         checkout.setPaidAt(paidAt);
         checkout.setProviderStatus("PAID");
+        checkout.setNextCheckAt(null);
+        checkout.setPreviousPeriodEnd(previousPeriodEnd);
+        checkout.setNewPeriodEnd(subscription.getEndsAt());
         SmilePayCheckout saved = checkouts.save(checkout);
-        if (emailService.sendPaymentConfirmation(tenant, plan, subscription, checkout)) {
-            saved.setInvoiceSentAt(LocalDateTime.now());
-            saved = checkouts.save(saved);
+        if (!subscriptionPayments.existsByCheckoutId(saved.getId())) {
+            subscriptionPayments.save(SubscriptionPayment.builder()
+                    .checkoutId(saved.getId())
+                    .tenantId(saved.getTenantId())
+                    .planId(saved.getPlanId())
+                    .checkoutPurpose(saved.getCheckoutPurpose())
+                    .billingMonths(billingMonths)
+                    .unitPrice(saved.getUnitPrice())
+                    .totalAmount(saved.getAmount())
+                    .currency(saved.getCurrency())
+                    .paymentMethod(saved.getPaymentMethod())
+                    .orderReference(saved.getOrderReference())
+                    .providerReference(paymentReference(saved, providerReference))
+                    .previousPeriodEnd(previousPeriodEnd)
+                    .newPeriodEnd(subscription.getEndsAt())
+                    .confirmedAt(paidAt)
+                    .build());
         }
+        queueInvoiceIfNeeded(saved, subscription);
         return saved;
     }
 
-    private void sendInvoiceIfNeeded(SmilePayCheckout checkout) {
-        if (checkout.getInvoiceSentAt() != null) {
+    private void queueInvoiceIfNeeded(
+            SmilePayCheckout checkout,
+            TenantSubscription paidSubscription) {
+        if (checkout.getInvoiceSentAt() != null
+                || paymentNotifications.existsByCheckoutId(checkout.getId())) {
             return;
         }
-        Tenant tenant = tenants.findById(checkout.getTenantId()).orElseThrow();
-        SaasPlan plan = plans.findById(checkout.getPlanId()).orElseThrow();
-        TenantSubscription subscription = tenantSubscriptions
-                .findByTenantIdAndStatus(tenant.getId(), TenantSubscription.SubscriptionStatus.ACTIVE)
+        TenantSubscription subscription = paidSubscription != null
+                ? paidSubscription
+                : tenantSubscriptions.findByTenantIdAndStatus(
+                        checkout.getTenantId(),
+                        TenantSubscription.SubscriptionStatus.ACTIVE)
                 .orElse(null);
-        if (subscription != null
-                && emailService.sendPaymentConfirmation(tenant, plan, subscription, checkout)) {
-            checkout.setInvoiceSentAt(LocalDateTime.now());
-            checkouts.save(checkout);
+        if (subscription != null) {
+            paymentNotifications.save(PaymentNotificationOutbox.builder()
+                    .checkoutId(checkout.getId())
+                    .subscriptionId(subscription.getId())
+                    .status(PaymentNotificationOutbox.DeliveryStatus.PENDING)
+                    .attempts(0)
+                    .nextAttemptAt(LocalDateTime.now())
+                    .build());
         }
     }
 
@@ -378,6 +580,9 @@ public class SmilePayCheckoutService {
         payload.put("orderReference", checkout.getOrderReference());
         payload.put("amount", checkout.getAmount());
         payload.put("resultUrl", cleanBaseUrl() + "/checkout/smilepay/webhook");
+        payload.put("returnUrl", paymentReturnUrl(checkout));
+        payload.put("cancelUrl", paymentCancelUrl(checkout));
+        payload.put("failureUrl", paymentReturnUrl(checkout));
         payload.put("itemName", "RetailZW " + plan.getName());
         payload.put("itemDescription", "RetailZW subscription for " + tenant.getCompanyName());
         payload.put("currencyCode", USD_NUMERIC_CODE);
@@ -398,12 +603,6 @@ public class SmilePayCheckoutService {
         if (!securityCode.matches("\\d{3,4}")) {
             throw new IllegalArgumentException("Enter a valid card security code.");
         }
-        payload.put("returnUrl", cleanBaseUrl() + "/checkout/smilepay/return?orderReference="
-                + payload.get("orderReference"));
-        payload.put("cancelUrl", cleanBaseUrl() + "/checkout/smilepay/cancel?orderReference="
-                + payload.get("orderReference"));
-        payload.put("failureUrl", cleanBaseUrl() + "/checkout/smilepay/return?orderReference="
-                + payload.get("orderReference"));
         payload.put("firstName", firstName);
         payload.put("lastName", lastName);
         payload.put("mobilePhoneNumber", clean(tenant.getPhone()));
@@ -503,10 +702,64 @@ public class SmilePayCheckoutService {
         }
     }
 
-    private LocalDateTime addBillingCycle(LocalDateTime start, SaasPlan.BillingCycle cycle) {
-        if (SaasPlan.BillingCycle.ANNUALLY.equals(cycle)) return start.plusYears(1);
-        if (SaasPlan.BillingCycle.QUARTERLY.equals(cycle)) return start.plusMonths(3);
-        return start.plusMonths(1);
+    @Transactional(readOnly = true)
+    public SmilePayCheckout checkoutState(String orderReference) {
+        return checkout(orderReference);
+    }
+
+    private SaasPlan activePlan(Long planId) {
+        return plans.findById(planId)
+                .filter(candidate -> Boolean.TRUE.equals(candidate.getIsActive()))
+                .orElseThrow(() -> new IllegalArgumentException("Choose an active package before checkout."));
+    }
+
+    private int cycleMonths(SaasPlan plan) {
+        if (SaasPlan.BillingCycle.ANNUALLY.equals(plan.getBillingCycle())) {
+            return 12;
+        }
+        if (SaasPlan.BillingCycle.QUARTERLY.equals(plan.getBillingCycle())) {
+            return 3;
+        }
+        return 1;
+    }
+
+    private void validateRenewalMonths(SaasPlan plan, int billingMonths) {
+        if (!allowedRenewalMonths(plan).contains(billingMonths)) {
+            throw new IllegalArgumentException(
+                    "Choose a supported renewal period for this package.");
+        }
+    }
+
+    private void requirePurpose(
+            SmilePayCheckout checkout,
+            SmilePayCheckout.CheckoutPurpose expected) {
+        if (!expected.equals(checkout.getCheckoutPurpose())) {
+            throw new IllegalArgumentException("This checkout cannot be opened from this payment flow.");
+        }
+    }
+
+    private void requireTenant(SmilePayCheckout checkout, Long tenantId) {
+        if (tenantId == null || !tenantId.equals(checkout.getTenantId())) {
+            throw new IllegalArgumentException("Checkout not found.");
+        }
+    }
+
+    private String paymentReturnUrl(SmilePayCheckout checkout) {
+        if (SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION.equals(checkout.getCheckoutPurpose())) {
+            return cleanBaseUrl() + "/checkout/smilepay/return?orderReference="
+                    + checkout.getOrderReference();
+        }
+        return cleanBaseUrl() + "/shop/billing/renew/return?orderReference="
+                + checkout.getOrderReference();
+    }
+
+    private String paymentCancelUrl(SmilePayCheckout checkout) {
+        if (SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION.equals(checkout.getCheckoutPurpose())) {
+            return cleanBaseUrl() + "/checkout/smilepay/cancel?orderReference="
+                    + checkout.getOrderReference();
+        }
+        return cleanBaseUrl() + "/shop/billing/renew/cancel?orderReference="
+                + checkout.getOrderReference();
     }
 
     private String paymentReference(SmilePayCheckout checkout, String providerReference) {
@@ -610,6 +863,16 @@ public class SmilePayCheckoutService {
             String redirectHtml,
             boolean requiresOtp,
             String message) {
+    }
+
+    public record RenewalQuote(
+            SaasPlan plan,
+            int billingMonths,
+            BigDecimal unitPrice,
+            BigDecimal total,
+            LocalDateTime previousPeriodEnd,
+            LocalDateTime newPeriodEnd,
+            SmilePayCheckout.CheckoutPurpose purpose) {
     }
 
     private static final class ProviderRequestException extends IllegalStateException {

@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.List;
 
 public interface HeldChangeRepository extends JpaRepository<HeldChange, Long> {
     Optional<HeldChange> findByTenantIdAndOfflineReference(Long tenantId, String offlineReference);
@@ -66,4 +67,10 @@ public interface HeldChangeRepository extends JpaRepository<HeldChange, Long> {
                                             @Param("currency") CurrencyCode currency);
 
     long countByTenantIdAndStatus(Long tenantId, HeldChange.Status status);
+
+    List<HeldChange> findTop100ByTenantIdAndBranchIdAndGasShiftIdIsNotNullAndStatusOrderByCreatedAtDesc(
+            Long tenantId, Long branchId, HeldChange.Status status);
+
+    long countByTenantIdAndBranchIdAndGasShiftIdIsNotNullAndStatus(
+            Long tenantId, Long branchId, HeldChange.Status status);
 }

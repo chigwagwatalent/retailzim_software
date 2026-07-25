@@ -8,6 +8,8 @@ import com.retailzw.model.Tenant;
 import com.retailzw.model.TenantSubscription;
 import com.retailzw.repository.SaasPlanRepository;
 import com.retailzw.repository.SmilePayCheckoutRepository;
+import com.retailzw.repository.PaymentNotificationOutboxRepository;
+import com.retailzw.repository.SubscriptionPaymentRepository;
 import com.retailzw.repository.TenantRepository;
 import com.retailzw.repository.TenantSubscriptionRepository;
 import com.sun.net.httpserver.HttpServer;
@@ -20,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,10 +34,11 @@ public class SmilePayCheckoutServiceTest {
     @Test
     public void providerServerErrorIsReconciledInsteadOfShownAsInitiationFailure() throws Exception {
         HttpServer provider = HttpServer.create(new InetSocketAddress(0), 0);
+        AtomicReference<String> requestBody = new AtomicReference<>();
         provider.createContext("/payments/express-checkout/ecocash", exchange -> {
             byte[] response = "{\"message\":\"Internal Server Error\"}"
                     .getBytes(StandardCharsets.UTF_8);
-            exchange.getRequestBody().readAllBytes();
+            requestBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
             exchange.getResponseHeaders().add("Content-Type", "application/json");
             exchange.sendResponseHeaders(500, response.length);
             exchange.getResponseBody().write(response);
@@ -47,10 +51,13 @@ public class SmilePayCheckoutServiceTest {
             TenantRepository tenants = mock(TenantRepository.class);
             SaasPlanRepository plans = mock(SaasPlanRepository.class);
             TenantSubscriptionRepository subscriptions = mock(TenantSubscriptionRepository.class);
+            SubscriptionPaymentRepository subscriptionPayments = mock(SubscriptionPaymentRepository.class);
+            PaymentNotificationOutboxRepository paymentNotifications =
+                    mock(PaymentNotificationOutboxRepository.class);
             PackageModuleAccessService packageModuleAccess = mock(PackageModuleAccessService.class);
-            EmailService email = mock(EmailService.class);
             SmilePayCheckoutService service = new SmilePayCheckoutService(
-                    checkouts, tenants, plans, subscriptions, packageModuleAccess, email, new ObjectMapper());
+                    checkouts, tenants, plans, subscriptions, subscriptionPayments,
+                    paymentNotifications, packageModuleAccess, new ObjectMapper());
 
             Tenant tenant = Tenant.builder()
                     .id(7L)
@@ -97,6 +104,9 @@ public class SmilePayCheckoutServiceTest {
                     .isEqualTo(SmilePayCheckout.CheckoutStatus.PROCESSING);
             assertThat(result.checkout().getProviderStatus()).isEqualTo("INITIATION_PENDING");
             assertThat(result.message()).contains("verification");
+            assertThat(requestBody.get()).contains(
+                    "\"returnUrl\":\"https://retailzw.co.zw/checkout/smilepay/return"
+                            + "?orderReference=RZW-TEST-500\"");
         } finally {
             provider.stop(0);
         }
@@ -129,5 +139,92 @@ public class SmilePayCheckoutServiceTest {
 
         assertThat(pdf).isNotEmpty();
         assertThat(new String(pdf, 0, 4, StandardCharsets.US_ASCII)).isEqualTo("%PDF");
+    }
+
+    @Test
+    public void renewalQuoteUsesSelectedMonthsAndExtendsCurrentPeriod() {
+        SmilePayCheckoutRepository checkouts = mock(SmilePayCheckoutRepository.class);
+        TenantRepository tenants = mock(TenantRepository.class);
+        SaasPlanRepository plans = mock(SaasPlanRepository.class);
+        TenantSubscriptionRepository subscriptions = mock(TenantSubscriptionRepository.class);
+        SubscriptionPaymentRepository subscriptionPayments = mock(SubscriptionPaymentRepository.class);
+        PaymentNotificationOutboxRepository paymentNotifications =
+                mock(PaymentNotificationOutboxRepository.class);
+        PackageModuleAccessService packageModuleAccess = mock(PackageModuleAccessService.class);
+        SmilePayCheckoutService service = new SmilePayCheckoutService(
+                checkouts, tenants, plans, subscriptions, subscriptionPayments,
+                paymentNotifications, packageModuleAccess, new ObjectMapper());
+
+        Tenant tenant = Tenant.builder().id(7L).planId(1L).build();
+        SaasPlan plan = SaasPlan.builder()
+                .id(1L)
+                .name("Growth")
+                .priceUsd(new BigDecimal("60.00"))
+                .billingCycle(SaasPlan.BillingCycle.MONTHLY)
+                .isActive(true)
+                .build();
+        LocalDateTime currentEnd = LocalDateTime.now().plusDays(10).withNano(0);
+        TenantSubscription active = TenantSubscription.builder()
+                .tenantId(7L)
+                .planId(1L)
+                .status(TenantSubscription.SubscriptionStatus.ACTIVE)
+                .endsAt(currentEnd)
+                .build();
+
+        when(tenants.findById(7L)).thenReturn(Optional.of(tenant));
+        when(plans.findById(1L)).thenReturn(Optional.of(plan));
+        when(subscriptions.findByTenantIdAndStatus(
+                7L, TenantSubscription.SubscriptionStatus.ACTIVE)).thenReturn(Optional.of(active));
+
+        SmilePayCheckoutService.RenewalQuote quote = service.quoteRenewal(7L, 1L, 6);
+
+        assertThat(quote.total()).isEqualByComparingTo("360.00");
+        assertThat(quote.previousPeriodEnd()).isEqualTo(currentEnd);
+        assertThat(quote.newPeriodEnd()).isEqualTo(currentEnd.plusMonths(6));
+        assertThat(quote.purpose())
+                .isEqualTo(SmilePayCheckout.CheckoutPurpose.SUBSCRIPTION_RENEWAL);
+    }
+
+    @Test
+    public void renewalCheckoutSnapshotsDurationPriceAndActor() {
+        SmilePayCheckoutRepository checkouts = mock(SmilePayCheckoutRepository.class);
+        TenantRepository tenants = mock(TenantRepository.class);
+        SaasPlanRepository plans = mock(SaasPlanRepository.class);
+        TenantSubscriptionRepository subscriptions = mock(TenantSubscriptionRepository.class);
+        SubscriptionPaymentRepository subscriptionPayments = mock(SubscriptionPaymentRepository.class);
+        PaymentNotificationOutboxRepository paymentNotifications =
+                mock(PaymentNotificationOutboxRepository.class);
+        PackageModuleAccessService packageModuleAccess = mock(PackageModuleAccessService.class);
+        SmilePayCheckoutService service = new SmilePayCheckoutService(
+                checkouts, tenants, plans, subscriptions, subscriptionPayments,
+                paymentNotifications, packageModuleAccess, new ObjectMapper());
+
+        Tenant tenant = Tenant.builder().id(7L).planId(1L).build();
+        SaasPlan plan = SaasPlan.builder()
+                .id(1L)
+                .name("Growth")
+                .priceUsd(new BigDecimal("60.00"))
+                .billingCycle(SaasPlan.BillingCycle.MONTHLY)
+                .isActive(true)
+                .build();
+        when(tenants.findById(7L)).thenReturn(Optional.of(tenant));
+        when(plans.findById(1L)).thenReturn(Optional.of(plan));
+        when(subscriptions.findByTenantIdAndStatus(
+                7L, TenantSubscription.SubscriptionStatus.ACTIVE)).thenReturn(Optional.empty());
+        when(checkouts.findFirstByTenantIdAndPlanIdAndCheckoutPurposeAndBillingMonthsAndStatusInOrderByCreatedAtDesc(
+                any(), any(), any(), any(), any())).thenReturn(Optional.empty());
+        when(checkouts.save(any(SmilePayCheckout.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        ReflectionTestUtils.setField(service, "apiKey", "production-key");
+        ReflectionTestUtils.setField(service, "apiSecret", "production-secret");
+
+        SmilePayCheckout checkout = service.createRenewalCheckout(7L, 1L, 12, 99L);
+
+        assertThat(checkout.getCheckoutPurpose())
+                .isEqualTo(SmilePayCheckout.CheckoutPurpose.SUBSCRIPTION_RENEWAL);
+        assertThat(checkout.getBillingMonths()).isEqualTo(12);
+        assertThat(checkout.getUnitPrice()).isEqualByComparingTo("60.00");
+        assertThat(checkout.getAmount()).isEqualByComparingTo("720.00");
+        assertThat(checkout.getCreatedByUserId()).isEqualTo(99L);
     }
 }

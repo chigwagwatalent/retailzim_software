@@ -17,8 +17,14 @@ public class GasTankRequest {
     @NotBlank(message = "Product name is required")
     private String productName;
 
+    @DecimalMin(value = "0.000", message = "Empty/tare weight cannot be negative")
+    private BigDecimal tareWeightKg;
+
     @DecimalMin(value = "0.000", message = "Capacity cannot be negative")
     private BigDecimal capacityKg;
+
+    @DecimalMin(value = "0.000", message = "Full gross weight cannot be negative")
+    private BigDecimal fullGrossWeightKg;
 
     @DecimalMin(value = "0.000", message = "Current quantity cannot be negative")
     private BigDecimal currentKg;
@@ -34,8 +40,12 @@ public class GasTankRequest {
     public void setName(String name) { this.name = name; }
     public String getProductName() { return productName; }
     public void setProductName(String productName) { this.productName = productName; }
+    public BigDecimal getTareWeightKg() { return tareWeightKg; }
+    public void setTareWeightKg(BigDecimal tareWeightKg) { this.tareWeightKg = tareWeightKg; }
     public BigDecimal getCapacityKg() { return capacityKg; }
     public void setCapacityKg(BigDecimal capacityKg) { this.capacityKg = capacityKg; }
+    public BigDecimal getFullGrossWeightKg() { return fullGrossWeightKg; }
+    public void setFullGrossWeightKg(BigDecimal fullGrossWeightKg) { this.fullGrossWeightKg = fullGrossWeightKg; }
     public BigDecimal getCurrentKg() { return currentKg; }
     public void setCurrentKg(BigDecimal currentKg) { this.currentKg = currentKg; }
     public BigDecimal getReorderLevelKg() { return reorderLevelKg; }

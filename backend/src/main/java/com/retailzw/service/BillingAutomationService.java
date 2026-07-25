@@ -83,7 +83,7 @@ public class BillingAutomationService {
     private boolean sendReminder(TenantSubscription subscription, long daysRemaining, String key) {
         Tenant tenant = tenants.findById(subscription.getTenantId()).orElseThrow();
         SaasPlan plan = plans.findById(subscription.getPlanId()).orElseThrow();
-        SmilePayCheckout checkout = checkoutService.createCheckout(tenant.getId());
+        SmilePayCheckout checkout = checkoutService.createRenewalCheckout(tenant.getId());
         boolean sent = emailService.sendPaymentReminder(
                 tenant,
                 plan,

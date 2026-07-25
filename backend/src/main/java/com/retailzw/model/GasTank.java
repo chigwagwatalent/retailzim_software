@@ -30,8 +30,15 @@ public class GasTank {
     @Column(name = "product_name", nullable = false, length = 120)
     private String productName;
 
+    @Column(name = "tare_weight_kg", nullable = false, precision = 12, scale = 3)
+    @Builder.Default
+    private BigDecimal tareWeightKg = BigDecimal.ZERO;
+
     @Column(name = "capacity_kg", precision = 12, scale = 3)
     private BigDecimal capacityKg;
+
+    @Column(name = "full_gross_weight_kg", precision = 12, scale = 3)
+    private BigDecimal fullGrossWeightKg;
 
     @Column(name = "current_kg", nullable = false, precision = 12, scale = 3)
     @Builder.Default
@@ -52,6 +59,10 @@ public class GasTank {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Version
+    @Column(nullable = false)
+    private long version;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -61,5 +72,11 @@ public class GasTank {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    @Transient
+    public BigDecimal getCurrentGrossWeightKg() {
+        return (tareWeightKg == null ? BigDecimal.ZERO : tareWeightKg)
+                .add(currentKg == null ? BigDecimal.ZERO : currentKg);
     }
 }

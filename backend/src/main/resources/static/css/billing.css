@@ -1595,3 +1595,79 @@
     font-size: 21px;
   }
 }
+
+.renewal-builder {
+  display: grid;
+  gap: 16px;
+}
+
+.renewal-period-panel form {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(220px, .7fr) minmax(220px, .65fr) auto;
+  align-items: end;
+  gap: 20px;
+}
+
+.renewal-period-panel label {
+  display: grid;
+  gap: 8px;
+  color: #17335c;
+  font-weight: 700;
+}
+
+.renewal-period-panel select {
+  min-height: 48px;
+  border: 1px solid #c9d7eb;
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  color: var(--text, #10294d);
+  padding: 0 14px;
+}
+
+.renewal-quote {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #edf5ff;
+}
+
+.renewal-quote strong {
+  color: #1265f3;
+  font-size: 24px;
+}
+
+.renewal-dashboard-checkout {
+  max-width: none;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.renewal-dashboard-checkout .checkout-layout {
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, .7fr);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 1100px) {
+  .renewal-period-panel form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .renewal-dashboard-checkout .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .renewal-period-panel form {
+    grid-template-columns: 1fr;
+  }
+}

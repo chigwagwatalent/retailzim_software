@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "smile_pay_checkouts")
@@ -25,8 +26,32 @@ public class SmilePayCheckout {
     @Column(name = "plan_id", nullable = false)
     private Long planId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "checkout_purpose", nullable = false, length = 30)
+    @Builder.Default
+    private CheckoutPurpose checkoutPurpose = CheckoutPurpose.SIGNUP_ACTIVATION;
+
+    @Column(name = "billing_months", nullable = false)
+    @Builder.Default
+    private Integer billingMonths = 1;
+
+    @Column(name = "unit_price", precision = 15, scale = 2)
+    private BigDecimal unitPrice;
+
+    @Column(name = "previous_period_end")
+    private LocalDateTime previousPeriodEnd;
+
+    @Column(name = "new_period_end")
+    private LocalDateTime newPeriodEnd;
+
+    @Column(name = "created_by_user_id")
+    private Long createdByUserId;
+
     @Column(name = "order_reference", nullable = false, unique = true, length = 80)
     private String orderReference;
+
+    @Column(name = "access_token", nullable = false, unique = true, length = 96)
+    private String accessToken;
 
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
@@ -77,11 +102,25 @@ public class SmilePayCheckout {
     @Column(name = "last_checked_at")
     private LocalDateTime lastCheckedAt;
 
+    @Column(name = "next_check_at")
+    private LocalDateTime nextCheckAt;
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Version
+    @Column(nullable = false)
+    private Long version;
+
     @PrePersist
     protected void onCreate() {
+        if (accessToken == null || accessToken.isBlank()) {
+            accessToken = UUID.randomUUID().toString().replace("-", "")
+                    + UUID.randomUUID().toString().replace("-", "");
+        }
+        if (unitPrice == null) {
+            unitPrice = amount;
+        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -93,6 +132,12 @@ public class SmilePayCheckout {
 
     public enum CheckoutStatus {
         PENDING, AWAITING_OTP, PROCESSING, PAID, FAILED, CANCELLED
+    }
+
+    public enum CheckoutPurpose {
+        SIGNUP_ACTIVATION,
+        SUBSCRIPTION_RENEWAL,
+        PLAN_CHANGE
     }
 
     public enum PaymentMethod {

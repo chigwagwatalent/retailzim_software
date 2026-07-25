@@ -12,7 +12,8 @@
         <div class="hero-icon"><i class="fa-solid fa-store"></i></div>
         <div>
           <p th:text="${tenant.tenantCode + ' / ' + planName}">Code</p>
-          <h1 th:text="${tenant.companyName}">Tenant</h1>
+          <h1 th:text="${tenant.companyName}">Shop</h1>
+          <span class="hero-subtitle">Account performance, access, billing, support, and operational activity.</span>
         </div>
       </div>
       <div class="hero-metrics">
@@ -23,7 +24,7 @@
     </section>
 
     <div class="page-toolbar">
-      <a class="btn btn-light" th:href="@{/admin/tenants}"><i class="fa-solid fa-arrow-left"></i>Tenants</a>
+      <a class="btn btn-light" th:href="@{/admin/tenants}"><i class="fa-solid fa-arrow-left"></i>All Shops</a>
       <a class="btn btn-light" href="#modal-edit-tenant"><i class="fa-solid fa-pen"></i>Edit Profile</a>
       <a class="btn btn-primary" href="#modal-tenant-announcement"><i class="fa-solid fa-bullhorn"></i>Message Shop</a>
     </div>
@@ -115,7 +116,7 @@
     </div></div>
 
     <div id="modal-edit-tenant" class="modal"><div class="modal-content modal-wide">
-      <div class="modal-head"><h2>Edit Tenant</h2><a class="close" href="#">&times;</a></div>
+      <div class="modal-head"><h2>Edit Shop</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/admin/tenants/{id}/edit(id=${tenant.id})}" class="form-grid">
         <label>Company<input name="companyName" th:value="${tenant.companyName}" required></label>
         <label>Email<input name="email" type="email" th:value="${tenant.email}" required></label>
@@ -128,7 +129,7 @@
         <label>Registration<input name="registrationNumber" th:value="${tenant.registrationNumber}"></label>
         <label>VAT<input name="vatNumber" th:value="${tenant.vatNumber}"></label>
         <label style="grid-column:1/-1">Address<textarea name="address" th:text="${tenant.address}"></textarea></label>
-        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Tenant</button></div>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Shop</button></div>
       </form>
     </div></div>
   </main>

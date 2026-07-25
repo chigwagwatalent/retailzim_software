@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('System Expenses')}"></head>
+<body>
+<div class="app-shell platform-shell">
+  <aside th:replace="~{common/layout :: platformSidebar('accounting')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: platformTopbar('System Accounting')}"></nav>
+
+    <section class="page-hero accounting-hero compact-hero">
+      <div class="hero-title">
+        <div class="hero-icon expense-icon"><i class="fa-solid fa-receipt"></i></div>
+        <div><p>Operating cost ledger</p><h1>System Expenses</h1><span class="hero-subtitle">Record and audit the costs incurred while operating Retail Zim.</span></div>
+      </div>
+      <a class="btn btn-primary hero-button" href="#modal-new-expense"><i class="fa-solid fa-plus"></i>Post expense</a>
+    </section>
+
+    <nav th:replace="~{common/layout :: accountingTabs('expenses')}"></nav>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <section class="expense-category-summary">
+      <article class="panel">
+        <header><span>USD</span><strong>Expense mix</strong></header>
+        <div class="category-chips"><span th:each="item : ${usdCategories}"><b th:text="${item.category.label}">Category</b><strong th:text="${'$ ' + #numbers.formatDecimal(item.amount, 1, 2)}">$ 0.00</strong></span><p class="empty" th:if="${#lists.isEmpty(usdCategories)}">No USD expenses posted.</p></div>
+      </article>
+      <article class="panel">
+        <header><span>ZWG</span><strong>Expense mix</strong></header>
+        <div class="category-chips"><span th:each="item : ${zwgCategories}"><b th:text="${item.category.label}">Category</b><strong th:text="${'ZWG ' + #numbers.formatDecimal(item.amount, 1, 2)}">ZWG 0.00</strong></span><p class="empty" th:if="${#lists.isEmpty(zwgCategories)}">No ZWG expenses posted.</p></div>
+      </article>
+    </section>
+
+    <section class="panel accounting-filter-panel">
+      <form method="get" th:action="@{/admin/accounting/expenses}" class="expense-filter-grid">
+        <label>Month<input type="month" name="month" th:value="${selectedMonth}"></label>
+        <label>Currency<select name="currency"><option value="">All</option><option th:each="item : ${currencies}" th:value="${item}" th:text="${item.name()}" th:selected="${item == selectedCurrency}"></option></select></label>
+        <label>Category<select name="category"><option value="">All categories</option><option th:each="item : ${expenseCategories}" th:value="${item}" th:text="${item.label}" th:selected="${item == selectedCategory}"></option></select></label>
+        <label>Status<select name="status"><option value="">All statuses</option><option th:each="item : ${expenseStatuses}" th:value="${item}" th:text="${item.name()}" th:selected="${item == selectedStatus}"></option></select></label>
+        <label class="filter-search">Search<input name="search" th:value="${search}" placeholder="Description, vendor or reference"></label>
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+      </form>
+    </section>
+
+    <section class="panel table-panel accounting-ledger-panel">
+      <div class="panel-title-row">
+        <div><p class="eyebrow">Audited operating costs</p><h2>Expense Ledger</h2></div>
+        <span class="ledger-badge"><i class="fa-solid fa-clock-rotate-left"></i>History retained</span>
+      </div>
+      <div class="table-scroll">
+        <table class="accounting-table">
+          <thead><tr><th>Date</th><th>Expense</th><th>Category</th><th>Reference</th><th>Entered by</th><th class="numeric">Amount</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+          <tr th:each="expense : ${expenses}" th:classappend="${expense.status.name() == 'VOIDED' ? 'voided-row' : ''}">
+            <td><strong th:text="${#temporals.format(expense.incurredOn, 'dd MMM yyyy')}">Date</strong><small class="table-muted" th:if="${expense.recurring}"><i class="fa-solid fa-rotate"></i> Recurring</small></td>
+            <td><strong th:text="${expense.description}">Expense</strong><small class="table-muted" th:text="${expense.vendor ?: 'No vendor'}">Vendor</small></td>
+            <td th:text="${expense.category.label}">Category</td>
+            <td><span class="reference-text" th:text="${expense.paymentReference ?: '—'}">Reference</span></td>
+            <td><strong th:text="${expense.createdBy}">Admin</strong><small class="table-muted" th:text="${#temporals.format(expense.createdAt, 'dd MMM, HH:mm')}">Created</small></td>
+            <td class="numeric"><strong th:text="${expense.currency.name() + ' ' + #numbers.formatDecimal(expense.amount, 1, 2)}">USD 0.00</strong></td>
+            <td><span class="badge" th:classappend="${expense.status.name() == 'POSTED' ? ' status-active' : ' status-suspended'}" th:text="${expense.status}">POSTED</span><small class="table-muted" th:if="${expense.status.name() == 'VOIDED'}" th:text="${expense.voidReason}">Reason</small></td>
+            <td>
+              <details class="row-actions" th:if="${expense.status.name() == 'POSTED'}">
+                <summary title="Expense actions"><i class="fa-solid fa-ellipsis-vertical"></i></summary>
+                <div><a th:href="${'#modal-edit-expense-' + expense.id}"><i class="fa-solid fa-pen"></i>Edit</a><a class="danger-link" th:href="${'#modal-void-expense-' + expense.id}"><i class="fa-solid fa-ban"></i>Void</a></div>
+              </details>
+              <span th:if="${expense.status.name() == 'VOIDED'}">—</span>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(expenses)}"><td colspan="8"><p class="empty">No expenses match these filters.</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div th:replace="~{common/layout :: pagination(${expensePage}, ${pageLinks}, ${prevUrl}, ${nextUrl})}"></div>
+    </section>
+
+    <div id="modal-new-expense" class="modal"><div class="modal-content modal-wide accounting-modal">
+      <div class="modal-head"><div><p class="eyebrow">New ledger entry</p><h2>Post an Expense</h2></div><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/admin/accounting/expenses}" class="form-grid expense-form">
+        <input type="hidden" name="returnMonth" th:value="${selectedMonth}">
+        <label class="full-field">Description<input name="description" maxlength="180" required placeholder="e.g. Production database hosting"></label>
+        <label>Vendor<input name="vendor" maxlength="150" placeholder="Supplier or service provider"></label>
+        <label>Category<select name="category" required><option value="" disabled selected>Select category</option><option th:each="item : ${expenseCategories}" th:value="${item}" th:text="${item.label}"></option></select></label>
+        <label>Amount<input name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00"></label>
+        <label>Currency<select name="currency" required><option th:each="item : ${currencies}" th:value="${item}" th:text="${item.name()}"></option></select></label>
+        <label>Date incurred<input name="incurredOn" type="date" th:max="${today}" th:value="${today}" required></label>
+        <label>Payment reference<input name="paymentReference" maxlength="120" placeholder="Invoice, bank, or receipt reference"></label>
+        <label class="check-row"><input name="recurring" type="checkbox" value="true"> Recurring operating expense</label>
+        <label class="full-field">Internal notes<textarea name="notes" placeholder="Optional context for the accounting team"></textarea></label>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit"><i class="fa-solid fa-check"></i>Post expense</button></div>
+      </form>
+    </div></div>
+
+    <th:block th:each="expense : ${expenses}" th:if="${expense.status.name() == 'POSTED'}">
+      <div th:id="${'modal-edit-expense-' + expense.id}" class="modal"><div class="modal-content modal-wide accounting-modal">
+        <div class="modal-head"><div><p class="eyebrow">Correct ledger details</p><h2>Edit Expense</h2></div><a class="close" href="#">&times;</a></div>
+        <form method="post" th:action="@{/admin/accounting/expenses/{id}/edit(id=${expense.id})}" class="form-grid expense-form">
+          <input type="hidden" name="version" th:value="${expense.version}"><input type="hidden" name="returnMonth" th:value="${selectedMonth}">
+          <label class="full-field">Description<input name="description" maxlength="180" th:value="${expense.description}" required></label>
+          <label>Vendor<input name="vendor" maxlength="150" th:value="${expense.vendor}"></label>
+          <label>Category<select name="category" required><option th:each="item : ${expenseCategories}" th:value="${item}" th:text="${item.label}" th:selected="${item == expense.category}"></option></select></label>
+          <label>Amount<input name="amount" type="number" min="0.01" step="0.01" th:value="${expense.amount}" required></label>
+          <label>Currency<select name="currency" required><option th:each="item : ${currencies}" th:value="${item}" th:text="${item.name()}" th:selected="${item == expense.currency}"></option></select></label>
+          <label>Date incurred<input name="incurredOn" type="date" th:max="${today}" th:value="${expense.incurredOn}" required></label>
+          <label>Payment reference<input name="paymentReference" maxlength="120" th:value="${expense.paymentReference}"></label>
+          <label class="check-row"><input name="recurring" type="checkbox" value="true" th:checked="${expense.recurring}"> Recurring operating expense</label>
+          <label class="full-field">Internal notes<textarea name="notes" th:text="${expense.notes}"></textarea></label>
+          <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Save changes</button></div>
+        </form>
+      </div></div>
+
+      <div th:id="${'modal-void-expense-' + expense.id}" class="modal"><div class="modal-content accounting-modal confirm-modal">
+        <div class="modal-head"><div><p class="eyebrow">Retain audit history</p><h2>Void this Expense?</h2></div><a class="close" href="#">&times;</a></div>
+        <p>This removes the expense from net-revenue calculations without deleting its accounting history.</p>
+        <div class="void-summary"><strong th:text="${expense.description}">Expense</strong><span th:text="${expense.currency.name() + ' ' + #numbers.formatDecimal(expense.amount, 1, 2)}">USD 0.00</span></div>
+        <form method="post" th:action="@{/admin/accounting/expenses/{id}/void(id=${expense.id})}">
+          <input type="hidden" name="version" th:value="${expense.version}"><input type="hidden" name="returnMonth" th:value="${selectedMonth}">
+          <label>Reason for voiding<textarea name="reason" minlength="4" maxlength="300" required placeholder="Explain why this entry must be voided"></textarea></label>
+          <div class="form-actions"><a class="btn btn-light" href="#">Keep expense</a><button class="btn btn-danger" type="submit"><i class="fa-solid fa-ban"></i>Void expense</button></div>
+        </form>
+      </div></div>
+    </th:block>
+  </main>
+</div>
+</body>
+</html>

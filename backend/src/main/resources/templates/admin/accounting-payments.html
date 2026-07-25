@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Confirmed Payments')}"></head>
+<body>
+<div class="app-shell platform-shell">
+  <aside th:replace="~{common/layout :: platformSidebar('accounting')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: platformTopbar('System Accounting')}"></nav>
+
+    <section class="page-hero accounting-hero compact-hero">
+      <div class="hero-title">
+        <div class="hero-icon success-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div><p>Revenue ledger</p><h1>Confirmed Payments</h1><span class="hero-subtitle">Gateway-confirmed subscription payments. Records are immutable and traceable to their checkout.</span></div>
+      </div>
+      <div class="hero-metrics"><div><i class="fa-solid fa-lock"></i><strong th:text="${paymentPage.totalElements}">0</strong><span>Confirmed records</span></div></div>
+    </section>
+
+    <nav th:replace="~{common/layout :: accountingTabs('payments')}"></nav>
+    <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+    <section class="panel accounting-filter-panel">
+      <form method="get" th:action="@{/admin/accounting/payments}" class="accounting-filter-grid">
+        <label>Reporting month<input type="month" name="month" th:value="${selectedMonth}"></label>
+        <label>Currency
+          <select name="currency"><option value="">All currencies</option><option th:each="item : ${currencies}" th:value="${item}" th:text="${item.name()}" th:selected="${item == selectedCurrency}">USD</option></select>
+        </label>
+        <label class="filter-search">Search<input name="search" th:value="${search}" placeholder="Shop, order or provider reference"></label>
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply filters</button>
+      </form>
+    </section>
+
+    <section class="panel table-panel accounting-ledger-panel">
+      <div class="panel-title-row">
+        <div><p class="eyebrow">Immutable revenue evidence</p><h2>Payment Ledger</h2></div>
+        <span class="ledger-badge"><i class="fa-solid fa-shield-check"></i>Gateway confirmed</span>
+      </div>
+      <div class="table-scroll">
+        <table class="accounting-table">
+          <thead><tr><th>Confirmed</th><th>Shop</th><th>Package</th><th>Purpose</th><th>Method</th><th>Reference</th><th class="numeric">Amount</th><th>Status</th></tr></thead>
+          <tbody>
+          <tr th:each="payment : ${payments}">
+            <td><strong th:text="${#temporals.format(payment.confirmedAt, 'dd MMM yyyy')}">Date</strong><small class="table-muted" th:text="${#temporals.format(payment.confirmedAt, 'HH:mm:ss')}">Time</small></td>
+            <td><strong th:text="${paymentTenantNames.get(payment.tenantId) ?: 'Shop #' + payment.tenantId}">Shop</strong><small class="table-muted" th:text="${paymentTenantCodes.get(payment.tenantId) ?: 'Tenant ' + payment.tenantId}">Code</small></td>
+            <td><strong th:text="${paymentPlanNames.get(payment.planId) ?: 'Plan #' + payment.planId}">Plan</strong><small class="table-muted" th:text="${payment.billingMonths + (payment.billingMonths == 1 ? ' month' : ' months')}">1 month</small></td>
+            <td th:text="${#strings.replace(payment.checkoutPurpose.name(), '_', ' ')}">Renewal</td>
+            <td th:text="${payment.paymentMethod != null ? #strings.replace(payment.paymentMethod.name(), '_', ' ') : 'Gateway'}">Method</td>
+            <td><strong class="reference-text" th:text="${payment.orderReference}">Order</strong><small class="table-muted" th:text="${payment.providerReference ?: 'Provider reference pending'}">Provider</small></td>
+            <td class="numeric"><strong th:text="${payment.currency.name() + ' ' + #numbers.formatDecimal(payment.totalAmount, 1, 2)}">USD 0.00</strong></td>
+            <td><span class="badge status-active"><i class="fa-solid fa-check"></i>Confirmed</span></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(payments)}"><td colspan="8"><p class="empty">No confirmed payments match these filters.</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div th:replace="~{common/layout :: pagination(${paymentPage}, ${pageLinks}, ${prevUrl}, ${nextUrl})}"></div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

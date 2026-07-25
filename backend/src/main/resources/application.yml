@@ -124,8 +124,8 @@ app:
 
 smilepay:
   base-url: https://zbnet.zb.co.zw/wallet_gateway/payments-gateway
-  api-key: CHANGE_ME
-  api-secret: CHANGE_ME
+  api-key: 66ab728f-563b-4a4e-9fc7-1743e549aa66
+  api-secret: c4b74356-55e8-45d2-b0ea-a132e3895784
 
 billing:
   reminder-days: 14,7,3,1,0,-1,-3

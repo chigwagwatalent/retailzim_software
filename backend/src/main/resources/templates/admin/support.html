@@ -11,13 +11,14 @@
       <div class="hero-title">
         <div class="hero-icon"><i class="fa-solid fa-headset"></i></div>
         <div>
-          <p>Realtime tenant care,</p>
+          <p>Realtime shop care</p>
           <h1>Live Support Center</h1>
+          <span class="hero-subtitle">Manage active conversations and resolve shop requests from one focused inbox.</span>
         </div>
       </div>
       <div class="hero-metrics">
         <div><i class="fa-solid fa-inbox"></i><strong th:text="${totalUnreadSupport}">0</strong><span>Unread Messages</span></div>
-        <div><i class="fa-solid fa-store"></i><strong th:text="${#lists.size(tenants)}">0</strong><span>Tenant Channels</span></div>
+        <div><i class="fa-solid fa-store"></i><strong th:text="${#lists.size(tenants)}">0</strong><span>Shop Channels</span></div>
       </div>
     </section>
 
@@ -28,7 +29,7 @@
         <div class="panel-title-row">
           <div>
             <p class="eyebrow">Inbox</p>
-            <h2>Tenant Conversations</h2>
+            <h2>Shop Conversations</h2>
           </div>
         </div>
         <a th:each="t : ${tenants}"
@@ -36,7 +37,7 @@
            th:class="${selectedTenantId != null and selectedTenantId == t.id ? 'support-thread active' : 'support-thread'}">
           <span class="thread-avatar" th:text="${#strings.substring(t.companyName,0,1)}">T</span>
           <span>
-            <strong th:text="${t.companyName}">Tenant</strong>
+            <strong th:text="${t.companyName}">Shop</strong>
             <small th:if="${lastMessageByTenant.get(t.id) != null}" th:text="${lastMessageByTenant.get(t.id).message}">Last message</small>
             <small th:if="${lastMessageByTenant.get(t.id) == null}">No messages yet</small>
           </span>
@@ -48,11 +49,11 @@
         <div class="support-room-head">
           <div>
             <p class="eyebrow">Active channel</p>
-            <h2 th:text="${selectedTenant.companyName}">Tenant</h2>
+            <h2 th:text="${selectedTenant.companyName}">Shop</h2>
             <small th:text="${selectedTenant.email + ' · ' + selectedTenant.status}">email</small>
           </div>
           <div class="support-room-actions">
-            <a class="btn btn-light" th:href="@{/admin/tenants/{id}(id=${selectedTenant.id})}"><i class="fa-solid fa-chart-line"></i>Tenant Detail</a>
+            <a class="btn btn-light" th:href="@{/admin/tenants/{id}(id=${selectedTenant.id})}"><i class="fa-solid fa-chart-line"></i>Shop Detail</a>
             <a class="btn btn-blue" th:href="@{/admin/tenants/{id}#modal-announce(id=${selectedTenant.id})}"><i class="fa-solid fa-bullhorn"></i>Announce</a>
           </div>
         </div>
@@ -73,7 +74,7 @@
       </section>
 
       <section class="support-room empty" th:if="${selectedTenant == null}">
-        No tenants are available for support yet.
+        No shops are available for support yet.
       </section>
     </section>
   </main>

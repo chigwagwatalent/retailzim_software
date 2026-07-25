@@ -16,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,6 +40,55 @@ public class GasApiController {
         payload.put("stockAdjustments", gas.stockAdjustments(current.tenantId(), branchId));
         payload.put("expenses", gas.expenses(current.tenantId(), branchId));
         return ApiResponse.success(payload);
+    }
+
+    /**
+     * Selling-only bootstrap for the standalone GasPOS RetailZW application.
+     * Administrative stock, price, restock and expense actions are deliberately
+     * excluded from this contract.
+     */
+    @GetMapping("/pos/bootstrap")
+    public ApiResponse<Map<String, Object>> posBootstrap(@RequestParam Long branchId) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("serverTime", OffsetDateTime.now(ZoneOffset.UTC));
+        payload.put("currentShift", gas.currentShift(current.tenantId(), branchId, current.userId()));
+        payload.put("shiftTanks", gas.currentShiftTanks(current.tenantId(), branchId, current.userId()));
+        payload.put("tanks", gas.tanks(current.tenantId(), branchId));
+        payload.put("prices", gas.prices(current.tenantId(), branchId));
+        payload.put("shiftSales", gas.shiftSales(current.tenantId(), branchId, current.userId()));
+        payload.put("heldChange", gas.openGasHeldChange(current.tenantId(), branchId));
+        payload.put("paymentMethods",
+                List.of("CASH", "ECOCASH", "ONEMONEY", "INNBUCKS", "CARD", "BANK_TRANSFER"));
+        return ApiResponse.success(payload);
+    }
+
+    @PostMapping("/pos/shifts/open")
+    public ApiResponse<?> openPosShift(@Valid @RequestBody OpenGasShiftRequest request) {
+        return ApiResponse.success("Gas shift opened",
+                gas.openShift(current.tenantId(), current.userId(), request));
+    }
+
+    @PostMapping("/pos/shifts/close")
+    public ApiResponse<?> closePosShift(@Valid @RequestBody CloseGasShiftRequest request) {
+        return ApiResponse.success("Gas shift reconciled and closed",
+                gas.closeShift(current.tenantId(), current.userId(), request));
+    }
+
+    @PostMapping("/pos/sales")
+    public ApiResponse<?> posSale(@Valid @RequestBody GasSaleRequest request) {
+        return ApiResponse.success("Gas sale completed",
+                gas.completeSale(current.tenantId(), current.userId(), request));
+    }
+
+    @GetMapping("/pos/held-change")
+    public ApiResponse<?> posHeldChange(@RequestParam Long branchId) {
+        return ApiResponse.success(gas.openGasHeldChange(current.tenantId(), branchId));
+    }
+
+    @PostMapping("/pos/held-change/{changeId}/collect")
+    public ApiResponse<?> collectPosHeldChange(@PathVariable Long changeId, @RequestParam Long branchId) {
+        return ApiResponse.success("Held change paid",
+                gas.collectGasHeldChange(current.tenantId(), branchId, current.userId(), changeId));
     }
 
     @GetMapping("/tanks")
