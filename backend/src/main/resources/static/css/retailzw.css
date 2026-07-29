@@ -18212,3 +18212,244 @@ body.auth-shell .auth-card.login-card::before {
     width: 100%;
   }
 }
+
+/* Shop-admin billing renewal toast */
+.billing-renewal-toast {
+  --renewal-accent: #f59e0b;
+  --renewal-soft: #fff7df;
+  position: fixed;
+  z-index: 2400;
+  top: 94px;
+  right: clamp(16px, 2.4vw, 36px);
+  width: min(440px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid #f2d48a;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(245, 158, 11, .16), transparent 36%),
+    rgba(255, 255, 255, .98);
+  box-shadow: 0 24px 60px rgba(9, 30, 66, .22), 0 5px 16px rgba(9, 30, 66, .1);
+  opacity: 0;
+  transform: translate3d(28px, -8px, 0) scale(.97);
+  pointer-events: none;
+  transition: opacity .24s ease, transform .28s cubic-bezier(.2, .85, .32, 1.15);
+}
+
+.billing-renewal-toast.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  pointer-events: auto;
+}
+
+.billing-renewal-toast.is-urgent {
+  --renewal-accent: #f97316;
+  --renewal-soft: #fff1e7;
+  border-color: #fdba74;
+}
+
+.billing-renewal-toast.is-overdue {
+  --renewal-accent: #e11d48;
+  --renewal-soft: #fff0f3;
+  border-color: #fda4af;
+}
+
+.billing-renewal-toast::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: linear-gradient(180deg, var(--renewal-accent), #0b69f0);
+}
+
+.billing-renewal-toast-link {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 19px 48px 20px 21px;
+  color: #102747;
+  text-decoration: none;
+}
+
+.billing-renewal-toast-link:hover,
+.billing-renewal-toast-link:focus-visible {
+  color: #102747;
+  background: linear-gradient(110deg, var(--renewal-soft), rgba(235, 245, 255, .72));
+  outline: none;
+}
+
+.billing-renewal-toast-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(245, 158, 11, .22);
+  border-radius: 17px;
+  color: var(--renewal-accent);
+  background: var(--renewal-soft);
+  box-shadow: inset 0 0 0 5px rgba(255, 255, 255, .58);
+  font-size: 21px;
+}
+
+.billing-renewal-toast-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.billing-renewal-toast-copy small {
+  color: var(--renewal-accent);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.billing-renewal-toast-copy strong {
+  color: #0b2345;
+  font-size: 16px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.billing-renewal-toast-copy > span {
+  color: #58708e;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.billing-renewal-toast-copy b {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: max-content;
+  margin-top: 5px;
+  color: #075fe8;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.billing-renewal-toast-copy b i {
+  font-size: 10px;
+  transition: transform .18s ease;
+}
+
+.billing-renewal-toast-link:hover b i,
+.billing-renewal-toast-link:focus-visible b i {
+  transform: translateX(4px);
+}
+
+.billing-renewal-toast-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  color: #6d8098;
+  background: rgba(238, 244, 252, .9);
+  cursor: pointer;
+}
+
+.billing-renewal-toast-close:hover,
+.billing-renewal-toast-close:focus-visible {
+  color: #0b2345;
+  background: #e2ecfa;
+  outline: 2px solid rgba(11, 105, 240, .2);
+}
+
+.billing-renewal-toast-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 5px;
+  height: 3px;
+  overflow: hidden;
+  background: rgba(148, 163, 184, .16);
+}
+
+.billing-renewal-toast-progress::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--renewal-accent), #0b69f0);
+  transform-origin: left center;
+  animation: billing-renewal-countdown 18s linear forwards;
+}
+
+.billing-renewal-toast.is-paused .billing-renewal-toast-progress::after {
+  animation-play-state: paused;
+}
+
+@keyframes billing-renewal-countdown {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+:root[data-theme="dark"] .billing-renewal-toast {
+  border-color: rgba(245, 158, 11, .34);
+  background:
+    radial-gradient(circle at 100% 0, rgba(245, 158, 11, .16), transparent 36%),
+    rgba(12, 30, 55, .98);
+  box-shadow: 0 26px 64px rgba(0, 0, 0, .45);
+}
+
+:root[data-theme="dark"] .billing-renewal-toast-link,
+:root[data-theme="dark"] .billing-renewal-toast-link:hover,
+:root[data-theme="dark"] .billing-renewal-toast-link:focus-visible {
+  color: #edf5ff;
+}
+
+:root[data-theme="dark"] .billing-renewal-toast-copy strong {
+  color: #f4f8ff;
+}
+
+:root[data-theme="dark"] .billing-renewal-toast-copy > span {
+  color: #aec1d9;
+}
+
+:root[data-theme="dark"] .billing-renewal-toast-close {
+  color: #b8c8dc;
+  background: rgba(29, 55, 87, .9);
+}
+
+@media (max-width: 650px) {
+  .billing-renewal-toast {
+    top: 76px;
+    right: 12px;
+    width: calc(100vw - 24px);
+    border-radius: 17px;
+  }
+
+  .billing-renewal-toast-link {
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 11px;
+    padding: 16px 42px 17px 17px;
+  }
+
+  .billing-renewal-toast-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+
+  .billing-renewal-toast-copy strong {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .billing-renewal-toast {
+    transition: none;
+  }
+
+  .billing-renewal-toast-progress::after {
+    animation: none;
+  }
+}

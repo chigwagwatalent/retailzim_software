@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
@@ -18,6 +19,10 @@ public interface TenantSubscriptionRepository extends JpaRepository<TenantSubscr
     List<TenantSubscription> findByTenantId(Long tenantId);
 
     Optional<TenantSubscription> findByTenantIdAndStatus(Long tenantId, TenantSubscription.SubscriptionStatus status);
+
+    Optional<TenantSubscription> findFirstByTenantIdAndStatusInAndEndsAtIsNotNullOrderByEndsAtDesc(
+            Long tenantId,
+            Collection<TenantSubscription.SubscriptionStatus> statuses);
 
     List<TenantSubscription> findByStatusAndEndsAtIsNotNull(TenantSubscription.SubscriptionStatus status);
 

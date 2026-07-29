@@ -41,6 +41,7 @@ document.querySelectorAll('.theme-toggle i').forEach((icon) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  setupBillingRenewalToast();
   setupSignupWizard();
   setupShiftCloseForms();
   setupGasTankWeightForms();
@@ -48,6 +49,44 @@ document.addEventListener('DOMContentLoaded', () => {
   openRequestedModal();
   enhanceForms();
 });
+
+function setupBillingRenewalToast() {
+  const toast = document.querySelector('[data-billing-renewal-toast]');
+  if (!toast) return;
+
+  let dismissTimer;
+  const dismiss = () => {
+    window.clearTimeout(dismissTimer);
+    toast.classList.remove('is-visible');
+    window.setTimeout(() => toast.remove(), 260);
+  };
+  const pause = () => {
+    window.clearTimeout(dismissTimer);
+    toast.classList.add('is-paused');
+  };
+  const resume = () => {
+    toast.classList.remove('is-paused');
+    window.clearTimeout(dismissTimer);
+    dismissTimer = window.setTimeout(dismiss, 18000);
+  };
+
+  toast.querySelector('[data-billing-toast-dismiss]')
+    ?.addEventListener('click', dismiss);
+  toast.addEventListener('mouseenter', pause);
+  toast.addEventListener('mouseleave', resume);
+  toast.addEventListener('focusin', pause);
+  toast.addEventListener('focusout', (event) => {
+    if (!toast.contains(event.relatedTarget)) resume();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && toast.isConnected) dismiss();
+  });
+
+  window.requestAnimationFrame(() => {
+    toast.classList.add('is-visible');
+    resume();
+  });
+}
 
 function setupGasTankWeightForms() {
   document.querySelectorAll('.gas-tank-weight-form').forEach((form) => {

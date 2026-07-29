@@ -7,6 +7,8 @@ import com.retailzw.repository.NotificationRepository;
 import com.retailzw.repository.SaasAdminRepository;
 import com.retailzw.repository.UserRepository;
 import com.retailzw.security.CustomUserDetails;
+import com.retailzw.service.BillingAccessService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,13 +20,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @RequiredArgsConstructor
 public class GlobalModelAttributes {
 
+    private static final String BILLING_TOAST_SESSION_KEY = "billing-renewal-toast-shown";
+
     private final UserRepository users;
     private final BranchRepository branches;
     private final SaasAdminRepository admins;
     private final NotificationRepository notifications;
+    private final BillingAccessService billingAccessService;
 
     @ModelAttribute
-    public void addCurrentUser(Model model) {
+    public void addCurrentUser(Model model, HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return;
@@ -36,6 +41,7 @@ public class GlobalModelAttributes {
                     .map(user -> UserMenuDetails.fromShopUser(user, branchLabel(user)))
                     .ifPresent(user -> model.addAttribute("currentUser", user));
             model.addAttribute("unreadNotificationCount", notifications.countByUserIdAndIsReadFalse(shopUser.getUserId()));
+            addBillingRenewalToast(model, request, shopUser);
             return;
         }
 
@@ -47,6 +53,33 @@ public class GlobalModelAttributes {
                 .map(UserMenuDetails::fromSaasAdmin)
                 .ifPresent(user -> model.addAttribute("currentUser", user));
         model.addAttribute("unreadNotificationCount", 0L);
+    }
+
+    private void addBillingRenewalToast(
+            Model model,
+            HttpServletRequest request,
+            CustomUserDetails shopUser) {
+        if (!"SUPER_ADMIN".equals(shopUser.getRoleName())
+                || !"GET".equalsIgnoreCase(request.getMethod())) {
+            return;
+        }
+
+        String path = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (contextPath != null && !contextPath.isBlank() && path.startsWith(contextPath)) {
+            path = path.substring(contextPath.length());
+        }
+        if (!path.startsWith("/shop/") || path.startsWith("/shop/billing")) {
+            return;
+        }
+        if (request.getSession().getAttribute(BILLING_TOAST_SESSION_KEY) != null) {
+            return;
+        }
+
+        billingAccessService.renewalNotice(shopUser.getTenantId()).ifPresent(notice -> {
+            model.addAttribute("billingRenewalNotice", notice);
+            request.getSession().setAttribute(BILLING_TOAST_SESSION_KEY, Boolean.TRUE);
+        });
     }
 
     private String branchLabel(User user) {

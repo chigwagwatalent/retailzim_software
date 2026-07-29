@@ -58,6 +58,24 @@ class ShopLayoutContractTest {
     }
 
     @Test
+    void shopAdminLayoutIncludesTheClickableBillingRenewalToast() throws IOException {
+        String layout = Files.readString(Path.of("src/main/resources/templates/common/layout.html"));
+        String javascript = Files.readString(Path.of("src/main/resources/static/js/retailzw.js"));
+        String css = Files.readString(Path.of("src/main/resources/static/css/retailzw.css"));
+
+        assertTrue(layout.contains("data-billing-renewal-toast"));
+        assertTrue(layout.contains("billingRenewalNotice != null"));
+        assertTrue(layout.contains("th:href=\"@{/shop/billing}\""));
+        assertTrue(layout.contains("Click here to pay"));
+        assertTrue(layout.contains("data-billing-toast-dismiss"));
+        assertTrue(layout.contains("aria-live=\"polite\""));
+        assertTrue(javascript.contains("setupBillingRenewalToast"));
+        assertTrue(javascript.contains("18000"));
+        assertTrue(css.contains(".billing-renewal-toast.is-urgent"));
+        assertTrue(css.contains(".billing-renewal-toast.is-overdue"));
+    }
+
+    @Test
     void inventoryPagesExposeAuditedRetailAndGasStockWorkflows() throws IOException {
         String inventory = Files.readString(SHOP_TEMPLATES.resolve("inventory.html"));
         String purchasing = Files.readString(SHOP_TEMPLATES.resolve("purchasing.html"));

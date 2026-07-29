@@ -7,12 +7,12 @@
   <script>
     document.documentElement.dataset.theme = localStorage.getItem('retailzw-theme') || 'light';
   </script>
-  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=57)}">
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=58)}">
   <link rel="stylesheet" th:href="@{/css/billing.css(v=3)}">
   <link rel="icon" type="image/png" th:href="@{/img/favicon.png}">
   <link rel="shortcut icon" th:href="@{/img/favicon.png}">
   <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
-  <script defer th:src="@{/js/retailzw.js(v=17)}"></script>
+  <script defer th:src="@{/js/retailzw.js(v=18)}"></script>
 </head>
 <body>
 <aside class="sidebar tenant-shell-sidebar" th:fragment="shopSidebar(active)">
@@ -248,6 +248,33 @@
       </div>
     </details>
   </div>
+  <aside class="billing-renewal-toast"
+         th:if="${billingRenewalNotice != null}"
+         th:classappend="${' is-' + billingRenewalNotice.severity}"
+         th:attr="data-reminder-key=${billingRenewalNotice.reminderKey}"
+         data-billing-renewal-toast
+         role="status"
+         aria-live="polite"
+         aria-atomic="true">
+    <a class="billing-renewal-toast-link" th:href="@{/shop/billing}">
+      <span class="billing-renewal-toast-icon" aria-hidden="true">
+        <i class="fa-solid fa-calendar-check"></i>
+      </span>
+      <span class="billing-renewal-toast-copy">
+        <small>Subscription reminder</small>
+        <strong th:text="${billingRenewalNotice.title}">Subscription renewal due soon</strong>
+        <span th:text="${billingRenewalNotice.message}">Your current billing period is nearing its end.</span>
+        <b>Click here to pay <i class="fa-solid fa-arrow-right"></i></b>
+      </span>
+    </a>
+    <button class="billing-renewal-toast-close"
+            type="button"
+            data-billing-toast-dismiss
+            aria-label="Dismiss subscription reminder">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <span class="billing-renewal-toast-progress" aria-hidden="true"></span>
+  </aside>
   <div id="support-chat" class="support-widget chat-panel" th:if="${tenantBillingOnly != true}" th:attr="data-feed-url=@{/shop/support/chat/feed}">
     <button class="support-fab" type="button" data-chat-toggle title="Live support">
       <i class="fa-solid fa-headset"></i>
