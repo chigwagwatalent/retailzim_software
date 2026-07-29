@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -268,6 +270,38 @@ public class PlatformAdminController {
         return "redirect:/admin/tenants/" + id;
     }
 
+    @PostMapping("/admin/tenants/{id}/billing-period")
+    public String updateTenantBillingPeriod(
+            @PathVariable Long id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startsOn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endsOn,
+            RedirectAttributes redirect) {
+        Tenant tenant = tenants.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Shop not found."));
+        if (endsOn.isBefore(startsOn)) {
+            redirect.addFlashAttribute("message", "Billing end date must be on or after the start date.");
+            return "redirect:/admin/tenants#modal-billing-" + id;
+        }
+
+        LocalDateTime startsAt = startsOn.atStartOfDay();
+        LocalDateTime endsAt = endsOn.plusDays(1).atStartOfDay().minusNanos(1);
+        tenant.setSubscriptionStart(startsAt);
+        tenant.setSubscriptionEnd(endsAt);
+        tenants.save(tenant);
+
+        tenantSubscriptions.findByTenantIdAndStatus(id, TenantSubscription.SubscriptionStatus.ACTIVE)
+                .or(() -> tenantSubscriptions.findByTenantIdAndStatus(
+                        id, TenantSubscription.SubscriptionStatus.TRIAL))
+                .ifPresent(subscription -> {
+                    subscription.setStartsAt(startsAt);
+                    subscription.setEndsAt(endsAt);
+                    tenantSubscriptions.save(subscription);
+                });
+
+        redirect.addFlashAttribute("message", "Billing period updated for " + tenant.getCompanyName() + ".");
+        return "redirect:/admin/tenants";
+    }
+
     @PostMapping("/admin/tenants/announce")
     public String sendAnnouncement(@RequestParam TenantAnnouncement.AudienceMode audienceMode,
                                    @RequestParam(required = false) List<Long> tenantIds,
@@ -412,77 +446,19 @@ public class PlatformAdminController {
     }
 
     @GetMapping("/admin/subscriptions")
-    public String subscriptions(@RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "25") int size,
+    public String subscriptions(@RequestParam(required = false) String search,
                                 Model model) {
         addNavigationModel(model);
-        List<SaasPlan> planList = plans.findAll();
+        List<SaasPlan> allPlans = plans.findAll();
         List<Tenant> allTenants = tenants.findAll();
-        Page<Tenant> tenantPage = tenants.findAll(pageRequest(page, size));
-        Map<Long, SaasPlan> planById = planList.stream()
+        Map<Long, SaasPlan> planById = allPlans.stream()
                 .collect(Collectors.toMap(SaasPlan::getId, Function.identity()));
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime renewalWindow = now.plusDays(30);
-
-        Map<Long, Long> planTenantCounts = new HashMap<>();
-        Map<Long, BigDecimal> planRevenueUsd = new HashMap<>();
-        Map<Long, BigDecimal> planRevenueZwg = new HashMap<>();
-        Map<Long, Integer> planSharePercent = new HashMap<>();
-        Map<Long, String> planIntelligence = new HashMap<>();
-        Map<Long, String> tenantPlanNames = new HashMap<>();
-        Map<Long, BigDecimal> tenantPlanPricesUsd = new HashMap<>();
-        Map<Long, BigDecimal> tenantPlanPricesZwg = new HashMap<>();
-        Map<Long, String> tenantBillingSignals = new HashMap<>();
-        Map<Long, String> tenantBillingSignalClasses = new HashMap<>();
-        Map<Long, String> tenantRecommendations = new HashMap<>();
-        Map<Long, Long> tenantDaysRemaining = new HashMap<>();
-
-        long activeCount = allTenants.stream().filter(t -> Tenant.TenantStatus.ACTIVE.equals(t.getStatus())).count();
-        long pendingCount = allTenants.stream().filter(t -> Tenant.TenantStatus.PENDING.equals(t.getStatus())).count();
-        long suspendedCount = allTenants.stream().filter(t -> Tenant.TenantStatus.SUSPENDED.equals(t.getStatus())).count();
-        long cancelledCount = allTenants.stream().filter(t -> Tenant.TenantStatus.CANCELLED.equals(t.getStatus())).count();
         long expiringSoonCount = allTenants.stream()
                 .filter(t -> t.getSubscriptionEnd() != null)
                 .filter(t -> !t.getSubscriptionEnd().isBefore(now) && t.getSubscriptionEnd().isBefore(renewalWindow))
                 .count();
-        long expiredCount = allTenants.stream()
-                .filter(t -> t.getSubscriptionEnd() != null && t.getSubscriptionEnd().isBefore(now))
-                .count();
-        long noPlanCount = allTenants.stream().filter(t -> tenantPlan(planById, t) == null).count();
-
-        for (SaasPlan plan : planList) {
-            long planTenants = allTenants.stream()
-                    .filter(t -> plan.getId() != null && plan.getId().equals(t.getPlanId()))
-                    .count();
-            BigDecimal usdRevenue = allTenants.stream()
-                    .filter(t -> Tenant.TenantStatus.ACTIVE.equals(t.getStatus()))
-                    .filter(t -> plan.getId() != null && plan.getId().equals(t.getPlanId()))
-                    .map(t -> safeMoney(plan.getPriceUsd()))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            BigDecimal zwgRevenue = allTenants.stream()
-                    .filter(t -> Tenant.TenantStatus.ACTIVE.equals(t.getStatus()))
-                    .filter(t -> plan.getId() != null && plan.getId().equals(t.getPlanId()))
-                    .map(t -> safeMoney(plan.getPriceZwg()))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            planTenantCounts.put(plan.getId(), planTenants);
-            planRevenueUsd.put(plan.getId(), usdRevenue);
-            planRevenueZwg.put(plan.getId(), zwgRevenue);
-            planSharePercent.put(plan.getId(), allTenants.isEmpty() ? 0 : (int) Math.round((planTenants * 100.0) / allTenants.size()));
-            planIntelligence.put(plan.getId(), packageInsight(plan, planTenants, activeCount));
-        }
-
-        for (Tenant tenant : tenantPage.getContent()) {
-            SaasPlan plan = tenantPlan(planById, tenant);
-            tenantPlanNames.put(tenant.getId(), plan == null ? "No package" : plan.getName());
-            tenantPlanPricesUsd.put(tenant.getId(), plan == null ? BigDecimal.ZERO : safeMoney(plan.getPriceUsd()));
-            tenantPlanPricesZwg.put(tenant.getId(), plan == null ? BigDecimal.ZERO : safeMoney(plan.getPriceZwg()));
-            tenantBillingSignals.put(tenant.getId(), billingSignal(tenant, plan, now, renewalWindow));
-            tenantBillingSignalClasses.put(tenant.getId(), billingSignalClass(tenant, plan, now, renewalWindow));
-            tenantRecommendations.put(tenant.getId(), billingRecommendation(tenant, plan, now, renewalWindow));
-            tenantDaysRemaining.put(tenant.getId(), tenant.getSubscriptionEnd() == null
-                    ? null
-                    : ChronoUnit.DAYS.between(now.toLocalDate(), tenant.getSubscriptionEnd().toLocalDate()));
-        }
 
         BigDecimal monthlyRevenueUsd = allTenants.stream()
                 .filter(t -> Tenant.TenantStatus.ACTIVE.equals(t.getStatus()))
@@ -492,47 +468,51 @@ public class PlatformAdminController {
                 .filter(t -> Tenant.TenantStatus.ACTIVE.equals(t.getStatus()))
                 .map(t -> planPrice(planById, t, SaasPlan::getPriceZwg))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal averageRevenueUsd = activeCount == 0
-                ? BigDecimal.ZERO
-                : monthlyRevenueUsd.divide(BigDecimal.valueOf(activeCount), 2, java.math.RoundingMode.HALF_UP);
-        BigDecimal averageRevenueZwg = activeCount == 0
-                ? BigDecimal.ZERO
-                : monthlyRevenueZwg.divide(BigDecimal.valueOf(activeCount), 2, java.math.RoundingMode.HALF_UP);
-        long intelligenceAlerts = pendingCount + suspendedCount + expiringSoonCount + expiredCount + noPlanCount;
+        String normalizedSearch = search == null ? "" : search.trim().toLowerCase(Locale.ROOT);
+        List<SaasPlan> planList = normalizedSearch.isBlank()
+                ? allPlans
+                : allPlans.stream()
+                        .filter(plan -> containsIgnoreCase(plan.getName(), normalizedSearch)
+                                || containsIgnoreCase(plan.getCode(), normalizedSearch)
+                                || containsIgnoreCase(plan.getDescription(), normalizedSearch))
+                        .toList();
+        List<SaasPlan> retailPlans = planList.stream()
+                .filter(plan -> isExclusiveModulePlan(plan, BusinessModule.SHOP_MODULE))
+                .toList();
+        List<SaasPlan> gasPlans = planList.stream()
+                .filter(plan -> isExclusiveModulePlan(plan, BusinessModule.GAS_MODULE))
+                .toList();
+        List<SaasPlan> restaurantPlans = planList.stream()
+                .filter(plan -> isExclusiveModulePlan(plan, BusinessModule.RESTAURANT_MODULE))
+                .toList();
+        List<SaasPlan> legacyMixedPlans = planList.stream()
+                .filter(plan -> plan.allowedModuleList().size() != 1)
+                .toList();
+        Map<Long, BusinessModule> planPrimaryModules = allPlans.stream()
+                .filter(plan -> plan.getId() != null)
+                .collect(Collectors.toMap(
+                        SaasPlan::getId,
+                        plan -> plan.allowedModuleList().isEmpty()
+                                ? BusinessModule.SHOP_MODULE
+                                : plan.allowedModuleList().get(0)));
 
         model.addAttribute("plans", planList);
-        model.addAttribute("tenantOptions", allTenants);
-        model.addAttribute("subscriptionStatuses", TenantSubscription.SubscriptionStatus.values());
-        model.addAttribute("currencies", CurrencyCode.values());
-        model.addAttribute("businessModules", List.of(BusinessModule.SHOP_MODULE, BusinessModule.GAS_MODULE));
-        model.addAttribute("allTenantCount", allTenants.size());
-        model.addAttribute("activeCount", activeCount);
-        model.addAttribute("pendingCount", pendingCount);
-        model.addAttribute("suspendedCount", suspendedCount);
-        model.addAttribute("cancelledCount", cancelledCount);
+        model.addAttribute("search", search == null ? "" : search.trim());
+        model.addAttribute("retailPlans", retailPlans);
+        model.addAttribute("gasPlans", gasPlans);
+        model.addAttribute("restaurantPlans", restaurantPlans);
+        model.addAttribute("legacyMixedPlans", legacyMixedPlans);
+        model.addAttribute("planPrimaryModules", planPrimaryModules);
+        model.addAttribute("activePackageCount", allPlans.stream()
+                .filter(plan -> Boolean.TRUE.equals(plan.getIsActive()))
+                .count());
+        model.addAttribute("businessModules", List.of(
+                BusinessModule.SHOP_MODULE,
+                BusinessModule.GAS_MODULE,
+                BusinessModule.RESTAURANT_MODULE));
         model.addAttribute("expiringSoonCount", expiringSoonCount);
-        model.addAttribute("expiredCount", expiredCount);
-        model.addAttribute("noPlanCount", noPlanCount);
-        model.addAttribute("intelligenceAlerts", intelligenceAlerts);
         model.addAttribute("monthlyRevenueUsd", monthlyRevenueUsd);
         model.addAttribute("monthlyRevenueZwg", monthlyRevenueZwg);
-        model.addAttribute("averageRevenueUsd", averageRevenueUsd);
-        model.addAttribute("averageRevenueZwg", averageRevenueZwg);
-        model.addAttribute("planTenantCounts", planTenantCounts);
-        model.addAttribute("planRevenueUsd", planRevenueUsd);
-        model.addAttribute("planRevenueZwg", planRevenueZwg);
-        model.addAttribute("planSharePercent", planSharePercent);
-        model.addAttribute("planIntelligence", planIntelligence);
-        model.addAttribute("tenantPlanNames", tenantPlanNames);
-        model.addAttribute("tenantPlanPricesUsd", tenantPlanPricesUsd);
-        model.addAttribute("tenantPlanPricesZwg", tenantPlanPricesZwg);
-        model.addAttribute("tenantBillingSignals", tenantBillingSignals);
-        model.addAttribute("tenantBillingSignalClasses", tenantBillingSignalClasses);
-        model.addAttribute("tenantRecommendations", tenantRecommendations);
-        model.addAttribute("tenantDaysRemaining", tenantDaysRemaining);
-        model.addAttribute("tenants", tenantPage.getContent());
-        model.addAttribute("tenantPage", tenantPage);
-        addPaginationModel(model, "tenant", tenantPage, "/admin/subscriptions", Map.of());
         return "admin/subscriptions";
     }
 
@@ -625,6 +605,10 @@ public class PlatformAdminController {
                                 @RequestParam(defaultValue = "false") boolean allowMixedModules,
                                 @RequestParam(defaultValue = "false") boolean gasReconciliationEnabled,
                                 RedirectAttributes redirect) {
+        BusinessModule packageModule = exclusivePackageModule(allowedModules, redirect);
+        if (packageModule == null) {
+            return "redirect:/admin/subscriptions";
+        }
         if (plans.existsByCode(code)) {
             redirect.addFlashAttribute("message", "A package with code " + code + " already exists.");
             return "redirect:/admin/subscriptions";
@@ -639,8 +623,8 @@ public class PlatformAdminController {
                 .maxUsers(maxUsers)
                 .maxProducts(maxProducts)
                 .maxGasTanks(maxGasTanks)
-                .allowedModules(modulesCsv(allowedModules))
-                .allowMixedModules(allowMixedModules)
+                .allowedModules(packageModule.name())
+                .allowMixedModules(false)
                 .gasReconciliationEnabled(gasReconciliationEnabled)
                 .isActive(true)
                 .features("[]")
@@ -665,6 +649,10 @@ public class PlatformAdminController {
                               @RequestParam(defaultValue = "false") boolean gasReconciliationEnabled,
                               @RequestParam(defaultValue = "false") boolean isActive,
                               RedirectAttributes redirect) {
+        BusinessModule packageModule = exclusivePackageModule(allowedModules, redirect);
+        if (packageModule == null) {
+            return "redirect:/admin/subscriptions";
+        }
         SaasPlan plan = plans.findById(id).orElseThrow(() -> new IllegalArgumentException("Package not found."));
         boolean duplicateCode = plans.findByCode(code.toUpperCase())
                 .filter(existing -> !existing.getId().equals(id))
@@ -682,14 +670,32 @@ public class PlatformAdminController {
         plan.setMaxUsers(maxUsers);
         plan.setMaxProducts(maxProducts);
         plan.setMaxGasTanks(maxGasTanks);
-        plan.setAllowedModules(modulesCsv(allowedModules));
-        plan.setAllowMixedModules(allowMixedModules);
+        plan.setAllowedModules(packageModule.name());
+        plan.setAllowMixedModules(false);
         plan.setGasReconciliationEnabled(gasReconciliationEnabled);
         plan.setIsActive(isActive);
         plans.save(plan);
         packageModuleAccess.reconcileTenantsOnPlan(plan.getId());
         redirect.addFlashAttribute("message", "Package updated.");
         return "redirect:/admin/subscriptions";
+    }
+
+    private boolean isExclusiveModulePlan(SaasPlan plan, BusinessModule module) {
+        List<BusinessModule> modules = plan.allowedModuleList();
+        return modules.size() == 1 && modules.contains(module);
+    }
+
+    private BusinessModule exclusivePackageModule(List<BusinessModule> modules,
+                                                  RedirectAttributes redirect) {
+        List<BusinessModule> selected = modules == null
+                ? List.of()
+                : modules.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        if (selected.size() != 1) {
+            redirect.addFlashAttribute("message",
+                    "Choose exactly one business module. Retail, Gas, and Restaurant packages must remain separate.");
+            return null;
+        }
+        return selected.get(0);
     }
 
     private void addNavigationModel(Model model) {

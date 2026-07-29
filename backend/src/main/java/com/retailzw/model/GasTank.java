@@ -79,4 +79,12 @@ public class GasTank {
         return (tareWeightKg == null ? BigDecimal.ZERO : tareWeightKg)
                 .add(currentKg == null ? BigDecimal.ZERO : currentKg);
     }
+
+    @Transient
+    public BigDecimal getNetCapacityKg() {
+        if (fullGrossWeightKg != null && tareWeightKg != null) {
+            return fullGrossWeightKg.subtract(tareWeightKg).max(BigDecimal.ZERO);
+        }
+        return capacityKg == null ? BigDecimal.ZERO : capacityKg.max(BigDecimal.ZERO);
+    }
 }

@@ -95,15 +95,22 @@
             <span>Your session stays inside the authenticated RetailZW dashboard.</span>
           </div>
 
-          <section class="checkout-recheck" th:if="${checkout.status.name() == 'FAILED'}">
+          <section class="checkout-recheck"
+                   th:if="${checkout.status.name() == 'FAILED' or checkout.status.name() == 'CANCELLED'}">
             <div>
               <i class="fa-solid fa-triangle-exclamation"></i>
-              <span><strong>Payment not confirmed</strong><small>Check status before trying again.</small></span>
+              <span><strong>Payment attempt closed</strong><small>A retry will use a new secure order reference.</small></span>
             </div>
-            <a class="btn btn-light"
-               th:href="@{/shop/billing/renew/{ref}/recheck(ref=${checkout.orderReference})}">
-              Check payment status
-            </a>
+            <div class="checkout-retry-actions">
+              <a class="btn btn-light"
+                 th:if="${checkout.status.name() == 'FAILED'}"
+                 th:href="@{/shop/billing/renew/{ref}/recheck(ref=${checkout.orderReference})}">
+                Check status
+              </a>
+              <form method="post" th:action="@{/shop/billing/renew/{ref}/restart(ref=${checkout.orderReference})}">
+                <button class="btn btn-primary" type="submit"><i class="fa-solid fa-rotate-right"></i>Start new attempt</button>
+              </form>
+            </div>
           </section>
 
           <section class="payment-complete" th:if="${checkout.status.name() == 'PAID'}">
@@ -124,7 +131,7 @@
           </section>
 
           <form class="express-payment-form"
-                th:if="${checkout.status.name() != 'PAID' and checkout.status.name() != 'PROCESSING' and checkout.status.name() != 'AWAITING_OTP'}"
+                th:if="${checkout.status.name() == 'PENDING'}"
                 method="post"
                 th:action="@{/shop/billing/renew/{ref}/initiate(ref=${checkout.orderReference})}"
                 data-express-payment-form>

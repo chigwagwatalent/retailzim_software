@@ -32,9 +32,10 @@ class GasPosState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> login(String username, String password) async {
+  Future<void> login(String username, String password,
+      {bool rememberMe = true}) async {
     await _run(() async {
-      user = await api.login(username, password);
+      user = await api.login(username, password, rememberMe: rememberMe);
       await refresh();
     });
   }

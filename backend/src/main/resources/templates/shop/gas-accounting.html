@@ -6,22 +6,214 @@
   <aside th:replace="~{common/layout :: shopSidebar('gas-accounting')}"></aside>
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Gas Accounting')}"></nav>
-    <section class="page-hero"><div class="hero-title"><div class="hero-icon"><i class="fa-solid fa-chart-line"></i></div><div><p>LPG profit view,</p><h1>Gas Accounting</h1></div></div></section>
-    <div class="page-toolbar"><form method="get" th:action="@{/shop/gas/accounting}" class="inline-form"><select name="branchId" onchange="this.form.submit()"><option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option></select></form></div>
-    <section class="metric-grid">
-      <div class="metric-card metric-blue"><span>USD Sales</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.revenueUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Today</small></div>
-      <div class="metric-card metric-orange"><span>USD Stock Cost</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.restockCostUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Today</small></div>
-      <div class="metric-card metric-red"><span>USD Expenses</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.expensesUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Today</small></div>
-      <div class="metric-card metric-green"><span>USD Margin</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.marginUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Sales less stock cost and expenses</small></div>
-      <div class="metric-card metric-blue"><span>ZWG Sales</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.revenueZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Today</small></div>
-      <div class="metric-card metric-orange"><span>ZWG Stock Cost</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.restockCostZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Today</small></div>
-      <div class="metric-card metric-red"><span>ZWG Expenses</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.expensesZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Today</small></div>
-      <div class="metric-card metric-green"><span>ZWG Margin</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.marginZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Sales less stock cost and expenses</small></div>
-    </section>
-    <section class="grid two-col">
-      <div class="panel table-panel"><div class="toolbar"><h2>Gas Shifts</h2><span class="badge" th:text="${#lists.size(gasShifts) + ' shifts'}">0 shifts</span></div><table><thead><tr><th>Shift</th><th>Status</th><th>Kg</th><th>USD</th><th>ZWG</th></tr></thead><tbody><tr th:each="s : ${gasShifts}"><td><strong th:text="${s.shiftNumber}">Shift</strong><small th:text="${s.openedAt != null ? #temporals.format(s.openedAt, 'dd MMM HH:mm') : ''}">Date</small></td><td><span class="badge" th:text="${s.status}">OPEN</span></td><td th:text="${s.totalKgSold + ' kg'}">0 kg</td><td th:text="${'USD ' + #numbers.formatDecimal(s.totalUsd, 1, 2)}">USD 0</td><td th:text="${'ZWG ' + #numbers.formatDecimal(s.totalZwg, 1, 2)}">ZWG 0</td></tr></tbody></table></div>
-      <div class="panel table-panel"><div class="toolbar"><h2>Stock Position</h2><span class="badge" th:text="${gasTotalKg + ' kg'}">0 kg</span></div><table><thead><tr><th>Tank</th><th>On Hand</th><th>Capacity</th><th>Reorder</th></tr></thead><tbody><tr th:each="t : ${gasTanks}"><td><strong th:text="${t.name}">Tank</strong></td><td th:text="${t.currentKg + ' kg'}">0 kg</td><td th:text="${t.capacityKg + ' kg'}">0 kg</td><td th:text="${t.reorderLevelKg + ' kg'}">0 kg</td></tr></tbody></table></div>
-    </section>
+
+    <div class="gas-accounting-page">
+      <header class="gas-accounting-titlebar">
+        <div class="gas-accounting-title">
+          <span><i class="fa-solid fa-chart-line"></i></span>
+          <div>
+            <p>LPG financial control</p>
+            <h1>Gas Accounting</h1>
+            <small>Revenue, costs, margins and shift reconciliation</small>
+          </div>
+        </div>
+        <div class="gas-accounting-header-actions">
+          <form method="get" th:action="@{/shop/gas/accounting}" class="gas-accounting-branch-form">
+            <label for="gas-accounting-branch"><i class="fa-solid fa-building-columns"></i><span class="sr-only">Branch</span></label>
+            <select id="gas-accounting-branch" name="branchId" onchange="this.form.submit()">
+              <option th:each="branch : ${gasBranches}"
+                      th:value="${branch.id}"
+                      th:text="${branch.name}"
+                      th:selected="${branch.id == gasBranchId}">Gas Branch</option>
+            </select>
+          </form>
+          <span class="gas-accounting-period"><i class="fa-regular fa-calendar"></i>Today</span>
+          <button class="btn btn-light gas-accounting-export" type="button" onclick="window.print()">
+            <i class="fa-solid fa-download"></i>Export report
+          </button>
+        </div>
+      </header>
+
+      <section class="gas-accounting-kpis" aria-label="USD performance today">
+        <article class="revenue">
+          <span><i class="fa-solid fa-dollar-sign"></i></span>
+          <div>
+            <small>Gross revenue</small>
+            <strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.revenueUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong>
+            <em><i class="fa-solid fa-circle-check"></i>Confirmed gas sales today</em>
+          </div>
+        </article>
+        <article class="stock-cost">
+          <span><i class="fa-solid fa-layer-group"></i></span>
+          <div>
+            <small>Stock cost</small>
+            <strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.restockCostUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong>
+            <em><i class="fa-solid fa-truck-droplet"></i>Deliveries received today</em>
+          </div>
+        </article>
+        <article class="expenses">
+          <span><i class="fa-solid fa-receipt"></i></span>
+          <div>
+            <small>Operating expenses</small>
+            <strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.expensesUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong>
+            <em><i class="fa-solid fa-file-circle-check"></i>Recorded operating costs</em>
+          </div>
+        </article>
+        <article th:classappend="${gasDashboard != null and gasDashboard.marginUsdToday.signum() < 0 ? ' negative' : ''}" class="net-margin">
+          <span><i class="fa-solid fa-arrow-trend-up"></i></span>
+          <div>
+            <small>Net margin</small>
+            <strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.marginUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong>
+            <em><b th:text="${#numbers.formatDecimal(gasMarginPercentUsd, 1, 1) + '%'}">0.0%</b> of revenue retained</em>
+          </div>
+        </article>
+      </section>
+
+      <section class="gas-accounting-zwg" aria-label="ZWG activity today">
+        <strong>ZWG activity</strong>
+        <dl>
+          <div><dt>Revenue</dt><dd th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.revenueZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</dd></div>
+          <div><dt>Stock cost</dt><dd th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.restockCostZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</dd></div>
+          <div><dt>Expenses</dt><dd th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.expensesZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</dd></div>
+          <div class="net"><dt>Net</dt><dd th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.marginZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</dd></div>
+        </dl>
+      </section>
+
+      <section class="gas-accounting-analysis">
+        <article class="panel gas-revenue-trend">
+          <header>
+            <div>
+              <h2>Revenue trend</h2>
+              <p>Confirmed USD sales by hour</p>
+            </div>
+            <span><i class="fa-solid fa-chart-simple"></i>Today · hourly</span>
+          </header>
+          <div class="gas-revenue-chart" th:if="${gasAccountingHours != null and !#lists.isEmpty(gasAccountingHours)}">
+            <div class="gas-revenue-axis" aria-hidden="true"><span>Peak</span><span>50%</span><span>0</span></div>
+            <div class="gas-revenue-bars">
+              <article th:each="hour : ${gasAccountingHours}"
+                       th:title="${hour.label + ' · USD ' + #numbers.formatDecimal(hour.revenueUsd, 1, 2)}"
+                       th:classappend="${hour.hasRevenue ? ' has-revenue' : ''}">
+                <strong th:if="${hour.hasRevenue}" th:text="${#numbers.formatDecimal(hour.revenueUsd, 1, 0)}">0</strong>
+                <span><i th:style="${'height:' + hour.heightPercent + '%'}"></i></span>
+                <small th:text="${hour.label.substring(0, 2)}">00</small>
+              </article>
+            </div>
+          </div>
+          <div class="gas-accounting-empty-chart" th:if="${gasAccountingHours == null or #lists.isEmpty(gasAccountingHours)}">
+            <i class="fa-solid fa-chart-column"></i>
+            <p>No confirmed sales have been recorded for this period.</p>
+          </div>
+        </article>
+
+        <article class="panel gas-profit-bridge">
+          <header>
+            <div>
+              <h2>Today's profit bridge</h2>
+              <p>How revenue becomes net margin</p>
+            </div>
+            <span th:classappend="${gasDashboard != null and gasDashboard.marginUsdToday.signum() < 0 ? ' negative' : ''}"
+                  th:text="${#numbers.formatDecimal(gasMarginPercentUsd, 1, 1) + '% margin'}">0.0% margin</span>
+          </header>
+          <div class="gas-profit-equation">
+            <div class="revenue"><small>Gross revenue</small><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.revenueUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong></div>
+            <i class="fa-solid fa-minus"></i>
+            <div class="cost"><small>Stock cost</small><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.restockCostUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong></div>
+            <i class="fa-solid fa-minus"></i>
+            <div class="expense"><small>Expenses</small><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.expensesUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong></div>
+            <i class="fa-solid fa-equals"></i>
+            <div class="margin"><small>Net margin</small><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.marginUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong></div>
+          </div>
+          <div class="gas-cost-breakdown">
+            <div class="gas-cost-donut"
+                 th:classappend="${gasAccountingCostTotalUsd.signum() == 0 ? ' empty' : ''}"
+                 th:style="${'--expense-share:' + gasExpenseShareUsd + '%'}">
+              <span><small>Total costs</small><strong th:text="${'USD ' + #numbers.formatDecimal(gasAccountingCostTotalUsd, 1, 2)}">USD 0.00</strong></span>
+            </div>
+            <dl>
+              <div><dt><i class="expense"></i>Operating expenses</dt><dd th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.expensesUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</dd></div>
+              <div><dt><i class="stock"></i>Stock cost</dt><dd th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.restockCostUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</dd></div>
+            </dl>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel gas-shift-performance">
+        <header class="gas-shift-performance-head">
+          <div>
+            <h2>Shift performance</h2>
+            <p>Sales, LPG movement and closing variances by cashier shift</p>
+          </div>
+          <span th:text="${gasShiftPage.totalElements + ' shifts'}">0 shifts</span>
+        </header>
+
+        <form class="gas-shift-filters" method="get" th:action="@{/shop/gas/accounting}">
+          <input type="hidden" name="branchId" th:value="${gasBranchId}">
+          <input type="hidden" name="shiftSize" th:value="${gasShiftPage.size}">
+          <label>
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" name="shiftQuery" th:value="${gasShiftQuery}" placeholder="Search shift ID" aria-label="Search shift ID">
+          </label>
+          <select name="shiftStatus" aria-label="Filter by shift status">
+            <option value="">All statuses</option>
+            <option th:each="status : ${gasShiftStatuses}"
+                    th:value="${status}"
+                    th:text="${#strings.capitalize(#strings.toLowerCase(status.name()))}"
+                    th:selected="${status == gasShiftStatus}">Closed</option>
+          </select>
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+          <a class="btn btn-light" th:href="@{/shop/gas/accounting(branchId=${gasBranchId})}"
+             th:if="${!#strings.isEmpty(gasShiftQuery) or gasShiftStatus != null}">Reset</a>
+        </form>
+
+        <div class="gas-shift-table-wrap">
+          <table>
+            <thead>
+            <tr>
+              <th>Shift</th>
+              <th>Closed at</th>
+              <th>Status</th>
+              <th class="numeric">LPG sold</th>
+              <th class="numeric">Transactions</th>
+              <th class="numeric">USD revenue</th>
+              <th class="numeric">ZWG revenue</th>
+              <th class="numeric">Variance</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="shift : ${gasShifts}">
+              <td><strong th:text="${shift.shiftNumber}">Shift</strong><small th:text="${shift.openedAt != null ? 'Opened ' + #temporals.format(shift.openedAt, 'dd MMM HH:mm') : ''}">Opened</small></td>
+              <td th:text="${shift.closedAt != null ? #temporals.format(shift.closedAt, 'dd MMM HH:mm') : 'In progress'}">In progress</td>
+              <td><span th:class="${shift.status.name() == 'OPEN' ? 'gas-shift-status open' : 'gas-shift-status closed'}" th:text="${shift.status}">CLOSED</span></td>
+              <td class="numeric" th:text="${#numbers.formatDecimal(shift.totalKgSold, 1, 3) + ' kg'}">0.000 kg</td>
+              <td class="numeric" th:text="${shift.totalTransactions != null ? shift.totalTransactions : 0}">0</td>
+              <td class="numeric" th:text="${'USD ' + #numbers.formatDecimal(shift.totalUsd, 1, 2)}">USD 0.00</td>
+              <td class="numeric" th:text="${'ZWG ' + #numbers.formatDecimal(shift.totalZwg, 1, 2)}">ZWG 0.00</td>
+              <td class="numeric" th:classappend="${shift.closingVarianceKg != null and shift.closingVarianceKg.signum() != 0 ? ' has-variance' : ''}"
+                  th:text="${shift.closingVarianceKg != null ? #numbers.formatDecimal(shift.closingVarianceKg, 1, 3) + ' kg' : '—'}">—</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(gasShifts)}">
+              <td colspan="8" class="gas-shift-empty">
+                <i class="fa-regular fa-folder-open"></i>
+                <strong>No shifts found</strong>
+                <span>Try changing the shift ID or status filter.</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="gas-shift-pagination">
+          <span th:text="${'Showing ' + gasShiftPageFrom + '–' + gasShiftPageTo + ' of ' + gasShiftPage.totalElements}">Showing 0–0 of 0</span>
+          <nav aria-label="Shift pagination">
+            <a th:href="${gasShiftPrevUrl ?: '#'}" th:classappend="${gasShiftPrevUrl == null ? ' disabled' : ''}"><i class="fa-solid fa-chevron-left"></i>Previous</a>
+            <a th:each="link : ${gasShiftPageLinks}" th:href="${link.url}" th:text="${link.label}" th:classappend="${link.active ? ' active' : ''}">1</a>
+            <span class="active" th:if="${#lists.isEmpty(gasShiftPageLinks)}">1</span>
+            <a th:href="${gasShiftNextUrl ?: '#'}" th:classappend="${gasShiftNextUrl == null ? ' disabled' : ''}">Next<i class="fa-solid fa-chevron-right"></i></a>
+          </nav>
+        </footer>
+      </section>
+    </div>
   </main>
 </div>
 </body>

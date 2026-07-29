@@ -266,13 +266,49 @@ public class SmilePayCheckoutService {
     }
 
     @Transactional
+    public SmilePayCheckout prepareSignupPaymentAttempt(String accessToken) {
+        SmilePayCheckout checkout = checkouts.findByAccessToken(accessToken)
+                .orElseThrow(() -> new IllegalArgumentException("Checkout not found."));
+        checkout = checkouts.findLockedByOrderReference(checkout.getOrderReference())
+                .orElseThrow(() -> new IllegalArgumentException("Checkout not found."));
+        requirePurpose(checkout, SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION);
+        if (!makeTerminalIfExpired(checkout)) {
+            return checkout;
+        }
+        return createSignupCheckout(checkout.getTenantId(), checkout.getPlanId());
+    }
+
+    @Transactional
+    public SmilePayCheckout prepareRenewalPaymentAttempt(
+            String orderReference,
+            Long tenantId,
+            Long createdByUserId) {
+        SmilePayCheckout checkout = checkouts.findLockedByOrderReference(orderReference)
+                .orElseThrow(() -> new IllegalArgumentException("Checkout not found."));
+        requireTenant(checkout, tenantId);
+        if (SmilePayCheckout.CheckoutPurpose.SIGNUP_ACTIVATION.equals(checkout.getCheckoutPurpose())) {
+            throw new IllegalArgumentException("This is an account activation checkout.");
+        }
+        if (!makeTerminalIfExpired(checkout)) {
+            return checkout;
+        }
+        int billingMonths = checkout.getBillingMonths() == null ? 1 : checkout.getBillingMonths();
+        return createRenewalCheckout(
+                checkout.getTenantId(),
+                checkout.getPlanId(),
+                billingMonths,
+                createdByUserId);
+    }
+
+    @Transactional
     public ExpressResult initiateExpress(
             String orderReference,
             SmilePayCheckout.PaymentMethod method,
             String mobile,
             Map<String, String> card) {
         requireConfigured();
-        SmilePayCheckout checkout = checkout(orderReference);
+        SmilePayCheckout checkout = checkouts.findLockedByOrderReference(orderReference)
+                .orElseThrow(() -> new IllegalArgumentException("Checkout not found."));
         ensurePayable(checkout);
         Tenant tenant = tenants.findById(checkout.getTenantId()).orElseThrow();
         SaasPlan plan = plans.findById(checkout.getPlanId()).orElseThrow();
@@ -302,7 +338,14 @@ public class SmilePayCheckoutService {
             response = post("/payments/express-checkout/" + method.getEndpoint(), payload);
         } catch (ProviderRequestException ex) {
             if (!ex.retryable()) {
-                throw ex;
+                checkout.setRawResponse(ex.safeResponse());
+                checkout.setProviderStatus("INITIATION_FAILED");
+                checkout.setStatus(SmilePayCheckout.CheckoutStatus.FAILED);
+                checkout.setNextCheckAt(null);
+                SmilePayCheckout saved = checkouts.save(checkout);
+                log.warn("Smile & Pay initiation rejected order={} method={} status={}",
+                        orderReference, method, ex.statusCode());
+                return new ExpressResult(saved, null, false, ex.getMessage());
             }
             checkout.setRawResponse(ex.safeResponse());
             checkout.setProviderStatus(INITIATION_PENDING);
@@ -692,14 +735,43 @@ public class SmilePayCheckoutService {
         if (SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus())) {
             throw new IllegalStateException("This subscription has already been paid.");
         }
+        if (SmilePayCheckout.CheckoutStatus.FAILED.equals(checkout.getStatus())) {
+            throw new IllegalStateException("This payment attempt failed. Start a new payment attempt.");
+        }
         if (SmilePayCheckout.CheckoutStatus.CANCELLED.equals(checkout.getStatus())) {
             throw new IllegalStateException("This checkout was cancelled. Start a new payment.");
+        }
+        if (SmilePayCheckout.CheckoutStatus.AWAITING_OTP.equals(checkout.getStatus())) {
+            throw new IllegalStateException("This payment is waiting for its OTP confirmation.");
+        }
+        if (SmilePayCheckout.CheckoutStatus.PROCESSING.equals(checkout.getStatus())
+                || checkout.getInitiatedAt() != null) {
+            throw new IllegalStateException(
+                    "This payment is already being confirmed. Check its status before retrying.");
         }
         if (checkout.getExpiresAt() != null && checkout.getExpiresAt().isBefore(LocalDateTime.now())) {
             checkout.setStatus(SmilePayCheckout.CheckoutStatus.CANCELLED);
             checkouts.save(checkout);
             throw new IllegalStateException("This checkout link has expired. Start a new payment.");
         }
+    }
+
+    private boolean makeTerminalIfExpired(SmilePayCheckout checkout) {
+        if (SmilePayCheckout.CheckoutStatus.PAID.equals(checkout.getStatus())) {
+            throw new IllegalStateException("This subscription has already been paid.");
+        }
+        boolean expired = checkout.getExpiresAt() != null
+                && !checkout.getExpiresAt().isAfter(LocalDateTime.now());
+        if (expired
+                && !SmilePayCheckout.CheckoutStatus.FAILED.equals(checkout.getStatus())
+                && !SmilePayCheckout.CheckoutStatus.CANCELLED.equals(checkout.getStatus())) {
+            checkout.setStatus(SmilePayCheckout.CheckoutStatus.CANCELLED);
+            checkout.setNextCheckAt(null);
+            checkouts.save(checkout);
+        }
+        return expired
+                || SmilePayCheckout.CheckoutStatus.FAILED.equals(checkout.getStatus())
+                || SmilePayCheckout.CheckoutStatus.CANCELLED.equals(checkout.getStatus());
     }
 
     @Transactional(readOnly = true)

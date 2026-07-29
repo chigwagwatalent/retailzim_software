@@ -72,7 +72,11 @@
               <td>
                 <span class="shop-table-name"><b th:text="${#strings.substring(t.companyName, 0, 1)}">S</b><span><strong th:text="${t.companyName}">Shop</strong><small class="table-muted" th:text="${t.tenantCode + ' · ' + t.email}">Code</small></span></span>
               </td>
-              <td><strong th:text="${tenantPlanNames.get(t.id)}">Plan</strong><small class="table-muted" th:text="${t.subscriptionEnd != null ? 'Renews ' + #temporals.format(t.subscriptionEnd, 'dd MMM yyyy') : 'No renewal date'}">Renews</small></td>
+              <td>
+                <strong th:text="${tenantPlanNames.get(t.id)}">Plan</strong>
+                <small class="table-muted" th:text="${t.subscriptionStart != null ? 'Starts ' + #temporals.format(t.subscriptionStart, 'dd MMM yyyy') : 'Start date not set'}">Starts</small>
+                <small class="table-muted" th:text="${t.subscriptionEnd != null ? 'Renews ' + #temporals.format(t.subscriptionEnd, 'dd MMM yyyy') : 'Renewal date not set'}">Renews</small>
+              </td>
               <td>
                 <strong th:text="${tenantBranchCounts.get(t.id) + (tenantBranchCounts.get(t.id) == 1 ? ' branch' : ' branches')}">0 branches</strong>
                 <small class="table-muted" th:text="${tenantUserCounts.get(t.id) + ' users · ' + tenantProductCounts.get(t.id) + ' products'}">0 users</small>
@@ -85,6 +89,7 @@
                   <div>
                     <a th:href="@{/admin/tenants/{id}(id=${t.id})}"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open workspace</a>
                     <a th:href="${'#modal-tenant-' + t.id}"><i class="fa-solid fa-pen"></i>Edit details</a>
+                    <a th:href="${'#modal-billing-' + t.id}"><i class="fa-regular fa-calendar-days"></i>Edit billing period</a>
                     <form th:action="@{'/admin/tenants/' + ${t.id} + '/activate'}" method="post"><button type="submit"><i class="fa-solid fa-circle-check"></i>Activate shop</button></form>
                     <form th:action="@{'/admin/tenants/' + ${t.id} + '/suspend'}" method="post"><button class="danger-link" type="submit"><i class="fa-solid fa-circle-pause"></i>Suspend shop</button></form>
                   </div>
@@ -171,6 +176,29 @@
         <label>VAT<input name="vatNumber" th:value="${t.vatNumber}"></label>
         <label style="grid-column:1/-1">Address<textarea name="address" th:text="${t.address}"></textarea></label>
         <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Shop</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="t : ${tenants}" th:id="${'modal-billing-' + t.id}" class="modal"><div class="modal-content billing-period-modal">
+      <div class="modal-head">
+        <div><p class="eyebrow">Subscription schedule</p><h2>Edit Billing Period</h2></div>
+        <a class="close" href="#">&times;</a>
+      </div>
+      <div class="billing-modal-shop">
+        <span><i class="fa-solid fa-store"></i></span>
+        <div><strong th:text="${t.companyName}">Shop</strong><small th:text="${t.tenantCode + ' · ' + tenantPlanNames.get(t.id)}">CODE · Package</small></div>
+      </div>
+      <form method="post" th:action="@{/admin/tenants/{id}/billing-period(id=${t.id})}" class="form-grid billing-period-form">
+        <label>Billing starts
+          <input name="startsOn" type="date" required th:value="${t.subscriptionStart != null ? #temporals.format(t.subscriptionStart, 'yyyy-MM-dd') : ''}">
+          <small>The first day covered by this billing period.</small>
+        </label>
+        <label>Access valid until
+          <input name="endsOn" type="date" required th:value="${t.subscriptionEnd != null ? #temporals.format(t.subscriptionEnd, 'yyyy-MM-dd') : ''}">
+          <small>The final day before the next renewal is required.</small>
+        </label>
+        <div class="billing-period-note form-full"><i class="fa-solid fa-circle-info"></i><span>This updates the shop access dates and its current active subscription record. It does not record a payment.</span></div>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit"><i class="fa-regular fa-calendar-check"></i>Update Billing Period</button></div>
       </form>
     </div></div>
   </main>

@@ -4,6 +4,7 @@ import com.retailzw.enums.CurrencyCode;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
@@ -12,9 +13,11 @@ public class GasExpenseRequest {
     private Long branchId;
 
     @NotBlank(message = "Expense category is required")
+    @Size(max = 80, message = "Expense category must be 80 characters or fewer")
     private String category;
 
     @NotBlank(message = "Expense description is required")
+    @Size(max = 255, message = "Expense description must be 255 characters or fewer")
     private String description;
 
     @NotNull(message = "Amount is required")
@@ -24,7 +27,10 @@ public class GasExpenseRequest {
     @NotNull(message = "Currency is required")
     private CurrencyCode currency = CurrencyCode.USD;
 
+    @Size(max = 30, message = "Payment method must be 30 characters or fewer")
     private String paymentMethod = "CASH";
+
+    @Size(max = 120, message = "Reference must be 120 characters or fewer")
     private String reference;
 
     public Long getBranchId() { return branchId; }

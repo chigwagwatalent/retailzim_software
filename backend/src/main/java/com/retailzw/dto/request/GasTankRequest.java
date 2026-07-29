@@ -20,14 +20,25 @@ public class GasTankRequest {
     @DecimalMin(value = "0.000", message = "Empty/tare weight cannot be negative")
     private BigDecimal tareWeightKg;
 
+    /**
+     * Legacy API input. Capacity is now derived from full gross minus tare.
+     * When supplied it must match the derived value.
+     */
     @DecimalMin(value = "0.000", message = "Capacity cannot be negative")
     private BigDecimal capacityKg;
 
     @DecimalMin(value = "0.000", message = "Full gross weight cannot be negative")
     private BigDecimal fullGrossWeightKg;
 
+    /**
+     * Legacy API input containing net LPG. New clients must submit
+     * currentGrossWeightKg so stock is derived from a physical measurement.
+     */
     @DecimalMin(value = "0.000", message = "Current quantity cannot be negative")
     private BigDecimal currentKg;
+
+    @DecimalMin(value = "0.000", message = "Current gross weight cannot be negative")
+    private BigDecimal currentGrossWeightKg;
 
     @DecimalMin(value = "0.000", message = "Reorder level cannot be negative")
     private BigDecimal reorderLevelKg;
@@ -48,6 +59,10 @@ public class GasTankRequest {
     public void setFullGrossWeightKg(BigDecimal fullGrossWeightKg) { this.fullGrossWeightKg = fullGrossWeightKg; }
     public BigDecimal getCurrentKg() { return currentKg; }
     public void setCurrentKg(BigDecimal currentKg) { this.currentKg = currentKg; }
+    public BigDecimal getCurrentGrossWeightKg() { return currentGrossWeightKg; }
+    public void setCurrentGrossWeightKg(BigDecimal currentGrossWeightKg) {
+        this.currentGrossWeightKg = currentGrossWeightKg;
+    }
     public BigDecimal getReorderLevelKg() { return reorderLevelKg; }
     public void setReorderLevelKg(BigDecimal reorderLevelKg) { this.reorderLevelKg = reorderLevelKg; }
     public GasTankStatus getStatus() { return status; }

@@ -49,8 +49,10 @@ public class SmilePayCheckoutController {
             @RequestParam(required = false) String expYear,
             @RequestParam(required = false) String securityCode,
             RedirectAttributes redirect) {
+        String redirectToken = accessToken;
         try {
-            SmilePayCheckout checkout = checkoutService.requireSignupCheckout(accessToken);
+            SmilePayCheckout checkout = checkoutService.prepareSignupPaymentAttempt(accessToken);
+            redirectToken = checkout.getAccessToken();
             String orderReference = checkout.getOrderReference();
             Map<String, String> card = new LinkedHashMap<>();
             card.put("firstName", firstName);
@@ -65,16 +67,34 @@ public class SmilePayCheckoutController {
                         .contentType(MediaType.TEXT_HTML)
                         .body(result.redirectHtml());
             }
+            if (SmilePayCheckout.CheckoutStatus.FAILED.equals(result.checkout().getStatus())) {
+                redirect.addFlashAttribute("message", result.message());
+                return "redirect:/checkout/smilepay/" + redirectToken;
+            }
             if (result.requiresOtp()) {
                 redirect.addFlashAttribute("message",
                         result.message() == null ? "Enter the OTP sent to your phone." : result.message());
-                return "redirect:/checkout/smilepay/" + accessToken + "?otp=true";
+                return "redirect:/checkout/smilepay/" + redirectToken + "?otp=true";
             }
             redirect.addFlashAttribute("message",
                     result.message() == null
                             ? "Payment started. Approve it and keep this page open."
                             : result.message());
-            return "redirect:/checkout/smilepay/" + accessToken + "?pending=true";
+            return "redirect:/checkout/smilepay/" + redirectToken + "?pending=true";
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+            return "redirect:/checkout/smilepay/" + redirectToken;
+        }
+    }
+
+    @PostMapping("/checkout/smilepay/{accessToken}/restart")
+    public String restart(
+            @PathVariable String accessToken,
+            RedirectAttributes redirect) {
+        try {
+            SmilePayCheckout checkout = checkoutService.prepareSignupPaymentAttempt(accessToken);
+            redirect.addFlashAttribute("message", "New payment attempt created. Choose a payment method.");
+            return "redirect:/checkout/smilepay/" + checkout.getAccessToken();
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
             return "redirect:/checkout/smilepay/" + accessToken;

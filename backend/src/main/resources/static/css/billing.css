@@ -252,6 +252,21 @@
   color: #7b6841;
 }
 
+.checkout-retry-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.checkout-retry-actions form {
+  margin: 0;
+}
+
+.checkout-retry-actions .btn {
+  white-space: nowrap;
+}
+
 .checkout-summary {
   display: flex;
   flex-direction: column;
@@ -636,6 +651,16 @@
   .checkout-recheck {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .checkout-retry-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .checkout-retry-actions .btn {
+    justify-content: center;
+    width: 100%;
   }
   .payment-method-grid,
   .card-fields .form-grid { grid-template-columns: 1fr; }

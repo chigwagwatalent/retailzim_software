@@ -6,46 +6,327 @@
   <aside th:replace="~{common/layout :: shopSidebar('gas-expenses')}"></aside>
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Gas Expenses')}"></nav>
-    <section class="page-hero">
-      <div class="hero-title"><div class="hero-icon"><i class="fa-solid fa-receipt"></i></div><div><p>LPG cost control,</p><h1>Gas Expenses</h1></div></div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-dollar-sign"></i><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.expensesUsdToday, 1, 2) : '0.00'}">0.00</strong><span>USD today</span></div>
-        <div><i class="fa-solid fa-money-bill"></i><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.expensesZwgToday, 1, 2) : '0.00'}">0.00</strong><span>ZWG today</span></div>
-      </div>
-    </section>
-    <div class="page-toolbar">
-      <form method="get" th:action="@{/shop/gas/expenses}" class="inline-form"><select name="branchId" onchange="this.form.submit()"><option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option></select></form>
-      <a class="btn btn-primary" href="#modal-gas-expense"><i class="fa-solid fa-plus"></i>Add Expense</a>
+
+    <div class="gas-expenses-page">
+      <header class="gas-expenses-titlebar">
+        <div class="gas-expenses-title">
+          <span><i class="fa-solid fa-receipt"></i></span>
+          <div>
+            <p>LPG cost control</p>
+            <h1>Gas Expenses</h1>
+            <small>Track operating costs and supporting references</small>
+          </div>
+        </div>
+        <div class="gas-expenses-header-actions">
+          <form method="get" th:action="@{/shop/gas/expenses}" class="gas-expenses-branch-form">
+            <input type="hidden" name="expensePeriod" th:value="${gasExpensePeriod}">
+            <label for="gas-expense-branch"><i class="fa-solid fa-building-columns"></i><span class="sr-only">Branch</span></label>
+            <select id="gas-expense-branch" name="branchId" onchange="this.form.submit()">
+              <option th:each="branch : ${gasBranches}"
+                      th:value="${branch.id}"
+                      th:text="${branch.name}"
+                      th:selected="${branch.id == gasBranchId}">Gas Branch</option>
+            </select>
+          </form>
+          <form method="get" th:action="@{/shop/gas/expenses}" class="gas-expenses-period-form">
+            <input type="hidden" name="branchId" th:value="${gasBranchId}">
+            <label for="gas-expense-period"><i class="fa-regular fa-calendar"></i><span class="sr-only">Reporting period</span></label>
+            <select id="gas-expense-period" name="expensePeriod" onchange="this.form.submit()">
+              <option value="today" th:selected="${gasExpensePeriod == 'today'}">Today</option>
+              <option value="7days" th:selected="${gasExpensePeriod == '7days'}">Last 7 days</option>
+              <option value="month" th:selected="${gasExpensePeriod == 'month'}">This month</option>
+            </select>
+          </form>
+          <a class="btn btn-light gas-expenses-export"
+             th:href="@{/shop/gas/expenses/export(
+               branchId=${gasBranchId},
+               expensePeriod=${gasExpensePeriod},
+               expenseQuery=${gasExpenseQuery},
+               expenseCategory=${gasExpenseCategory},
+               expensePayment=${gasExpensePayment})}">
+            <i class="fa-solid fa-download"></i>Export
+          </a>
+          <a class="btn btn-primary gas-expenses-record" href="#modal-gas-expense">
+            <i class="fa-solid fa-plus"></i>Record expense
+          </a>
+        </div>
+      </header>
+
+      <div th:if="${message}" class="alert gas-expenses-alert" th:text="${message}"></div>
+
+      <section class="gas-expenses-kpis" aria-label="Expense summary">
+        <article class="today">
+          <span><i class="fa-solid fa-receipt"></i></span>
+          <div>
+            <small>Expenses today</small>
+            <strong th:text="${'USD ' + #numbers.formatDecimal(gasExpenseTodayUsd, 1, 2)}">USD 0.00</strong>
+            <em th:text="${gasExpenseTodayCount + (gasExpenseTodayCount == 1 ? ' recorded expense' : ' recorded expenses')}">0 recorded expenses</em>
+          </div>
+        </article>
+        <article class="month">
+          <span><i class="fa-regular fa-calendar-check"></i></span>
+          <div>
+            <small>Month to date</small>
+            <strong th:text="${'USD ' + #numbers.formatDecimal(gasExpenseMonthUsd, 1, 2)}">USD 0.00</strong>
+            <em th:text="${gasExpenseMonthCount + (gasExpenseMonthCount == 1 ? ' entry this month' : ' entries this month')}">0 entries this month</em>
+          </div>
+        </article>
+        <article class="average">
+          <span><i class="fa-solid fa-calculator"></i></span>
+          <div>
+            <small>Average expense</small>
+            <strong th:text="${'USD ' + #numbers.formatDecimal(gasExpenseAverageUsd, 1, 2)}">USD 0.00</strong>
+            <em th:text="${gasExpensePeriodLabel + ' · USD entries'}">This month · USD entries</em>
+          </div>
+        </article>
+        <article class="largest">
+          <span><i class="fa-solid fa-building"></i></span>
+          <div>
+            <small>Largest category</small>
+            <strong th:text="${gasExpenseLargestCategory.category}">No USD expenses</strong>
+            <em th:text="${'USD ' + #numbers.formatDecimal(gasExpenseLargestCategory.total, 1, 2)}">USD 0.00</em>
+          </div>
+        </article>
+      </section>
+
+      <section class="gas-expenses-zwg" aria-label="ZWG expense activity">
+        <div>
+          <span><i class="fa-solid fa-money-bill-wave"></i></span>
+          <p><small>ZWG expenses</small><strong th:text="${'ZWG ' + #numbers.formatDecimal(gasExpenseSelectedZwg, 1, 2)}">ZWG 0.00</strong></p>
+        </div>
+        <div>
+          <span><i class="fa-regular fa-file-lines"></i></span>
+          <p><small>Entries</small><strong th:text="${gasExpenseSelectedZwgCount}">0</strong></p>
+        </div>
+        <div>
+          <span><i class="fa-regular fa-clock"></i></span>
+          <p><small>Last recorded</small><strong th:text="${gasExpenseSelectedZwgLast != null ? #temporals.format(gasExpenseSelectedZwgLast, 'dd MMM HH:mm') : '—'}">—</strong></p>
+        </div>
+      </section>
+
+      <section class="gas-expenses-analysis">
+        <article class="panel gas-expense-trend-panel">
+          <header>
+            <div>
+              <h2>Expense trend</h2>
+              <p th:text="${'Confirmed USD operating costs · ' + gasExpensePeriodLabel}">Confirmed USD operating costs</p>
+            </div>
+            <div><small>Period total</small><strong th:text="${'USD ' + #numbers.formatDecimal(gasExpenseSelectedUsd, 1, 2)}">USD 0.00</strong></div>
+          </header>
+          <div class="gas-expense-chart">
+            <div class="gas-expense-chart-axis" aria-hidden="true"><span>Peak</span><span>50%</span><span>0</span></div>
+            <div class="gas-expense-chart-bars">
+              <article th:each="day : ${gasExpenseTrend}"
+                       th:title="${day.label + ' · USD ' + #numbers.formatDecimal(day.totalUsd, 1, 2)}"
+                       th:classappend="${day.hasExpense ? ' has-expense' : ''}">
+                <strong th:if="${day.hasExpense}" th:text="${#numbers.formatDecimal(day.totalUsd, 1, 0)}">0</strong>
+                <span><i th:style="${'height:' + day.heightPercent + '%'}"></i></span>
+                <small th:text="${day.shortLabel}">29</small>
+              </article>
+            </div>
+          </div>
+          <footer><i></i><span>USD expenses</span></footer>
+        </article>
+
+        <article class="panel gas-expense-category-panel">
+          <header>
+            <div>
+              <h2>Category breakdown</h2>
+              <p th:text="${gasExpensePeriodLabel + ' · USD'}">This month · USD</p>
+            </div>
+          </header>
+          <div class="gas-expense-category-content" th:if="${!#lists.isEmpty(gasExpenseCategoryRows)}">
+            <div class="gas-expense-category-donut"
+                 th:style="${'--largest-share:' + gasExpenseLargestShareUsd + '%'}">
+              <span><small>Total</small><strong th:text="${'USD ' + #numbers.formatDecimal(gasExpenseSelectedUsd, 1, 2)}">USD 0.00</strong></span>
+            </div>
+            <dl>
+              <div th:each="category : ${gasExpenseCategoryRows}" th:class="${category.tone}">
+                <dt><i></i><span th:text="${category.category}">Category</span></dt>
+                <dd>
+                  <strong th:text="${'USD ' + #numbers.formatDecimal(category.total, 1, 2)}">USD 0.00</strong>
+                  <small th:text="${#numbers.formatDecimal(category.percent, 1, 1) + '%'}">0.0%</small>
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div class="gas-expense-category-empty" th:if="${#lists.isEmpty(gasExpenseCategoryRows)}">
+            <i class="fa-solid fa-chart-pie"></i>
+            <strong>No USD expenses in this period</strong>
+            <span>Recorded expense categories will appear here.</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel gas-expense-register">
+        <header class="gas-expense-register-head">
+          <div>
+            <h2>Expense register</h2>
+            <p>Auditable operating-cost entries for the selected branch</p>
+          </div>
+          <span th:text="${gasExpensePage.totalElements + (gasExpensePage.totalElements == 1 ? ' expense' : ' expenses')}">0 expenses</span>
+        </header>
+
+        <form class="gas-expense-filters" method="get" th:action="@{/shop/gas/expenses}">
+          <input type="hidden" name="branchId" th:value="${gasBranchId}">
+          <input type="hidden" name="expensePeriod" th:value="${gasExpensePeriod}">
+          <label>
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" name="expenseQuery" th:value="${gasExpenseQuery}"
+                   placeholder="Search description or reference" aria-label="Search description or reference">
+          </label>
+          <select name="expenseCategory" aria-label="Filter by category">
+            <option value="">All categories</option>
+            <option th:each="category : ${gasExpenseCategories}"
+                    th:value="${category}" th:text="${category}"
+                    th:selected="${category == gasExpenseCategory}">Category</option>
+          </select>
+          <select name="expensePayment" aria-label="Filter by payment method">
+            <option value="">All payment methods</option>
+            <option th:each="method : ${gasExpensePaymentMethods}"
+                    th:value="${method}"
+                    th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(method, '_', ' ')))}"
+                    th:selected="${method == gasExpensePayment}">Cash</option>
+          </select>
+          <select name="expenseSize" aria-label="Rows per page">
+            <option value="10" th:selected="${gasExpensePage.size == 10}">10 rows</option>
+            <option value="25" th:selected="${gasExpensePage.size == 25}">25 rows</option>
+            <option value="50" th:selected="${gasExpensePage.size == 50}">50 rows</option>
+          </select>
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+          <a class="btn btn-light"
+             th:if="${!#strings.isEmpty(gasExpenseQuery) or gasExpenseCategory != null or gasExpensePayment != null}"
+             th:href="@{/shop/gas/expenses(branchId=${gasBranchId},expensePeriod=${gasExpensePeriod})}">Reset</a>
+        </form>
+
+        <div class="gas-expense-table-wrap">
+          <table>
+            <thead>
+            <tr>
+              <th>Category</th>
+              <th>Description</th>
+              <th class="numeric">Amount</th>
+              <th>Currency</th>
+              <th>Payment</th>
+              <th>Reference</th>
+              <th>Recorded at</th>
+              <th>Recorded by</th>
+              <th class="action-cell">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="expense : ${gasExpenses}">
+              <td><span class="gas-expense-category-badge" th:text="${expense.category}">Category</span></td>
+              <td><strong th:text="${expense.description}">Description</strong></td>
+              <td class="numeric"><strong th:text="${expense.currency + ' ' + #numbers.formatDecimal(expense.amount, 1, 2)}">USD 0.00</strong></td>
+              <td th:text="${expense.currency}">USD</td>
+              <td><span class="gas-expense-payment" th:text="${#strings.replace(expense.paymentMethod, '_', ' ')}">CASH</span></td>
+              <td th:text="${!#strings.isEmpty(expense.reference) ? expense.reference : '—'}">—</td>
+              <td th:text="${expense.createdAt != null ? #temporals.format(expense.createdAt, 'dd MMM yyyy HH:mm') : '—'}">—</td>
+              <td th:text="${expense.createdBy != null and gasExpenseCreatorNames[expense.createdBy] != null ? gasExpenseCreatorNames[expense.createdBy] : 'System'}">System</td>
+              <td class="action-cell">
+                <a class="icon-button" th:href="${'#expense-details-' + expense.id}" title="View expense details" aria-label="View expense details">
+                  <i class="fa-solid fa-ellipsis"></i>
+                </a>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(gasExpenses)}">
+              <td colspan="9" class="gas-expense-empty">
+                <i class="fa-regular fa-folder-open"></i>
+                <strong>No expenses found</strong>
+                <span>Change the filters or record a new expense.</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="gas-expense-pagination">
+          <span th:text="${'Showing ' + gasExpensePageFrom + '–' + gasExpensePageTo + ' of ' + gasExpensePage.totalElements}">Showing 0–0 of 0</span>
+          <nav aria-label="Expense pagination">
+            <a th:href="${gasExpensePrevUrl ?: '#'}" th:classappend="${gasExpensePrevUrl == null ? ' disabled' : ''}">
+              <i class="fa-solid fa-chevron-left"></i>Previous
+            </a>
+            <a th:each="link : ${gasExpensePageLinks}" th:href="${link.url}" th:text="${link.label}"
+               th:classappend="${link.active ? ' active' : ''}">1</a>
+            <span class="active" th:if="${#lists.isEmpty(gasExpensePageLinks)}">1</span>
+            <a th:href="${gasExpenseNextUrl ?: '#'}" th:classappend="${gasExpenseNextUrl == null ? ' disabled' : ''}">
+              Next<i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </nav>
+        </footer>
+      </section>
     </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
-    <section class="panel table-panel">
-      <div class="toolbar"><h2>Expense Register</h2><span class="badge" th:text="${#lists.size(gasExpenses) + ' expenses'}">0 expenses</span></div>
-      <table>
-        <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>Payment</th><th>Reference</th><th>Date</th></tr></thead>
-        <tbody><tr th:each="e : ${gasExpenses}">
-          <td><strong th:text="${e.category}">Expense</strong></td>
-          <td th:text="${e.description}">Description</td>
-          <td><strong th:text="${e.currency + ' ' + #numbers.formatDecimal(e.amount, 1, 2)}">USD 0</strong></td>
-          <td><span class="badge" th:text="${e.paymentMethod}">CASH</span></td>
-          <td th:text="${e.reference ?: ''}">Ref</td>
-          <td th:text="${e.createdAt != null ? #temporals.format(e.createdAt, 'dd MMM yyyy HH:mm') : ''}">Date</td>
-        </tr></tbody>
-      </table>
-    </section>
-    <div id="modal-gas-expense" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2>Record Gas Expense</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{/shop/gas/expenses}" class="form-grid">
-        <input type="hidden" name="branchId" th:value="${gasBranchId}">
-        <input type="hidden" name="returnTo" value="/shop/gas/expenses">
-        <label>Category *<input name="category" required placeholder="Transport, ZERA, Maintenance"></label>
-        <label>Amount *<input name="amount" type="number" step="0.01" min="0.01" required></label>
-        <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
-        <label>Payment Method<select name="paymentMethod"><option>CASH</option><option>ECOCASH</option><option>ZIPIT</option><option>SWIPE</option><option>BANK_TRANSFER</option></select></label>
-        <label>Reference<input name="reference"></label>
-        <label class="span-2">Description *<input name="description" required></label>
-        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Expense</button></div>
-      </form>
-    </div></div>
+
+    <div id="modal-gas-expense" class="modal gas-expense-modal">
+      <div class="modal-content">
+        <div class="modal-head">
+          <div><p>Operating cost</p><h2>Record gas expense</h2><small>Add a traceable expense to this branch.</small></div>
+          <a class="close" href="#" aria-label="Close">&times;</a>
+        </div>
+        <form method="post" th:action="@{/shop/gas/expenses}" class="form-grid gas-expense-form">
+          <input type="hidden" name="branchId" th:value="${gasBranchId}">
+          <input type="hidden" name="returnTo" th:value="${gasExpenseReturnTo}">
+          <label>Category *
+            <input name="category" list="gas-expense-category-options" maxlength="80" required
+                   placeholder="Rent, maintenance, transport">
+            <datalist id="gas-expense-category-options">
+              <option th:each="category : ${gasExpenseCategories}" th:value="${category}"></option>
+            </datalist>
+          </label>
+          <label>Amount *
+            <input name="amount" type="number" step="0.01" min="0.01" required placeholder="0.00">
+          </label>
+          <label>Currency *
+            <select name="currency" required>
+              <option th:each="currency : ${currencies}" th:value="${currency}" th:text="${currency}">USD</option>
+            </select>
+          </label>
+          <label>Payment method *
+            <select name="paymentMethod" required>
+              <option th:each="method : ${gasExpensePaymentMethods}"
+                      th:value="${method}"
+                      th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(method, '_', ' ')))}">Cash</option>
+            </select>
+          </label>
+          <label class="span-2">Reference
+            <input name="reference" maxlength="120" placeholder="Invoice, receipt or transaction reference">
+          </label>
+          <label class="span-2">Description *
+            <textarea name="description" maxlength="255" required rows="3"
+                      placeholder="What was this expense for?"></textarea>
+          </label>
+          <div class="gas-expense-form-note span-2">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Expense records are kept as an audit trail. Confirm the amount, currency and reference before saving.</span>
+          </div>
+          <div class="modal-actions span-2">
+            <a class="btn btn-light" href="#">Cancel</a>
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save expense</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div th:each="expense : ${gasExpenses}"
+         th:id="${'expense-details-' + expense.id}"
+         class="modal gas-expense-detail-modal">
+      <div class="modal-content">
+        <div class="modal-head">
+          <div><p>Expense record</p><h2 th:text="${expense.category}">Expense</h2><small>Read-only audit details</small></div>
+          <a class="close" href="#" aria-label="Close">&times;</a>
+        </div>
+        <dl class="gas-expense-detail-grid">
+          <div><dt>Amount</dt><dd th:text="${expense.currency + ' ' + #numbers.formatDecimal(expense.amount, 1, 2)}">USD 0.00</dd></div>
+          <div><dt>Payment method</dt><dd th:text="${#strings.replace(expense.paymentMethod, '_', ' ')}">CASH</dd></div>
+          <div><dt>Reference</dt><dd th:text="${!#strings.isEmpty(expense.reference) ? expense.reference : 'Not supplied'}">Not supplied</dd></div>
+          <div><dt>Recorded at</dt><dd th:text="${expense.createdAt != null ? #temporals.format(expense.createdAt, 'dd MMM yyyy HH:mm') : '—'}">—</dd></div>
+          <div><dt>Recorded by</dt><dd th:text="${expense.createdBy != null and gasExpenseCreatorNames[expense.createdBy] != null ? gasExpenseCreatorNames[expense.createdBy] : 'System'}">System</dd></div>
+          <div class="span-2"><dt>Description</dt><dd th:text="${expense.description}">Description</dd></div>
+        </dl>
+        <div class="modal-actions"><a class="btn btn-primary" href="#">Done</a></div>
+      </div>
+    </div>
   </main>
 </div>
 </body>

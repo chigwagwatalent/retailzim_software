@@ -2,6 +2,7 @@ package com.retailzw.controller.web;
 
 import com.retailzw.enums.CurrencyCode;
 import com.retailzw.enums.BusinessModule;
+import com.retailzw.enums.GasShiftStatus;
 import com.retailzw.enums.GasTankStatus;
 import com.retailzw.enums.UserRole;
 import com.retailzw.dto.request.*;
@@ -27,14 +28,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLEncoder;
@@ -63,10 +69,16 @@ public class ShopWebController {
     private static final List<String> PEOPLE_MODULES = List.of("customers", "borrowers", "users");
     private static final List<String> FINANCE_MODULES = List.of("suppliers", "purchasing", "reports");
     private static final List<String> SYSTEM_MODULES = List.of("branches", "company", "audit");
-    private static final List<String> GAS_MODULES = List.of("gas", "gas-sales", "gas-restocking", "gas-expenses", "gas-tanks", "gas-accounting");
+    private static final List<String> GAS_MODULES = List.of("gas", "gas-sales", "gas-change", "gas-restocking", "gas-expenses", "gas-tanks", "gas-accounting");
     private static final List<UserRole> USER_MANAGEMENT_ROLES = List.of(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT, UserRole.CASHIER);
     private static final int DEFAULT_PAGE_SIZE = 25;
     private static final int MAX_PAGE_SIZE = 100;
+    private static final List<String> GAS_EXPENSE_PAYMENT_METHODS = List.of(
+            "CASH", "ECOCASH", "ONEMONEY", "INNBUCKS", "CARD",
+            "SWIPE", "ZIPIT", "BANK_TRANSFER");
+    private static final List<String> GAS_SALE_PAYMENT_METHODS = List.of(
+            "CASH", "ECOCASH", "ONEMONEY", "INNBUCKS", "CARD",
+            "SWIPE", "ZIPIT", "BANK_TRANSFER", "SPLIT");
 
     private static final List<String> WORKSPACE_MODULES = List.of("reports", "notifications", "audit");
 
@@ -82,6 +94,7 @@ public class ShopWebController {
             Map.entry("inventory-intelligence", "Inventory Intelligence"),
             Map.entry("gas", "Gas Control"),
             Map.entry("gas-sales", "Gas Sales"),
+            Map.entry("gas-change", "Gas Held Change"),
             Map.entry("gas-restocking", "Tank Restocking"),
             Map.entry("gas-expenses", "Gas Expenses"),
             Map.entry("gas-tanks", "Tanks & Prices"),
@@ -109,6 +122,7 @@ public class ShopWebController {
             Map.entry("inventory-intelligence", "fa-solid fa-brain"),
             Map.entry("gas", "fa-solid fa-gas-pump"),
             Map.entry("gas-sales", "fa-solid fa-scale-balanced"),
+            Map.entry("gas-change", "fa-solid fa-coins"),
             Map.entry("gas-restocking", "fa-solid fa-truck-droplet"),
             Map.entry("gas-expenses", "fa-solid fa-receipt"),
             Map.entry("gas-tanks", "fa-solid fa-fire-flame-simple"),
@@ -129,6 +143,7 @@ public class ShopWebController {
     private static final Map<String, String> MODULE_URLS = Map.ofEntries(
             Map.entry("gas", "/shop/gas"),
             Map.entry("gas-sales", "/shop/gas/sales"),
+            Map.entry("gas-change", "/shop/gas/change"),
             Map.entry("gas-restocking", "/shop/gas/restocking"),
             Map.entry("gas-expenses", "/shop/gas/expenses"),
             Map.entry("gas-tanks", "/shop/gas/tanks"),
@@ -412,8 +427,13 @@ public class ShopWebController {
             @RequestParam(required = false) String expYear,
             @RequestParam(required = false) String securityCode,
             RedirectAttributes redirect) {
+        String redirectReference = orderReference;
         try {
-            smilePayCheckoutService.requireRenewalCheckout(orderReference, current.tenantId());
+            SmilePayCheckout checkout = smilePayCheckoutService.prepareRenewalPaymentAttempt(
+                    orderReference,
+                    current.tenantId(),
+                    current.userId());
+            redirectReference = checkout.getOrderReference();
             Map<String, String> card = new LinkedHashMap<>();
             card.put("firstName", firstName);
             card.put("lastName", lastName);
@@ -422,22 +442,43 @@ public class ShopWebController {
             card.put("expYear", expYear);
             card.put("securityCode", securityCode);
             var result = smilePayCheckoutService.initiateExpress(
-                    orderReference, paymentMethod, mobile, card);
+                    redirectReference, paymentMethod, mobile, card);
             if (result.redirectHtml() != null && !result.redirectHtml().isBlank()) {
                 return ResponseEntity.ok()
                         .contentType(MediaType.TEXT_HTML)
                         .body(result.redirectHtml());
             }
+            if (SmilePayCheckout.CheckoutStatus.FAILED.equals(result.checkout().getStatus())) {
+                redirect.addFlashAttribute("message", result.message());
+                return "redirect:/shop/billing/renew/" + redirectReference;
+            }
             if (result.requiresOtp()) {
                 redirect.addFlashAttribute("message",
                         result.message() == null ? "Enter the OTP sent to your phone." : result.message());
-                return "redirect:/shop/billing/renew/" + orderReference + "?otp=true";
+                return "redirect:/shop/billing/renew/" + redirectReference + "?otp=true";
             }
             redirect.addFlashAttribute("message",
                     result.message() == null
                             ? "Payment started. Approve it and keep this page open."
                             : result.message());
-            return "redirect:/shop/billing/renew/" + orderReference + "?pending=true";
+            return "redirect:/shop/billing/renew/" + redirectReference + "?pending=true";
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+            return "redirect:/shop/billing/renew/" + redirectReference;
+        }
+    }
+
+    @PostMapping("/shop/billing/renew/{orderReference}/restart")
+    public String restartRenewal(
+            @PathVariable String orderReference,
+            RedirectAttributes redirect) {
+        try {
+            SmilePayCheckout checkout = smilePayCheckoutService.prepareRenewalPaymentAttempt(
+                    orderReference,
+                    current.tenantId(),
+                    current.userId());
+            redirect.addFlashAttribute("message", "New payment attempt created. Choose a payment method.");
+            return "redirect:/shop/billing/renew/" + checkout.getOrderReference();
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
             return "redirect:/shop/billing/renew/" + orderReference;
@@ -609,7 +650,9 @@ public class ShopWebController {
             return "shop/inventory-intelligence";
         }
         if ("gas".equals(activeModule)) {
-            addGasManagementModel(model, tenantId, activeBranchId);
+            addGasManagementModel(model, tenantId, activeBranchId,
+                    currentPage, Math.min(pageSize, 24), 0, 5,
+                    0, 8, null, null);
             return "shop/gas";
         }
         if ("users".equals(activeModule)) {
@@ -707,6 +750,38 @@ public class ShopWebController {
     @GetMapping("/shop/gas/{section}")
     public String gasSection(@PathVariable String section,
                              @RequestParam(required = false) Long branchId,
+                             @RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "6") int size,
+                             @RequestParam(defaultValue = "0") int auditPage,
+                             @RequestParam(defaultValue = "5") int auditSize,
+                             @RequestParam(defaultValue = "0") int shiftPage,
+                             @RequestParam(defaultValue = "8") int shiftSize,
+                             @RequestParam(required = false) String shiftQuery,
+                             @RequestParam(required = false) String shiftStatus,
+                             @RequestParam(defaultValue = "0") int expensePage,
+                             @RequestParam(defaultValue = "10") int expenseSize,
+                             @RequestParam(required = false) String expenseQuery,
+                             @RequestParam(required = false) String expenseCategory,
+                             @RequestParam(required = false) String expensePayment,
+                             @RequestParam(defaultValue = "month") String expensePeriod,
+                             @RequestParam(defaultValue = "0") int restockPage,
+                             @RequestParam(defaultValue = "10") int restockSize,
+                             @RequestParam(required = false) String restockQuery,
+                             @RequestParam(required = false) Long restockTankId,
+                             @RequestParam(required = false) String restockCurrency,
+                             @RequestParam(defaultValue = "month") String restockPeriod,
+                             @RequestParam(defaultValue = "0") int salesPage,
+                             @RequestParam(defaultValue = "10") int salesSize,
+                             @RequestParam(required = false) String salesQuery,
+                             @RequestParam(required = false) String salesPayment,
+                             @RequestParam(required = false) Long salesCashierId,
+                             @RequestParam(defaultValue = "today") String salesPeriod,
+                             @RequestParam(defaultValue = "0") int gasChangePage,
+                             @RequestParam(defaultValue = "10") int gasChangeSize,
+                             @RequestParam(required = false) String gasChangeSearch,
+                             @RequestParam(required = false) String gasChangeStatus,
+                             @RequestParam(required = false) String gasChangeFrom,
+                             @RequestParam(required = false) String gasChangeTo,
                              Model model) {
         Long tenantId = current.tenantId();
         if (!packageModuleAccessService.hasGas(tenantId)) {
@@ -715,6 +790,7 @@ public class ShopWebController {
         Long activeBranchId = selectedBranch(branchId);
         String activeModule = switch (section) {
             case "sales" -> "gas-sales";
+            case "change" -> "gas-change";
             case "restocking" -> "gas-restocking";
             case "expenses" -> "gas-expenses";
             case "tanks" -> "gas-tanks";
@@ -727,9 +803,45 @@ public class ShopWebController {
         model.addAttribute("selectedBranchName", branchById(tenantId).get(activeBranchId));
         model.addAttribute("branchById", branchById(tenantId));
         addNavigationModel(model);
-        addGasManagementModel(model, tenantId, activeBranchId);
+        addGasManagementModel(model, tenantId, activeBranchId,
+                Math.max(0, page), Math.max(1, Math.min(size, 24)),
+                Math.max(0, auditPage), Math.max(1, Math.min(auditSize, 20)),
+                Math.max(0, shiftPage), Math.max(1, Math.min(shiftSize, 50)),
+                shiftQuery, parseEnum(shiftStatus, GasShiftStatus.class));
+        if ("gas-sales".equals(activeModule)) {
+            Long resolvedGasBranchId = (Long) model.getAttribute("gasBranchId");
+            addGasSalesModel(
+                    model, tenantId, resolvedGasBranchId,
+                    Math.max(0, salesPage), Math.max(1, Math.min(salesSize, 100)),
+                    salesQuery, salesPayment, salesCashierId, salesPeriod);
+        }
+        if ("gas-change".equals(activeModule)) {
+            Long resolvedGasBranchId = (Long) model.getAttribute("gasBranchId");
+            addGasHeldChangeModel(
+                    model, tenantId, resolvedGasBranchId,
+                    Math.max(0, gasChangePage), Math.max(1, Math.min(gasChangeSize, 100)),
+                    gasChangeSearch,
+                    parseEnum(gasChangeStatus, HeldChange.Status.class),
+                    gasChangeStatus, gasChangeFrom, gasChangeTo);
+        }
+        if ("gas-expenses".equals(activeModule)) {
+            Long resolvedGasBranchId = (Long) model.getAttribute("gasBranchId");
+            addGasExpenseModel(
+                    model, tenantId, resolvedGasBranchId,
+                    Math.max(0, expensePage), Math.max(1, Math.min(expenseSize, 100)),
+                    expenseQuery, expenseCategory, expensePayment, expensePeriod);
+        }
+        if ("gas-restocking".equals(activeModule)) {
+            Long resolvedGasBranchId = (Long) model.getAttribute("gasBranchId");
+            addGasRestockModel(
+                    model, tenantId, resolvedGasBranchId,
+                    Math.max(0, restockPage), Math.max(1, Math.min(restockSize, 100)),
+                    restockQuery, restockTankId,
+                    parseEnum(restockCurrency, CurrencyCode.class), restockPeriod);
+        }
         return switch (activeModule) {
             case "gas-sales" -> "shop/gas-sales";
+            case "gas-change" -> "shop/gas-change";
             case "gas-restocking" -> "shop/gas-restocking";
             case "gas-expenses" -> "shop/gas-expenses";
             case "gas-tanks" -> "shop/gas-tanks";
@@ -997,6 +1109,29 @@ public class ShopWebController {
         return "redirect:/shop/change";
     }
 
+    @PostMapping("/shop/gas/change/{id}/{action}")
+    public String gasChangeAction(@PathVariable Long id,
+                                  @PathVariable String action,
+                                  @RequestParam Long branchId,
+                                  RedirectAttributes redirect) {
+        try {
+            if ("collect".equals(action)) {
+                gasOperations.collectGasHeldChange(
+                        current.tenantId(), branchId, current.userId(), id);
+                redirect.addFlashAttribute("message", "Gas held change marked as collected.");
+            } else if ("cancel".equals(action)) {
+                gasOperations.cancelGasHeldChange(
+                        current.tenantId(), branchId, current.userId(), id);
+                redirect.addFlashAttribute("message", "Gas held change cancelled.");
+            } else {
+                throw new IllegalArgumentException("Unsupported gas held-change action.");
+            }
+        } catch (RuntimeException ex) {
+            redirect.addFlashAttribute("message", ex.getMessage());
+        }
+        return "redirect:/shop/gas/change?branchId=" + branchId;
+    }
+
     @PostMapping("/shop/products/{id}/update")
     public String updateProduct(@PathVariable Long id, @ModelAttribute CreateProductRequest request, RedirectAttributes redirect) {
         Long targetBranch = selectedBranch(request.getBranchId());
@@ -1239,15 +1374,131 @@ public class ShopWebController {
 
     @PostMapping("/shop/gas/restocks")
     public String restockGasTank(@Valid @ModelAttribute GasRestockRequest request,
+                                 BindingResult bindingResult,
                                  @RequestParam(required = false) String returnTo,
                                  RedirectAttributes redirect) {
-        try {
-            gasOperations.restock(current.tenantId(), current.userId(), request);
-            redirect.addFlashAttribute("message", "Gas stock received and costing captured.");
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            redirect.addFlashAttribute("message", ex.getMessage());
+        if (bindingResult.hasErrors()) {
+            redirect.addFlashAttribute("message",
+                    bindingResult.getAllErrors().get(0).getDefaultMessage());
+        } else {
+            try {
+                gasOperations.restock(current.tenantId(), current.userId(), request);
+                redirect.addFlashAttribute("message", "Gas stock received and costing captured.");
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                redirect.addFlashAttribute("message", ex.getMessage());
+            }
         }
         return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/restocking");
+    }
+
+    @GetMapping(value = "/shop/gas/sales/export", produces = "text/csv")
+    public ResponseEntity<StreamingResponseBody> exportGasSales(
+            @RequestParam(required = false) Long branchId,
+            @RequestParam(required = false) String salesQuery,
+            @RequestParam(required = false) String salesPayment,
+            @RequestParam(required = false) Long salesCashierId,
+            @RequestParam(defaultValue = "today") String salesPeriod) {
+        Long tenantId = current.tenantId();
+        if (!packageModuleAccessService.hasGas(tenantId)) {
+            return ResponseEntity.status(403).build();
+        }
+        Long activeBranchId = selectedBranch(branchId);
+        GasSalesDateRange range = gasSalesDateRange(salesPeriod);
+        Map<Long, String> cashierNames = gasSalesCashierNames(
+                tenantId,
+                gasOperations.salesCashierIds(tenantId, activeBranchId, range.from(), range.to()));
+        String filename = "gas-sales-" + range.key() + "-" + LocalDate.now() + ".csv";
+        StreamingResponseBody stream = output -> {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+            writer.write('\ufeff');
+            writer.write("Receipt,Offline Receipt,Customer,Phone,Cashier,Kg Sold,Unit Price,Total,Currency,Payment Method,Payment Reference,Shift ID,Created At");
+            writer.newLine();
+            int pageNumber = 0;
+            Page<GasSale> exportPage;
+            do {
+                exportPage = gasOperations.salesPage(
+                        tenantId, activeBranchId, range.from(), range.to(),
+                        salesQuery, salesPayment, salesCashierId,
+                        PageRequest.of(pageNumber, 1000));
+                for (GasSale sale : exportPage.getContent()) {
+                    writer.write(String.join(",",
+                            csvCell(sale.getReceiptNumber()),
+                            csvCell(sale.getOfflineReceiptNumber()),
+                            csvCell(sale.getCustomerName()),
+                            csvCell(sale.getCustomerPhone()),
+                            csvCell(cashierNames.getOrDefault(sale.getCashierId(), "User #" + sale.getCashierId())),
+                            csvCell(sale.getQuantityKg() == null ? "0.000" : sale.getQuantityKg().toPlainString()),
+                            csvCell(sale.getUnitPrice() == null ? "0.0000" : sale.getUnitPrice().toPlainString()),
+                            csvCell(sale.getTotal() == null ? "0.00" : sale.getTotal().toPlainString()),
+                            csvCell(sale.getCurrency() == null ? "" : sale.getCurrency().name()),
+                            csvCell(sale.getPaymentMethod()),
+                            csvCell(sale.getPaymentReference()),
+                            csvCell(sale.getGasShiftId() == null ? "" : sale.getGasShiftId().toString()),
+                            csvCell(sale.getCreatedAt() == null ? "" : sale.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))));
+                    writer.newLine();
+                }
+                writer.flush();
+                pageNumber++;
+            } while (exportPage.hasNext());
+        };
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(stream);
+    }
+
+    @GetMapping(value = "/shop/gas/restocking/export", produces = "text/csv")
+    public ResponseEntity<StreamingResponseBody> exportGasRestocks(
+            @RequestParam(required = false) Long branchId,
+            @RequestParam(required = false) String restockQuery,
+            @RequestParam(required = false) Long restockTankId,
+            @RequestParam(required = false) String restockCurrency,
+            @RequestParam(defaultValue = "month") String restockPeriod) {
+        Long tenantId = current.tenantId();
+        if (!packageModuleAccessService.hasGas(tenantId)) {
+            return ResponseEntity.status(403).build();
+        }
+        Long activeBranchId = selectedBranch(branchId);
+        GasRestockDateRange range = gasRestockDateRange(restockPeriod);
+        CurrencyCode currency = parseEnum(restockCurrency, CurrencyCode.class);
+        Map<Long, String> tankNames = gasOperations.tanks(tenantId, activeBranchId).stream()
+                .collect(Collectors.toMap(GasTank::getId, GasTank::getName));
+        String filename = "supplier-deliveries-" + range.key() + "-" + LocalDate.now() + ".csv";
+        StreamingResponseBody stream = output -> {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+            writer.write('\ufeff');
+            writer.write("Receipt,Supplier,Tank,Net LPG Received,Cost Per Kg,Total Cost,Currency,Reference,Received At,Received By User ID,Notes");
+            writer.newLine();
+            int pageNumber = 0;
+            Page<GasRestock> exportPage;
+            do {
+                exportPage = gasOperations.restockPage(
+                        tenantId, activeBranchId, range.from(), range.to(),
+                        restockQuery, restockTankId, currency,
+                        PageRequest.of(pageNumber, 1000));
+                for (GasRestock receipt : exportPage.getContent()) {
+                    writer.write(String.join(",",
+                            csvCell("GR-" + receipt.getId()),
+                            csvCell(receipt.getSupplierName()),
+                            csvCell(tankNames.getOrDefault(receipt.getTankId(), "Tank #" + receipt.getTankId())),
+                            csvCell(receipt.getQuantityKg() == null ? "0.000" : receipt.getQuantityKg().toPlainString()),
+                            csvCell(receipt.getUnitCost() == null ? "0.0000" : receipt.getUnitCost().toPlainString()),
+                            csvCell(receipt.getTotalCost() == null ? "0.00" : receipt.getTotalCost().toPlainString()),
+                            csvCell(receipt.getCurrency() == null ? "" : receipt.getCurrency().name()),
+                            csvCell(receipt.getSupplierInvoice()),
+                            csvCell(receipt.getCreatedAt() == null ? "" : receipt.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                            csvCell(receipt.getCreatedBy() == null ? "" : receipt.getCreatedBy().toString()),
+                            csvCell(receipt.getNotes())));
+                    writer.newLine();
+                }
+                writer.flush();
+                pageNumber++;
+            } while (exportPage.hasNext());
+        };
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(stream);
     }
 
     @PostMapping("/shop/gas/stock/reconcile")
@@ -1267,15 +1518,69 @@ public class ShopWebController {
 
     @PostMapping("/shop/gas/expenses")
     public String recordGasExpense(@Valid @ModelAttribute GasExpenseRequest request,
+                                   BindingResult bindingResult,
                                    @RequestParam(required = false) String returnTo,
                                    RedirectAttributes redirect) {
-        try {
-            gasOperations.recordExpense(current.tenantId(), current.userId(), request);
-            redirect.addFlashAttribute("message", "Gas expense recorded.");
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            redirect.addFlashAttribute("message", ex.getMessage());
+        if (bindingResult.hasErrors()) {
+            redirect.addFlashAttribute("message",
+                    bindingResult.getAllErrors().get(0).getDefaultMessage());
+        } else {
+            try {
+                gasOperations.recordExpense(current.tenantId(), current.userId(), request);
+                redirect.addFlashAttribute("message", "Gas expense recorded.");
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                redirect.addFlashAttribute("message", ex.getMessage());
+            }
         }
         return gasRedirect(returnTo, request.getBranchId(), "/shop/gas/expenses");
+    }
+
+    @GetMapping(value = "/shop/gas/expenses/export", produces = "text/csv")
+    public ResponseEntity<StreamingResponseBody> exportGasExpenses(
+            @RequestParam(required = false) Long branchId,
+            @RequestParam(required = false) String expenseQuery,
+            @RequestParam(required = false) String expenseCategory,
+            @RequestParam(required = false) String expensePayment,
+            @RequestParam(defaultValue = "month") String expensePeriod) {
+        Long tenantId = current.tenantId();
+        if (!packageModuleAccessService.hasGas(tenantId)) {
+            return ResponseEntity.status(403).build();
+        }
+        Long activeBranchId = selectedBranch(branchId);
+        GasExpenseDateRange range = gasExpenseDateRange(expensePeriod);
+        String filename = "gas-expenses-" + range.key() + "-" + LocalDate.now() + ".csv";
+        StreamingResponseBody stream = output -> {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+            writer.write('\ufeff');
+            writer.write("Category,Description,Amount,Currency,Payment Method,Reference,Recorded At,Recorded By User ID");
+            writer.newLine();
+            int pageNumber = 0;
+            Page<GasExpense> exportPage;
+            do {
+                exportPage = gasOperations.expensePage(
+                        tenantId, activeBranchId, range.from(), range.to(),
+                        expenseQuery, expenseCategory, expensePayment,
+                        PageRequest.of(pageNumber, 1000));
+                for (GasExpense expense : exportPage.getContent()) {
+                    writer.write(String.join(",",
+                            csvCell(expense.getCategory()),
+                            csvCell(expense.getDescription()),
+                            csvCell(expense.getAmount() == null ? "0.00" : expense.getAmount().toPlainString()),
+                            csvCell(expense.getCurrency() == null ? "" : expense.getCurrency().name()),
+                            csvCell(expense.getPaymentMethod()),
+                            csvCell(expense.getReference()),
+                            csvCell(expense.getCreatedAt() == null ? "" : expense.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                            csvCell(expense.getCreatedBy() == null ? "" : expense.getCreatedBy().toString())));
+                    writer.newLine();
+                }
+                writer.flush();
+                pageNumber++;
+            } while (exportPage.hasNext());
+        };
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(stream);
     }
 
     @PostMapping("/shop/users")
@@ -1690,7 +1995,7 @@ public class ShopWebController {
 
     private String gasRedirect(String returnTo, Long branchId, String fallbackPath) {
         String path = (returnTo != null && returnTo.startsWith("/shop/gas")) ? returnTo : fallbackPath;
-        return "redirect:" + path + "?branchId=" + branchId;
+        return "redirect:" + path + (path.contains("?") ? "&" : "?") + "branchId=" + branchId;
     }
 
     private String safeModule(String module) {
@@ -3071,7 +3376,11 @@ public class ShopWebController {
         model.addAttribute("branchModuleOptions", enabledModules.isEmpty() ? List.of(BusinessModule.SHOP_MODULE) : enabledModules);
     }
 
-    private void addGasManagementModel(Model model, Long tenantId, Long selectedBranchId) {
+    private void addGasManagementModel(Model model, Long tenantId, Long selectedBranchId,
+                                       int tankPageNumber, int tankPageSize,
+                                       int auditPageNumber, int auditPageSize,
+                                       int shiftPageNumber, int shiftPageSize,
+                                       String shiftQuery, GasShiftStatus shiftStatus) {
         List<Branch> gasBranches = branches.findByTenantIdAndIsActiveTrue(tenantId).stream()
                 .filter(branch -> BusinessModule.GAS_MODULE.equals(branch.getModuleType()))
                 .toList();
@@ -3088,8 +3397,11 @@ public class ShopWebController {
         List<GasSale> allGasSales = List.of();
         List<GasRestock> gasRestocks = List.of();
         List<GasStockAdjustment> gasStockAdjustments = List.of();
-        List<GasExpense> gasExpenses = List.of();
-        Page<GasShift> gasShiftPage = Page.empty();
+        Page<GasTank> gasTankPage = Page.empty(PageRequest.of(tankPageNumber, tankPageSize));
+        Page<GasStockAdjustment> gasStockAdjustmentPage =
+                Page.empty(PageRequest.of(auditPageNumber, auditPageSize));
+        Page<GasShift> gasShiftPage =
+                Page.empty(PageRequest.of(shiftPageNumber, shiftPageSize));
         GasOperationsService.GasDashboard gasDashboard = null;
         GasShift currentGasShift = null;
         if (!gasBranches.isEmpty()) {
@@ -3100,8 +3412,13 @@ public class ShopWebController {
             allGasSales = gasOperations.sales(tenantId, gasBranchId);
             gasRestocks = gasOperations.restocks(tenantId, gasBranchId);
             gasStockAdjustments = gasOperations.stockAdjustments(tenantId, gasBranchId);
-            gasExpenses = gasOperations.expenses(tenantId, gasBranchId);
-            gasShiftPage = gasOperations.shifts(tenantId, gasBranchId, PageRequest.of(0, 50));
+            gasTankPage = gasOperations.tankPage(
+                    tenantId, gasBranchId, PageRequest.of(tankPageNumber, tankPageSize));
+            gasStockAdjustmentPage = gasOperations.stockAdjustmentPage(
+                    tenantId, gasBranchId, PageRequest.of(auditPageNumber, auditPageSize));
+            gasShiftPage = gasOperations.shifts(
+                    tenantId, gasBranchId, shiftQuery, shiftStatus,
+                    PageRequest.of(shiftPageNumber, shiftPageSize));
             gasDashboard = gasOperations.dashboard(tenantId, gasBranchId);
         }
 
@@ -3114,21 +3431,64 @@ public class ShopWebController {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal capacityKg = gasTanks.stream()
-                .map(GasTank::getCapacityKg)
+                .map(GasTank::getNetCapacityKg)
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         model.addAttribute("gasBranches", gasBranches);
         model.addAttribute("gasBranchId", gasBranchId);
         model.addAttribute("gasTanks", gasTanks);
+        model.addAttribute("gasTankPage", gasTankPage);
+        model.addAttribute("pagedGasTanks", gasTankPage.getContent());
+        addNamedPaginationModel(model, "gasTank", gasTankPage, "/shop/gas/tanks",
+                "page", "size", params(
+                        "branchId", gasBranchId,
+                        "auditPage", auditPageNumber,
+                        "auditSize", auditPageSize
+                ));
         model.addAttribute("gasTankNameById", gasTanks.stream().collect(Collectors.toMap(GasTank::getId, GasTank::getName)));
         model.addAttribute("gasPrices", gasPrices);
         model.addAttribute("allGasSales", allGasSales);
         model.addAttribute("gasRestocks", gasRestocks);
         model.addAttribute("gasStockAdjustments", gasStockAdjustments);
-        model.addAttribute("gasExpenses", gasExpenses);
+        model.addAttribute("gasStockAdjustmentPage", gasStockAdjustmentPage);
+        model.addAttribute("pagedGasStockAdjustments", gasStockAdjustmentPage.getContent());
+        addNamedPaginationModel(model, "gasAudit", gasStockAdjustmentPage, "/shop/gas/tanks",
+                "auditPage", "auditSize", params(
+                        "branchId", gasBranchId,
+                        "page", tankPageNumber,
+                        "size", tankPageSize
+                ));
         model.addAttribute("gasShifts", gasShiftPage.getContent());
+        model.addAttribute("gasShiftPage", gasShiftPage);
+        model.addAttribute("gasShiftQuery", shiftQuery == null ? "" : shiftQuery.trim());
+        model.addAttribute("gasShiftStatus", shiftStatus);
+        model.addAttribute("gasShiftStatuses", GasShiftStatus.values());
+        model.addAttribute("gasShiftPageFrom", gasShiftPage.getTotalElements() == 0
+                ? 0
+                : (long) gasShiftPage.getNumber() * gasShiftPage.getSize() + 1);
+        model.addAttribute("gasShiftPageTo", Math.min(
+                (long) (gasShiftPage.getNumber() + 1) * gasShiftPage.getSize(),
+                gasShiftPage.getTotalElements()));
+        addNamedPaginationModel(model, "gasShift", gasShiftPage, "/shop/gas/accounting",
+                "shiftPage", "shiftSize", params(
+                        "branchId", gasBranchId,
+                        "shiftQuery", shiftQuery,
+                        "shiftStatus", shiftStatus
+                ));
         model.addAttribute("gasDashboard", gasDashboard);
+        model.addAttribute("gasAccountingHours", gasAccountingHours(gasDashboard));
+        model.addAttribute("gasMarginPercentUsd", gasDashboard == null
+                ? BigDecimal.ZERO
+                : percentage(gasDashboard.marginUsdToday(), gasDashboard.revenueUsdToday()));
+        model.addAttribute("gasAccountingCostTotalUsd", gasDashboard == null
+                ? BigDecimal.ZERO
+                : nvl(gasDashboard.restockCostUsdToday()).add(nvl(gasDashboard.expensesUsdToday())));
+        model.addAttribute("gasExpenseShareUsd", gasDashboard == null
+                ? BigDecimal.ZERO
+                : percentage(
+                        gasDashboard.expensesUsdToday(),
+                        nvl(gasDashboard.restockCostUsdToday()).add(nvl(gasDashboard.expensesUsdToday()))));
         model.addAttribute("currentGasShift", currentGasShift);
         model.addAttribute("gasShiftSales", shiftSales);
         model.addAttribute("maxGasTanks", maxGasTanks);
@@ -3137,6 +3497,619 @@ public class ShopWebController {
         model.addAttribute("gasCapacityKg", capacityKg);
         model.addAttribute("gasTankStatuses", GasTankStatus.values());
         model.addAttribute("currencies", CurrencyCode.values());
+        model.addAttribute("gasInventoryReturnTo",
+                "/shop/gas/tanks?page=" + gasTankPage.getNumber()
+                        + "&size=" + gasTankPage.getSize()
+                        + "&auditPage=" + gasStockAdjustmentPage.getNumber()
+                        + "&auditSize=" + gasStockAdjustmentPage.getSize());
+    }
+
+    private void addGasHeldChangeModel(Model model, Long tenantId, Long branchId,
+                                       int pageNumber, int pageSize,
+                                       String search, HeldChange.Status status,
+                                       String statusValue, String fromValue, String toValue) {
+        String normalizedSearch = blank(search);
+        LocalDateTime from = parseDate(fromValue, false);
+        LocalDateTime to = parseDate(toValue, true);
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        LocalDateTime tomorrowStart = todayStart.plusDays(1);
+        Page<HeldChange> page = gasOperations.gasHeldChangePage(
+                tenantId, branchId, status, normalizedSearch, from, to,
+                PageRequest.of(pageNumber, pageSize));
+        long openCount = gasOperations.gasHeldChangePage(
+                tenantId, branchId, HeldChange.Status.OPEN, null, null, null,
+                PageRequest.of(0, 1)).getTotalElements();
+        Set<Long> userIds = page.getContent().stream()
+                .flatMap(change -> java.util.stream.Stream.of(
+                        change.getCreatedBy(), change.getCollectedBy(), change.getCancelledBy()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        model.addAttribute("gasChangePage", page);
+        model.addAttribute("gasChangeRecords", page.getContent());
+        model.addAttribute("gasChangePageFrom", page.getTotalElements() == 0
+                ? 0
+                : (long) page.getNumber() * page.getSize() + 1);
+        model.addAttribute("gasChangePageTo", Math.min(
+                (long) (page.getNumber() + 1) * page.getSize(),
+                page.getTotalElements()));
+        addNamedPaginationModel(model, "gasChange", page, "/shop/gas/change",
+                "gasChangePage", "gasChangeSize", params(
+                        "branchId", branchId,
+                        "gasChangeSearch", normalizedSearch,
+                        "gasChangeStatus", status,
+                        "gasChangeFrom", fromValue,
+                        "gasChangeTo", toValue));
+        model.addAttribute("gasChangeSearch", normalizedSearch == null ? "" : normalizedSearch);
+        model.addAttribute("gasChangeStatus", statusValue == null ? "" : statusValue);
+        model.addAttribute("gasChangeFrom", fromValue == null ? "" : fromValue);
+        model.addAttribute("gasChangeTo", toValue == null ? "" : toValue);
+        model.addAttribute("gasChangeOpenCount", openCount);
+        model.addAttribute("gasChangeOpenUsd", gasOperations.gasHeldChangeTotal(
+                tenantId, branchId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.USD));
+        model.addAttribute("gasChangeOpenZwg", gasOperations.gasHeldChangeTotal(
+                tenantId, branchId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.ZWG));
+        model.addAttribute("gasChangeCollectedTodayUsd", gasOperations.gasHeldChangeTotal(
+                tenantId, branchId, HeldChange.Status.COLLECTED, null,
+                todayStart, tomorrowStart, CurrencyCode.USD));
+        model.addAttribute("gasChangeCollectedTodayZwg", gasOperations.gasHeldChangeTotal(
+                tenantId, branchId, HeldChange.Status.COLLECTED, null,
+                todayStart, tomorrowStart, CurrencyCode.ZWG));
+        model.addAttribute("gasChangeFilteredUsd", gasOperations.gasHeldChangeTotal(
+                tenantId, branchId, status, normalizedSearch, from, to, CurrencyCode.USD));
+        model.addAttribute("gasChangeFilteredZwg", gasOperations.gasHeldChangeTotal(
+                tenantId, branchId, status, normalizedSearch, from, to, CurrencyCode.ZWG));
+        model.addAttribute("gasChangeUserNames",
+                gasSalesCashierNames(tenantId, new ArrayList<>(userIds)));
+    }
+
+    private void addGasSalesModel(Model model, Long tenantId, Long branchId,
+                                  int pageNumber, int pageSize,
+                                  String query, String paymentMethod, Long cashierId,
+                                  String period) {
+        GasSalesDateRange range = gasSalesDateRange(period);
+        String normalizedQuery = blank(query);
+        String normalizedPayment = blank(paymentMethod);
+        Page<GasSale> salesPage = gasOperations.salesPage(
+                tenantId, branchId, range.from(), range.to(),
+                normalizedQuery, normalizedPayment, cashierId,
+                PageRequest.of(pageNumber, pageSize));
+        GasOperationsService.SalesAnalytics analytics = gasOperations.salesAnalytics(
+                tenantId, branchId, range.from(), range.to());
+        GasOperationsService.SalesAnalytics previous = gasOperations.salesAnalytics(
+                tenantId, branchId, range.previousFrom(), range.previousTo());
+
+        List<Long> cashierIds = new ArrayList<>(
+                gasOperations.salesCashierIds(tenantId, branchId, range.from(), range.to()));
+        salesPage.getContent().stream()
+                .map(GasSale::getCashierId)
+                .filter(Objects::nonNull)
+                .filter(id -> !cashierIds.contains(id))
+                .forEach(cashierIds::add);
+        GasShift currentShift = (GasShift) model.getAttribute("currentGasShift");
+        if (currentShift != null && !cashierIds.contains(currentShift.getCashierId())) {
+            cashierIds.add(currentShift.getCashierId());
+        }
+        Map<Long, String> cashierNames = gasSalesCashierNames(tenantId, cashierIds);
+
+        List<GasSalesChartPoint> chartPoints = gasSalesChart(
+                tenantId, branchId, range);
+        List<GasSalesPaymentView> paymentViews = gasSalesPaymentViews(analytics.paymentMix());
+        String paymentCurrency = analytics.paymentMix().stream()
+                .anyMatch(row -> CurrencyCode.USD.equals(row.currency())
+                        && nvl(row.amount()).signum() > 0)
+                ? CurrencyCode.USD.name()
+                : CurrencyCode.ZWG.name();
+        BigDecimal paymentTotal = paymentViews.stream()
+                .map(GasSalesPaymentView::amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        String paymentGradient = paymentViews.isEmpty()
+                ? "#e7edf5 0% 100%"
+                : paymentViews.stream()
+                        .map(view -> view.color() + " " + view.startPercent() + "% "
+                                + view.endPercent() + "%")
+                        .collect(Collectors.joining(", "));
+
+        model.addAttribute("allGasSales", salesPage.getContent());
+        model.addAttribute("gasSalesPage", salesPage);
+        model.addAttribute("gasSalesPageFrom", salesPage.getTotalElements() == 0
+                ? 0
+                : (long) salesPage.getNumber() * salesPage.getSize() + 1);
+        model.addAttribute("gasSalesPageTo", Math.min(
+                (long) (salesPage.getNumber() + 1) * salesPage.getSize(),
+                salesPage.getTotalElements()));
+        addNamedPaginationModel(model, "gasSales", salesPage, "/shop/gas/sales",
+                "salesPage", "salesSize", params(
+                        "branchId", branchId,
+                        "salesQuery", normalizedQuery,
+                        "salesPayment", normalizedPayment,
+                        "salesCashierId", cashierId,
+                        "salesPeriod", range.key()));
+        model.addAttribute("gasSalesQuery", normalizedQuery == null ? "" : normalizedQuery);
+        model.addAttribute("gasSalesPayment", normalizedPayment);
+        model.addAttribute("gasSalesCashierId", cashierId);
+        model.addAttribute("gasSalesPeriod", range.key());
+        model.addAttribute("gasSalesPeriodLabel", range.label());
+        model.addAttribute("gasSalesPaymentMethods", GAS_SALE_PAYMENT_METHODS);
+        model.addAttribute("gasSalesCashierNames", cashierNames);
+        model.addAttribute("gasSalesAnalytics", analytics);
+        model.addAttribute("gasSalesRevenueGrowth",
+                growth(analytics.revenueUsd(), previous.revenueUsd()));
+        model.addAttribute("gasSalesKgGrowth",
+                growth(analytics.soldKg(), previous.soldKg()));
+        model.addAttribute("gasSalesTransactionGrowth",
+                growth(BigDecimal.valueOf(analytics.transactions()),
+                        BigDecimal.valueOf(previous.transactions())));
+        model.addAttribute("gasSalesAverageGrowth",
+                growth(analytics.averageSaleUsd(), previous.averageSaleUsd()));
+        model.addAttribute("gasSalesChart", chartPoints);
+        model.addAttribute("gasSalesPaymentViews", paymentViews);
+        model.addAttribute("gasSalesPaymentCurrency", paymentCurrency);
+        model.addAttribute("gasSalesPaymentTotal", paymentTotal);
+        model.addAttribute("gasSalesPaymentGradient", paymentGradient);
+    }
+
+    private GasSalesDateRange gasSalesDateRange(String requestedPeriod) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime tomorrow = today.plusDays(1).atStartOfDay();
+        String period = requestedPeriod == null ? "today" : requestedPeriod.trim().toLowerCase();
+        return switch (period) {
+            case "7days" -> new GasSalesDateRange(
+                    "7days", "Last 7 days",
+                    today.minusDays(6).atStartOfDay(), tomorrow,
+                    today.minusDays(13).atStartOfDay(), today.minusDays(6).atStartOfDay());
+            case "month" -> {
+                LocalDate monthStart = today.withDayOfMonth(1);
+                LocalDate previousMonthStart = monthStart.minusMonths(1);
+                yield new GasSalesDateRange(
+                        "month", "This month",
+                        monthStart.atStartOfDay(), tomorrow,
+                        previousMonthStart.atStartOfDay(), monthStart.atStartOfDay());
+            }
+            default -> new GasSalesDateRange(
+                    "today", "Today",
+                    today.atStartOfDay(), tomorrow,
+                    today.minusDays(1).atStartOfDay(), today.atStartOfDay());
+        };
+    }
+
+    private List<GasSalesChartPoint> gasSalesChart(Long tenantId, Long branchId,
+                                                   GasSalesDateRange range) {
+        List<GasSalesChartValue> values = new ArrayList<>();
+        if ("today".equals(range.key())) {
+            List<GasOperationsService.HourlyRevenue> hourly = gasOperations.salesHourlyRevenue(
+                    tenantId, branchId, range.from(), range.to());
+            for (int hour = 0; hour < 24; hour += 2) {
+                BigDecimal usd = BigDecimal.ZERO;
+                BigDecimal zwg = BigDecimal.ZERO;
+                for (int offset = 0; offset < 2; offset++) {
+                    int index = hour + offset;
+                    if (index < hourly.size()) {
+                        usd = usd.add(nvl(hourly.get(index).usd()));
+                        zwg = zwg.add(nvl(hourly.get(index).zwg()));
+                    }
+                }
+                values.add(new GasSalesChartValue(
+                        String.format("%02d:00", hour), usd, zwg));
+            }
+        } else {
+            gasOperations.salesDailyRevenue(
+                            tenantId, branchId, range.from(), range.to())
+                    .forEach(day -> values.add(new GasSalesChartValue(
+                            day.date().format(DateTimeFormatter.ofPattern("dd MMM")),
+                            nvl(day.usd()), nvl(day.zwg()))));
+        }
+        BigDecimal peak = values.stream()
+                .map(GasSalesChartValue::usd)
+                .max(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+        return values.stream()
+                .map(value -> {
+                    int height = peak.signum() == 0 ? 0 : value.usd()
+                            .multiply(BigDecimal.valueOf(100))
+                            .divide(peak, 0, RoundingMode.HALF_UP)
+                            .intValue();
+                    if (value.usd().signum() > 0) {
+                        height = Math.max(4, height);
+                    }
+                    return new GasSalesChartPoint(
+                            value.label(), value.usd(), value.zwg(), height);
+                })
+                .toList();
+    }
+
+    private List<GasSalesPaymentView> gasSalesPaymentViews(
+            List<GasOperationsService.PaymentMix> rows) {
+        CurrencyCode currency = rows.stream()
+                .anyMatch(row -> CurrencyCode.USD.equals(row.currency())
+                        && nvl(row.amount()).signum() > 0)
+                ? CurrencyCode.USD
+                : CurrencyCode.ZWG;
+        Map<String, BigDecimal> totals = new LinkedHashMap<>();
+        rows.stream()
+                .filter(row -> currency.equals(row.currency()))
+                .forEach(row -> totals.merge(
+                        row.paymentMethod(), nvl(row.amount()), BigDecimal::add));
+        BigDecimal grandTotal = totals.values().stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        String[] colors = {"#0b69f0", "#7b4be2", "#ff8b20", "#17b890", "#e84f6a", "#4b7bec"};
+        List<GasSalesPaymentView> views = new ArrayList<>();
+        BigDecimal cursor = BigDecimal.ZERO;
+        int index = 0;
+        for (Map.Entry<String, BigDecimal> entry : totals.entrySet()) {
+            BigDecimal percent = percentage(entry.getValue(), grandTotal);
+            BigDecimal end = cursor.add(percent);
+            views.add(new GasSalesPaymentView(
+                    entry.getKey(), entry.getValue(), percent,
+                    colors[index % colors.length], cursor, end));
+            cursor = end;
+            index++;
+        }
+        if (!views.isEmpty()) {
+            GasSalesPaymentView last = views.get(views.size() - 1);
+            views.set(views.size() - 1, new GasSalesPaymentView(
+                    last.method(), last.amount(), last.percent(), last.color(),
+                    last.startPercent(), BigDecimal.valueOf(100)));
+        }
+        return views;
+    }
+
+    private Map<Long, String> gasSalesCashierNames(Long tenantId, List<Long> cashierIds) {
+        Map<Long, User> found = users.findAllById(cashierIds).stream()
+                .filter(user -> tenantId.equals(user.getTenantId()))
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+        Map<Long, String> names = new LinkedHashMap<>();
+        cashierIds.stream().distinct().forEach(id -> {
+            User user = found.get(id);
+            if (user == null) {
+                names.put(id, "User #" + id);
+                return;
+            }
+            String name = ((user.getFirstName() == null ? "" : user.getFirstName()) + " "
+                    + (user.getLastName() == null ? "" : user.getLastName())).trim();
+            names.put(id, name.isBlank() ? user.getEmail() : name);
+        });
+        return names;
+    }
+
+    private BigDecimal growth(BigDecimal currentValue, BigDecimal previousValue) {
+        BigDecimal previous = nvl(previousValue);
+        BigDecimal currentAmount = nvl(currentValue);
+        if (previous.signum() == 0) {
+            return currentAmount.signum() == 0 ? BigDecimal.ZERO : BigDecimal.valueOf(100);
+        }
+        return currentAmount.subtract(previous)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(previous.abs(), 1, RoundingMode.HALF_UP);
+    }
+
+    private void addGasRestockModel(Model model, Long tenantId, Long branchId,
+                                    int pageNumber, int pageSize,
+                                    String query, Long tankId, CurrencyCode currency,
+                                    String period) {
+        GasRestockDateRange selectedRange = gasRestockDateRange(period);
+        GasRestockDateRange monthRange = gasRestockDateRange("month");
+        String normalizedQuery = blank(query);
+        List<GasTank> tanksForBranch = gasOperations.tanks(tenantId, branchId);
+        Map<Long, String> tankNames = tanksForBranch.stream()
+                .collect(Collectors.toMap(GasTank::getId, GasTank::getName));
+        Page<GasRestock> restockPage = gasOperations.restockPage(
+                tenantId, branchId, selectedRange.from(), selectedRange.to(),
+                normalizedQuery, tankId, currency,
+                PageRequest.of(pageNumber, pageSize));
+        GasOperationsService.RestockSummary selectedSummary = gasOperations.restockSummary(
+                tenantId, branchId, selectedRange.from(), selectedRange.to());
+        GasOperationsService.RestockSummary monthSummary = gasOperations.restockSummary(
+                tenantId, branchId, monthRange.from(), monthRange.to());
+
+        List<GasRestockTankView> reorderViews = tanksForBranch.stream()
+                .filter(tank -> nvl(tank.getReorderLevelKg()).signum() > 0)
+                .filter(tank -> nvl(tank.getCurrentKg()).compareTo(nvl(tank.getReorderLevelKg())) <= 0)
+                .map(tank -> {
+                    BigDecimal currentKg = nvl(tank.getCurrentKg());
+                    BigDecimal capacityKg = nvl(tank.getCapacityKg());
+                    BigDecimal suggestedKg = capacityKg.subtract(currentKg).max(BigDecimal.ZERO);
+                    int fillPercent = capacityKg.signum() == 0 ? 0 : currentKg
+                            .multiply(BigDecimal.valueOf(100))
+                            .divide(capacityKg, 0, RoundingMode.HALF_UP)
+                            .intValue();
+                    return new GasRestockTankView(
+                            tank.getId(), tank.getName(), tank.getProductName(),
+                            currentKg, capacityKg, nvl(tank.getReorderLevelKg()),
+                            suggestedKg, Math.max(0, Math.min(fillPercent, 100)));
+                })
+                .sorted(Comparator.comparing(GasRestockTankView::fillPercent))
+                .toList();
+        BigDecimal suggestedTotal = reorderViews.stream()
+                .map(GasRestockTankView::suggestedKg)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal currentTotal = tanksForBranch.stream()
+                .map(GasTank::getCurrentKg)
+                .map(this::nvl)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal capacityTotal = tanksForBranch.stream()
+                .map(GasTank::getCapacityKg)
+                .map(this::nvl)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Set<Long> creatorIds = restockPage.getContent().stream()
+                .map(GasRestock::getCreatedBy)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<Long, String> creatorNames = users.findAllById(creatorIds).stream()
+                .filter(user -> tenantId.equals(user.getTenantId()))
+                .collect(Collectors.toMap(
+                        User::getId,
+                        user -> ((user.getFirstName() == null ? "" : user.getFirstName()) + " "
+                                + (user.getLastName() == null ? "" : user.getLastName())).trim()));
+
+        model.addAttribute("gasRestocks", restockPage.getContent());
+        model.addAttribute("gasRestockPage", restockPage);
+        model.addAttribute("gasRestockPageFrom", restockPage.getTotalElements() == 0
+                ? 0
+                : (long) restockPage.getNumber() * restockPage.getSize() + 1);
+        model.addAttribute("gasRestockPageTo", Math.min(
+                (long) (restockPage.getNumber() + 1) * restockPage.getSize(),
+                restockPage.getTotalElements()));
+        addNamedPaginationModel(model, "gasRestock", restockPage, "/shop/gas/restocking",
+                "restockPage", "restockSize", params(
+                        "branchId", branchId,
+                        "restockQuery", normalizedQuery,
+                        "restockTankId", tankId,
+                        "restockCurrency", currency,
+                        "restockPeriod", selectedRange.key()));
+        model.addAttribute("gasRestockQuery", normalizedQuery == null ? "" : normalizedQuery);
+        model.addAttribute("gasRestockTankId", tankId);
+        model.addAttribute("gasRestockCurrency", currency);
+        model.addAttribute("gasRestockPeriod", selectedRange.key());
+        model.addAttribute("gasRestockPeriodLabel", selectedRange.label());
+        model.addAttribute("gasRestockToday", LocalDate.now());
+        model.addAttribute("gasRestockTankNames", tankNames);
+        model.addAttribute("gasRestockCreatorNames", creatorNames);
+        model.addAttribute("gasRestockReorderRows", reorderViews);
+        model.addAttribute("gasRestockSuggestedTotal", suggestedTotal);
+        model.addAttribute("gasRestockCapacityPercent", percentage(currentTotal, capacityTotal));
+        model.addAttribute("gasRestockSelectedSummary", selectedSummary);
+        model.addAttribute("gasRestockMonthSummary", monthSummary);
+        model.addAttribute("gasRestockSuppliers", suppliers.findByTenantIdAndIsActiveTrue(tenantId));
+        model.addAttribute("gasRestockReturnTo", namedPageUrl(
+                "/shop/gas/restocking", "restockPage", "restockSize",
+                params(
+                        "branchId", branchId,
+                        "restockQuery", normalizedQuery,
+                        "restockTankId", tankId,
+                        "restockCurrency", currency,
+                        "restockPeriod", selectedRange.key()),
+                restockPage.getNumber(), restockPage.getSize()));
+    }
+
+    private GasRestockDateRange gasRestockDateRange(String requestedPeriod) {
+        LocalDate today = LocalDate.now();
+        String period = requestedPeriod == null ? "month" : requestedPeriod.trim().toLowerCase();
+        return switch (period) {
+            case "today" -> new GasRestockDateRange(
+                    "today", "Today", today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+            case "7days" -> new GasRestockDateRange(
+                    "7days", "Last 7 days", today.minusDays(6).atStartOfDay(),
+                    today.plusDays(1).atStartOfDay());
+            default -> new GasRestockDateRange(
+                    "month", "This month", today.withDayOfMonth(1).atStartOfDay(),
+                    today.plusDays(1).atStartOfDay());
+        };
+    }
+
+    private void addGasExpenseModel(Model model, Long tenantId, Long branchId,
+                                    int pageNumber, int pageSize,
+                                    String query, String category, String paymentMethod,
+                                    String period) {
+        GasExpenseDateRange selectedRange = gasExpenseDateRange(period);
+        GasExpenseDateRange todayRange = gasExpenseDateRange("today");
+        GasExpenseDateRange monthRange = gasExpenseDateRange("month");
+        String normalizedQuery = blank(query);
+        String normalizedCategory = blank(category);
+        String normalizedPayment = blank(paymentMethod);
+
+        Page<GasExpense> expensePage = gasOperations.expensePage(
+                tenantId, branchId, selectedRange.from(), selectedRange.to(),
+                normalizedQuery, normalizedCategory, normalizedPayment,
+                PageRequest.of(pageNumber, pageSize));
+        GasOperationsService.ExpenseAnalytics analytics = gasOperations.expenseAnalytics(
+                tenantId, branchId, selectedRange.from(), selectedRange.to());
+        GasOperationsService.ExpenseCurrencySummary todayUsd = expenseCurrencySummary(
+                gasOperations.expenseCurrencySummary(
+                        tenantId, branchId, todayRange.from(), todayRange.to()),
+                CurrencyCode.USD);
+        GasOperationsService.ExpenseCurrencySummary monthUsd = expenseCurrencySummary(
+                gasOperations.expenseCurrencySummary(
+                        tenantId, branchId, monthRange.from(), monthRange.to()),
+                CurrencyCode.USD);
+        GasOperationsService.ExpenseCurrencySummary selectedUsd =
+                expenseCurrencySummary(analytics.currencies(), CurrencyCode.USD);
+        GasOperationsService.ExpenseCurrencySummary selectedZwg =
+                expenseCurrencySummary(analytics.currencies(), CurrencyCode.ZWG);
+
+        List<GasExpenseCategoryView> categoryViews = expenseCategoryViews(
+                analytics.categories(), selectedUsd.total());
+        GasExpenseCategoryView largestCategory = categoryViews.stream()
+                .findFirst()
+                .orElse(new GasExpenseCategoryView("No USD expenses", BigDecimal.ZERO,
+                        BigDecimal.ZERO, "tone-1"));
+        BigDecimal averageUsd = selectedUsd.count() == 0
+                ? BigDecimal.ZERO
+                : selectedUsd.total().divide(
+                        BigDecimal.valueOf(selectedUsd.count()), 2, RoundingMode.HALF_UP);
+
+        Set<Long> creatorIds = expensePage.getContent().stream()
+                .map(GasExpense::getCreatedBy)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<Long, String> creatorNames = users.findAllById(creatorIds).stream()
+                .filter(user -> tenantId.equals(user.getTenantId()))
+                .collect(Collectors.toMap(
+                        User::getId,
+                        user -> ((user.getFirstName() == null ? "" : user.getFirstName()) + " "
+                                + (user.getLastName() == null ? "" : user.getLastName())).trim()));
+
+        model.addAttribute("gasExpenses", expensePage.getContent());
+        model.addAttribute("gasExpensePage", expensePage);
+        model.addAttribute("gasExpensePageFrom", expensePage.getTotalElements() == 0
+                ? 0
+                : (long) expensePage.getNumber() * expensePage.getSize() + 1);
+        model.addAttribute("gasExpensePageTo", Math.min(
+                (long) (expensePage.getNumber() + 1) * expensePage.getSize(),
+                expensePage.getTotalElements()));
+        addNamedPaginationModel(model, "gasExpense", expensePage, "/shop/gas/expenses",
+                "expensePage", "expenseSize", params(
+                        "branchId", branchId,
+                        "expenseQuery", normalizedQuery,
+                        "expenseCategory", normalizedCategory,
+                        "expensePayment", normalizedPayment,
+                        "expensePeriod", selectedRange.key()));
+        model.addAttribute("gasExpenseQuery", normalizedQuery == null ? "" : normalizedQuery);
+        model.addAttribute("gasExpenseCategory", normalizedCategory);
+        model.addAttribute("gasExpensePayment", normalizedPayment);
+        model.addAttribute("gasExpensePeriod", selectedRange.key());
+        model.addAttribute("gasExpensePeriodLabel", selectedRange.label());
+        model.addAttribute("gasExpenseCategories", gasOperations.expenseCategories(tenantId, branchId));
+        model.addAttribute("gasExpensePaymentMethods", GAS_EXPENSE_PAYMENT_METHODS);
+        model.addAttribute("gasExpenseCreatorNames", creatorNames);
+        model.addAttribute("gasExpenseTodayUsd", todayUsd.total());
+        model.addAttribute("gasExpenseTodayCount", todayUsd.count());
+        model.addAttribute("gasExpenseMonthUsd", monthUsd.total());
+        model.addAttribute("gasExpenseMonthCount", monthUsd.count());
+        model.addAttribute("gasExpenseAverageUsd", averageUsd);
+        model.addAttribute("gasExpenseLargestCategory", largestCategory);
+        model.addAttribute("gasExpenseSelectedUsd", selectedUsd.total());
+        model.addAttribute("gasExpenseSelectedUsdCount", selectedUsd.count());
+        model.addAttribute("gasExpenseSelectedZwg", selectedZwg.total());
+        model.addAttribute("gasExpenseSelectedZwgCount", selectedZwg.count());
+        model.addAttribute("gasExpenseSelectedZwgLast", selectedZwg.lastRecordedAt());
+        model.addAttribute("gasExpenseTrend", expenseTrend(analytics.daily(), selectedRange));
+        model.addAttribute("gasExpenseCategoryRows", categoryViews);
+        model.addAttribute("gasExpenseLargestShareUsd", largestCategory.percent());
+        model.addAttribute("gasExpenseReturnTo", namedPageUrl(
+                "/shop/gas/expenses", "expensePage", "expenseSize",
+                params(
+                        "branchId", branchId,
+                        "expenseQuery", normalizedQuery,
+                        "expenseCategory", normalizedCategory,
+                        "expensePayment", normalizedPayment,
+                        "expensePeriod", selectedRange.key()),
+                expensePage.getNumber(), expensePage.getSize()));
+    }
+
+    private GasOperationsService.ExpenseCurrencySummary expenseCurrencySummary(
+            List<GasOperationsService.ExpenseCurrencySummary> rows, CurrencyCode currency) {
+        return rows.stream()
+                .filter(row -> currency.equals(row.currency()))
+                .findFirst()
+                .orElse(new GasOperationsService.ExpenseCurrencySummary(
+                        currency, BigDecimal.ZERO, 0, null));
+    }
+
+    private List<GasExpenseCategoryView> expenseCategoryViews(
+            List<GasOperationsService.ExpenseCategorySummary> rows, BigDecimal usdTotal) {
+        String[] tones = {"tone-1", "tone-2", "tone-3", "tone-4", "tone-5"};
+        List<GasOperationsService.ExpenseCategorySummary> usdRows = rows.stream()
+                .filter(row -> CurrencyCode.USD.equals(row.currency()))
+                .sorted(Comparator.comparing(GasOperationsService.ExpenseCategorySummary::total).reversed())
+                .limit(5)
+                .toList();
+        List<GasExpenseCategoryView> result = new ArrayList<>();
+        for (int i = 0; i < usdRows.size(); i++) {
+            GasOperationsService.ExpenseCategorySummary row = usdRows.get(i);
+            result.add(new GasExpenseCategoryView(
+                    row.category(), row.total(), percentage(row.total(), usdTotal), tones[i]));
+        }
+        return result;
+    }
+
+    private List<GasExpenseTrendDay> expenseTrend(
+            List<GasOperationsService.ExpenseDailySummary> rows,
+            GasExpenseDateRange range) {
+        Map<LocalDate, BigDecimal> usdByDate = rows.stream()
+                .filter(row -> CurrencyCode.USD.equals(row.currency()))
+                .collect(Collectors.toMap(
+                        GasOperationsService.ExpenseDailySummary::date,
+                        GasOperationsService.ExpenseDailySummary::total,
+                        BigDecimal::add));
+        List<LocalDate> dates = range.from().toLocalDate()
+                .datesUntil(range.to().toLocalDate())
+                .toList();
+        BigDecimal peak = dates.stream()
+                .map(date -> nvl(usdByDate.get(date)))
+                .max(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+        int labelStep = dates.size() > 14 ? 3 : 1;
+        List<GasExpenseTrendDay> result = new ArrayList<>();
+        for (int i = 0; i < dates.size(); i++) {
+            LocalDate date = dates.get(i);
+            BigDecimal total = nvl(usdByDate.get(date));
+            int height = peak.signum() == 0 ? 0 : total
+                    .multiply(BigDecimal.valueOf(100))
+                    .divide(peak, 0, RoundingMode.HALF_UP)
+                    .intValue();
+            if (total.signum() > 0) {
+                height = Math.max(5, height);
+            }
+            result.add(new GasExpenseTrendDay(
+                    date.format(DateTimeFormatter.ofPattern("dd MMM")),
+                    i % labelStep == 0 || i == dates.size() - 1
+                            ? date.format(DateTimeFormatter.ofPattern("dd"))
+                            : "",
+                    total, height, total.signum() > 0));
+        }
+        return result;
+    }
+
+    private GasExpenseDateRange gasExpenseDateRange(String requestedPeriod) {
+        LocalDate today = LocalDate.now();
+        String period = requestedPeriod == null ? "month" : requestedPeriod.trim().toLowerCase();
+        return switch (period) {
+            case "today" -> new GasExpenseDateRange(
+                    "today", "Today", today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+            case "7days" -> new GasExpenseDateRange(
+                    "7days", "Last 7 days", today.minusDays(6).atStartOfDay(),
+                    today.plusDays(1).atStartOfDay());
+            default -> new GasExpenseDateRange(
+                    "month", "This month", today.withDayOfMonth(1).atStartOfDay(),
+                    today.plusDays(1).atStartOfDay());
+        };
+    }
+
+    private List<GasAccountingHour> gasAccountingHours(GasOperationsService.GasDashboard dashboard) {
+        if (dashboard == null || dashboard.hourlyRevenue() == null) {
+            return List.of();
+        }
+        BigDecimal peak = dashboard.hourlyRevenue().stream()
+                .map(GasOperationsService.HourlyRevenue::usd)
+                .map(this::nvl)
+                .max(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+        return dashboard.hourlyRevenue().stream()
+                .map(hour -> {
+                    BigDecimal revenue = nvl(hour.usd());
+                    int height = peak.signum() == 0 ? 0 : revenue
+                            .multiply(BigDecimal.valueOf(100))
+                            .divide(peak, 0, RoundingMode.HALF_UP)
+                            .intValue();
+                    if (revenue.signum() > 0) {
+                        height = Math.max(4, height);
+                    }
+                    return new GasAccountingHour(
+                            String.format("%02d:00", hour.hour()), revenue, height, revenue.signum() > 0);
+                })
+                .toList();
+    }
+
+    private BigDecimal percentage(BigDecimal value, BigDecimal total) {
+        BigDecimal safeTotal = nvl(total);
+        if (safeTotal.signum() == 0) {
+            return BigDecimal.ZERO;
+        }
+        return nvl(value)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(safeTotal, 1, RoundingMode.HALF_UP);
     }
 
     private boolean belongsToBranch(User user, Long branchId, Long primaryBranchId) {
@@ -3297,6 +4270,21 @@ public class ShopWebController {
         model.addAttribute(prefix + "NextUrl", page.hasNext() ? pageUrl(path, params, page.getNumber() + 1, page.getSize()) : null);
     }
 
+    private void addNamedPaginationModel(Model model, String prefix, Page<?> page,
+                                         String path, String pageParameter, String sizeParameter,
+                                         Map<String, ?> params) {
+        model.addAttribute(prefix + "PageLinks",
+                namedPageLinks(page, path, pageParameter, sizeParameter, params));
+        model.addAttribute(prefix + "PrevUrl", page.hasPrevious()
+                ? namedPageUrl(path, pageParameter, sizeParameter, params,
+                        page.getNumber() - 1, page.getSize())
+                : null);
+        model.addAttribute(prefix + "NextUrl", page.hasNext()
+                ? namedPageUrl(path, pageParameter, sizeParameter, params,
+                        page.getNumber() + 1, page.getSize())
+                : null);
+    }
+
     private List<PageLink> pageLinks(Page<?> page, String path, Map<String, ?> params) {
         int totalPages = page.getTotalPages();
         if (totalPages <= 1) {
@@ -3313,8 +4301,42 @@ public class ShopWebController {
         return links;
     }
 
+    private List<PageLink> namedPageLinks(Page<?> page, String path,
+                                          String pageParameter, String sizeParameter,
+                                          Map<String, ?> params) {
+        int totalPages = page.getTotalPages();
+        if (totalPages <= 1) {
+            return List.of();
+        }
+        int current = page.getNumber();
+        int start = Math.max(0, current - 3);
+        int end = Math.min(totalPages - 1, start + 6);
+        start = Math.max(0, end - 6);
+        List<PageLink> links = new ArrayList<>();
+        for (int i = start; i <= end; i++) {
+            links.add(new PageLink(i, String.valueOf(i + 1),
+                    namedPageUrl(path, pageParameter, sizeParameter, params, i, page.getSize()),
+                    i == current));
+        }
+        return links;
+    }
+
     private String pageUrl(String path, Map<String, ?> params, int page, int size) {
         StringBuilder url = new StringBuilder(path).append("?page=").append(page).append("&size=").append(size);
+        params.forEach((key, value) -> {
+            if (value != null && !value.toString().isBlank()) {
+                url.append("&").append(key).append("=")
+                        .append(URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));
+            }
+        });
+        return url.toString();
+    }
+
+    private String namedPageUrl(String path, String pageParameter, String sizeParameter,
+                                Map<String, ?> params, int page, int size) {
+        StringBuilder url = new StringBuilder(path)
+                .append("?").append(pageParameter).append("=").append(page)
+                .append("&").append(sizeParameter).append("=").append(size);
         params.forEach((key, value) -> {
             if (value != null && !value.toString().isBlank()) {
                 url.append("&").append(key).append("=")
@@ -3328,6 +4350,14 @@ public class ShopWebController {
         return URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8);
     }
 
+    private String csvCell(String value) {
+        String safe = value == null ? "" : value;
+        if (!safe.isEmpty() && "=+-@".indexOf(safe.charAt(0)) >= 0) {
+            safe = "'" + safe;
+        }
+        return "\"" + safe.replace("\"", "\"\"") + "\"";
+    }
+
     private <E extends Enum<E>> E parseEnum(String value, Class<E> type) {
         if (value == null || value.isBlank()) return null;
         try {
@@ -3338,6 +4368,50 @@ public class ShopWebController {
     }
 
     public record PageLink(int number, String label, String url, boolean active) {
+    }
+
+    public record GasAccountingHour(String label, BigDecimal revenueUsd,
+                                    int heightPercent, boolean hasRevenue) {
+    }
+
+    public record GasSalesDateRange(String key, String label,
+                                    LocalDateTime from, LocalDateTime to,
+                                    LocalDateTime previousFrom, LocalDateTime previousTo) {
+    }
+
+    private record GasSalesChartValue(String label, BigDecimal usd, BigDecimal zwg) {
+    }
+
+    public record GasSalesChartPoint(String label, BigDecimal revenueUsd,
+                                     BigDecimal revenueZwg, int heightPercent) {
+    }
+
+    public record GasSalesPaymentView(String method, BigDecimal amount,
+                                      BigDecimal percent, String color,
+                                      BigDecimal startPercent, BigDecimal endPercent) {
+    }
+
+    public record GasExpenseDateRange(String key, String label,
+                                      LocalDateTime from, LocalDateTime to) {
+    }
+
+    public record GasExpenseTrendDay(String label, String shortLabel,
+                                     BigDecimal totalUsd, int heightPercent,
+                                     boolean hasExpense) {
+    }
+
+    public record GasExpenseCategoryView(String category, BigDecimal total,
+                                         BigDecimal percent, String tone) {
+    }
+
+    public record GasRestockDateRange(String key, String label,
+                                      LocalDateTime from, LocalDateTime to) {
+    }
+
+    public record GasRestockTankView(Long id, String name, String productName,
+                                     BigDecimal currentKg, BigDecimal capacityKg,
+                                     BigDecimal reorderKg, BigDecimal suggestedKg,
+                                     int fillPercent) {
     }
 
     public static class Insight {

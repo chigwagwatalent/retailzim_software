@@ -50,6 +50,7 @@ class GasTank {
     required this.currentKg,
     required this.capacityKg,
     required this.tareKg,
+    required this.fullGrossKg,
     required this.status,
   });
 
@@ -58,6 +59,7 @@ class GasTank {
   double currentKg;
   final double capacityKg;
   final double tareKg;
+  final double fullGrossKg;
   final String status;
   double get grossKg => currentKg + tareKg;
 
@@ -67,6 +69,9 @@ class GasTank {
         currentKg: (json['currentKg'] as num?)?.toDouble() ?? 0,
         capacityKg: (json['capacityKg'] as num?)?.toDouble() ?? 0,
         tareKg: (json['tareWeightKg'] as num?)?.toDouble() ?? 0,
+        fullGrossKg: (json['fullGrossWeightKg'] as num?)?.toDouble() ??
+            ((json['capacityKg'] as num?)?.toDouble() ?? 0) +
+                ((json['tareWeightKg'] as num?)?.toDouble() ?? 0),
         status: json['status'] as String? ?? 'ACTIVE',
       );
 
@@ -76,6 +81,7 @@ class GasTank {
         'currentKg': currentKg,
         'capacityKg': capacityKg,
         'tareWeightKg': tareKg,
+        'fullGrossWeightKg': fullGrossKg,
         'status': status,
       };
 }

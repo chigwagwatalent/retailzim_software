@@ -43,9 +43,65 @@ document.querySelectorAll('.theme-toggle i').forEach((icon) => {
 document.addEventListener('DOMContentLoaded', () => {
   setupSignupWizard();
   setupShiftCloseForms();
+  setupGasTankWeightForms();
+  setupGasReconciliationForms();
   openRequestedModal();
   enhanceForms();
 });
+
+function setupGasTankWeightForms() {
+  document.querySelectorAll('.gas-tank-weight-form').forEach((form) => {
+    const tare = form.querySelector('[data-gas-tare]');
+    const fullGross = form.querySelector('[data-gas-full-gross]');
+    const currentGross = form.querySelector('[data-gas-current-gross]');
+    const reorder = form.querySelector('[data-gas-reorder]');
+    const capacityOutput = form.querySelector('[data-gas-capacity]');
+    const currentNetOutput = form.querySelector('[data-gas-current-net]');
+    if (!tare || !fullGross || !currentGross) return;
+
+    const update = () => {
+      const tareKg = Number.parseFloat(tare.value);
+      const fullGrossKg = Number.parseFloat(fullGross.value);
+      const currentGrossKg = Number.parseFloat(currentGross.value);
+      const capacityKg = Number.isFinite(tareKg) && Number.isFinite(fullGrossKg)
+        ? Math.max(0, fullGrossKg - tareKg)
+        : 0;
+      const currentNetKg = Number.isFinite(tareKg) && Number.isFinite(currentGrossKg)
+        ? Math.max(0, currentGrossKg - tareKg)
+        : 0;
+
+      if (capacityOutput) capacityOutput.textContent = `${capacityKg.toFixed(3)} kg`;
+      if (currentNetOutput) currentNetOutput.textContent = `${currentNetKg.toFixed(3)} kg`;
+      if (Number.isFinite(tareKg)) {
+        fullGross.min = (tareKg + 0.001).toFixed(3);
+        currentGross.min = tareKg.toFixed(3);
+      }
+      if (Number.isFinite(fullGrossKg)) currentGross.max = fullGrossKg.toFixed(3);
+      if (reorder) reorder.max = capacityKg.toFixed(3);
+    };
+
+    [tare, fullGross, currentGross].forEach((field) => field.addEventListener('input', update));
+    update();
+  });
+}
+
+function setupGasReconciliationForms() {
+  document.querySelectorAll('.gas-reconcile-weight-form').forEach((form) => {
+    const tare = form.querySelector('[data-gas-reconcile-tare]');
+    const gross = form.querySelector('[data-gas-reconcile-gross]');
+    const net = form.querySelector('[data-gas-reconcile-net]');
+    if (!tare || !gross || !net) return;
+    const update = () => {
+      const tareKg = Number.parseFloat(tare.value);
+      const grossKg = Number.parseFloat(gross.value);
+      net.value = Number.isFinite(tareKg) && Number.isFinite(grossKg)
+        ? `${Math.max(0, grossKg - tareKg).toFixed(3)} kg`
+        : 'Enter the gross weight';
+    };
+    gross.addEventListener('input', update);
+    update();
+  });
+}
 
 window.addEventListener('load', () => {
   window.setTimeout(() => {

@@ -3,6 +3,7 @@ package com.retailzw.dto.request;
 import com.retailzw.enums.CurrencyCode;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
@@ -17,10 +18,19 @@ public class GasRestockRequest {
     @DecimalMin(value = "0.001", message = "Quantity must be greater than zero")
     private BigDecimal quantityKg;
 
+    @NotNull(message = "Currency is required")
     private CurrencyCode currency = CurrencyCode.USD;
+
+    @DecimalMin(value = "0.00", message = "Unit cost cannot be negative")
     private BigDecimal unitCost = BigDecimal.ZERO;
+
+    @Size(max = 120, message = "Supplier name must be 120 characters or fewer")
     private String supplierName;
+
+    @Size(max = 120, message = "Invoice or reference must be 120 characters or fewer")
     private String supplierInvoice;
+
+    @Size(max = 500, message = "Notes must be 500 characters or fewer")
     private String notes;
 
     public Long getBranchId() { return branchId; }

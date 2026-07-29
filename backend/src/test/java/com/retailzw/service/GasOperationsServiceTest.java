@@ -1,11 +1,13 @@
 package com.retailzw.service;
 
 import com.retailzw.dto.request.CloseGasShiftRequest;
+import com.retailzw.dto.request.GasExpenseRequest;
 import com.retailzw.dto.request.GasRestockRequest;
 import com.retailzw.dto.request.GasSaleRequest;
 import com.retailzw.dto.request.GasSaleTankRequest;
 import com.retailzw.dto.request.GasTankClosingWeightRequest;
 import com.retailzw.dto.request.GasStockReconciliationRequest;
+import com.retailzw.dto.request.GasTankRequest;
 import com.retailzw.dto.request.OpenGasShiftRequest;
 import com.retailzw.enums.BusinessModule;
 import com.retailzw.enums.CurrencyCode;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +66,123 @@ public class GasOperationsServiceTest {
                 branches, tanks, prices, shifts, sales, restocks, expenses,
                 stockAdjustments, subscriptions, plans, shiftTanks,
                 saleTankAllocations, salePayments, heldChange);
+    }
+
+    @Test
+    public void tankSetupDerivesNetCapacityAndStockFromPhysicalWeights() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+        when(tanks.save(any(GasTank.class))).thenAnswer(invocation -> {
+            GasTank saved = invocation.getArgument(0);
+            saved.setId(10L);
+            return saved;
+        });
+        when(stockAdjustments.save(any(GasStockAdjustment.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        GasTankRequest request = new GasTankRequest();
+        request.setBranchId(branchId);
+        request.setName("Tank A");
+        request.setProductName("LPG Gas");
+        request.setTareWeightKg(new BigDecimal("200.000"));
+        request.setFullGrossWeightKg(new BigDecimal("1200.000"));
+        request.setCurrentGrossWeightKg(new BigDecimal("950.000"));
+        request.setReorderLevelKg(new BigDecimal("100.000"));
+
+        GasTank tank = service.createTank(tenantId, request);
+
+        assertThat(tank.getCapacityKg()).isEqualByComparingTo("1000.000");
+        assertThat(tank.getCurrentKg()).isEqualByComparingTo("750.000");
+        assertThat(tank.getCurrentGrossWeightKg()).isEqualByComparingTo("950.000");
+        verify(stockAdjustments).save(argThat(adjustment ->
+                adjustment.getCountedKg().compareTo(new BigDecimal("750.000")) == 0));
+    }
+
+    @Test
+    public void tankSetupRejectsCurrentGrossAboveFullGross() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+
+        GasTankRequest request = new GasTankRequest();
+        request.setBranchId(branchId);
+        request.setName("Tank A");
+        request.setProductName("LPG Gas");
+        request.setTareWeightKg(new BigDecimal("200.000"));
+        request.setFullGrossWeightKg(new BigDecimal("1200.000"));
+        request.setCurrentGrossWeightKg(new BigDecimal("1200.001"));
+        request.setReorderLevelKg(new BigDecimal("100.000"));
+
+        assertThatThrownBy(() -> service.createTank(tenantId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("cannot exceed its full gross weight");
+        verify(tanks, never()).save(any(GasTank.class));
+    }
+
+    @Test
+    public void expenseRecordingRejectsNonPositiveAmountsBeforePersistence() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+
+        GasExpenseRequest request = new GasExpenseRequest();
+        request.setBranchId(branchId);
+        request.setCategory("Rent");
+        request.setDescription("Monthly storage rent");
+        request.setAmount(BigDecimal.ZERO);
+        request.setCurrency(CurrencyCode.USD);
+        request.setPaymentMethod("CASH");
+
+        assertThatThrownBy(() -> service.recordExpense(tenantId, 9L, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("greater than zero");
+        verify(expenses, never()).save(any(GasExpense.class));
+    }
+
+    @Test
+    public void openingShiftSnapshotsDerivedGrossAndNetWeights() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        Long cashierId = 3L;
+        GasTank tank = GasTank.builder()
+                .id(10L).tenantId(tenantId).branchId(branchId)
+                .name("Tank A").productName("LPG Gas")
+                .tareWeightKg(new BigDecimal("200.000"))
+                .fullGrossWeightKg(new BigDecimal("1200.000"))
+                .capacityKg(new BigDecimal("1000.000"))
+                .currentKg(new BigDecimal("750.000"))
+                .status(GasTankStatus.ACTIVE).build();
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+        when(shifts.findByTenantIdAndBranchIdAndCashierIdAndStatus(
+                tenantId, branchId, cashierId, GasShiftStatus.OPEN)).thenReturn(Optional.empty());
+        when(tanks.findByTenantIdAndBranchIdAndStatusOrderByNameAsc(
+                tenantId, branchId, GasTankStatus.ACTIVE)).thenReturn(List.of(tank));
+        when(tanks.lockTank(tenantId, branchId, tank.getId())).thenReturn(Optional.of(tank));
+        when(shifts.save(any(GasShift.class))).thenAnswer(invocation -> {
+            GasShift saved = invocation.getArgument(0);
+            saved.setId(20L);
+            return saved;
+        });
+        when(shiftTanks.save(any(GasShiftTank.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        OpenGasShiftRequest request = new OpenGasShiftRequest();
+        request.setBranchId(branchId);
+        request.setTankIds(List.of(tank.getId()));
+        service.openShift(tenantId, cashierId, request);
+
+        verify(shiftTanks).save(argThat(snapshot ->
+                snapshot.getStartingGrossKg().compareTo(new BigDecimal("950.000")) == 0
+                        && snapshot.getStartingNetKg().compareTo(new BigDecimal("750.000")) == 0
+                        && snapshot.getExpectedClosingNetKg().compareTo(new BigDecimal("750.000")) == 0));
     }
 
     @Test
@@ -149,6 +269,9 @@ public class GasOperationsServiceTest {
         Long userId = 3L;
         GasTank tank = GasTank.builder()
                 .id(10L).tenantId(tenantId).branchId(branchId).name("Main Tank").productName("LPG")
+                .tareWeightKg(new BigDecimal("20.000"))
+                .capacityKg(new BigDecimal("100.000"))
+                .fullGrossWeightKg(new BigDecimal("120.000"))
                 .currentKg(new BigDecimal("10.000")).status(GasTankStatus.ACTIVE).build();
         when(branches.findById(branchId)).thenReturn(Optional.of(
                 Branch.builder().id(branchId).tenantId(tenantId).moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
@@ -164,7 +287,91 @@ public class GasOperationsServiceTest {
         GasRestock restock = service.restock(tenantId, userId, request);
 
         assertThat(tank.getCurrentKg()).isEqualByComparingTo("35.000");
+        assertThat(tank.getCurrentGrossWeightKg()).isEqualByComparingTo("55.000");
         assertThat(restock.getQuantityKg()).isEqualByComparingTo("25.000");
+    }
+
+    @Test
+    public void restockRejectsNegativeCostBeforeStockChanges() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        GasTank tank = GasTank.builder()
+                .id(10L).tenantId(tenantId).branchId(branchId).name("Main Tank").productName("LPG")
+                .capacityKg(new BigDecimal("100.000"))
+                .currentKg(new BigDecimal("10.000")).status(GasTankStatus.ACTIVE).build();
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+        when(tanks.lockTank(tenantId, branchId, tank.getId())).thenReturn(Optional.of(tank));
+
+        GasRestockRequest request = new GasRestockRequest();
+        request.setBranchId(branchId);
+        request.setTankId(tank.getId());
+        request.setQuantityKg(new BigDecimal("25.000"));
+        request.setUnitCost(new BigDecimal("-0.0100"));
+
+        assertThatThrownBy(() -> service.restock(tenantId, 3L, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("cannot be negative");
+        assertThat(tank.getCurrentKg()).isEqualByComparingTo("10.000");
+        verify(tanks, never()).save(any(GasTank.class));
+        verify(restocks, never()).save(any(GasRestock.class));
+    }
+
+    @Test
+    public void salesAnalyticsCalculatesPeriodTotalsAndAverageUsdSale() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        LocalDateTime from = LocalDateTime.of(2026, 7, 29, 0, 0);
+        LocalDateTime to = from.plusDays(1);
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+        when(sales.dailySummary(tenantId, branchId, from, to)).thenReturn(List.of(
+                new Object[]{CurrencyCode.USD, new BigDecimal("65.000"), new BigDecimal("143.00"), 6L},
+                new Object[]{CurrencyCode.ZWG, new BigDecimal("5.000"), new BigDecimal("300.00"), 1L}
+        ));
+        when(salePayments.paymentMix(tenantId, branchId, from, to)).thenReturn(List.of(
+                new Object[]{"CASH", CurrencyCode.USD, new BigDecimal("105.00")},
+                new Object[]{"ECOCASH", CurrencyCode.USD, new BigDecimal("38.00")}
+        ));
+
+        GasOperationsService.SalesAnalytics analytics =
+                service.salesAnalytics(tenantId, branchId, from, to);
+
+        assertThat(analytics.soldKg()).isEqualByComparingTo("70.000");
+        assertThat(analytics.revenueUsd()).isEqualByComparingTo("143.00");
+        assertThat(analytics.revenueZwg()).isEqualByComparingTo("300.00");
+        assertThat(analytics.transactions()).isEqualTo(7);
+        assertThat(analytics.averageSaleUsd()).isEqualByComparingTo("23.83");
+        assertThat(analytics.paymentMix()).hasSize(2);
+    }
+
+    @Test
+    public void cancellingGasHeldChangeKeepsTheRecordInTheGasBranchAudit() {
+        Long tenantId = 1L;
+        Long branchId = 2L;
+        Long userId = 3L;
+        HeldChange record = HeldChange.builder()
+                .id(40L).tenantId(tenantId).branchId(branchId)
+                .gasShiftId(20L).gasSaleId(30L)
+                .referenceNumber("GCH-40").customerName("Customer")
+                .phone("0770000000").currency(CurrencyCode.USD)
+                .amount(new BigDecimal("5.00"))
+                .status(HeldChange.Status.OPEN).build();
+        when(branches.findById(branchId)).thenReturn(Optional.of(
+                Branch.builder().id(branchId).tenantId(tenantId)
+                        .moduleType(BusinessModule.GAS_MODULE).isActive(true).build()));
+        when(heldChange.lockById(tenantId, record.getId())).thenReturn(Optional.of(record));
+        when(heldChange.save(any(HeldChange.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        HeldChange cancelled =
+                service.cancelGasHeldChange(tenantId, branchId, userId, record.getId());
+
+        assertThat(cancelled.getStatus()).isEqualTo(HeldChange.Status.CANCELLED);
+        assertThat(cancelled.getCancelledBy()).isEqualTo(userId);
+        assertThat(cancelled.getCancelledAt()).isNotNull();
+        verify(heldChange).save(record);
     }
 
     @Test
@@ -174,7 +381,9 @@ public class GasOperationsServiceTest {
         Long userId = 3L;
         GasTank tank = GasTank.builder()
                 .id(10L).tenantId(tenantId).branchId(branchId).name("Main Tank").productName("LPG")
+                .tareWeightKg(new BigDecimal("10.000"))
                 .capacityKg(new BigDecimal("100.000"))
+                .fullGrossWeightKg(new BigDecimal("110.000"))
                 .currentKg(new BigDecimal("50.000"))
                 .status(GasTankStatus.ACTIVE).build();
         when(branches.findById(branchId)).thenReturn(Optional.of(
@@ -188,7 +397,7 @@ public class GasOperationsServiceTest {
         GasStockReconciliationRequest request = new GasStockReconciliationRequest();
         request.setBranchId(branchId);
         request.setTankId(tank.getId());
-        request.setCountedKg(new BigDecimal("47.500"));
+        request.setCountedGrossKg(new BigDecimal("57.500"));
         request.setReason("DIP_VARIANCE");
         request.setNotes("Verified against morning dip reading");
 
@@ -237,9 +446,11 @@ public class GasOperationsServiceTest {
         Long cashierId = 3L;
         GasTank tankA = GasTank.builder().id(10L).tenantId(tenantId).branchId(branchId)
                 .name("Tank A").productName("LPG").currentKg(new BigDecimal("6.000"))
+                .tareWeightKg(new BigDecimal("10.000")).fullGrossWeightKg(new BigDecimal("30.000"))
                 .capacityKg(new BigDecimal("20.000")).status(GasTankStatus.ACTIVE).build();
         GasTank tankB = GasTank.builder().id(11L).tenantId(tenantId).branchId(branchId)
                 .name("Tank B").productName("LPG").currentKg(new BigDecimal("10.000"))
+                .tareWeightKg(new BigDecimal("15.000")).fullGrossWeightKg(new BigDecimal("35.000"))
                 .capacityKg(new BigDecimal("20.000")).status(GasTankStatus.ACTIVE).build();
         GasShift shift = GasShift.builder().id(20L).tenantId(tenantId).branchId(branchId)
                 .cashierId(cashierId).status(GasShiftStatus.OPEN).build();
@@ -289,6 +500,8 @@ public class GasOperationsServiceTest {
 
         assertThat(tankA.getCurrentKg()).isEqualByComparingTo("2.000");
         assertThat(tankB.getCurrentKg()).isEqualByComparingTo("6.000");
+        assertThat(tankA.getCurrentGrossWeightKg()).isEqualByComparingTo("12.000");
+        assertThat(tankB.getCurrentGrossWeightKg()).isEqualByComparingTo("21.000");
         assertThat(sale.getTankAllocations()).extracting(GasSaleTankAllocation::getQuantityKg)
                 .containsExactly(new BigDecimal("4.000"), new BigDecimal("4.000"));
         assertThat(shift.getTotalKgSold()).isEqualByComparingTo("8.000");
@@ -303,9 +516,11 @@ public class GasOperationsServiceTest {
                 .cashierId(cashierId).status(GasShiftStatus.OPEN).build();
         GasTank tankA = GasTank.builder().id(10L).tenantId(tenantId).branchId(branchId)
                 .name("Tank A").tareWeightKg(new BigDecimal("10.000"))
+                .fullGrossWeightKg(new BigDecimal("110.000"))
                 .capacityKg(new BigDecimal("100.000")).currentKg(new BigDecimal("40.000")).build();
         GasTank tankB = GasTank.builder().id(11L).tenantId(tenantId).branchId(branchId)
                 .name("Tank B").tareWeightKg(new BigDecimal("15.000"))
+                .fullGrossWeightKg(new BigDecimal("115.000"))
                 .capacityKg(new BigDecimal("100.000")).currentKg(new BigDecimal("50.000")).build();
         GasShiftTank selectedA = GasShiftTank.builder().id(21L).tenantId(tenantId)
                 .branchId(branchId).gasShiftId(20L).tankId(10L)

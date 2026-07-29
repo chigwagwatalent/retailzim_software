@@ -86,7 +86,10 @@ class AdminUiContractTest {
                 .contains("tenant-kpi-grid")
                 .contains("Registered Shops")
                 .contains("Recent Activity")
-                .contains("row-actions");
+                .contains("row-actions")
+                .contains("Edit billing period")
+                .contains("billing-period-modal")
+                .contains("/billing-period");
         assertThat(layout)
                 .contains("Accounting")
                 .contains("accountingTabs");
@@ -101,5 +104,34 @@ class AdminUiContractTest {
                 .contains("System Expenses")
                 .contains("Post an Expense")
                 .contains("Void this Expense?");
+    }
+
+    @Test
+    void subscriptionsUseIndependentModulePackageFamilies() throws IOException {
+        String subscriptions = Files.readString(ADMIN_ROOT.resolve("subscriptions.html"));
+        String layout = Files.readString(LAYOUT);
+        String css = Files.readString(STYLES);
+
+        assertThat(subscriptions)
+                .contains("Subscription Packages")
+                .contains("Retail POS Packages")
+                .contains("LPG Gas Packages")
+                .contains("Restaurant Packages")
+                .contains("Packages cannot combine business modules")
+                .contains("Each subscription activates one business module")
+                .doesNotContain("shop mix")
+                .doesNotContain("Registered shops")
+                .doesNotContain("Billing Queue")
+                .doesNotContain("<th>Shop</th>")
+                .doesNotContain("module-package-card");
+        assertThat(layout)
+                .contains(">Shops</span>")
+                .contains("Search packages");
+        assertThat(css)
+                .contains(".package-family-tabs")
+                .contains(".package-table-wrap")
+                .contains(".package-management-table")
+                .contains(".billing-period-modal")
+                .contains(".legacy-package-review");
     }
 }

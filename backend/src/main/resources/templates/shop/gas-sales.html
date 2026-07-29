@@ -7,51 +7,259 @@
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Gas Sales')}"></nav>
 
-    <section class="page-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-scale-balanced"></i></div>
-        <div><p>LPG sales register,</p><h1>Gas Sales</h1></div>
-      </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-weight-hanging"></i><strong th:text="${gasDashboard != null ? gasDashboard.soldKgToday : 0}">0</strong><span>Kg today</span></div>
-        <div><i class="fa-solid fa-dollar-sign"></i><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.revenueUsdToday, 1, 2) : '0.00'}">0.00</strong><span>USD sales</span></div>
-      </div>
-    </section>
+    <div class="gas-sales-page">
+      <header class="gas-sales-titlebar">
+        <div class="gas-sales-title">
+          <div>
+            <h1>Gas Sales</h1>
+            <p>Monitor LPG revenue, volume and payment performance</p>
+          </div>
+        </div>
+        <div class="gas-sales-header-actions">
+          <form method="get" th:action="@{/shop/gas/sales}" class="gas-sales-branch-form">
+            <input type="hidden" name="salesPeriod" th:value="${gasSalesPeriod}">
+            <label for="gas-sales-branch"><i class="fa-solid fa-building-columns"></i><span class="sr-only">Branch</span></label>
+            <select id="gas-sales-branch" name="branchId" onchange="this.form.submit()">
+              <option th:each="branch : ${gasBranches}"
+                      th:value="${branch.id}"
+                      th:text="${branch.name}"
+                      th:selected="${branch.id == gasBranchId}">Head Office</option>
+            </select>
+          </form>
+          <form method="get" th:action="@{/shop/gas/sales}" class="gas-sales-period-form">
+            <input type="hidden" name="branchId" th:value="${gasBranchId}">
+            <label for="gas-sales-period"><i class="fa-regular fa-calendar"></i><span class="sr-only">Reporting period</span></label>
+            <select id="gas-sales-period" name="salesPeriod" onchange="this.form.submit()">
+              <option value="today" th:selected="${gasSalesPeriod == 'today'}">Today</option>
+              <option value="7days" th:selected="${gasSalesPeriod == '7days'}">Last 7 days</option>
+              <option value="month" th:selected="${gasSalesPeriod == 'month'}">This month</option>
+            </select>
+          </form>
+          <a class="btn btn-light gas-sales-export"
+             th:href="@{/shop/gas/sales/export(
+               branchId=${gasBranchId},
+               salesPeriod=${gasSalesPeriod},
+               salesQuery=${gasSalesQuery},
+               salesPayment=${gasSalesPayment},
+               salesCashierId=${gasSalesCashierId})}">
+            <i class="fa-solid fa-download"></i>Export report
+          </a>
+          <a class="btn btn-primary gas-sales-pos" th:href="@{/shop/gas(branchId=${gasBranchId})}">
+            <i class="fa-solid fa-cash-register"></i>Open Gas POS
+          </a>
+        </div>
+      </header>
 
-    <div class="page-toolbar">
-      <form method="get" th:action="@{/shop/gas/sales}" class="inline-form">
-        <select name="branchId" onchange="this.form.submit()">
-          <option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option>
-        </select>
-      </form>
-      <a class="btn btn-primary" th:href="@{/shop/gas}"><i class="fa-solid fa-gas-pump"></i>Gas Control</a>
+      <section class="gas-sales-kpis" aria-label="Gas sales performance">
+        <article>
+          <span class="revenue"><i class="fa-solid fa-circle-dollar-to-slot"></i></span>
+          <div>
+            <small th:text="${gasSalesPeriodLabel + ' revenue'}">Today's revenue</small>
+            <strong th:text="${'USD ' + #numbers.formatDecimal(gasSalesAnalytics.revenueUsd, 1, 2)}">USD 0.00</strong>
+            <em th:classappend="${gasSalesRevenueGrowth < 0 ? ' negative' : ''}">
+              <i th:class="${gasSalesRevenueGrowth < 0 ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up'}"></i>
+              <b th:text="${#numbers.formatDecimal(gasSalesRevenueGrowth.abs(), 1, 1) + '%'}">0.0%</b>
+              <span>vs previous period</span>
+            </em>
+          </div>
+        </article>
+        <article>
+          <span class="volume"><i class="fa-solid fa-weight-scale"></i></span>
+          <div>
+            <small>Gas sold</small>
+            <strong th:text="${#numbers.formatDecimal(gasSalesAnalytics.soldKg, 1, 3) + ' kg'}">0.000 kg</strong>
+            <em th:classappend="${gasSalesKgGrowth < 0 ? ' negative' : ''}">
+              <i th:class="${gasSalesKgGrowth < 0 ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up'}"></i>
+              <b th:text="${#numbers.formatDecimal(gasSalesKgGrowth.abs(), 1, 1) + '%'}">0.0%</b>
+              <span>vs previous period</span>
+            </em>
+          </div>
+        </article>
+        <article>
+          <span class="transactions"><i class="fa-solid fa-receipt"></i></span>
+          <div>
+            <small>Transactions</small>
+            <strong th:text="${gasSalesAnalytics.transactions}">0</strong>
+            <em th:classappend="${gasSalesTransactionGrowth < 0 ? ' negative' : ''}">
+              <i th:class="${gasSalesTransactionGrowth < 0 ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up'}"></i>
+              <b th:text="${#numbers.formatDecimal(gasSalesTransactionGrowth.abs(), 1, 1) + '%'}">0.0%</b>
+              <span>vs previous period</span>
+            </em>
+          </div>
+        </article>
+        <article>
+          <span class="average"><i class="fa-solid fa-chart-line"></i></span>
+          <div>
+            <small>Average USD sale</small>
+            <strong th:text="${'USD ' + #numbers.formatDecimal(gasSalesAnalytics.averageSaleUsd, 1, 2)}">USD 0.00</strong>
+            <em th:classappend="${gasSalesAverageGrowth < 0 ? ' negative' : ''}">
+              <i th:class="${gasSalesAverageGrowth < 0 ? 'fa-solid fa-arrow-down' : 'fa-solid fa-arrow-up'}"></i>
+              <b th:text="${#numbers.formatDecimal(gasSalesAverageGrowth.abs(), 1, 1) + '%'}">0.0%</b>
+              <span>vs previous period</span>
+            </em>
+          </div>
+        </article>
+      </section>
+
+      <section class="gas-sales-analysis">
+        <article class="panel gas-sales-performance">
+          <header>
+            <div><h2><i class="fa-solid fa-chart-column"></i>Sales performance</h2><p>USD revenue by time interval</p></div>
+            <span th:text="${gasSalesPeriodLabel}">Today</span>
+          </header>
+          <div class="gas-sales-chart" th:classappend="${#lists.isEmpty(gasSalesChart) ? ' empty-chart' : ''}">
+            <div class="gas-sales-y-axis"><span>Peak</span><span>50%</span><span>0</span></div>
+            <div class="gas-sales-bars">
+              <div th:each="point : ${gasSalesChart}">
+                <div class="gas-sales-bar-value" th:text="${point.revenueUsd.signum() > 0 ? #numbers.formatDecimal(point.revenueUsd, 1, 2) : ''}">0.00</div>
+                <span class="gas-sales-bar-track">
+                  <i th:style="${'height:' + point.heightPercent + '%'}"
+                     th:title="${point.label + ': USD ' + #numbers.formatDecimal(point.revenueUsd, 1, 2)}"></i>
+                </span>
+                <small th:text="${point.label}">00:00</small>
+              </div>
+            </div>
+          </div>
+          <footer>
+            <span><i class="usd"></i>Revenue (USD)</span>
+            <strong th:text="${'ZWG total ' + #numbers.formatDecimal(gasSalesAnalytics.revenueZwg, 1, 2)}">ZWG total 0.00</strong>
+          </footer>
+        </article>
+
+        <article class="panel gas-sales-payment">
+          <header><div><h2>Payment mix</h2><p th:text="${gasSalesPaymentCurrency + ' collections'}">USD collections</p></div></header>
+          <div class="gas-sales-payment-content">
+            <div class="gas-sales-donut"
+                 th:style="${'background:conic-gradient(' + gasSalesPaymentGradient + ')'}">
+              <div><small th:text="${gasSalesPaymentCurrency}">USD</small><strong th:text="${#numbers.formatDecimal(gasSalesPaymentTotal, 1, 2)}">0.00</strong><span>Total</span></div>
+            </div>
+            <div class="gas-sales-payment-legend">
+              <div th:each="method : ${gasSalesPaymentViews}">
+                <i th:style="${'background:' + method.color}"></i>
+                <span th:text="${#strings.replace(method.method, '_', ' ')}">Cash</span>
+                <b th:text="${#numbers.formatDecimal(method.percent, 1, 1) + '%'}">0.0%</b>
+                <em th:text="${#numbers.formatDecimal(method.amount, 1, 2)}">0.00</em>
+              </div>
+              <div class="gas-sales-payment-empty" th:if="${#lists.isEmpty(gasSalesPaymentViews)}">
+                No payment collections in this period.
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel gas-sales-shift">
+          <header><h2>Current shift</h2><span th:classappend="${currentGasShift == null ? ' closed' : ''}" th:text="${currentGasShift != null ? 'OPEN' : 'CLOSED'}">OPEN</span></header>
+          <div th:if="${currentGasShift != null}" class="gas-sales-shift-open">
+            <i class="fa-solid fa-user"></i>
+            <small>Cashier</small>
+            <strong th:text="${gasSalesCashierNames[currentGasShift.cashierId] ?: 'Current user'}">Cashier</strong>
+            <dl>
+              <div><dt>Shift total</dt><dd th:text="${'USD ' + #numbers.formatDecimal(currentGasShift.totalUsd, 1, 2)}">USD 0.00</dd></div>
+              <div><dt>Gas sold</dt><dd th:text="${#numbers.formatDecimal(currentGasShift.totalKgSold, 1, 3) + ' kg'}">0.000 kg</dd></div>
+              <div><dt>Started</dt><dd th:text="${#temporals.format(currentGasShift.openedAt, 'dd MMM yyyy, HH:mm')}">Date</dd></div>
+            </dl>
+          </div>
+          <div th:if="${currentGasShift == null}" class="gas-sales-shift-empty">
+            <i class="fa-solid fa-lock"></i>
+            <strong>No personal shift open</strong>
+            <span>Open Gas POS to begin a cashier shift.</span>
+            <a class="btn btn-light" th:href="@{/shop/gas(branchId=${gasBranchId})}">Open Gas POS</a>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel gas-sales-receipts">
+        <header class="gas-sales-receipts-head">
+          <div><h2>Sales receipts</h2><p>Completed LPG transactions for this branch and reporting period</p></div>
+          <button type="button" class="icon-button" onclick="window.location.reload()" title="Refresh receipts" aria-label="Refresh receipts"><i class="fa-solid fa-rotate-right"></i></button>
+        </header>
+        <form class="gas-sales-filters" method="get" th:action="@{/shop/gas/sales}">
+          <input type="hidden" name="branchId" th:value="${gasBranchId}">
+          <input type="hidden" name="salesPeriod" th:value="${gasSalesPeriod}">
+          <label><i class="fa-solid fa-magnifying-glass"></i><input type="search" name="salesQuery" th:value="${gasSalesQuery}" placeholder="Search receipt, customer or reference" aria-label="Search receipts"></label>
+          <select name="salesPayment" aria-label="Filter by payment method">
+            <option value="">All payment methods</option>
+            <option th:each="method : ${gasSalesPaymentMethods}"
+                    th:value="${method}"
+                    th:text="${#strings.replace(method, '_', ' ')}"
+                    th:selected="${method == gasSalesPayment}">Cash</option>
+          </select>
+          <select name="salesCashierId" aria-label="Filter by cashier">
+            <option value="">All cashiers</option>
+            <option th:each="cashier : ${gasSalesCashierNames}"
+                    th:value="${cashier.key}"
+                    th:text="${cashier.value}"
+                    th:selected="${cashier.key == gasSalesCashierId}">Cashier</option>
+          </select>
+          <select name="salesSize" aria-label="Rows per page">
+            <option value="10" th:selected="${gasSalesPage.size == 10}">10 rows</option>
+            <option value="25" th:selected="${gasSalesPage.size == 25}">25 rows</option>
+            <option value="50" th:selected="${gasSalesPage.size == 50}">50 rows</option>
+          </select>
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+          <a class="btn btn-light"
+             th:if="${!#strings.isEmpty(gasSalesQuery) or !#strings.isEmpty(gasSalesPayment) or gasSalesCashierId != null}"
+             th:href="@{/shop/gas/sales(branchId=${gasBranchId},salesPeriod=${gasSalesPeriod})}">Reset</a>
+        </form>
+        <div class="gas-sales-table-wrap">
+          <table>
+            <thead><tr><th>Receipt</th><th>Customer</th><th>Cashier</th><th class="numeric">Kg sold</th><th class="numeric">Unit price</th><th class="numeric">Total</th><th>Payment</th><th>Time</th><th class="action-cell">Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="sale : ${allGasSales}">
+              <td><strong th:text="${sale.receiptNumber}">GS-000184</strong><small th:if="${!#strings.isEmpty(sale.offlineReceiptNumber)}" th:text="${sale.offlineReceiptNumber}">Offline receipt</small></td>
+              <td><strong th:text="${sale.customerName ?: 'Walk-in'}">Walk-in</strong><small th:if="${!#strings.isEmpty(sale.customerPhone)}" th:text="${sale.customerPhone}">Phone</small></td>
+              <td th:text="${gasSalesCashierNames[sale.cashierId] ?: 'User #' + sale.cashierId}">Cashier</td>
+              <td class="numeric" th:text="${#numbers.formatDecimal(sale.quantityKg, 1, 3) + ' kg'}">0.000 kg</td>
+              <td class="numeric" th:text="${sale.currency + ' ' + #numbers.formatDecimal(sale.unitPrice, 1, 4) + '/kg'}">USD 0.0000/kg</td>
+              <td class="numeric"><strong th:text="${sale.currency + ' ' + #numbers.formatDecimal(sale.total, 1, 2)}">USD 0.00</strong></td>
+              <td><span class="gas-sales-payment-pill" th:text="${#strings.replace(sale.paymentMethod, '_', ' ')}">CASH</span></td>
+              <td th:text="${sale.createdAt != null ? #temporals.format(sale.createdAt, 'dd MMM yyyy, HH:mm') : '—'}">Date</td>
+              <td class="action-cell"><a class="icon-button" th:href="${'#gas-sale-details-' + sale.id}" title="View receipt details" aria-label="View receipt details"><i class="fa-solid fa-ellipsis-vertical"></i></a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(allGasSales)}">
+              <td colspan="9" class="gas-sales-empty">
+                <i class="fa-solid fa-receipt"></i>
+                <strong>No completed LPG sales found</strong>
+                <span>New Gas POS transactions will appear here.</span>
+                <a class="btn btn-light" th:href="@{/shop/gas(branchId=${gasBranchId})}">Open Gas POS</a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <footer class="gas-sales-pagination">
+          <span th:text="${'Showing ' + gasSalesPageFrom + '–' + gasSalesPageTo + ' of ' + gasSalesPage.totalElements}">Showing 0–0 of 0</span>
+          <nav aria-label="Gas sales pagination">
+            <a th:href="${gasSalesPrevUrl ?: '#'}" th:classappend="${gasSalesPrevUrl == null ? ' disabled' : ''}" aria-label="Previous page"><i class="fa-solid fa-chevron-left"></i></a>
+            <a th:each="link : ${gasSalesPageLinks}" th:href="${link.url}" th:text="${link.label}" th:classappend="${link.active ? ' active' : ''}">1</a>
+            <span class="active" th:if="${#lists.isEmpty(gasSalesPageLinks)}">1</span>
+            <a th:href="${gasSalesNextUrl ?: '#'}" th:classappend="${gasSalesNextUrl == null ? ' disabled' : ''}" aria-label="Next page"><i class="fa-solid fa-chevron-right"></i></a>
+          </nav>
+        </footer>
+      </section>
     </div>
 
-    <section class="metric-grid">
-      <div class="metric-card metric-blue"><span>USD Revenue</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.revenueUsdToday, 1, 2) : 'USD 0.00'}">USD 0.00</strong><small>Today</small></div>
-      <div class="metric-card metric-green"><span>ZWG Revenue</span><strong th:text="${gasDashboard != null ? 'ZWG ' + #numbers.formatDecimal(gasDashboard.revenueZwgToday, 1, 2) : 'ZWG 0.00'}">ZWG 0.00</strong><small>Today</small></div>
-      <div class="metric-card metric-orange"><span>Current Shift</span><strong th:text="${currentGasShift != null ? currentGasShift.totalKgSold + ' kg' : 'Closed'}">Closed</strong><small>Cashier shift sales</small></div>
-      <div class="metric-card metric-red"><span>Transactions</span><strong th:text="${#lists.size(allGasSales)}">0</strong><small>Latest gas receipts</small></div>
-    </section>
-
-    <section class="panel table-panel">
-      <div class="toolbar"><h2>Gas Sales Receipts</h2><span class="badge" th:text="${#lists.size(allGasSales) + ' sales'}">0 sales</span></div>
-      <table>
-        <thead><tr><th>Receipt</th><th>Customer</th><th>Kg</th><th>Price</th><th>Total</th><th>Payment</th><th>Date</th></tr></thead>
-        <tbody>
-        <tr th:each="s : ${allGasSales}">
-          <td><strong th:text="${s.receiptNumber}">GAS</strong><small th:text="${s.offlineReceiptNumber ?: ''}">Offline</small></td>
-          <td><strong th:text="${s.customerName ?: 'Walk-in'}">Walk-in</strong><small th:text="${s.customerPhone ?: ''}">Phone</small></td>
-          <td th:text="${s.quantityKg + ' kg'}">0 kg</td>
-          <td th:text="${s.currency + ' ' + s.unitPrice + ' / kg'}">USD 0 / kg</td>
-          <td><strong th:text="${s.currency + ' ' + #numbers.formatDecimal(s.total, 1, 2)}">USD 0</strong></td>
-          <td><span class="badge" th:text="${s.paymentMethod}">CASH</span><small th:text="${s.paymentReference ?: ''}">Ref</small></td>
-          <td th:text="${s.createdAt != null ? #temporals.format(s.createdAt, 'dd MMM yyyy HH:mm') : ''}">Date</td>
-        </tr>
-        </tbody>
-      </table>
-      <div class="empty" th:if="${#lists.isEmpty(allGasSales)}">No LPG sales yet for this branch.</div>
-    </section>
+    <div th:each="sale : ${allGasSales}" th:id="${'gas-sale-details-' + sale.id}" class="modal gas-sale-detail-modal">
+      <div class="modal-content">
+        <div class="modal-head">
+          <div><p>Completed LPG sale</p><h2 th:text="${sale.receiptNumber}">GS-000184</h2><small>Read-only transaction and payment audit</small></div>
+          <a class="close" href="#" aria-label="Close">&times;</a>
+        </div>
+        <dl class="gas-sale-detail-grid">
+          <div><dt>Customer</dt><dd th:text="${sale.customerName ?: 'Walk-in'}">Walk-in</dd></div>
+          <div><dt>Cashier</dt><dd th:text="${gasSalesCashierNames[sale.cashierId] ?: 'User #' + sale.cashierId}">Cashier</dd></div>
+          <div><dt>Gas sold</dt><dd th:text="${#numbers.formatDecimal(sale.quantityKg, 1, 3) + ' kg'}">0.000 kg</dd></div>
+          <div><dt>Unit price</dt><dd th:text="${sale.currency + ' ' + #numbers.formatDecimal(sale.unitPrice, 1, 4) + ' / kg'}">USD 0.0000 / kg</dd></div>
+          <div><dt>Total</dt><dd th:text="${sale.currency + ' ' + #numbers.formatDecimal(sale.total, 1, 2)}">USD 0.00</dd></div>
+          <div><dt>Payment method</dt><dd th:text="${#strings.replace(sale.paymentMethod, '_', ' ')}">Cash</dd></div>
+          <div><dt>Payment reference</dt><dd th:text="${!#strings.isEmpty(sale.paymentReference) ? sale.paymentReference : 'Not supplied'}">Not supplied</dd></div>
+          <div><dt>Shift ID</dt><dd th:text="${sale.gasShiftId}">0</dd></div>
+          <div><dt>Sold at</dt><dd th:text="${sale.createdAt != null ? #temporals.format(sale.createdAt, 'dd MMM yyyy, HH:mm:ss') : '—'}">Date</dd></div>
+          <div><dt>Offline receipt</dt><dd th:text="${!#strings.isEmpty(sale.offlineReceiptNumber) ? sale.offlineReceiptNumber : 'Online transaction'}">Online transaction</dd></div>
+        </dl>
+        <div class="modal-actions"><a class="btn btn-primary" href="#">Done</a></div>
+      </div>
+    </div>
   </main>
 </div>
 </body>

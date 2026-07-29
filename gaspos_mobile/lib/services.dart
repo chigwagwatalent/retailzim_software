@@ -20,16 +20,23 @@ class GasApi {
   String get baseUrl =>
       configuredUrl.trim().isEmpty ? productionUrl : configuredUrl.trim();
 
-  Future<GasUser> login(String username, String password) async {
+  Future<GasUser> login(String username, String password,
+      {bool rememberMe = true}) async {
     final response = await _client
         .post(Uri.parse('$baseUrl/api/auth/mobile-login'),
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'username': username.trim(), 'password': password}))
+            body:
+                jsonEncode({'username': username.trim(), 'password': password}))
         .timeout(const Duration(seconds: 20));
     final user = GasUser.fromLogin(_decode(response));
     token = user.token;
-    await _secure.write(key: 'gaspos_token', value: token);
-    await _secure.write(key: 'gaspos_user', value: jsonEncode(user.toJson()));
+    if (rememberMe) {
+      await _secure.write(key: 'gaspos_token', value: token);
+      await _secure.write(key: 'gaspos_user', value: jsonEncode(user.toJson()));
+    } else {
+      await _secure.delete(key: 'gaspos_token');
+      await _secure.delete(key: 'gaspos_user');
+    }
     return user;
   }
 
@@ -78,8 +85,7 @@ class GasApi {
     return _decode(response);
   }
 
-  Future<Map<String, dynamic>> _post(
-      String path, Map<String, dynamic> body,
+  Future<Map<String, dynamic>> _post(String path, Map<String, dynamic> body,
       {Map<String, String>? query}) async {
     final response = await _client
         .post(Uri.parse('$baseUrl$path').replace(queryParameters: query),
@@ -169,8 +175,7 @@ class OfflineStore {
       0;
 
   Future<void> removePending(String id) async {
-    await (await db)
-        .delete('pending_sales', where: 'id = ?', whereArgs: [id]);
+    await (await db).delete('pending_sales', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> markFailed(String id, Object error) async {

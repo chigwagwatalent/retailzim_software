@@ -6,68 +6,222 @@
   <aside th:replace="~{common/layout :: shopSidebar('gas-tanks')}"></aside>
   <main class="main">
     <nav th:replace="~{common/layout :: shopTopbar('Gas Inventory')}"></nav>
-    <section class="page-hero">
-      <div class="hero-title"><div class="hero-icon"><i class="fa-solid fa-database"></i></div><div><p>Controlled LPG stock,</p><h1>Gas Inventory</h1></div></div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-weight-scale"></i><strong th:text="${#numbers.formatDecimal(gasTotalKg ?: 0, 1, 3) + ' kg'}">0 kg</strong><span>On Hand</span></div>
-        <div><i class="fa-solid fa-database"></i><strong th:text="${#numbers.formatDecimal(gasCapacityKg ?: 0, 1, 3) + ' kg'}">0 kg</strong><span>Capacity</span></div>
+
+    <div class="gas-inventory-page">
+      <div class="gas-inventory-content">
+      <section class="gas-inventory-titlebar">
+        <div>
+          <span class="gas-inventory-eyebrow">LPG INVENTORY CONTROL</span>
+          <h1>Gas Inventory</h1>
+          <p>Live LPG stock, physical tank weights and reconciliation.</p>
+        </div>
+        <div class="gas-inventory-actions">
+          <a class="btn btn-primary" th:href="@{/shop/gas/restocking(branchId=${gasBranchId})}">
+            <i class="fa-solid fa-truck-droplet"></i>Receive Stock
+          </a>
+          <a class="btn btn-light" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
+          <details class="gas-inventory-more">
+            <summary aria-label="More inventory actions"><i class="fa-solid fa-ellipsis-vertical"></i></summary>
+            <div>
+              <a href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Update prices</a>
+              <a th:href="@{/shop/gas(branchId=${gasBranchId})}"><i class="fa-solid fa-gauge-high"></i>Gas dashboard</a>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <div th:if="${message}" class="alert" th:text="${message}"></div>
+
+      <section class="gas-inventory-kpis">
+        <article>
+          <span class="blue"><i class="fa-solid fa-layer-group"></i></span>
+          <div><small>Net LPG on hand</small><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.currentStockKg,1,3) + ' kg' : '0.000 kg'}">0.000 kg</strong></div>
+        </article>
+        <article>
+          <span class="blue"><i class="fa-solid fa-database"></i></span>
+          <div><small>Net capacity</small><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.totalCapacityKg,1,3) + ' kg' : '0.000 kg'}">0.000 kg</strong></div>
+        </article>
+        <article>
+          <span class="green"><i class="fa-solid fa-circle-dollar-to-slot"></i></span>
+          <div><small>Stock value</small><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.stockValueUsd,1,2) : 'USD 0.00'}">USD 0.00</strong></div>
+        </article>
+        <article>
+          <span class="amber"><i class="fa-solid fa-triangle-exclamation"></i></span>
+          <div><small>Low-stock tanks</small><strong th:text="${gasDashboard != null ? #lists.size(gasDashboard.reorderTanks) : 0}">0</strong></div>
+        </article>
+      </section>
+
+      <section class="gas-inventory-utilization panel">
+        <span>Utilization</span>
+        <div><i th:style="${gasDashboard != null && gasDashboard.totalCapacityKg > 0 ? 'width:' + (gasDashboard.currentStockKg * 100 / gasDashboard.totalCapacityKg) + '%' : 'width:0%'}"></i></div>
+        <strong th:text="${gasDashboard != null && gasDashboard.totalCapacityKg > 0 ? #numbers.formatDecimal(gasDashboard.currentStockKg * 100 / gasDashboard.totalCapacityKg,1,1) + '% available' : '0% available'}">0% available</strong>
+        <em th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.totalCapacityKg - gasDashboard.currentStockKg,1,3) + ' kg free capacity' : '0.000 kg free capacity'}">0.000 kg free capacity</em>
+      </section>
+
+      <section class="gas-inventory-stock">
+        <div class="gas-inventory-section-head">
+          <div><i class="fa-solid fa-toolbox"></i><h2>Tank stock</h2></div>
+          <form method="get" th:action="@{/shop/gas/tanks}">
+            <input type="hidden" name="page" value="0">
+            <input type="hidden" name="size" th:value="${gasTankPage != null ? gasTankPage.size : 6}">
+            <input type="hidden" name="auditPage" th:value="${gasStockAdjustmentPage != null ? gasStockAdjustmentPage.number : 0}">
+            <input type="hidden" name="auditSize" th:value="${gasStockAdjustmentPage != null ? gasStockAdjustmentPage.size : 5}">
+            <label><span>Branch</span><select name="branchId" onchange="this.form.submit()">
+              <option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Head Office</option>
+            </select></label>
+          </form>
+        </div>
+
+        <div class="gas-inventory-tank-list">
+          <article th:each="t : ${pagedGasTanks}" class="gas-inventory-tank-card"
+                   th:classappend="${t.currentKg <= t.reorderLevelKg ? ' is-low' : ''}">
+            <div class="gas-inventory-cylinder"
+                 th:style="${t.netCapacityKg > 0 ? '--tank-fill:' + (t.currentKg * 100 / t.netCapacityKg) : '--tank-fill:0'}">
+              <i></i>
+            </div>
+            <div class="gas-inventory-tank-name">
+              <div><h3 th:text="${t.name}">TANK-01</h3><span th:class="${t.status.name() == 'ACTIVE' ? 'status-active' : 'status-suspended'}" th:text="${t.status}">ACTIVE</span></div>
+              <small th:if="${t.currentKg <= t.reorderLevelKg}"><i class="fa-solid fa-triangle-exclamation"></i>LOW STOCK</small>
+              <small class="healthy" th:if="${t.currentKg > t.reorderLevelKg}"><i class="fa-solid fa-circle-check"></i>STOCK HEALTHY</small>
+            </div>
+            <dl class="gas-inventory-tank-metrics">
+              <div><dt>Current gross</dt><dd th:text="${#numbers.formatDecimal(t.currentGrossWeightKg,1,3) + ' kg'}">0.000 kg</dd></div>
+              <div><dt>Empty / tare</dt><dd th:text="${#numbers.formatDecimal(t.tareWeightKg,1,3) + ' kg'}">0.000 kg</dd></div>
+              <div class="net"><dt>Net LPG</dt><dd th:text="${#numbers.formatDecimal(t.currentKg,1,3) + ' kg'}">0.000 kg</dd></div>
+              <div><dt>Net capacity</dt><dd th:text="${#numbers.formatDecimal(t.netCapacityKg,1,3) + ' kg'}">0.000 kg</dd></div>
+              <div><dt>Reorder at</dt><dd th:text="${#numbers.formatDecimal(t.reorderLevelKg,1,3) + ' kg'}">0.000 kg</dd></div>
+            </dl>
+            <div class="gas-inventory-tank-level">
+              <strong th:text="${t.netCapacityKg > 0 ? #numbers.formatDecimal(t.currentKg * 100 / t.netCapacityKg,1,1) + '%' : '0%'}">0%</strong>
+              <span>available</span>
+              <div><i th:style="${t.netCapacityKg > 0 ? 'width:' + (t.currentKg * 100 / t.netCapacityKg) + '%' : 'width:0%'}"></i></div>
+            </div>
+            <div class="gas-inventory-tank-actions">
+              <a class="btn btn-light btn-compact" th:href="${'#modal-gas-reconcile-' + t.id}">Reconcile</a>
+              <a class="icon-button" th:href="${'#modal-gas-tank-' + t.id}" th:attr="aria-label=${'Edit ' + t.name}" title="Edit tank"><i class="fa-solid fa-pen"></i></a>
+            </div>
+          </article>
+
+          <div class="gas-inventory-empty" th:if="${#lists.isEmpty(pagedGasTanks)}">
+            <span><i class="fa-solid fa-gas-pump"></i></span>
+            <h3>No LPG tanks configured</h3>
+            <p>Add the first tank using its tare, full gross and current gross weights.</p>
+            <a class="btn btn-primary" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
+          </div>
+        </div>
+
+        <div class="gas-inventory-pagination"
+             th:replace="~{common/layout :: pagination(${gasTankPage}, ${gasTankPageLinks}, ${gasTankPrevUrl}, ${gasTankNextUrl})}"></div>
+      </section>
+
+      <section class="gas-inventory-lower-grid">
+        <article class="panel gas-inventory-prices">
+          <div class="gas-inventory-panel-head">
+            <div><i class="fa-regular fa-file-lines"></i><h2>Active LPG prices</h2></div>
+            <a class="btn btn-light btn-compact" href="#modal-gas-price"><i class="fa-solid fa-pen"></i>Update prices</a>
+          </div>
+          <div class="gas-inventory-price-grid">
+            <div th:each="p : ${gasPrices}">
+              <span th:text="${p.currency}">USD</span>
+              <strong th:text="${#numbers.formatDecimal(p.pricePerKg,1,4)}">0.0000</strong>
+              <small>/ kg</small>
+            </div>
+            <div class="gas-inventory-empty-price" th:if="${#lists.isEmpty(gasPrices)}">No active prices configured.</div>
+          </div>
+        </article>
+
+        <article class="panel gas-inventory-audit">
+          <div class="gas-inventory-panel-head">
+            <div><i class="fa-solid fa-clock-rotate-left"></i><h2>Recent reconciliation</h2></div>
+            <span th:text="${gasStockAdjustmentPage != null ? gasStockAdjustmentPage.totalElements + ' records' : '0 records'}">0 records</span>
+          </div>
+          <div class="gas-inventory-audit-table">
+            <table>
+              <thead><tr><th>Date</th><th>Tank</th><th>Variance</th><th>Reason</th></tr></thead>
+              <tbody>
+              <tr th:each="a : ${pagedGasStockAdjustments}">
+                <td th:text="${a.createdAt != null ? #temporals.format(a.createdAt, 'dd MMM yyyy HH:mm') : '-'}">Date</td>
+                <td><strong th:text="${gasTankNameById.get(a.tankId) ?: 'Tank #' + a.tankId}">Tank</strong></td>
+                <td><strong th:class="${a.varianceKg < 0 ? 'negative' : 'positive'}" th:text="${(a.varianceKg > 0 ? '+' : '') + #numbers.formatDecimal(a.varianceKg,1,3) + ' kg'}">0.000 kg</strong></td>
+                <td th:text="${#strings.replace(a.reason, '_', ' ')}">Reason</td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="gas-inventory-empty-audit" th:if="${#lists.isEmpty(pagedGasStockAdjustments)}">No stock reconciliations recorded yet.</div>
+          </div>
+          <div th:replace="~{common/layout :: pagination(${gasStockAdjustmentPage}, ${gasAuditPageLinks}, ${gasAuditPrevUrl}, ${gasAuditNextUrl})}"></div>
+        </article>
+      </section>
       </div>
-    </section>
-    <div class="page-toolbar">
-      <form method="get" th:action="@{/shop/gas/tanks}" class="inline-form"><select name="branchId" onchange="this.form.submit()"><option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option></select></form>
-      <a class="btn btn-light" th:href="@{/shop/gas/restocking(branchId=${gasBranchId})}"><i class="fa-solid fa-truck-droplet"></i>Supplier Deliveries</a>
-      <a class="btn btn-blue" href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Set Price</a>
-      <a class="btn btn-primary" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
     </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
-    <section class="grid two-col">
-      <div class="panel table-panel">
-        <div class="toolbar"><h2>Gas Tanks</h2><span class="badge" th:text="${gasTankCount + ' tanks'}">0 tanks</span></div>
-        <table><thead><tr><th>Tank</th><th>On Hand</th><th>Capacity</th><th>Reorder</th><th>Status</th><th></th></tr></thead><tbody>
-        <tr th:each="t : ${gasTanks}">
-          <td><strong th:text="${t.name}">Tank</strong><small th:text="${t.productName}">LPG Gas</small></td>
-          <td th:text="${t.currentKg + ' kg'}">0 kg</td><td th:text="${t.capacityKg + ' kg'}">0 kg</td><td th:text="${t.reorderLevelKg + ' kg'}">0 kg</td>
-          <td><span th:class="${t.status.name() == 'ACTIVE' ? 'badge status-active' : 'badge status-suspended'}" th:text="${t.status}">ACTIVE</span></td>
-          <td><div class="action-row"><a class="icon-button mini" th:href="${'#modal-gas-reconcile-' + t.id}" title="Reconcile stock"><i class="fa-solid fa-scale-balanced"></i></a><a class="icon-button mini" th:href="${'#modal-gas-tank-' + t.id}" title="Edit tank"><i class="fa-solid fa-pen"></i></a></div></td>
-        </tr></tbody></table>
-      </div>
-      <div class="panel table-panel">
-        <div class="toolbar"><h2>Active LPG Prices</h2><a class="btn btn-light" href="#modal-gas-price"><i class="fa-solid fa-pen"></i>Update</a></div>
-        <table><thead><tr><th>Currency</th><th>Price / kg</th><th>Created</th></tr></thead><tbody>
-        <tr th:each="p : ${gasPrices}"><td><span class="badge" th:text="${p.currency}">USD</span></td><td><strong th:text="${p.pricePerKg}">0</strong></td><td th:text="${p.createdAt != null ? #temporals.format(p.createdAt, 'dd MMM yyyy HH:mm') : ''}">Date</td></tr>
-        </tbody></table>
-      </div>
-    </section>
-    <div id="modal-gas-tank" class="modal"><div class="modal-content"><div class="modal-head"><h2>Add Gas Tank</h2><a class="close" href="#">&times;</a></div><form method="post" th:action="@{/shop/gas/tanks}" class="form-grid"><input type="hidden" name="branchId" th:value="${gasBranchId}"><input type="hidden" name="returnTo" value="/shop/gas/tanks"><label>Tank Name *<input name="name" required></label><label>Product *<input name="productName" required value="LPG Gas"></label><label>Capacity Kg *<input name="capacityKg" type="number" step="0.001" min="0" required></label><label>Current Kg *<input name="currentKg" type="number" step="0.001" min="0" required></label><label>Reorder Kg *<input name="reorderLevelKg" type="number" step="0.001" min="0" required></label><label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}">ACTIVE</option></select></label><div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Tank</button></div></form></div></div>
-    <div th:each="t : ${gasTanks}" th:id="${'modal-gas-tank-' + t.id}" class="modal"><div class="modal-content"><div class="modal-head"><h2 th:text="${'Edit ' + t.name}">Edit Tank</h2><a class="close" href="#">&times;</a></div><form method="post" th:action="@{'/shop/gas/tanks/' + ${t.id} + '/update'}" class="form-grid"><input type="hidden" name="branchId" th:value="${gasBranchId}"><input type="hidden" name="returnTo" value="/shop/gas/tanks"><input type="hidden" name="currentKg" th:value="${t.currentKg}"><label>Tank Name *<input name="name" required th:value="${t.name}"></label><label>Product *<input name="productName" required th:value="${t.productName}"></label><label>Capacity Kg *<input name="capacityKg" type="number" step="0.001" min="0" required th:value="${t.capacityKg}"></label><label>System Stock<input th:value="${t.currentKg + ' kg'}" readonly></label><label>Reorder Kg *<input name="reorderLevelKg" type="number" step="0.001" min="0" required th:value="${t.reorderLevelKg}"></label><label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}" th:selected="${t.status == s}">ACTIVE</option></select></label><div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Tank</button></div></form></div></div>
-    <div th:each="t : ${gasTanks}" th:id="${'modal-gas-reconcile-' + t.id}" class="modal"><div class="modal-content">
+
+    <div id="modal-gas-tank" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Add Gas Tank</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/gas/tanks}" class="form-grid gas-tank-weight-form">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <input type="hidden" name="returnTo" th:value="${gasInventoryReturnTo}">
+        <label>Tank Name *<input name="name" required placeholder="TANK-01"></label>
+        <label>Product *<input name="productName" required value="LPG Gas"></label>
+        <label>Empty / tare weight (kg) *<input name="tareWeightKg" data-gas-tare type="number" step="0.001" min="0" required><small>Tank weight with no LPG.</small></label>
+        <label>Full tank gross weight (kg) *<input name="fullGrossWeightKg" data-gas-full-gross type="number" step="0.001" min="0.001" required><small>Tank plus LPG when completely full.</small></label>
+        <label>Current measured gross weight (kg) *<input name="currentGrossWeightKg" data-gas-current-gross type="number" step="0.001" min="0" required><small>Physical scale reading now.</small></label>
+        <label>Reorder level (net LPG kg) *<input name="reorderLevelKg" data-gas-reorder type="number" step="0.001" min="0" required value="0"></label>
+        <div class="gas-weight-summary span-2" aria-live="polite">
+          <div><small>Net LPG capacity</small><strong data-gas-capacity>0.000 kg</strong><span>Full gross − tare</span></div>
+          <div><small>Current LPG available</small><strong data-gas-current-net>0.000 kg</strong><span>Current gross − tare</span></div>
+        </div>
+        <label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}">ACTIVE</option></select></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Tank</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="t : ${pagedGasTanks}" th:id="${'modal-gas-tank-' + t.id}" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2 th:text="${'Edit ' + t.name}">Edit Tank</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{'/shop/gas/tanks/' + ${t.id} + '/update'}" class="form-grid gas-tank-weight-form">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <input type="hidden" name="returnTo" th:value="${gasInventoryReturnTo}">
+        <label>Tank Name *<input name="name" required th:value="${t.name}"></label>
+        <label>Product *<input name="productName" required th:value="${t.productName}"></label>
+        <label>Empty / tare weight (kg) *<input name="tareWeightKg" data-gas-tare type="number" step="0.001" min="0" required th:value="${t.tareWeightKg}"><small>Tank weight with no LPG.</small></label>
+        <label>Full tank gross weight (kg) *<input name="fullGrossWeightKg" data-gas-full-gross type="number" step="0.001" min="0.001" required th:value="${t.fullGrossWeightKg}"><small>Tank plus LPG when completely full.</small></label>
+        <label>Current measured gross weight (kg) *<input name="currentGrossWeightKg" data-gas-current-gross type="number" step="0.001" min="0" required th:value="${t.currentGrossWeightKg}"><small>Physical scale reading now.</small></label>
+        <label>Reorder level (net LPG kg) *<input name="reorderLevelKg" data-gas-reorder type="number" step="0.001" min="0" required th:value="${t.reorderLevelKg}"></label>
+        <div class="gas-weight-summary span-2" aria-live="polite">
+          <div><small>Net LPG capacity</small><strong data-gas-capacity th:text="${#numbers.formatDecimal(t.netCapacityKg,1,3) + ' kg'}">0.000 kg</strong><span>Full gross − tare</span></div>
+          <div><small>Current LPG available</small><strong data-gas-current-net th:text="${#numbers.formatDecimal(t.currentKg,1,3) + ' kg'}">0.000 kg</strong><span>Current gross − tare</span></div>
+        </div>
+        <label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}" th:selected="${t.status == s}">ACTIVE</option></select></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Tank</button></div>
+      </form>
+    </div></div>
+
+    <div th:each="t : ${pagedGasTanks}" th:id="${'modal-gas-reconcile-' + t.id}" class="modal"><div class="modal-content">
       <div class="modal-head"><h2 th:text="${'Reconcile ' + t.name}">Reconcile Gas Stock</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{/shop/gas/stock/reconcile}" class="form-grid">
+      <form method="post" th:action="@{/shop/gas/stock/reconcile}" class="form-grid gas-reconcile-weight-form">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
         <input type="hidden" name="tankId" th:value="${t.id}">
-        <input type="hidden" name="returnTo" value="/shop/gas/tanks">
-        <label>System Stock<input th:value="${t.currentKg + ' kg'}" readonly></label>
-        <label>Actual Counted Kg *<input name="countedKg" type="number" step="0.001" min="0" th:max="${t.capacityKg}" required></label>
+        <input type="hidden" name="returnTo" th:value="${gasInventoryReturnTo}">
+        <label>System net LPG<input th:value="${#numbers.formatDecimal(t.currentKg,1,3) + ' kg'}" readonly></label>
+        <label>Empty / tare weight<input data-gas-reconcile-tare th:value="${t.tareWeightKg}" readonly></label>
+        <label>Measured gross weight (kg) *<input name="countedGrossKg" data-gas-reconcile-gross type="number" step="0.001" th:min="${t.tareWeightKg}" th:max="${t.fullGrossWeightKg}" required></label>
+        <label>Calculated net LPG<input data-gas-reconcile-net value="Enter the gross weight" readonly></label>
         <label>Reason *<select name="reason" required><option value="">Select reason</option><option>DIP_VARIANCE</option><option>LEAKAGE</option><option>EVAPORATION</option><option>DELIVERY_CORRECTION</option><option>MANUAL_COUNT</option><option>DAMAGE</option><option>OTHER</option></select></label>
-        <label class="span-2">Notes<textarea name="notes" placeholder="Explain the physical count and supporting evidence"></textarea></label>
+        <label class="span-2">Notes<textarea name="notes" placeholder="Explain the physical reading and supporting evidence"></textarea></label>
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-scale-balanced"></i>Post Reconciliation</button></div>
       </form>
     </div></div>
-    <div id="modal-gas-price" class="modal"><div class="modal-content"><div class="modal-head"><h2>Set Gas Price</h2><a class="close" href="#">&times;</a></div><form method="post" th:action="@{/shop/gas/prices}" class="form-grid"><input type="hidden" name="branchId" th:value="${gasBranchId}"><input type="hidden" name="returnTo" value="/shop/gas/tanks"><label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label><label>Price per kg *<input name="pricePerKg" type="number" step="0.0001" min="0.0001" required></label><div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Price</button></div></form></div></div>
-    <section class="panel table-panel">
-      <div class="toolbar"><h2>Stock Reconciliation Audit</h2><span class="badge" th:text="${#lists.size(gasStockAdjustments) + ' records'}">0 records</span></div>
-      <table><thead><tr><th>Date</th><th>Tank</th><th>Before</th><th>Counted</th><th>Variance</th><th>Reason</th><th>Notes</th></tr></thead><tbody>
-      <tr th:each="a : ${gasStockAdjustments}">
-        <td th:text="${a.createdAt != null ? #temporals.format(a.createdAt, 'dd MMM yyyy HH:mm') : '-'}">Date</td>
-        <td><strong th:text="${gasTankNameById.get(a.tankId) ?: 'Tank #' + a.tankId}">Tank</strong></td>
-        <td th:text="${a.quantityBeforeKg + ' kg'}">0 kg</td>
-        <td th:text="${a.countedKg + ' kg'}">0 kg</td>
-        <td><strong th:class="${a.varianceKg < 0 ? 'inventory-low-value' : 'inventory-available-value'}" th:text="${a.varianceKg + ' kg'}">0 kg</strong></td>
-        <td><span class="badge" th:text="${#strings.replace(a.reason, '_', ' ')}">Reason</span></td>
-        <td th:text="${a.notes ?: '-'}">Notes</td>
-      </tr></tbody></table>
-      <div class="empty" th:if="${#lists.isEmpty(gasStockAdjustments)}">No reconciliations recorded. Supplier deliveries and sales already update stock automatically.</div>
-    </section>
+
+    <div id="modal-gas-price" class="modal"><div class="modal-content">
+      <div class="modal-head"><h2>Set LPG Price</h2><a class="close" href="#">&times;</a></div>
+      <form method="post" th:action="@{/shop/gas/prices}" class="form-grid">
+        <input type="hidden" name="branchId" th:value="${gasBranchId}">
+        <input type="hidden" name="returnTo" th:value="${gasInventoryReturnTo}">
+        <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
+        <label>Price per kg *<input name="pricePerKg" type="number" step="0.0001" min="0.0001" required></label>
+        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Price</button></div>
+      </form>
+    </div></div>
+
     <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>
 </div>

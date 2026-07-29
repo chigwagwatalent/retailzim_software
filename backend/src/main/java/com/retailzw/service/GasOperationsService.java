@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -73,6 +74,11 @@ public class GasOperationsService {
         return tanks.findByTenantIdAndBranchIdOrderByNameAsc(tenantId, branchId);
     }
 
+    public Page<GasTank> tankPage(Long tenantId, Long branchId, Pageable pageable) {
+        requireGasBranch(tenantId, branchId);
+        return tanks.findByTenantIdAndBranchIdOrderByNameAsc(tenantId, branchId, pageable);
+    }
+
     public List<GasPrice> prices(Long tenantId, Long branchId) {
         requireGasBranch(tenantId, branchId);
         return prices.findByTenantIdAndBranchIdAndIsActiveTrue(tenantId, branchId);
@@ -83,22 +89,19 @@ public class GasOperationsService {
         Long branchId = request.getBranchId();
         requireGasBranch(tenantId, branchId);
         enforceTankLimit(tenantId);
-        BigDecimal capacityKg = nvl(request.getCapacityKg());
-        BigDecimal currentKg = nvl(request.getCurrentKg());
+        TankWeights weights = resolveTankWeights(request, null);
+        BigDecimal capacityKg = weights.capacityKg();
+        BigDecimal currentKg = weights.currentNetKg();
         BigDecimal reorderLevelKg = nvl(request.getReorderLevelKg());
         validateTankLevels(capacityKg, currentKg, reorderLevelKg);
-        BigDecimal tareWeightKg = nvl(request.getTareWeightKg());
-        BigDecimal fullGrossWeightKg = request.getFullGrossWeightKg() == null
-                ? tareWeightKg.add(capacityKg) : request.getFullGrossWeightKg();
-        validateTankWeights(tareWeightKg, fullGrossWeightKg, capacityKg);
         GasTank tank = tanks.save(GasTank.builder()
                 .tenantId(tenantId)
                 .branchId(branchId)
                 .name(requiredText(request.getName(), "Tank name is required."))
                 .productName(requiredText(request.getProductName(), "Product name is required."))
-                .tareWeightKg(tareWeightKg)
+                .tareWeightKg(weights.tareKg())
                 .capacityKg(capacityKg)
-                .fullGrossWeightKg(fullGrossWeightKg)
+                .fullGrossWeightKg(weights.fullGrossKg())
                 .currentKg(currentKg)
                 .reorderLevelKg(reorderLevelKg)
                 .status(request.getStatus() == null ? GasTankStatus.ACTIVE : request.getStatus())
@@ -117,20 +120,23 @@ public class GasOperationsService {
         GasTank tank = tanks.lockTank(tenantId, branchId, tankId)
                 .orElseThrow(() -> new IllegalArgumentException("Gas tank not found for this branch."));
         BigDecimal quantityBefore = nvl(tank.getCurrentKg());
-        BigDecimal currentKg = request.getCurrentKg() == null ? quantityBefore : nvl(request.getCurrentKg());
-        BigDecimal capacityKg = nvl(request.getCapacityKg());
+        TankWeights weights = resolveTankWeights(request, tank);
+        BigDecimal currentKg = weights.currentNetKg();
+        BigDecimal capacityKg = weights.capacityKg();
         BigDecimal reorderLevelKg = nvl(request.getReorderLevelKg());
         validateTankLevels(capacityKg, currentKg, reorderLevelKg);
-        BigDecimal tareWeightKg = request.getTareWeightKg() == null
-                ? nvl(tank.getTareWeightKg()) : nvl(request.getTareWeightKg());
-        BigDecimal fullGrossWeightKg = request.getFullGrossWeightKg() == null
-                ? tareWeightKg.add(capacityKg) : request.getFullGrossWeightKg();
-        validateTankWeights(tareWeightKg, fullGrossWeightKg, capacityKg);
+        boolean physicalWeightsChanged = nvl(tank.getTareWeightKg()).compareTo(weights.tareKg()) != 0
+                || nvl(tank.getFullGrossWeightKg()).compareTo(weights.fullGrossKg()) != 0
+                || quantityBefore.compareTo(currentKg) != 0;
+        if (physicalWeightsChanged && shiftTanks.existsByTenantIdAndBranchIdAndTankIdAndStatus(
+                tenantId, branchId, tankId, GasShiftTank.Status.IN_USE)) {
+            throw new IllegalStateException("Close the open gas shift before changing this tank's physical weights.");
+        }
         tank.setName(requiredText(request.getName(), "Tank name is required."));
         tank.setProductName(requiredText(request.getProductName(), "Product name is required."));
-        tank.setTareWeightKg(tareWeightKg);
+        tank.setTareWeightKg(weights.tareKg());
         tank.setCapacityKg(capacityKg);
-        tank.setFullGrossWeightKg(fullGrossWeightKg);
+        tank.setFullGrossWeightKg(weights.fullGrossKg());
         tank.setCurrentKg(currentKg);
         tank.setReorderLevelKg(reorderLevelKg);
         tank.setStatus(request.getStatus() == null ? GasTankStatus.ACTIVE : request.getStatus());
@@ -174,7 +180,6 @@ public class GasOperationsService {
                 .ifPresent(existing -> {
                     throw new IllegalStateException("This cashier already has an open gas shift.");
                 });
-        seedGasDefaults(tenantId, branchId);
         List<GasTank> availableTanks = tanks.findByTenantIdAndBranchIdAndStatusOrderByNameAsc(
                 tenantId, branchId, GasTankStatus.ACTIVE);
         Set<Long> requestedTankIds = request.getTankIds() == null
@@ -220,7 +225,7 @@ public class GasOperationsService {
                     .branchId(branchId)
                     .gasShiftId(shift.getId())
                     .tankId(tank.getId())
-                    .startingGrossKg(nvl(tank.getTareWeightKg()).add(startingNet).setScale(3, RoundingMode.HALF_UP))
+                    .startingGrossKg(tank.getCurrentGrossWeightKg().setScale(3, RoundingMode.HALF_UP))
                     .startingNetKg(startingNet)
                     .expectedClosingNetKg(startingNet)
                     .status(GasShiftTank.Status.IN_USE)
@@ -345,14 +350,20 @@ public class GasOperationsService {
         requireGasBranch(tenantId, branchId);
         GasTank tank = tanks.lockTank(tenantId, branchId, request.getTankId())
                 .orElseThrow(() -> new IllegalArgumentException("Gas tank not found for this branch."));
-        BigDecimal quantity = nvl(request.getQuantityKg());
+        BigDecimal quantity = nvl(request.getQuantityKg()).setScale(3, RoundingMode.HALF_UP);
+        if (quantity.signum() <= 0) {
+            throw new IllegalArgumentException("Delivered LPG quantity must be greater than zero.");
+        }
+        BigDecimal unitCost = nvl(request.getUnitCost()).setScale(4, RoundingMode.HALF_UP);
+        if (unitCost.signum() < 0) {
+            throw new IllegalArgumentException("Unit cost cannot be negative.");
+        }
         BigDecimal capacity = nvl(tank.getCapacityKg());
         if (capacity.compareTo(BigDecimal.ZERO) > 0 && nvl(tank.getCurrentKg()).add(quantity).compareTo(capacity) > 0) {
             throw new IllegalStateException("Restock would exceed " + tank.getName() + " capacity.");
         }
         tank.setCurrentKg(nvl(tank.getCurrentKg()).add(quantity));
         tanks.save(tank);
-        BigDecimal unitCost = nvl(request.getUnitCost()).setScale(4, RoundingMode.HALF_UP);
         BigDecimal totalCost = quantity.multiply(unitCost).setScale(2, RoundingMode.HALF_UP);
         return restocks.save(GasRestock.builder()
                 .tenantId(tenantId)
@@ -377,7 +388,20 @@ public class GasOperationsService {
         GasTank tank = tanks.lockTank(tenantId, branchId, request.getTankId())
                 .orElseThrow(() -> new IllegalArgumentException("Gas tank not found for this branch."));
         BigDecimal quantityBefore = nvl(tank.getCurrentKg()).setScale(3, RoundingMode.HALF_UP);
-        BigDecimal countedKg = nvl(request.getCountedKg()).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal countedKg;
+        String measurementNote = null;
+        if (request.getCountedGrossKg() != null) {
+            BigDecimal countedGross = scaleWeight(request.getCountedGrossKg());
+            BigDecimal tare = scaleWeight(tank.getTareWeightKg());
+            BigDecimal fullGross = effectiveFullGross(tank);
+            validateCurrentGross(tank.getName(), tare, fullGross, countedGross);
+            countedKg = countedGross.subtract(tare).setScale(3, RoundingMode.HALF_UP);
+            measurementNote = "Measured gross " + countedGross + " kg; tare " + tare + " kg.";
+        } else if (request.getCountedKg() != null) {
+            countedKg = scaleWeight(request.getCountedKg());
+        } else {
+            throw new IllegalArgumentException("Enter the measured gross tank weight.");
+        }
         if (countedKg.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Counted gas stock cannot be negative.");
         }
@@ -390,21 +414,29 @@ public class GasOperationsService {
         }
         tank.setCurrentKg(countedKg);
         tanks.save(tank);
+        String notes = blank(request.getNotes());
+        if (measurementNote != null) {
+            notes = notes == null ? measurementNote : measurementNote + " " + notes;
+        }
         return recordAdjustment(tank, quantityBefore, countedKg,
                 requiredText(request.getReason(), "Reconciliation reason is required."),
-                blank(request.getNotes()), userId);
+                notes, userId);
     }
 
     @Transactional
     public GasExpense recordExpense(Long tenantId, Long userId, GasExpenseRequest request) {
         Long branchId = request.getBranchId();
         requireGasBranch(tenantId, branchId);
+        BigDecimal amount = nvl(request.getAmount()).setScale(2, RoundingMode.HALF_UP);
+        if (amount.signum() <= 0) {
+            throw new IllegalArgumentException("Expense amount must be greater than zero.");
+        }
         return expenses.save(GasExpense.builder()
                 .tenantId(tenantId)
                 .branchId(branchId)
                 .category(requiredText(request.getCategory(), "Expense category is required."))
                 .description(requiredText(request.getDescription(), "Expense description is required."))
-                .amount(nvl(request.getAmount()).setScale(2, RoundingMode.HALF_UP))
+                .amount(amount)
                 .currency(request.getCurrency() == null ? CurrencyCode.USD : request.getCurrency())
                 .paymentMethod(normalizePaymentMethod(request.getPaymentMethod()))
                 .reference(blank(request.getReference()))
@@ -445,9 +477,7 @@ public class GasOperationsService {
                         .orElseThrow(() -> new IllegalArgumentException("A selected gas tank no longer exists."));
                 BigDecimal gross = nvl(closingWeights.get(tank.getId())).setScale(3, RoundingMode.HALF_UP);
                 BigDecimal tare = nvl(tank.getTareWeightKg()).setScale(3, RoundingMode.HALF_UP);
-                if (gross.compareTo(tare) < 0) {
-                    throw new IllegalArgumentException(tank.getName() + " gross weight cannot be below its empty/tare weight.");
-                }
+                validateCurrentGross(tank.getName(), tare, effectiveFullGross(tank), gross);
                 BigDecimal closingNet = gross.subtract(tare).setScale(3, RoundingMode.HALF_UP);
                 if (nvl(tank.getCapacityKg()).compareTo(BigDecimal.ZERO) > 0
                         && closingNet.compareTo(tank.getCapacityKg()) > 0) {
@@ -497,6 +527,24 @@ public class GasOperationsService {
                 tenantId, branchId, HeldChange.Status.OPEN);
     }
 
+    public Page<HeldChange> gasHeldChangePage(Long tenantId, Long branchId,
+                                              HeldChange.Status status, String search,
+                                              LocalDateTime from, LocalDateTime to,
+                                              Pageable pageable) {
+        requireGasBranch(tenantId, branchId);
+        return heldChange.searchGas(
+                tenantId, branchId, status, blank(search), from, to, pageable);
+    }
+
+    public BigDecimal gasHeldChangeTotal(Long tenantId, Long branchId,
+                                         HeldChange.Status status, String search,
+                                         LocalDateTime from, LocalDateTime to,
+                                         CurrencyCode currency) {
+        requireGasBranch(tenantId, branchId);
+        return nvl(heldChange.sumGas(
+                tenantId, branchId, status, blank(search), from, to, currency));
+    }
+
     @Transactional
     public HeldChange collectGasHeldChange(Long tenantId, Long branchId, Long cashierId, Long changeId) {
         requireGasBranch(tenantId, branchId);
@@ -517,14 +565,110 @@ public class GasOperationsService {
         return heldChange.save(record);
     }
 
+    @Transactional
+    public HeldChange cancelGasHeldChange(Long tenantId, Long branchId, Long userId, Long changeId) {
+        requireGasBranch(tenantId, branchId);
+        HeldChange record = heldChange.lockById(tenantId, changeId)
+                .orElseThrow(() -> new IllegalArgumentException("Held change record not found."));
+        if (!branchId.equals(record.getBranchId()) || record.getGasShiftId() == null) {
+            throw new IllegalArgumentException("Held change does not belong to this gas branch.");
+        }
+        if (!HeldChange.Status.OPEN.equals(record.getStatus())) {
+            throw new IllegalStateException("Only open held change can be cancelled.");
+        }
+        record.setStatus(HeldChange.Status.CANCELLED);
+        record.setCancelledBy(userId);
+        record.setCancelledAt(LocalDateTime.now());
+        return heldChange.save(record);
+    }
+
     public List<GasSale> sales(Long tenantId, Long branchId) {
         requireGasBranch(tenantId, branchId);
-        return sales.findByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
+        return sales.findTop100ByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
+    }
+
+    public Page<GasSale> salesPage(Long tenantId, Long branchId,
+                                   LocalDateTime from, LocalDateTime to,
+                                   String query, String paymentMethod, Long cashierId,
+                                   Pageable pageable) {
+        requireGasBranch(tenantId, branchId);
+        return sales.search(
+                tenantId, branchId, from, to, blank(query),
+                blank(paymentMethod) == null ? null : normalizePaymentMethod(paymentMethod),
+                cashierId, pageable);
+    }
+
+    public SalesAnalytics salesAnalytics(Long tenantId, Long branchId,
+                                         LocalDateTime from, LocalDateTime to) {
+        requireGasBranch(tenantId, branchId);
+        List<Object[]> summary = sales.dailySummary(tenantId, branchId, from, to);
+        BigDecimal soldKg = summary.stream()
+                .map(row -> (BigDecimal) row[1])
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal revenueUsd = dailySummaryValue(summary, CurrencyCode.USD, 2);
+        BigDecimal revenueZwg = dailySummaryValue(summary, CurrencyCode.ZWG, 2);
+        long transactions = summary.stream()
+                .mapToLong(row -> ((Number) row[3]).longValue())
+                .sum();
+        long usdTransactions = summary.stream()
+                .filter(row -> CurrencyCode.USD.equals(row[0]))
+                .mapToLong(row -> ((Number) row[3]).longValue())
+                .findFirst()
+                .orElse(0L);
+        BigDecimal averageUsd = usdTransactions == 0
+                ? BigDecimal.ZERO
+                : revenueUsd.divide(BigDecimal.valueOf(usdTransactions), 2, RoundingMode.HALF_UP);
+        List<PaymentMix> paymentMix = salePayments.paymentMix(tenantId, branchId, from, to).stream()
+                .map(row -> new PaymentMix(row[0].toString(), (CurrencyCode) row[1], (BigDecimal) row[2]))
+                .toList();
+        return new SalesAnalytics(
+                soldKg.setScale(3, RoundingMode.HALF_UP),
+                revenueUsd.setScale(2, RoundingMode.HALF_UP),
+                revenueZwg.setScale(2, RoundingMode.HALF_UP),
+                transactions, averageUsd, paymentMix);
+    }
+
+    public List<HourlyRevenue> salesHourlyRevenue(Long tenantId, Long branchId,
+                                                   LocalDateTime from, LocalDateTime to) {
+        requireGasBranch(tenantId, branchId);
+        return hourlyRevenueRows(sales.hourlyRevenue(tenantId, branchId, from, to));
+    }
+
+    public List<DailyRevenue> salesDailyRevenue(Long tenantId, Long branchId,
+                                                LocalDateTime from, LocalDateTime to) {
+        requireGasBranch(tenantId, branchId);
+        Map<LocalDate, BigDecimal[]> daily = new LinkedHashMap<>();
+        for (LocalDate date = from.toLocalDate(); date.isBefore(to.toLocalDate()); date = date.plusDays(1)) {
+            daily.put(date, new BigDecimal[]{BigDecimal.ZERO, BigDecimal.ZERO});
+        }
+        for (Object[] row : sales.dailyRevenue(tenantId, branchId, from, to)) {
+            LocalDate date = toLocalDate(row[0]);
+            BigDecimal[] values = daily.computeIfAbsent(
+                    date, ignored -> new BigDecimal[]{BigDecimal.ZERO, BigDecimal.ZERO});
+            values[CurrencyCode.USD.equals(row[1]) ? 0 : 1] = (BigDecimal) row[2];
+        }
+        return daily.entrySet().stream()
+                .map(entry -> new DailyRevenue(
+                        entry.getKey(), entry.getValue()[0], entry.getValue()[1]))
+                .toList();
+    }
+
+    public List<Long> salesCashierIds(Long tenantId, Long branchId,
+                                      LocalDateTime from, LocalDateTime to) {
+        requireGasBranch(tenantId, branchId);
+        return sales.distinctCashierIds(tenantId, branchId, from, to);
     }
 
     public Page<GasShift> shifts(Long tenantId, Long branchId, Pageable pageable) {
         requireGasBranch(tenantId, branchId);
         return shifts.findByTenantIdAndBranchIdOrderByOpenedAtDesc(tenantId, branchId, pageable);
+    }
+
+    public Page<GasShift> shifts(Long tenantId, Long branchId, String query,
+                                 GasShiftStatus status, Pageable pageable) {
+        requireGasBranch(tenantId, branchId);
+        String normalizedQuery = query == null || query.isBlank() ? null : query.trim();
+        return shifts.search(tenantId, branchId, normalizedQuery, status, pageable);
     }
 
     public GasDashboard dashboard(Long tenantId, Long branchId) {
@@ -546,7 +690,7 @@ public class GasOperationsService {
         BigDecimal expensesUsd = sum(todayUsdExpenses, GasExpense::getAmount);
         BigDecimal expensesZwg = sum(todayZwgExpenses, GasExpense::getAmount);
         BigDecimal currentStockKg = sum(branchTanks, GasTank::getCurrentKg).setScale(3, RoundingMode.HALF_UP);
-        BigDecimal totalCapacityKg = sum(branchTanks, GasTank::getCapacityKg).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal totalCapacityKg = sum(branchTanks, GasTank::getNetCapacityKg).setScale(3, RoundingMode.HALF_UP);
         List<GasPrice> activePrices = prices.findByTenantIdAndBranchIdAndIsActiveTrue(tenantId, branchId);
         BigDecimal sellingPriceUsd = activePrices.stream()
                 .filter(price -> CurrencyCode.USD.equals(price.getCurrency()))
@@ -586,9 +730,96 @@ public class GasOperationsService {
         return restocks.findByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
     }
 
+    public Page<GasRestock> restockPage(Long tenantId, Long branchId,
+                                        LocalDateTime from, LocalDateTime to,
+                                        String query, Long tankId, CurrencyCode currency,
+                                        Pageable pageable) {
+        requireGasBranch(tenantId, branchId);
+        return restocks.search(
+                tenantId, branchId, from, to, blank(query), tankId, currency, pageable);
+    }
+
+    public RestockSummary restockSummary(Long tenantId, Long branchId,
+                                         LocalDateTime from, LocalDateTime to) {
+        requireGasBranch(tenantId, branchId);
+        return restocks.summarize(tenantId, branchId, from, to).stream()
+                .findFirst()
+                .map(row -> new RestockSummary(
+                        (BigDecimal) row[0],
+                        ((Number) row[1]).longValue(),
+                        (LocalDateTime) row[2]))
+                .orElse(new RestockSummary(BigDecimal.ZERO, 0, null));
+    }
+
     public List<GasExpense> expenses(Long tenantId, Long branchId) {
         requireGasBranch(tenantId, branchId);
         return expenses.findByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
+    }
+
+    public Page<GasExpense> expensePage(Long tenantId, Long branchId,
+                                        LocalDateTime from, LocalDateTime to,
+                                        String query, String category, String paymentMethod,
+                                        Pageable pageable) {
+        requireGasBranch(tenantId, branchId);
+        return expenses.search(
+                tenantId, branchId, from, to,
+                blank(query), blank(category),
+                blank(paymentMethod) == null ? null : normalizePaymentMethod(paymentMethod),
+                pageable);
+    }
+
+    public List<String> expenseCategories(Long tenantId, Long branchId) {
+        requireGasBranch(tenantId, branchId);
+        return expenses.distinctCategories(tenantId, branchId);
+    }
+
+    public ExpenseAnalytics expenseAnalytics(Long tenantId, Long branchId,
+                                             LocalDateTime from, LocalDateTime to) {
+        requireGasBranch(tenantId, branchId);
+        List<ExpenseCurrencySummary> currencies =
+                expenseCurrencySummary(tenantId, branchId, from, to);
+        List<ExpenseCategorySummary> categories = expenses
+                .summarizeByCategory(tenantId, branchId, from, to).stream()
+                .map(row -> new ExpenseCategorySummary(
+                        row[0].toString(),
+                        (CurrencyCode) row[1],
+                        (BigDecimal) row[2],
+                        ((Number) row[3]).longValue()))
+                .toList();
+        List<ExpenseDailySummary> daily = expenses
+                .summarizeByDay(tenantId, branchId, from, to).stream()
+                .map(row -> new ExpenseDailySummary(
+                        toLocalDate(row[0]),
+                        (CurrencyCode) row[1],
+                        (BigDecimal) row[2],
+                        ((Number) row[3]).longValue()))
+                .toList();
+        return new ExpenseAnalytics(currencies, categories, daily);
+    }
+
+    public List<ExpenseCurrencySummary> expenseCurrencySummary(
+            Long tenantId, Long branchId, LocalDateTime from, LocalDateTime to) {
+        requireGasBranch(tenantId, branchId);
+        return expenses.summarizeByCurrency(tenantId, branchId, from, to).stream()
+                .map(row -> new ExpenseCurrencySummary(
+                        (CurrencyCode) row[0],
+                        (BigDecimal) row[1],
+                        ((Number) row[2]).longValue(),
+                        (LocalDateTime) row[3]))
+                .toList();
+    }
+
+    private LocalDate toLocalDate(Object value) {
+        if (value instanceof LocalDate localDate) {
+            return localDate;
+        }
+        if (value instanceof java.sql.Date sqlDate) {
+            return sqlDate.toLocalDate();
+        }
+        if (value instanceof java.util.Date date) {
+            return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return LocalDate.parse(value.toString());
     }
 
     public List<GasStockAdjustment> stockAdjustments(Long tenantId, Long branchId) {
@@ -596,23 +827,14 @@ public class GasOperationsService {
         return stockAdjustments.findTop50ByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId);
     }
 
+    public Page<GasStockAdjustment> stockAdjustmentPage(Long tenantId, Long branchId, Pageable pageable) {
+        requireGasBranch(tenantId, branchId);
+        return stockAdjustments.findByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId, pageable);
+    }
+
     @Transactional
     public void seedGasDefaults(Long tenantId, Long branchId) {
         requireGasBranch(tenantId, branchId);
-        if (tanks.findByTenantIdAndBranchIdOrderByNameAsc(tenantId, branchId).isEmpty()) {
-            tanks.save(GasTank.builder()
-                    .tenantId(tenantId)
-                    .branchId(branchId)
-                    .name("Main LPG Tank")
-                    .productName("LPG Gas")
-                    .tareWeightKg(BigDecimal.ZERO)
-                    .capacityKg(new BigDecimal("1000.000"))
-                    .fullGrossWeightKg(new BigDecimal("1000.000"))
-                    .currentKg(BigDecimal.ZERO)
-                    .reorderLevelKg(new BigDecimal("100.000"))
-                    .status(GasTankStatus.ACTIVE)
-                    .build());
-        }
         if (prices.findByTenantIdAndBranchIdAndIsActiveTrue(tenantId, branchId).isEmpty()) {
             prices.save(GasPrice.builder().tenantId(tenantId).branchId(branchId).currency(CurrencyCode.USD).pricePerKg(new BigDecimal("2.0000")).isActive(true).build());
             prices.save(GasPrice.builder().tenantId(tenantId).branchId(branchId).currency(CurrencyCode.ZWG).pricePerKg(new BigDecimal("60.0000")).isActive(true).build());
@@ -651,17 +873,61 @@ public class GasOperationsService {
         }
     }
 
-    private void validateTankWeights(BigDecimal tareWeightKg, BigDecimal fullGrossWeightKg, BigDecimal capacityKg) {
-        if (tareWeightKg.compareTo(BigDecimal.ZERO) < 0) {
+    private TankWeights resolveTankWeights(GasTankRequest request, GasTank existing) {
+        BigDecimal tare = request.getTareWeightKg() != null
+                ? scaleWeight(request.getTareWeightKg())
+                : existing == null ? null : scaleWeight(existing.getTareWeightKg());
+        BigDecimal fullGross = request.getFullGrossWeightKg() != null
+                ? scaleWeight(request.getFullGrossWeightKg())
+                : existing == null ? null : effectiveFullGross(existing);
+        if (tare == null || fullGross == null) {
+            throw new IllegalArgumentException("Empty/tare weight and full gross weight are required.");
+        }
+        if (tare.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Empty/tare weight cannot be negative.");
         }
-        if (fullGrossWeightKg.compareTo(tareWeightKg) < 0) {
-            throw new IllegalArgumentException("Full gross weight cannot be below empty/tare weight.");
+        if (fullGross.compareTo(tare) <= 0) {
+            throw new IllegalArgumentException("Full gross weight must be greater than the empty/tare weight.");
         }
-        BigDecimal configuredNet = fullGrossWeightKg.subtract(tareWeightKg);
-        if (capacityKg.compareTo(BigDecimal.ZERO) > 0 && configuredNet.compareTo(capacityKg) != 0) {
-            throw new IllegalArgumentException("Full gross weight must equal empty/tare weight plus LPG capacity.");
+        BigDecimal capacity = fullGross.subtract(tare).setScale(3, RoundingMode.HALF_UP);
+        if (request.getCapacityKg() != null
+                && scaleWeight(request.getCapacityKg()).compareTo(capacity) != 0) {
+            throw new IllegalArgumentException("LPG capacity is calculated as full gross weight minus empty/tare weight.");
         }
+        BigDecimal currentGross;
+        if (request.getCurrentGrossWeightKg() != null) {
+            currentGross = scaleWeight(request.getCurrentGrossWeightKg());
+        } else if (request.getCurrentKg() != null) {
+            currentGross = tare.add(scaleWeight(request.getCurrentKg())).setScale(3, RoundingMode.HALF_UP);
+        } else if (existing != null) {
+            currentGross = tare.add(nvl(existing.getCurrentKg())).setScale(3, RoundingMode.HALF_UP);
+        } else {
+            throw new IllegalArgumentException("Current gross tank weight is required.");
+        }
+        validateCurrentGross(existing == null ? "Tank" : existing.getName(), tare, fullGross, currentGross);
+        return new TankWeights(tare, fullGross, capacity,
+                currentGross.subtract(tare).setScale(3, RoundingMode.HALF_UP));
+    }
+
+    private void validateCurrentGross(String tankName, BigDecimal tare,
+                                      BigDecimal fullGross, BigDecimal currentGross) {
+        if (currentGross.compareTo(tare) < 0) {
+            throw new IllegalArgumentException(tankName + " current gross weight cannot be below its empty/tare weight.");
+        }
+        if (currentGross.compareTo(fullGross) > 0) {
+            throw new IllegalArgumentException(tankName + " current gross weight cannot exceed its full gross weight.");
+        }
+    }
+
+    private BigDecimal effectiveFullGross(GasTank tank) {
+        if (tank.getFullGrossWeightKg() != null) {
+            return scaleWeight(tank.getFullGrossWeightKg());
+        }
+        return scaleWeight(nvl(tank.getTareWeightKg()).add(nvl(tank.getCapacityKg())));
+    }
+
+    private BigDecimal scaleWeight(BigDecimal value) {
+        return nvl(value).setScale(3, RoundingMode.HALF_UP);
     }
 
     private GasStockAdjustment recordAdjustment(GasTank tank, BigDecimal quantityBefore,
@@ -887,4 +1153,22 @@ public class GasOperationsService {
 
     public record PaymentMix(String paymentMethod, CurrencyCode currency, BigDecimal amount) {}
     public record HourlyRevenue(int hour, BigDecimal usd, BigDecimal zwg) {}
+    public record DailyRevenue(LocalDate date, BigDecimal usd, BigDecimal zwg) {}
+    public record SalesAnalytics(BigDecimal soldKg, BigDecimal revenueUsd,
+                                 BigDecimal revenueZwg, long transactions,
+                                 BigDecimal averageSaleUsd,
+                                 List<PaymentMix> paymentMix) {}
+    public record ExpenseCurrencySummary(CurrencyCode currency, BigDecimal total,
+                                         long count, LocalDateTime lastRecordedAt) {}
+    public record ExpenseCategorySummary(String category, CurrencyCode currency,
+                                         BigDecimal total, long count) {}
+    public record ExpenseDailySummary(LocalDate date, CurrencyCode currency,
+                                      BigDecimal total, long count) {}
+    public record ExpenseAnalytics(List<ExpenseCurrencySummary> currencies,
+                                   List<ExpenseCategorySummary> categories,
+                                   List<ExpenseDailySummary> daily) {}
+    public record RestockSummary(BigDecimal totalKg, long count,
+                                 LocalDateTime lastReceivedAt) {}
+    private record TankWeights(BigDecimal tareKg, BigDecimal fullGrossKg,
+                               BigDecimal capacityKg, BigDecimal currentNetKg) {}
 }

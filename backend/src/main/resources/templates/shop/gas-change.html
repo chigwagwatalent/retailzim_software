@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Gas Held Change')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('gas-change')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Gas Held Change')}"></nav>
+
+    <section class="change-page gas-change-page">
+      <section class="change-hero">
+        <div class="change-hero-title">
+          <span class="change-hero-icon"><i class="fa-solid fa-coins"></i></span>
+          <div>
+            <p>Gas POS customer cash custody</p>
+            <h1>Gas Held Change</h1>
+            <small>Track LPG-sale change balances and customer payouts separately from retail transactions.</small>
+          </div>
+        </div>
+        <div class="change-hero-actions gas-change-actions">
+          <form method="get" th:action="@{/shop/gas/change}">
+            <select name="branchId" onchange="this.form.submit()" aria-label="Gas branch">
+              <option th:each="branch : ${gasBranches}"
+                      th:value="${branch.id}"
+                      th:text="${branch.name}"
+                      th:selected="${branch.id == gasBranchId}">Gas Branch</option>
+            </select>
+          </form>
+          <a class="btn btn-blue" th:href="@{/shop/gas(branchId=${gasBranchId})}">
+            <i class="fa-solid fa-cash-register"></i>Open Gas POS
+          </a>
+        </div>
+      </section>
+
+      <div th:if="${message}" class="alert" th:text="${message}"></div>
+      <div class="alert gas-change-shift-note" th:if="${currentGasShift == null}">
+        <i class="fa-solid fa-circle-info"></i>
+        Open a Gas POS shift before paying held change. Viewing and cancelling records remain available.
+      </div>
+
+      <section class="change-kpi-grid">
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-hourglass-half"></i></span>
+          <div><small>Awaiting Collection</small><strong th:text="${gasChangeOpenCount}">0</strong><em>Gas customers to pay</em></div>
+        </article>
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-dollar-sign"></i></span>
+          <div><small>Total Held USD</small><strong th:text="${'USD ' + #numbers.formatDecimal(gasChangeOpenUsd, 1, 2)}">USD 0.00</strong><em>Open gas liability</em></div>
+        </article>
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-coins"></i></span>
+          <div><small>Total Held ZWG</small><strong th:text="${'ZWG ' + #numbers.formatDecimal(gasChangeOpenZwg, 1, 2)}">ZWG 0.00</strong><em>Open gas liability</em></div>
+        </article>
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-hand-holding-dollar"></i></span>
+          <div><small>Collected Today</small><strong th:text="${'USD ' + #numbers.formatDecimal(gasChangeCollectedTodayUsd, 1, 2)}">USD 0.00</strong><em th:text="${'ZWG ' + #numbers.formatDecimal(gasChangeCollectedTodayZwg, 1, 2)}">ZWG 0.00</em></div>
+        </article>
+        <article class="change-kpi-card">
+          <span><i class="fa-solid fa-receipt"></i></span>
+          <div><small>Filtered Records</small><strong th:text="${gasChangePage.totalElements}">0</strong><em th:text="${'USD ' + #numbers.formatDecimal(gasChangeFilteredUsd, 1, 2) + ' / ZWG ' + #numbers.formatDecimal(gasChangeFilteredZwg, 1, 2)}">USD 0.00 / ZWG 0.00</em></div>
+        </article>
+      </section>
+
+      <section id="gas-change-filter-panel" class="change-filter-panel">
+        <div>
+          <h2>Search &amp; Filter</h2>
+          <p>Find a gas payout by reference, customer, phone, date, or status.</p>
+        </div>
+        <form method="get" th:action="@{/shop/gas/change}" class="change-filter-form">
+          <input type="hidden" name="branchId" th:value="${gasBranchId}">
+          <label>Reference, customer, or phone
+            <input name="gasChangeSearch" th:value="${gasChangeSearch}" placeholder="GCH reference, customer, or phone">
+          </label>
+          <label>From
+            <input type="date" name="gasChangeFrom" th:value="${gasChangeFrom}">
+          </label>
+          <label>To
+            <input type="date" name="gasChangeTo" th:value="${gasChangeTo}">
+          </label>
+          <label>Status
+            <select name="gasChangeStatus">
+              <option value="" th:selected="${#strings.isEmpty(gasChangeStatus)}">All statuses</option>
+              <option value="OPEN" th:selected="${gasChangeStatus == 'OPEN'}">Awaiting collection</option>
+              <option value="COLLECTED" th:selected="${gasChangeStatus == 'COLLECTED'}">Collected</option>
+              <option value="CANCELLED" th:selected="${gasChangeStatus == 'CANCELLED'}">Cancelled</option>
+            </select>
+          </label>
+          <label>Rows
+            <select name="gasChangeSize">
+              <option value="10" th:selected="${gasChangePage.size == 10}">10 rows</option>
+              <option value="25" th:selected="${gasChangePage.size == 25}">25 rows</option>
+              <option value="50" th:selected="${gasChangePage.size == 50}">50 rows</option>
+            </select>
+          </label>
+          <div class="change-filter-actions">
+            <button class="btn btn-blue" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+            <a class="btn btn-light" th:href="@{/shop/gas/change(branchId=${gasBranchId})}"><i class="fa-solid fa-xmark"></i>Clear</a>
+          </div>
+        </form>
+      </section>
+
+      <section class="change-register-panel">
+        <div class="change-register-head">
+          <div><h2>Gas Change Register</h2><p>Audited LPG-sale change custody and payout history.</p></div>
+          <span class="badge">Gas POS records only</span>
+        </div>
+        <div class="change-table-wrap">
+          <table>
+            <thead><tr><th>Reference</th><th>Customer</th><th>Gas Sale</th><th>Amount</th><th>Created</th><th>Status</th><th>Processed By</th><th>Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="change : ${gasChangeRecords}">
+              <td><strong th:text="${change.referenceNumber}">GCH-000</strong><small th:text="${change.offlineReference != null ? change.offlineReference : 'Online record'}">Online record</small></td>
+              <td><strong th:text="${change.customerName}">Customer</strong><small th:text="${change.phone}">Phone</small></td>
+              <td th:text="${change.gasSaleId != null ? '#' + change.gasSaleId : '—'}">—</td>
+              <td><strong th:text="${change.currency + ' ' + #numbers.formatDecimal(change.amount, 1, 2)}">USD 0.00</strong></td>
+              <td th:text="${change.createdAt != null ? #temporals.format(change.createdAt, 'dd MMM yyyy HH:mm') : '—'}">Date</td>
+              <td><span th:class="${change.status.name() == 'OPEN' ? 'badge status-pending' : (change.status.name() == 'COLLECTED' ? 'badge status-active' : 'badge status-suspended')}" th:text="${change.status.name() == 'OPEN' ? 'AWAITING' : change.status}">OPEN</span></td>
+              <td th:text="${change.collectedBy != null ? (gasChangeUserNames[change.collectedBy] ?: 'User #' + change.collectedBy) : (change.cancelledBy != null ? (gasChangeUserNames[change.cancelledBy] ?: 'User #' + change.cancelledBy) : '—')}">—</td>
+              <td>
+                <div class="action-row" th:if="${change.status.name() == 'OPEN'}">
+                  <a class="icon-button mini"
+                     th:if="${currentGasShift != null}"
+                     th:href="${'#modal-collect-gas-change-' + change.id}"
+                     title="Pay customer"><i class="fa-solid fa-hand-holding-dollar"></i></a>
+                  <button class="icon-button mini disabled" th:if="${currentGasShift == null}" type="button" disabled title="Open a Gas POS shift first"><i class="fa-solid fa-lock"></i></button>
+                  <form method="post" th:action="@{'/shop/gas/change/' + ${change.id} + '/cancel'}">
+                    <input type="hidden" name="branchId" th:value="${gasBranchId}">
+                    <button class="icon-button mini danger" type="submit" title="Cancel record"><i class="fa-solid fa-ban"></i></button>
+                  </form>
+                </div>
+                <span class="muted-text" th:unless="${change.status.name() == 'OPEN'}">No action</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="change-empty" th:if="${#lists.isEmpty(gasChangeRecords)}">
+          <span><i class="fa-solid fa-coins"></i></span>
+          <strong>No gas held-change records match your filters.</strong>
+          <small>Gas POS balances held for customers will appear here after syncing.</small>
+        </div>
+        <div th:replace="~{common/layout :: pagination(${gasChangePage}, ${gasChangePageLinks}, ${gasChangePrevUrl}, ${gasChangeNextUrl})}"></div>
+      </section>
+
+      <div th:each="change : ${gasChangeRecords}" th:id="${'modal-collect-gas-change-' + change.id}" class="modal">
+        <div class="modal-content change-collect-modal">
+          <div class="modal-head"><h2>Pay Gas Held Change</h2><a class="close" href="#">&times;</a></div>
+          <div class="change-collect-summary">
+            <article><small>Reference</small><strong th:text="${change.referenceNumber}">GCH-000</strong></article>
+            <article><small>Customer</small><strong th:text="${change.customerName}">Customer</strong></article>
+            <article><small>Amount to pay</small><strong th:text="${change.currency + ' ' + #numbers.formatDecimal(change.amount, 1, 2)}">USD 0.00</strong></article>
+            <article><small>Phone</small><strong th:text="${change.phone}">Phone</strong></article>
+          </div>
+          <p class="change-modal-note">Confirm only after the customer receives the cash. The payout is recorded against your open Gas POS shift.</p>
+          <form method="post" th:action="@{'/shop/gas/change/' + ${change.id} + '/collect'}">
+            <input type="hidden" name="branchId" th:value="${gasBranchId}">
+            <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-check"></i>Confirm Paid &amp; Collected</button></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer th:replace="~{common/layout :: shopFooter}"></footer>
+  </main>
+</div>
+</body>
+</html>

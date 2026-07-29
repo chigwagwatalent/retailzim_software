@@ -108,15 +108,18 @@
 
     <div id="modal-gas-tank" class="modal"><div class="modal-content">
       <div class="modal-head"><h2>Add Gas Tank</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{/shop/gas/tanks}" class="form-grid">
+      <form method="post" th:action="@{/shop/gas/tanks}" class="form-grid gas-tank-weight-form">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
         <label>Tank Name *<input name="name" required placeholder="Main LPG Tank"></label>
         <label>Product *<input name="productName" required value="LPG Gas"></label>
-        <label>Capacity Kg *<input name="capacityKg" type="number" step="0.001" min="0" required value="0"></label>
-        <label>Empty / tare Kg *<input name="tareWeightKg" type="number" step="0.001" min="0" required value="0"></label>
-        <label>Full gross Kg *<input name="fullGrossWeightKg" type="number" step="0.001" min="0" required value="0"></label>
-        <label>Current Kg *<input name="currentKg" type="number" step="0.001" min="0" required value="0"></label>
-        <label>Reorder Kg *<input name="reorderLevelKg" type="number" step="0.001" min="0" required value="0"></label>
+        <label>Empty / tare weight (kg) *<input name="tareWeightKg" data-gas-tare type="number" step="0.001" min="0" required placeholder="200.000"><small>Weight of the tank with no LPG.</small></label>
+        <label>Full tank gross weight (kg) *<input name="fullGrossWeightKg" data-gas-full-gross type="number" step="0.001" min="0.001" required placeholder="1200.000"><small>Tank plus LPG when completely full.</small></label>
+        <label>Current measured gross weight (kg) *<input name="currentGrossWeightKg" data-gas-current-gross type="number" step="0.001" min="0" required placeholder="950.000"><small>Physical scale reading now.</small></label>
+        <label>Reorder level (net LPG kg) *<input name="reorderLevelKg" data-gas-reorder type="number" step="0.001" min="0" required value="0"></label>
+        <div class="gas-weight-summary span-2" aria-live="polite">
+          <div><small>Net LPG capacity</small><strong data-gas-capacity>0.000 kg</strong><span>Full gross − tare</span></div>
+          <div><small>Current LPG available</small><strong data-gas-current-net>0.000 kg</strong><span>Current gross − tare</span></div>
+        </div>
         <label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}">ACTIVE</option></select></label>
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Tank</button></div>
       </form>
@@ -124,15 +127,18 @@
 
     <div th:each="t : ${gasTanks}" th:id="${'modal-gas-tank-' + t.id}" class="modal"><div class="modal-content">
       <div class="modal-head"><h2 th:text="${'Edit ' + t.name}">Edit Tank</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{'/shop/gas/tanks/' + ${t.id} + '/update'}" class="form-grid">
+      <form method="post" th:action="@{'/shop/gas/tanks/' + ${t.id} + '/update'}" class="form-grid gas-tank-weight-form">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
         <label>Tank Name *<input name="name" required th:value="${t.name}"></label>
         <label>Product *<input name="productName" required th:value="${t.productName}"></label>
-        <label>Capacity Kg *<input name="capacityKg" type="number" step="0.001" min="0" required th:value="${t.capacityKg}"></label>
-        <label>Empty / tare Kg *<input name="tareWeightKg" type="number" step="0.001" min="0" required th:value="${t.tareWeightKg ?: 0}"></label>
-        <label>Full gross Kg *<input name="fullGrossWeightKg" type="number" step="0.001" min="0" required th:value="${t.fullGrossWeightKg ?: (t.tareWeightKg ?: 0) + (t.capacityKg ?: 0)}"></label>
-        <label>Current Kg *<input name="currentKg" type="number" step="0.001" min="0" required th:value="${t.currentKg}"></label>
-        <label>Reorder Kg *<input name="reorderLevelKg" type="number" step="0.001" min="0" required th:value="${t.reorderLevelKg}"></label>
+        <label>Empty / tare weight (kg) *<input name="tareWeightKg" data-gas-tare type="number" step="0.001" min="0" required th:value="${t.tareWeightKg ?: 0}"><small>Weight of the tank with no LPG.</small></label>
+        <label>Full tank gross weight (kg) *<input name="fullGrossWeightKg" data-gas-full-gross type="number" step="0.001" min="0.001" required th:value="${t.fullGrossWeightKg ?: (t.tareWeightKg ?: 0) + (t.capacityKg ?: 0)}"><small>Tank plus LPG when completely full.</small></label>
+        <label>Current measured gross weight (kg) *<input name="currentGrossWeightKg" data-gas-current-gross type="number" step="0.001" min="0" required th:value="${t.currentGrossWeightKg}"><small>Physical scale reading now.</small></label>
+        <label>Reorder level (net LPG kg) *<input name="reorderLevelKg" data-gas-reorder type="number" step="0.001" min="0" required th:value="${t.reorderLevelKg}"></label>
+        <div class="gas-weight-summary span-2" aria-live="polite">
+          <div><small>Net LPG capacity</small><strong data-gas-capacity th:text="${#numbers.formatDecimal(t.netCapacityKg,1,3) + ' kg'}">0.000 kg</strong><span>Full gross − tare</span></div>
+          <div><small>Current LPG available</small><strong data-gas-current-net th:text="${#numbers.formatDecimal(t.currentKg,1,3) + ' kg'}">0.000 kg</strong><span>Current gross − tare</span></div>
+        </div>
         <label>Status<select name="status"><option th:each="s : ${gasTankStatuses}" th:value="${s}" th:text="${s}" th:selected="${t.status == s}">ACTIVE</option></select></label>
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Tank</button></div>
       </form>
@@ -152,8 +158,8 @@
       <div class="modal-head"><h2>Receive LPG Stock</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/gas/restocks}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
-        <label>Tank *<select name="tankId" required><option th:each="t : ${gasTanks}" th:value="${t.id}" th:text="${t.name + ' - ' + t.currentKg + ' kg'}">Tank</option></select></label>
-        <label>Quantity Kg *<input name="quantityKg" type="number" step="0.001" min="0.001" required placeholder="500.000"></label>
+        <label>Tank *<select name="tankId" required><option th:each="t : ${gasTanks}" th:value="${t.id}" th:text="${t.name + ' - ' + t.currentKg + ' kg net LPG'}">Tank</option></select></label>
+        <label>LPG delivered (net kg) *<input name="quantityKg" type="number" step="0.001" min="0.001" required placeholder="500.000"></label>
         <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
         <label>Unit Cost / kg<input name="unitCost" type="number" step="0.0001" min="0" value="0"></label>
         <label>Supplier<input name="supplierName" placeholder="LPG supplier"></label>

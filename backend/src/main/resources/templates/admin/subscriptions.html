@@ -1,290 +1,193 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{common/layout :: head('Subscriptions')}"></head>
+<head th:replace="~{common/layout :: head('Subscription Packages')}"></head>
 <body>
 <div class="app-shell platform-shell">
   <aside th:replace="~{common/layout :: platformSidebar('subscriptions')}"></aside>
   <main class="main">
-    <nav th:replace="~{common/layout :: platformTopbar('Subscriptions')}"></nav>
+    <nav th:replace="~{common/layout :: platformTopbar('Subscription Packages')}"></nav>
 
-    <section class="page-hero subscription-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-brain"></i></div>
-        <div>
-          <p>Billing intelligence</p>
-          <h1>Subscriptions &amp; Plans</h1>
-          <span class="hero-subtitle">Monitor recurring revenue, renewal risk, packages, and account billing.</span>
-        </div>
+    <section class="package-workspace-head">
+      <div>
+        <p class="eyebrow">Package architecture</p>
+        <h1>Subscription Packages</h1>
+        <span>Configure pricing and limits independently for every business module.</span>
       </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-sack-dollar"></i><strong th:text="${'USD ' + monthlyRevenueUsd}">USD 0.00</strong><span>Monthly recurring</span></div>
-        <div><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${intelligenceAlerts}">0</strong><span>Signals</span></div>
-        <div><i class="fa-solid fa-store"></i><strong th:text="${allTenantCount}">0</strong><span>Registered shops</span></div>
-      </div>
+      <a class="btn btn-primary" href="#modal-package">
+        <i class="fa-solid fa-plus"></i>Create Package
+      </a>
     </section>
+    <div th:if="${message}" class="alert package-alert" th:text="${message}"></div>
 
-    <div class="page-toolbar">
-      <a class="btn btn-light" href="#billing-queue"><i class="fa-solid fa-list-check"></i>Billing Queue</a>
-      <a class="btn btn-light" href="#modal-subscription"><i class="fa-solid fa-file-invoice-dollar"></i>New Subscription</a>
-      <a class="btn btn-primary" href="#modal-package"><i class="fa-solid fa-plus"></i>New Package</a>
-    </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
-
-    <section class="subscription-command-grid">
-      <article class="subscription-command-card metric-blue">
-        <span>MRR</span>
-        <strong th:text="${'USD ' + monthlyRevenueUsd}">USD 0.00</strong>
-        <small th:text="${'ZWG ' + monthlyRevenueZwg + ' monthly'}">ZWG 0.00 monthly</small>
+    <section class="package-summary-grid" aria-label="Subscription package summary">
+      <article>
+        <span class="package-summary-icon green"><i class="fa-solid fa-cube"></i></span>
+        <div><small>Active Packages</small><strong th:text="${activePackageCount}">0</strong><em>Available for subscription</em></div>
       </article>
-      <article class="subscription-command-card metric-green">
-        <span>Active Accounts</span>
-        <strong th:text="${activeCount}">0</strong>
-        <small th:text="${pendingCount + ' pending / ' + suspendedCount + ' suspended'}">0 pending / 0 suspended</small>
+      <article>
+        <span class="package-summary-icon blue"><i class="fa-solid fa-dollar-sign"></i></span>
+        <div><small>Monthly Revenue</small><strong th:text="${'USD ' + #numbers.formatDecimal(monthlyRevenueUsd, 1, 2)}">USD 0.00</strong><em th:text="${'ZWG ' + #numbers.formatDecimal(monthlyRevenueZwg, 1, 2)}">ZWG 0.00</em></div>
       </article>
-      <article class="subscription-command-card metric-orange">
-        <span>Renewal Risk</span>
-        <strong th:text="${expiringSoonCount}">0</strong>
-        <small th:text="${expiredCount + ' expired / next 30 days'}">0 expired / next 30 days</small>
-      </article>
-      <article class="subscription-command-card metric-red">
-        <span>ARPA</span>
-        <strong th:text="${'USD ' + averageRevenueUsd}">USD 0.00</strong>
-        <small th:text="${'ZWG ' + averageRevenueZwg + ' per active shop'}">ZWG 0.00 per active shop</small>
+      <article>
+        <span class="package-summary-icon orange"><i class="fa-regular fa-calendar"></i></span>
+        <div><small>Renewals Due</small><strong th:text="${expiringSoonCount}">0</strong><em>Within the next 30 days</em></div>
       </article>
     </section>
 
-    <section class="panel subscription-panel">
-      <div class="panel-title-row">
+    <nav class="package-family-tabs" aria-label="Package families">
+      <a class="active" href="#retail-packages"><i class="fa-solid fa-bag-shopping"></i><span>Retail POS</span><b th:text="${#lists.size(retailPlans)}">0</b></a>
+      <a href="#gas-packages"><i class="fa-solid fa-fire-flame-simple"></i><span>LPG Gas</span><b th:text="${#lists.size(gasPlans)}">0</b></a>
+      <a href="#restaurant-packages"><i class="fa-solid fa-utensils"></i><span>Restaurant</span><b th:text="${#lists.size(restaurantPlans)}">0</b></a>
+    </nav>
+
+    <section id="retail-packages" class="package-family-section retail-family">
+      <header>
         <div>
-          <p class="eyebrow">Package intelligence</p>
-          <h2>Plans, adoption and revenue weight</h2>
+          <p class="eyebrow">Retail POS</p>
+          <h2>Retail POS Packages</h2>
+          <span>Plans created exclusively for retail sales, inventory, and reporting.</span>
         </div>
-        <span class="badge status-active" th:text="${#lists.size(plans) + ' packages'}">0 packages</span>
-      </div>
-      <div class="plan-intel-grid">
-        <article class="plan-intel-card" th:each="p : ${plans}">
-          <div class="plan-intel-head">
-            <div>
-              <span th:text="${p.code}">CODE</span>
-              <h3 th:text="${p.name}">Package</h3>
-            </div>
-            <strong th:text="${'USD ' + p.priceUsd}">USD 0.00</strong>
-          </div>
-          <div class="plan-intel-meter">
-            <div><em th:style="${'width:' + planSharePercent.get(p.id) + '%'}"></em></div>
-            <span th:text="${planSharePercent.get(p.id) + '% shop mix'}">0% shop mix</span>
-          </div>
-          <dl>
-            <div><dt>Shops</dt><dd th:text="${planTenantCounts.get(p.id)}">0</dd></div>
-            <div><dt>MRR</dt><dd th:text="${'USD ' + planRevenueUsd.get(p.id)}">USD 0.00</dd></div>
-            <div><dt>Limits</dt><dd th:text="${p.maxBranches + ' branches / ' + p.maxUsers + ' users'}">0 branches</dd></div>
-          </dl>
-          <p class="intel-note"><i class="fa-solid fa-wand-magic-sparkles"></i><span th:text="${planIntelligence.get(p.id)}">Ready</span></p>
-        </article>
+        <a class="btn btn-primary" href="#modal-package"><i class="fa-solid fa-plus"></i>Create Retail Package</a>
+      </header>
+      <div class="package-table-wrap">
+        <table class="package-management-table">
+          <thead><tr><th>Package</th><th>Monthly price</th><th>Capacity</th><th>Included controls</th><th>Status</th><th class="table-action-cell">Actions</th></tr></thead>
+          <tbody>
+          <tr th:each="p : ${retailPlans}">
+            <td>
+              <span class="package-table-name"><i class="fa-solid fa-bag-shopping"></i><span><strong th:text="${p.name}">Retail Package</strong><small th:text="${p.code}">RETAIL</small></span></span>
+              <small class="package-table-description" th:text="${p.description != null && !p.description.isBlank() ? p.description : 'Retail operations package.'}">Description</small>
+            </td>
+            <td><strong th:text="${'USD ' + #numbers.formatDecimal(p.priceUsd, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(p.priceZwg, 1, 2) + ' / ' + #strings.toLowerCase(p.billingCycle)}">ZWG 0.00</small></td>
+            <td><strong th:text="${p.maxBranches + (p.maxBranches == 1 ? ' branch' : ' branches')}">1 branch</strong><small th:text="${p.maxUsers + ' users · ' + #numbers.formatInteger(p.maxProducts, 1, 'COMMA') + ' products'}">5 users</small></td>
+            <td><strong>POS &amp; inventory</strong><small>Sales and management reporting</small></td>
+            <td><span class="badge" th:classappend="${p.isActive ? ' status-active' : ' status-suspended'}" th:text="${p.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+            <td class="table-action-cell"><a class="btn btn-light package-table-action" th:href="${'#modal-package-' + p.id}"><i class="fa-solid fa-pen"></i>Edit</a></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(retailPlans)}"><td colspan="6"><div class="package-table-empty"><i class="fa-solid fa-bag-shopping"></i><span><strong>No Retail POS packages</strong><small>Create the first package dedicated to retail operations.</small></span><a href="#modal-package">Create package</a></div></td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <section class="panel table-panel" style="margin-top:16px">
-      <div class="panel-title-row">
+    <section id="gas-packages" class="package-family-section gas-family">
+      <header>
         <div>
-          <p class="eyebrow">Control table</p>
-          <h2>Packages</h2>
+          <p class="eyebrow">LPG Gas</p>
+          <h2>LPG Gas Packages</h2>
+          <span>Independent plans for gas sales, tank control, and shift reconciliation.</span>
         </div>
+        <a class="btn btn-primary gas-package-action" href="#modal-package"><i class="fa-solid fa-plus"></i>Create Gas Package</a>
+      </header>
+      <div class="package-table-wrap">
+        <table class="package-management-table">
+          <thead><tr><th>Package</th><th>Monthly price</th><th>Capacity</th><th>Gas controls</th><th>Status</th><th class="table-action-cell">Actions</th></tr></thead>
+          <tbody>
+          <tr th:each="p : ${gasPlans}">
+            <td>
+              <span class="package-table-name gas"><i class="fa-solid fa-fire-flame-simple"></i><span><strong th:text="${p.name}">Gas Package</strong><small th:text="${p.code}">GAS</small></span></span>
+              <small class="package-table-description" th:text="${p.description != null && !p.description.isBlank() ? p.description : 'LPG operations package.'}">Description</small>
+            </td>
+            <td><strong th:text="${'USD ' + #numbers.formatDecimal(p.priceUsd, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(p.priceZwg, 1, 2) + ' / ' + #strings.toLowerCase(p.billingCycle)}">ZWG 0.00</small></td>
+            <td><strong th:text="${(p.maxGasTanks ?: 0) + ((p.maxGasTanks ?: 0) == 1 ? ' gas tank' : ' gas tanks')}">0 tanks</strong><small th:text="${p.maxBranches + ' branches · ' + p.maxUsers + ' operators'}">1 branch</small></td>
+            <td><strong>Gas POS &amp; shifts</strong><small th:text="${p.gasReconciliationEnabled ? 'Weight reconciliation enabled' : 'Standard stock reconciliation'}">Reconciliation</small></td>
+            <td><span class="badge" th:classappend="${p.isActive ? ' status-active' : ' status-suspended'}" th:text="${p.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+            <td class="table-action-cell"><a class="btn btn-light package-table-action" th:href="${'#modal-package-' + p.id}"><i class="fa-solid fa-pen"></i>Edit</a></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(gasPlans)}"><td colspan="6"><div class="package-table-empty"><i class="fa-solid fa-fire-flame-simple"></i><span><strong>No LPG Gas packages</strong><small>Create a package dedicated to gas operations.</small></span><a href="#modal-package">Create package</a></div></td></tr>
+          </tbody>
+        </table>
       </div>
-      <table>
-        <thead>
-        <tr><th>Name</th><th>Code</th><th>Modules</th><th>USD</th><th>ZWG</th><th>Limits</th><th>Status</th><th></th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="p : ${plans}">
-          <td th:text="${p.name}"></td>
-          <td th:text="${p.code}"></td>
-          <td>
-            <span class="badge" th:each="m : ${p.allowedModuleList()}" th:text="${m.displayName}">Retail Shop</span>
-          </td>
-          <td th:text="${p.priceUsd}"></td>
-          <td th:text="${p.priceZwg}"></td>
-          <td th:text="${p.maxBranches + ' branches / ' + p.maxUsers + ' users / ' + p.maxProducts + ' products / ' + (p.maxGasTanks ?: 0) + ' tanks'}"></td>
-          <td><span class="badge" th:classappend="${p.isActive ? ' status-active' : ' status-suspended'}" th:text="${p.isActive ? 'ACTIVE' : 'INACTIVE'}"></span></td>
-          <td><a class="btn btn-light btn-compact" th:href="${'#modal-package-' + p.id}"><i class="fa-solid fa-pen"></i>Edit</a></td>
-        </tr>
-        </tbody>
-      </table>
     </section>
 
-    <section id="billing-queue" class="panel table-panel billing-queue-panel" style="margin-top:16px">
-      <div class="panel-title-row">
+    <section id="restaurant-packages" class="package-family-section restaurant-family">
+      <header>
         <div>
-          <p class="eyebrow">Shop intelligence</p>
-          <h2>Billing Queue</h2>
+          <p class="eyebrow">Restaurant</p>
+          <h2>Restaurant Packages</h2>
+          <span>Dedicated plans for food service operations and restaurant teams.</span>
         </div>
-        <div class="queue-summary">
-          <span><i class="fa-solid fa-circle-check"></i><b th:text="${activeCount}">0</b> active</span>
-          <span><i class="fa-solid fa-clock"></i><b th:text="${expiringSoonCount}">0</b> renewals</span>
-          <span><i class="fa-solid fa-link-slash"></i><b th:text="${noPlanCount}">0</b> no package</span>
-        </div>
+        <a class="btn btn-primary restaurant-package-action" href="#modal-package"><i class="fa-solid fa-plus"></i>Create Restaurant Package</a>
+      </header>
+      <div class="package-table-wrap">
+        <table class="package-management-table">
+          <thead><tr><th>Package</th><th>Monthly price</th><th>Capacity</th><th>Included controls</th><th>Status</th><th class="table-action-cell">Actions</th></tr></thead>
+          <tbody>
+          <tr th:each="p : ${restaurantPlans}">
+            <td>
+              <span class="package-table-name restaurant"><i class="fa-solid fa-utensils"></i><span><strong th:text="${p.name}">Restaurant Package</strong><small th:text="${p.code}">RESTAURANT</small></span></span>
+              <small class="package-table-description" th:text="${p.description != null && !p.description.isBlank() ? p.description : 'Restaurant operations package.'}">Description</small>
+            </td>
+            <td><strong th:text="${'USD ' + #numbers.formatDecimal(p.priceUsd, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(p.priceZwg, 1, 2) + ' / ' + #strings.toLowerCase(p.billingCycle)}">ZWG 0.00</small></td>
+            <td><strong th:text="${p.maxBranches + (p.maxBranches == 1 ? ' location' : ' locations')}">1 location</strong><small th:text="${p.maxUsers + ' users · ' + #numbers.formatInteger(p.maxProducts, 1, 'COMMA') + ' menu items'}">5 users</small></td>
+            <td><strong>Restaurant operations</strong><small>Sales and management reporting</small></td>
+            <td><span class="badge" th:classappend="${p.isActive ? ' status-active' : ' status-suspended'}" th:text="${p.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+            <td class="table-action-cell"><a class="btn btn-light package-table-action" th:href="${'#modal-package-' + p.id}"><i class="fa-solid fa-pen"></i>Edit</a></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(restaurantPlans)}"><td colspan="6"><div class="package-table-empty"><i class="fa-solid fa-utensils"></i><span><strong>No Restaurant packages</strong><small>Create a package dedicated to restaurant operations.</small></span><a href="#modal-package">Create package</a></div></td></tr>
+          </tbody>
+        </table>
       </div>
-      <table>
-        <thead>
-        <tr>
-          <th>Shop</th>
-          <th>Signal</th>
-          <th>Package</th>
-          <th>MRR</th>
-          <th>Subscription End</th>
-          <th>Action</th>
-          <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="t : ${tenants}">
-          <td>
-            <strong th:text="${t.companyName}">Shop</strong>
-            <small class="table-muted" th:text="${t.email}">email</small>
-          </td>
-          <td><span class="badge" th:classappend="${' ' + tenantBillingSignalClasses.get(t.id)}" th:text="${tenantBillingSignals.get(t.id)}">Healthy</span></td>
-          <td>
-            <strong th:text="${tenantPlanNames.get(t.id)}">Package</strong>
-            <small class="table-muted" th:text="${t.status}">ACTIVE</small>
-          </td>
-          <td>
-            <strong th:text="${'USD ' + tenantPlanPricesUsd.get(t.id)}">USD 0.00</strong>
-            <small class="table-muted" th:text="${'ZWG ' + tenantPlanPricesZwg.get(t.id)}">ZWG 0.00</small>
-          </td>
-          <td>
-            <span th:text="${t.subscriptionEnd != null ? #temporals.format(t.subscriptionEnd, 'dd MMM yyyy') : 'Open ended'}">Open ended</span>
-            <small class="table-muted" th:if="${tenantDaysRemaining.get(t.id) != null}" th:text="${tenantDaysRemaining.get(t.id) + ' days'}">0 days</small>
-          </td>
-          <td><span class="recommendation" th:text="${tenantRecommendations.get(t.id)}">Monitor</span></td>
-          <td>
-            <div class="table-actions">
-              <form method="post" th:action="@{/admin/subscriptions/tenants/{id}/checkout(id=${t.id})}">
-                <button class="btn btn-primary btn-compact" type="submit" title="Open secure payment"><i class="fa-solid fa-credit-card"></i>Pay</button>
-              </form>
-              <form method="post" th:action="@{/admin/subscriptions/tenants/{id}/remind(id=${t.id})}">
-                <button class="btn btn-light btn-compact" type="submit" title="Send payment reminder"><i class="fa-solid fa-paper-plane"></i>Remind</button>
-              </form>
-              <a class="btn btn-light btn-compact" th:href="${'#modal-subscription-' + t.id}"><i class="fa-solid fa-pen-to-square"></i>Edit</a>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-      <div th:replace="~{common/layout :: pagination(${tenantPage}, ${tenantPageLinks}, ${tenantPrevUrl}, ${tenantNextUrl})}"></div>
     </section>
 
-    <div id="modal-subscription" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2>New Subscription</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{/admin/subscriptions}" class="form-grid">
-        <label>Shop
-          <select name="tenantId" required>
-            <option value="">Choose shop</option>
-            <option th:each="t : ${tenantOptions}" th:value="${t.id}" th:text="${t.companyName + ' · ' + t.tenantCode}">Shop</option>
-          </select>
-        </label>
-        <label>Package
-          <select name="planId" required>
-            <option value="">Choose package</option>
-            <option th:each="p : ${plans}" th:value="${p.id}" th:text="${p.name + ' · USD ' + p.priceUsd}">Package</option>
-          </select>
-        </label>
-        <label>Status
-          <select name="status" required>
-            <option th:each="s : ${subscriptionStatuses}" th:value="${s}" th:text="${s}" th:selected="${s.name() == 'ACTIVE'}">ACTIVE</option>
-          </select>
-        </label>
-        <label>Currency
-          <select name="currency" required>
-            <option th:each="c : ${currencies}" th:value="${c}" th:text="${c}" th:selected="${c.name() == 'USD'}">USD</option>
-          </select>
-        </label>
-        <label>Starts At<input name="startsAt" type="datetime-local" required></label>
-        <label>Ends At<input name="endsAt" type="datetime-local"></label>
-        <label>Amount Paid<input name="amountPaid" type="number" step="0.01" min="0" placeholder="Use package price"></label>
-        <label>Payment Reference<input name="paymentReference" placeholder="Invoice / payment ref"></label>
-        <label style="grid-column:1/-1">Notes<textarea name="notes" placeholder="Internal billing note"></textarea></label>
-        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Create Subscription</button></div>
-      </form>
-    </div></div>
+    <section class="legacy-package-review" th:if="${!#lists.isEmpty(legacyMixedPlans)}">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <div><strong>Legacy combined packages require separation</strong><span>Assign one business module to each package before offering it to new accounts.</span></div>
+      <div>
+        <a th:each="p : ${legacyMixedPlans}" th:href="${'#modal-package-' + p.id}" th:text="${p.name}">Legacy package</a>
+      </div>
+    </section>
 
-    <div id="modal-package" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2>New Package</h2><a class="close" href="#">&times;</a></div>
+    <p class="package-policy-note"><i class="fa-solid fa-shield-halved"></i>Each subscription activates one business module. Every module is priced and managed independently.</p>
+
+    <div id="modal-package" class="modal"><div class="modal-content package-modal">
+      <div class="modal-head"><div><p class="eyebrow">New package</p><h2>Create Subscription Package</h2></div><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/admin/packages}" class="form-grid">
-        <label>Name<input name="name" required></label>
-        <label>Code<input name="code" required></label>
+        <label>Package Name<input name="name" required placeholder="Growth"></label>
+        <label>Package Code<input name="code" required placeholder="RETAIL-GROWTH"></label>
+        <label class="form-full">Business Module
+          <select name="allowedModules" required>
+            <option value="">Choose one module</option>
+            <option th:each="m : ${businessModules}" th:value="${m}" th:text="${m.name() == 'SHOP_MODULE' ? 'Retail POS' : (m.name() == 'GAS_MODULE' ? 'LPG Gas' : 'Restaurant')}">Retail POS</option>
+          </select>
+          <small>Packages cannot combine business modules.</small>
+        </label>
         <label>Price USD<input name="priceUsd" type="number" step="0.01" min="0" value="0" required></label>
         <label>Price ZWG<input name="priceZwg" type="number" step="0.01" min="0" value="0" required></label>
-        <label>Max Branches<input name="maxBranches" type="number" min="1" value="1" required></label>
-        <label>Max Users<input name="maxUsers" type="number" min="1" value="5" required></label>
-        <label>Max Products<input name="maxProducts" type="number" min="1" value="500" required></label>
-        <label>Max Gas Tanks<input name="maxGasTanks" type="number" min="0" value="0"></label>
-        <div class="form-full">
-          <span class="field-title">Modules</span>
-          <label class="check-row" th:each="m : ${businessModules}">
-            <input name="allowedModules" type="checkbox" th:value="${m}" th:checked="${m.name() == 'SHOP_MODULE'}">
-            <span th:text="${m.displayName}">Retail Shop</span>
-          </label>
-        </div>
-        <label class="check-row"><input name="allowMixedModules" type="checkbox" value="true"> Allow mixed-module shops</label>
-        <label class="check-row"><input name="gasReconciliationEnabled" type="checkbox" value="true"> Gas reconciliation</label>
-        <label style="grid-column:1/-1">Description<textarea name="description"></textarea></label>
-        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Save Package</button></div>
+        <label>Maximum Branches<input name="maxBranches" type="number" min="1" value="1" required></label>
+        <label>Maximum Users<input name="maxUsers" type="number" min="1" value="5" required></label>
+        <label>Maximum Products / Items<input name="maxProducts" type="number" min="1" value="500" required></label>
+        <label>Maximum Gas Tanks<input name="maxGasTanks" type="number" min="0" value="0"></label>
+        <input name="allowMixedModules" type="hidden" value="false">
+        <label class="check-row"><input name="gasReconciliationEnabled" type="checkbox" value="true"> Enable gas weight reconciliation</label>
+        <label class="form-full">Description<textarea name="description" placeholder="Describe the audience and included capabilities"></textarea></label>
+        <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Create Package</button></div>
       </form>
     </div></div>
 
-    <div th:each="t : ${tenants}" th:id="${'modal-subscription-' + t.id}" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2 th:text="${'Edit Subscription · ' + t.companyName}">Edit Subscription</h2><a class="close" href="#billing-queue">&times;</a></div>
-      <form method="post" th:action="@{/admin/subscriptions/tenants/{id}/edit(id=${t.id})}" class="form-grid">
-        <label>Package
-          <select name="planId" required>
-            <option th:each="p : ${plans}" th:value="${p.id}" th:text="${p.name + ' · USD ' + p.priceUsd}" th:selected="${p.id == t.planId}">Package</option>
-          </select>
-        </label>
-        <label>Status
-          <select name="status" required>
-            <option value="ACTIVE" th:selected="${t.status.name() == 'ACTIVE'}">ACTIVE</option>
-            <option value="TRIAL">TRIAL</option>
-            <option value="EXPIRED">EXPIRED</option>
-            <option value="CANCELLED" th:selected="${t.status.name() == 'CANCELLED'}">CANCELLED</option>
-          </select>
-        </label>
-        <label>Currency
-          <select name="currency" required>
-            <option value="USD" selected>USD</option>
-            <option value="ZWG">ZWG</option>
-          </select>
-        </label>
-        <label>Amount Paid<input name="amountPaid" type="number" step="0.01" min="0" th:value="${tenantPlanPricesUsd.get(t.id)}"></label>
-        <label>Starts At<input name="startsAt" type="datetime-local" required th:value="${t.subscriptionStart != null ? #temporals.format(t.subscriptionStart, 'yyyy-MM-dd''T''HH:mm') : ''}"></label>
-        <label>Ends At<input name="endsAt" type="datetime-local" th:value="${t.subscriptionEnd != null ? #temporals.format(t.subscriptionEnd, 'yyyy-MM-dd''T''HH:mm') : ''}"></label>
-        <label>Payment Reference<input name="paymentReference" placeholder="Invoice / payment ref"></label>
-        <label style="grid-column:1/-1">Notes<textarea name="notes" placeholder="Internal billing note"></textarea></label>
-        <div class="form-actions"><a class="btn btn-light" href="#billing-queue">Cancel</a><button class="btn btn-primary" type="submit">Update Subscription</button></div>
-      </form>
-    </div></div>
-
-    <div th:each="p : ${plans}" th:id="${'modal-package-' + p.id}" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2 th:text="${'Edit Package · ' + p.name}">Edit Package</h2><a class="close" href="#">&times;</a></div>
+    <div th:each="p : ${plans}" th:id="${'modal-package-' + p.id}" class="modal"><div class="modal-content package-modal">
+      <div class="modal-head"><div><p class="eyebrow">Package settings</p><h2 th:text="${'Edit ' + p.name}">Edit Package</h2></div><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/admin/packages/{id}/edit(id=${p.id})}" class="form-grid">
-        <label>Name<input name="name" th:value="${p.name}" required></label>
-        <label>Code<input name="code" th:value="${p.code}" required></label>
+        <label>Package Name<input name="name" th:value="${p.name}" required></label>
+        <label>Package Code<input name="code" th:value="${p.code}" required></label>
+        <label class="form-full">Business Module
+          <select name="allowedModules" required>
+            <option th:each="m : ${businessModules}" th:value="${m}"
+                    th:text="${m.name() == 'SHOP_MODULE' ? 'Retail POS' : (m.name() == 'GAS_MODULE' ? 'LPG Gas' : 'Restaurant')}"
+                    th:selected="${planPrimaryModules.get(p.id) == m}">Retail POS</option>
+          </select>
+          <small>Selecting a module moves this package into that independent family.</small>
+        </label>
         <label>Price USD<input name="priceUsd" type="number" step="0.01" min="0" th:value="${p.priceUsd}" required></label>
         <label>Price ZWG<input name="priceZwg" type="number" step="0.01" min="0" th:value="${p.priceZwg}" required></label>
-        <label>Max Branches<input name="maxBranches" type="number" min="1" th:value="${p.maxBranches}" required></label>
-        <label>Max Users<input name="maxUsers" type="number" min="1" th:value="${p.maxUsers}" required></label>
-        <label>Max Products<input name="maxProducts" type="number" min="1" th:value="${p.maxProducts}" required></label>
-        <label>Max Gas Tanks<input name="maxGasTanks" type="number" min="0" th:value="${p.maxGasTanks ?: 0}"></label>
-        <div class="form-full">
-          <span class="field-title">Modules</span>
-          <label class="check-row" th:each="m : ${businessModules}">
-            <input name="allowedModules" type="checkbox" th:value="${m}" th:checked="${p.allowedModuleList().contains(m)}">
-            <span th:text="${m.displayName}">Retail Shop</span>
-          </label>
-        </div>
-        <label class="check-row"><input name="allowMixedModules" type="checkbox" value="true" th:checked="${p.allowMixedModules}"> Allow mixed-module shops</label>
-        <label class="check-row"><input name="gasReconciliationEnabled" type="checkbox" value="true" th:checked="${p.gasReconciliationEnabled}"> Gas reconciliation</label>
+        <label>Maximum Branches<input name="maxBranches" type="number" min="1" th:value="${p.maxBranches}" required></label>
+        <label>Maximum Users<input name="maxUsers" type="number" min="1" th:value="${p.maxUsers}" required></label>
+        <label>Maximum Products / Items<input name="maxProducts" type="number" min="1" th:value="${p.maxProducts}" required></label>
+        <label>Maximum Gas Tanks<input name="maxGasTanks" type="number" min="0" th:value="${p.maxGasTanks ?: 0}"></label>
+        <input name="allowMixedModules" type="hidden" value="false">
+        <label class="check-row"><input name="gasReconciliationEnabled" type="checkbox" value="true" th:checked="${p.gasReconciliationEnabled}"> Enable gas weight reconciliation</label>
         <label class="check-row"><input name="isActive" type="checkbox" value="true" th:checked="${p.isActive}"> Active package</label>
-        <label style="grid-column:1/-1">Description<textarea name="description" th:text="${p.description}"></textarea></label>
+        <label class="form-full">Description<textarea name="description" th:text="${p.description}"></textarea></label>
         <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Package</button></div>
       </form>
     </div></div>

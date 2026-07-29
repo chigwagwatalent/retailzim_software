@@ -73,4 +73,50 @@ public interface HeldChangeRepository extends JpaRepository<HeldChange, Long> {
 
     long countByTenantIdAndBranchIdAndGasShiftIdIsNotNullAndStatus(
             Long tenantId, Long branchId, HeldChange.Status status);
+
+    @Query("""
+            select c from HeldChange c
+            where c.tenantId = :tenantId
+              and c.branchId = :branchId
+              and c.gasShiftId is not null
+              and (:status is null or c.status = :status)
+              and (:fromDate is null or c.createdAt >= :fromDate)
+              and (:toDate is null or c.createdAt < :toDate)
+              and (:search is null
+                   or lower(c.customerName) like lower(concat('%', :search, '%'))
+                   or lower(c.phone) like lower(concat('%', :search, '%'))
+                   or lower(c.referenceNumber) like lower(concat('%', :search, '%'))
+                   or lower(c.offlineReference) like lower(concat('%', :search, '%')))
+            order by c.createdAt desc, c.id desc
+            """)
+    Page<HeldChange> searchGas(@Param("tenantId") Long tenantId,
+                               @Param("branchId") Long branchId,
+                               @Param("status") HeldChange.Status status,
+                               @Param("search") String search,
+                               @Param("fromDate") LocalDateTime fromDate,
+                               @Param("toDate") LocalDateTime toDate,
+                               Pageable pageable);
+
+    @Query("""
+            select coalesce(sum(c.amount), 0) from HeldChange c
+            where c.tenantId = :tenantId
+              and c.branchId = :branchId
+              and c.gasShiftId is not null
+              and c.currency = :currency
+              and (:status is null or c.status = :status)
+              and (:fromDate is null or c.createdAt >= :fromDate)
+              and (:toDate is null or c.createdAt < :toDate)
+              and (:search is null
+                   or lower(c.customerName) like lower(concat('%', :search, '%'))
+                   or lower(c.phone) like lower(concat('%', :search, '%'))
+                   or lower(c.referenceNumber) like lower(concat('%', :search, '%'))
+                   or lower(c.offlineReference) like lower(concat('%', :search, '%')))
+            """)
+    java.math.BigDecimal sumGas(@Param("tenantId") Long tenantId,
+                                @Param("branchId") Long branchId,
+                                @Param("status") HeldChange.Status status,
+                                @Param("search") String search,
+                                @Param("fromDate") LocalDateTime fromDate,
+                                @Param("toDate") LocalDateTime toDate,
+                                @Param("currency") CurrencyCode currency);
 }

@@ -1,79 +1,318 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{common/layout :: head('Tank Restocking')}"></head>
+<head th:replace="~{common/layout :: head('Supplier Deliveries')}"></head>
 <body>
 <div class="app-shell">
   <aside th:replace="~{common/layout :: shopSidebar('gas-restocking')}"></aside>
   <main class="main">
-    <nav th:replace="~{common/layout :: shopTopbar('Tank Restocking')}"></nav>
+    <nav th:replace="~{common/layout :: shopTopbar('Supplier Deliveries')}"></nav>
 
-    <section class="page-hero">
-      <div class="hero-title">
-        <div class="hero-icon"><i class="fa-solid fa-truck-droplet"></i></div>
-        <div><p>LPG receiving,</p><h1>Tank Restocking</h1></div>
-      </div>
-      <div class="hero-metrics">
-        <div><i class="fa-solid fa-database"></i><strong th:text="${gasTotalKg}">0</strong><span>Kg on hand</span></div>
-        <div><i class="fa-solid fa-triangle-exclamation"></i><strong th:text="${gasDashboard != null ? #lists.size(gasDashboard.reorderTanks) : 0}">0</strong><span>Reorder alerts</span></div>
-      </div>
-    </section>
+    <div class="gas-deliveries-page">
+      <header class="gas-deliveries-titlebar">
+        <div class="gas-deliveries-title">
+          <span><i class="fa-solid fa-truck-droplet"></i></span>
+          <div>
+            <p>LPG receiving</p>
+            <h1>Supplier Deliveries</h1>
+            <small>Plan LPG replenishment and record verified stock receipts</small>
+          </div>
+        </div>
+        <div class="gas-deliveries-header-actions">
+          <form method="get" th:action="@{/shop/gas/restocking}" class="gas-deliveries-branch-form">
+            <input type="hidden" name="restockPeriod" th:value="${gasRestockPeriod}">
+            <label for="gas-delivery-branch"><i class="fa-solid fa-building-columns"></i><span class="sr-only">Branch</span></label>
+            <select id="gas-delivery-branch" name="branchId" onchange="this.form.submit()">
+              <option th:each="branch : ${gasBranches}"
+                      th:value="${branch.id}"
+                      th:text="${branch.name}"
+                      th:selected="${branch.id == gasBranchId}">Gas Branch</option>
+            </select>
+          </form>
+          <form method="get" th:action="@{/shop/gas/restocking}" class="gas-deliveries-period-form">
+            <input type="hidden" name="branchId" th:value="${gasBranchId}">
+            <label for="gas-delivery-period"><i class="fa-regular fa-calendar"></i><span class="sr-only">Reporting period</span></label>
+            <select id="gas-delivery-period" name="restockPeriod" onchange="this.form.submit()">
+              <option value="today" th:selected="${gasRestockPeriod == 'today'}">Today</option>
+              <option value="7days" th:selected="${gasRestockPeriod == '7days'}">Last 7 days</option>
+              <option value="month" th:selected="${gasRestockPeriod == 'month'}">This month</option>
+            </select>
+          </form>
+          <a class="btn btn-light gas-deliveries-export"
+             th:href="@{/shop/gas/restocking/export(
+               branchId=${gasBranchId},
+               restockPeriod=${gasRestockPeriod},
+               restockQuery=${gasRestockQuery},
+               restockTankId=${gasRestockTankId},
+               restockCurrency=${gasRestockCurrency})}">
+            <i class="fa-solid fa-download"></i>Export history
+          </a>
+          <a class="btn btn-primary gas-deliveries-receive" href="#modal-gas-restock">
+            <i class="fa-solid fa-plus"></i>Receive LPG
+          </a>
+        </div>
+      </header>
 
-    <div class="page-toolbar">
-      <form method="get" th:action="@{/shop/gas/restocking}" class="inline-form">
-        <select name="branchId" onchange="this.form.submit()">
-          <option th:each="b : ${gasBranches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == gasBranchId}">Gas Branch</option>
-        </select>
-      </form>
-      <a class="btn btn-primary" href="#modal-gas-restock"><i class="fa-solid fa-plus"></i>Receive LPG</a>
+      <div th:if="${message}" class="alert gas-deliveries-alert" th:text="${message}"></div>
+
+      <section class="gas-deliveries-kpis" aria-label="LPG receiving summary">
+        <article class="stock">
+          <span><i class="fa-solid fa-database"></i></span>
+          <div><small>LPG on hand</small><strong th:text="${#numbers.formatDecimal(gasTotalKg, 1, 3) + ' kg'}">0.000 kg</strong><em th:text="${'Across ' + gasTankCount + ' active tanks'}">Across 0 active tanks</em></div>
+        </article>
+        <article class="capacity">
+          <span><i class="fa-solid fa-fill-drip"></i></span>
+          <div><small>Storage capacity</small><strong th:text="${#numbers.formatDecimal(gasCapacityKg, 1, 3) + ' kg'}">0.000 kg</strong><em th:text="${#numbers.formatDecimal(gasRestockCapacityPercent, 1, 1) + '% currently filled'}">0.0% currently filled</em></div>
+        </article>
+        <article class="alerts">
+          <span><i class="fa-solid fa-triangle-exclamation"></i></span>
+          <div><small>Reorder alerts</small><strong th:text="${#lists.size(gasRestockReorderRows) + (#lists.size(gasRestockReorderRows) == 1 ? ' tank' : ' tanks')}">0 tanks</strong><em>Action required</em></div>
+        </article>
+        <article class="received">
+          <span><i class="fa-solid fa-truck"></i></span>
+          <div><small>Received this month</small><strong th:text="${#numbers.formatDecimal(gasRestockMonthSummary.totalKg, 1, 3) + ' kg'}">0.000 kg</strong><em th:text="${gasRestockMonthSummary.count == 0 ? 'No receipts recorded' : gasRestockMonthSummary.count + (gasRestockMonthSummary.count == 1 ? ' receipt' : ' receipts')}">No receipts recorded</em></div>
+        </article>
+      </section>
+
+      <section class="gas-deliveries-workspace">
+        <article class="panel gas-reorder-watch">
+          <header>
+            <div><h2>Reorder watch</h2><p>Tank stock compared with configured reorder levels</p></div>
+            <span th:classappend="${#lists.isEmpty(gasRestockReorderRows) ? ' healthy' : ''}"
+                  th:text="${#lists.isEmpty(gasRestockReorderRows) ? 'Stock levels healthy' : #lists.size(gasRestockReorderRows) + ' tanks need stock'}">Stock levels healthy</span>
+          </header>
+          <div class="gas-reorder-list" th:if="${!#lists.isEmpty(gasRestockReorderRows)}">
+            <article th:each="tank : ${gasRestockReorderRows}">
+              <div class="gas-reorder-cylinder" th:style="${'--tank-fill:' + tank.fillPercent}"><i class="fa-solid fa-gas-pump"></i></div>
+              <div class="gas-reorder-name">
+                <h3 th:text="${tank.name}">Tank</h3>
+                <span>Below reorder</span>
+                <small th:text="${tank.productName ?: 'LPG Gas'}">LPG Gas</small>
+              </div>
+              <div class="gas-reorder-position">
+                <div><span>On hand</span><strong th:text="${#numbers.formatDecimal(tank.currentKg, 1, 3) + ' kg'}">0.000 kg</strong><em th:text="${tank.fillPercent + '% of capacity'}">0% of capacity</em></div>
+                <div class="gas-reorder-progress"><i th:style="${'width:' + tank.fillPercent + '%'}"></i></div>
+                <dl>
+                  <div><dt>Capacity</dt><dd th:text="${#numbers.formatDecimal(tank.capacityKg, 1, 3) + ' kg'}">0.000 kg</dd></div>
+                  <div><dt>Reorder level</dt><dd th:text="${#numbers.formatDecimal(tank.reorderKg, 1, 3) + ' kg'}">0.000 kg</dd></div>
+                  <div><dt>Suggested order</dt><dd th:text="${#numbers.formatDecimal(tank.suggestedKg, 1, 3) + ' kg'}">0.000 kg</dd></div>
+                </dl>
+              </div>
+              <a class="btn btn-light"
+                 href="#modal-gas-restock"
+                 data-receive-tank
+                 th:attr="data-tank-id=${tank.id},data-suggested-kg=${tank.suggestedKg}">
+                Receive into tank
+              </a>
+            </article>
+          </div>
+          <div class="gas-reorder-empty" th:if="${#lists.isEmpty(gasRestockReorderRows)}">
+            <i class="fa-solid fa-circle-check"></i>
+            <strong>No tanks are below their reorder level</strong>
+            <span>Current LPG stock does not require replenishment.</span>
+          </div>
+        </article>
+
+        <article class="panel gas-restock-planner">
+          <header><div><h2>Restock planner</h2><p>Prepare the next verified LPG receipt</p></div></header>
+          <div class="gas-restock-planner-summary">
+            <div><small>Total suggested order</small><strong th:text="${#numbers.formatDecimal(gasRestockSuggestedTotal, 1, 3) + ' kg'}">0.000 kg</strong></div>
+            <div><small>Tanks affected</small><strong th:text="${#lists.size(gasRestockReorderRows)}">0</strong></div>
+          </div>
+          <div class="gas-restock-planner-lines" th:if="${!#lists.isEmpty(gasRestockReorderRows)}">
+            <div th:each="tank : ${gasRestockReorderRows}"><span th:text="${tank.name}">Tank</span><strong th:text="${#numbers.formatDecimal(tank.suggestedKg, 1, 3) + ' kg'}">0.000 kg</strong></div>
+            <div class="total"><span>Total</span><strong th:text="${#numbers.formatDecimal(gasRestockSuggestedTotal, 1, 3) + ' kg'}">0.000 kg</strong></div>
+          </div>
+          <div class="gas-restock-planner-fields">
+            <label>Supplier
+              <select id="gas-restock-planner-supplier">
+                <option value="">Select supplier</option>
+                <option th:each="supplier : ${gasRestockSuppliers}" th:value="${supplier.name}" th:text="${supplier.name}">Supplier</option>
+              </select>
+            </label>
+            <label>Receiving date
+              <span><i class="fa-regular fa-calendar"></i><b th:text="${#temporals.format(gasRestockToday, 'dd MMM yyyy')}">29 Jul 2026</b></span>
+            </label>
+          </div>
+          <a class="btn btn-primary gas-restock-planner-start"
+             href="#modal-gas-restock" data-restock-planner-open>
+            Start receiving<i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </article>
+      </section>
+
+      <section class="panel gas-delivery-history">
+        <header class="gas-delivery-history-head">
+          <div><h2>Delivery history</h2><p>Verified supplier receipts for the selected branch and period</p></div>
+          <span th:text="${gasRestockPage.totalElements + (gasRestockPage.totalElements == 1 ? ' receipt' : ' receipts')}">0 receipts</span>
+        </header>
+        <form class="gas-delivery-filters" method="get" th:action="@{/shop/gas/restocking}">
+          <input type="hidden" name="branchId" th:value="${gasBranchId}">
+          <input type="hidden" name="restockPeriod" th:value="${gasRestockPeriod}">
+          <label><i class="fa-solid fa-magnifying-glass"></i><input type="search" name="restockQuery" th:value="${gasRestockQuery}" placeholder="Search supplier or reference" aria-label="Search supplier or reference"></label>
+          <select name="restockTankId" aria-label="Filter by tank">
+            <option value="">All tanks</option>
+            <option th:each="tank : ${gasTanks}" th:value="${tank.id}" th:text="${tank.name}" th:selected="${tank.id == gasRestockTankId}">Tank</option>
+          </select>
+          <select name="restockCurrency" aria-label="Filter by currency">
+            <option value="">All currencies</option>
+            <option th:each="currency : ${currencies}" th:value="${currency}" th:text="${currency}" th:selected="${currency == gasRestockCurrency}">USD</option>
+          </select>
+          <select name="restockSize" aria-label="Rows per page">
+            <option value="10" th:selected="${gasRestockPage.size == 10}">10 rows</option>
+            <option value="25" th:selected="${gasRestockPage.size == 25}">25 rows</option>
+            <option value="50" th:selected="${gasRestockPage.size == 50}">50 rows</option>
+          </select>
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-filter"></i>Apply</button>
+          <a class="btn btn-light"
+             th:if="${!#strings.isEmpty(gasRestockQuery) or gasRestockTankId != null or gasRestockCurrency != null}"
+             th:href="@{/shop/gas/restocking(branchId=${gasBranchId},restockPeriod=${gasRestockPeriod})}">Reset</a>
+        </form>
+        <div class="gas-delivery-table-wrap">
+          <table>
+            <thead><tr><th>Receipt</th><th>Supplier</th><th>Tank</th><th class="numeric">Net LPG received</th><th class="numeric">Cost / kg</th><th class="numeric">Total cost</th><th>Currency</th><th>Reference</th><th>Received at</th><th>Received by</th><th class="action-cell">Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="receipt : ${gasRestocks}">
+              <td><strong th:text="${'GR-' + receipt.id}">GR-1</strong></td>
+              <td th:text="${receipt.supplierName ?: 'Not supplied'}">Supplier</td>
+              <td><span class="gas-delivery-tank" th:text="${gasRestockTankNames[receipt.tankId] ?: 'Tank #' + receipt.tankId}">Tank</span></td>
+              <td class="numeric"><strong th:text="${#numbers.formatDecimal(receipt.quantityKg, 1, 3) + ' kg'}">0.000 kg</strong></td>
+              <td class="numeric" th:text="${receipt.currency + ' ' + #numbers.formatDecimal(receipt.unitCost, 1, 4)}">USD 0.0000</td>
+              <td class="numeric"><strong th:text="${receipt.currency + ' ' + #numbers.formatDecimal(receipt.totalCost, 1, 2)}">USD 0.00</strong></td>
+              <td th:text="${receipt.currency}">USD</td>
+              <td th:text="${!#strings.isEmpty(receipt.supplierInvoice) ? receipt.supplierInvoice : '—'}">—</td>
+              <td th:text="${receipt.createdAt != null ? #temporals.format(receipt.createdAt, 'dd MMM yyyy HH:mm') : '—'}">—</td>
+              <td th:text="${receipt.createdBy != null and gasRestockCreatorNames[receipt.createdBy] != null ? gasRestockCreatorNames[receipt.createdBy] : 'System'}">System</td>
+              <td class="action-cell"><a class="icon-button" th:href="${'#delivery-details-' + receipt.id}" title="View receipt details" aria-label="View receipt details"><i class="fa-solid fa-ellipsis"></i></a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(gasRestocks)}">
+              <td colspan="11" class="gas-delivery-empty">
+                <i class="fa-solid fa-truck"></i><strong>No LPG receipts recorded</strong><span>Completed supplier deliveries will appear here.</span>
+                <a class="btn btn-light" href="#modal-gas-restock">Receive first delivery</a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <footer class="gas-delivery-pagination">
+          <span th:text="${'Showing ' + gasRestockPageFrom + '–' + gasRestockPageTo + ' of ' + gasRestockPage.totalElements}">Showing 0–0 of 0</span>
+          <nav aria-label="Delivery pagination">
+            <a th:href="${gasRestockPrevUrl ?: '#'}" th:classappend="${gasRestockPrevUrl == null ? ' disabled' : ''}"><i class="fa-solid fa-chevron-left"></i>Previous</a>
+            <a th:each="link : ${gasRestockPageLinks}" th:href="${link.url}" th:text="${link.label}" th:classappend="${link.active ? ' active' : ''}">1</a>
+            <span class="active" th:if="${#lists.isEmpty(gasRestockPageLinks)}">1</span>
+            <a th:href="${gasRestockNextUrl ?: '#'}" th:classappend="${gasRestockNextUrl == null ? ' disabled' : ''}">Next<i class="fa-solid fa-chevron-right"></i></a>
+          </nav>
+        </footer>
+      </section>
     </div>
-    <div th:if="${message}" class="alert" th:text="${message}"></div>
 
-    <section class="panel table-panel" th:if="${gasDashboard != null && !#lists.isEmpty(gasDashboard.reorderTanks)}">
-      <div class="toolbar"><h2>Reorder Watch</h2><span class="badge status-pending">Needs stock</span></div>
-      <table>
-        <thead><tr><th>Tank</th><th>On Hand</th><th>Reorder Level</th><th>Suggested Order</th></tr></thead>
-        <tbody><tr th:each="t : ${gasDashboard.reorderTanks}">
-          <td><strong th:text="${t.name}">Tank</strong><small th:text="${t.productName}">LPG Gas</small></td>
-          <td th:text="${t.currentKg + ' kg'}">0 kg</td>
-          <td th:text="${t.reorderLevelKg + ' kg'}">0 kg</td>
-          <td th:text="${(t.capacityKg ?: 0) - (t.currentKg ?: 0) + ' kg'}">0 kg</td>
-        </tr></tbody>
-      </table>
-    </section>
+    <div id="modal-gas-restock" class="modal gas-restock-modal">
+      <div class="modal-content">
+        <div class="modal-head"><div><p>Verified stock receipt</p><h2>Receive LPG delivery</h2><small>Record the supplier quantity, cost and supporting reference.</small></div><a class="close" href="#" aria-label="Close">&times;</a></div>
+        <form method="post" th:action="@{/shop/gas/restocks}" class="form-grid gas-restock-form">
+          <input type="hidden" name="branchId" th:value="${gasBranchId}">
+          <input type="hidden" name="returnTo" th:value="${gasRestockReturnTo}">
+          <label>Tank *
+            <select id="gas-restock-tank" name="tankId" required>
+              <option value="">Select tank</option>
+              <option th:each="tank : ${gasTanks}" th:value="${tank.id}" th:text="${tank.name + ' · ' + #numbers.formatDecimal(tank.currentKg, 1, 3) + ' kg on hand'}"
+                      th:attr="data-name=${tank.name},data-current=${tank.currentKg},data-capacity=${tank.capacityKg}">Tank</option>
+            </select>
+          </label>
+          <label>Net LPG delivered (kg) *
+            <input id="gas-restock-quantity" name="quantityKg" type="number" step="0.001" min="0.001" required placeholder="0.000">
+          </label>
+          <div class="gas-restock-capacity span-2">
+            <span><small>Current stock</small><strong id="gas-restock-current">—</strong></span>
+            <span><small>Available capacity</small><strong id="gas-restock-available">—</strong></span>
+            <span><small>Stock after receipt</small><strong id="gas-restock-after">—</strong></span>
+          </div>
+          <label>Currency *
+            <select name="currency" required><option th:each="currency : ${currencies}" th:value="${currency}" th:text="${currency}">USD</option></select>
+          </label>
+          <label>Unit cost / kg
+            <input id="gas-restock-unit-cost" name="unitCost" type="number" step="0.0001" min="0" value="0">
+          </label>
+          <label>Supplier
+            <input id="gas-restock-supplier" name="supplierName" list="gas-restock-suppliers" maxlength="120" placeholder="Select or enter supplier">
+            <datalist id="gas-restock-suppliers"><option th:each="supplier : ${gasRestockSuppliers}" th:value="${supplier.name}"></option></datalist>
+          </label>
+          <label>Invoice / reference
+            <input name="supplierInvoice" maxlength="120" placeholder="Invoice or delivery note">
+          </label>
+          <label class="span-2">Notes
+            <textarea name="notes" maxlength="500" rows="3" placeholder="Delivery condition, seal number or verification notes"></textarea>
+          </label>
+          <div class="gas-restock-cost-preview span-2"><i class="fa-solid fa-calculator"></i><span>Calculated total cost</span><strong id="gas-restock-total-cost">0.00</strong></div>
+          <div class="gas-restock-form-note span-2"><i class="fa-solid fa-shield-halved"></i><span>Saving this receipt immediately increases the selected tank’s LPG stock. Quantity cannot exceed available capacity.</span></div>
+          <div class="modal-actions span-2"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save receipt</button></div>
+        </form>
+      </div>
+    </div>
 
-    <section class="panel table-panel">
-      <div class="toolbar"><h2>Restock History</h2><span class="badge" th:text="${#lists.size(gasRestocks) + ' receipts'}">0 receipts</span></div>
-      <table>
-        <thead><tr><th>Supplier</th><th>Tank</th><th>Kg</th><th>Cost / kg</th><th>Total Cost</th><th>Date</th></tr></thead>
-        <tbody>
-        <tr th:each="r : ${gasRestocks}">
-          <td><strong th:text="${r.supplierName ?: 'Supplier'}">Supplier</strong><small th:text="${r.supplierInvoice ?: ''}">Invoice</small></td>
-          <td th:text="${gasTankNameById.get(r.tankId) ?: 'Tank #' + r.tankId}">Tank</td>
-          <td th:text="${r.quantityKg + ' kg'}">0 kg</td>
-          <td th:text="${r.currency + ' ' + r.unitCost}">USD 0</td>
-          <td><strong th:text="${r.currency + ' ' + #numbers.formatDecimal(r.totalCost, 1, 2)}">USD 0</strong></td>
-          <td th:text="${r.createdAt != null ? #temporals.format(r.createdAt, 'dd MMM yyyy HH:mm') : ''}">Date</td>
-        </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <div id="modal-gas-restock" class="modal"><div class="modal-content">
-      <div class="modal-head"><h2>Receive LPG Stock</h2><a class="close" href="#">&times;</a></div>
-      <form method="post" th:action="@{/shop/gas/restocks}" class="form-grid">
-        <input type="hidden" name="branchId" th:value="${gasBranchId}">
-        <input type="hidden" name="returnTo" value="/shop/gas/restocking">
-        <label>Tank *<select name="tankId" required><option th:each="t : ${gasTanks}" th:value="${t.id}" th:text="${t.name + ' - ' + t.currentKg + ' kg'}">Tank</option></select></label>
-        <label>Quantity Kg *<input name="quantityKg" type="number" step="0.001" min="0.001" required></label>
-        <label>Currency *<select name="currency" required><option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">USD</option></select></label>
-        <label>Unit Cost / kg<input name="unitCost" type="number" step="0.0001" min="0" value="0"></label>
-        <label>Supplier<input name="supplierName" placeholder="LPG supplier"></label>
-        <label>Invoice / Reference<input name="supplierInvoice"></label>
-        <label class="span-2">Notes<input name="notes"></label>
-        <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Stock</button></div>
-      </form>
-    </div></div>
+    <div th:each="receipt : ${gasRestocks}" th:id="${'delivery-details-' + receipt.id}" class="modal gas-delivery-detail-modal">
+      <div class="modal-content">
+        <div class="modal-head"><div><p>Supplier receipt</p><h2 th:text="${'GR-' + receipt.id}">GR-1</h2><small>Read-only stock and costing audit</small></div><a class="close" href="#" aria-label="Close">&times;</a></div>
+        <dl class="gas-delivery-detail-grid">
+          <div><dt>Supplier</dt><dd th:text="${receipt.supplierName ?: 'Not supplied'}">Supplier</dd></div>
+          <div><dt>Tank</dt><dd th:text="${gasRestockTankNames[receipt.tankId] ?: 'Tank #' + receipt.tankId}">Tank</dd></div>
+          <div><dt>Net LPG received</dt><dd th:text="${#numbers.formatDecimal(receipt.quantityKg, 1, 3) + ' kg'}">0.000 kg</dd></div>
+          <div><dt>Unit cost</dt><dd th:text="${receipt.currency + ' ' + #numbers.formatDecimal(receipt.unitCost, 1, 4) + ' / kg'}">USD 0.0000 / kg</dd></div>
+          <div><dt>Total cost</dt><dd th:text="${receipt.currency + ' ' + #numbers.formatDecimal(receipt.totalCost, 1, 2)}">USD 0.00</dd></div>
+          <div><dt>Reference</dt><dd th:text="${!#strings.isEmpty(receipt.supplierInvoice) ? receipt.supplierInvoice : 'Not supplied'}">Not supplied</dd></div>
+          <div><dt>Received at</dt><dd th:text="${receipt.createdAt != null ? #temporals.format(receipt.createdAt, 'dd MMM yyyy HH:mm') : '—'}">—</dd></div>
+          <div><dt>Received by</dt><dd th:text="${receipt.createdBy != null and gasRestockCreatorNames[receipt.createdBy] != null ? gasRestockCreatorNames[receipt.createdBy] : 'System'}">System</dd></div>
+          <div class="span-2"><dt>Notes</dt><dd th:text="${!#strings.isEmpty(receipt.notes) ? receipt.notes : 'No notes recorded'}">No notes recorded</dd></div>
+        </dl>
+        <div class="modal-actions"><a class="btn btn-primary" href="#">Done</a></div>
+      </div>
+    </div>
   </main>
 </div>
+<script>
+  (() => {
+    const tankSelect = document.getElementById('gas-restock-tank');
+    const quantityInput = document.getElementById('gas-restock-quantity');
+    const unitCostInput = document.getElementById('gas-restock-unit-cost');
+    const supplierInput = document.getElementById('gas-restock-supplier');
+    const currentOutput = document.getElementById('gas-restock-current');
+    const availableOutput = document.getElementById('gas-restock-available');
+    const afterOutput = document.getElementById('gas-restock-after');
+    const totalOutput = document.getElementById('gas-restock-total-cost');
+    const plannerSupplier = document.getElementById('gas-restock-planner-supplier');
+
+    const number = value => Number.parseFloat(value || '0') || 0;
+    const selectedTank = () => tankSelect?.selectedOptions?.[0];
+    const refreshPreview = () => {
+      if (!tankSelect || !quantityInput) return;
+      const option = selectedTank();
+      const current = number(option?.dataset.current);
+      const capacity = number(option?.dataset.capacity);
+      const quantity = number(quantityInput.value);
+      const available = Math.max(0, capacity - current);
+      currentOutput.textContent = option?.value ? `${current.toFixed(3)} kg` : '—';
+      availableOutput.textContent = option?.value ? `${available.toFixed(3)} kg` : '—';
+      afterOutput.textContent = option?.value ? `${(current + quantity).toFixed(3)} kg` : '—';
+      if (capacity > 0) quantityInput.max = available.toFixed(3);
+      else quantityInput.removeAttribute('max');
+      totalOutput.textContent = (quantity * number(unitCostInput?.value)).toFixed(2);
+    };
+
+    document.querySelectorAll('[data-receive-tank]').forEach(button => {
+      button.addEventListener('click', () => {
+        if (!tankSelect || !quantityInput) return;
+        tankSelect.value = button.dataset.tankId || '';
+        quantityInput.value = button.dataset.suggestedKg || '';
+        refreshPreview();
+      });
+    });
+    document.querySelector('[data-restock-planner-open]')?.addEventListener('click', () => {
+      if (supplierInput && plannerSupplier) supplierInput.value = plannerSupplier.value;
+    });
+    tankSelect?.addEventListener('change', refreshPreview);
+    quantityInput?.addEventListener('input', refreshPreview);
+    unitCostInput?.addEventListener('input', refreshPreview);
+    refreshPreview();
+  })();
+</script>
 </body>
 </html>
