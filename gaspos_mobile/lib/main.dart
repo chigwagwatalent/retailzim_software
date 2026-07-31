@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -21,11 +24,20 @@ class GasPosApp extends StatefulWidget {
 
 class _GasPosAppState extends State<GasPosApp> {
   final state = GasPosState();
+  bool showingSplash = true;
 
   @override
   void initState() {
     super.initState();
-    state.restore();
+    _restore();
+  }
+
+  Future<void> _restore() async {
+    await Future.wait([
+      state.restore(),
+      Future<void>.delayed(const Duration(milliseconds: 700)),
+    ]);
+    if (mounted) setState(() => showingSplash = false);
   }
 
   @override
@@ -45,7 +57,7 @@ class _GasPosAppState extends State<GasPosApp> {
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12))),
             ),
-            cardTheme: const CardTheme(
+            cardTheme: const CardThemeData(
                 color: Colors.white,
                 elevation: 0,
                 margin: EdgeInsets.zero,
@@ -53,7 +65,7 @@ class _GasPosAppState extends State<GasPosApp> {
                     side: BorderSide(color: Color(0xFFD9E3F1)),
                     borderRadius: BorderRadius.all(Radius.circular(14)))),
           ),
-          home: state.busy && state.user == null
+          home: showingSplash || (state.busy && state.user == null)
               ? const Splash()
               : state.user == null
                   ? LoginScreen(state: state)
@@ -70,13 +82,35 @@ class Splash extends StatelessWidget {
         body: SafeArea(
           child: Semantics(
             label: 'GasPOS RetailZW is starting',
-            image: true,
-            child: SizedBox.expand(
-              child: Image.asset(
-                'assets/images/gaspos_splash.png',
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
-              ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 34),
+                    child: Image.asset(
+                      'assets/images/retail_zim_logo.png',
+                      width: 310,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
+                  ),
+                ),
+                const Positioned(
+                  left: 24,
+                  right: 24,
+                  bottom: 28,
+                  child: Text(
+                    'Powered by CN TECH',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF526985),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -96,10 +130,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final password = TextEditingController();
   bool rememberMe = true;
   bool obscurePassword = true;
+  String? loginError;
 
   Future<void> submit() async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (formKey.currentState?.validate() != true) return;
+    setState(() => loginError = null);
     try {
       await widget.state.login(
         username.text,
@@ -107,29 +143,12 @@ class _LoginScreenState extends State<LoginScreen> {
         rememberMe: rememberMe,
       );
     } catch (e) {
-      if (mounted) message(context, cleanError(e), error: true);
+      if (mounted) setState(() => loginError = loginFailureMessage(e));
     }
   }
 
-  void showPasswordHelp() {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: const Icon(Icons.lock_reset_rounded, color: blue, size: 38),
-        title: const Text('Reset your password'),
-        content: const Text(
-          'Ask your RetailZW shop administrator to reset your cashier '
-          'password, then return here to sign in.',
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
-    );
+  void clearLoginError(String _) {
+    if (loginError != null) setState(() => loginError = null);
   }
 
   @override
@@ -146,233 +165,138 @@ class _LoginScreenState extends State<LoginScreen> {
           child: LayoutBuilder(
             builder: (context, constraints) => SingleChildScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 20),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 430,
-                    minHeight: constraints.maxHeight - 48,
-                  ),
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 22),
-                        Image.asset(
-                          'assets/images/retail_zim_logo.png',
-                          height: 100,
-                          fit: BoxFit.contain,
-                          semanticLabel: 'Retail Zim',
-                        ),
-                        const SizedBox(height: 26),
-                        const Text(
-                          'GasPOS RetailZW',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: navy,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 30,
-                            letterSpacing: -0.5,
+                  constraints: const BoxConstraints(maxWidth: 430),
+                  child: SizedBox(
+                    height: constraints.maxHeight > 620
+                        ? constraints.maxHeight - 40
+                        : 620,
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Spacer(flex: 2),
+                          Image.asset(
+                            'assets/images/retail_zim_logo.png',
+                            height: 92,
+                            fit: BoxFit.contain,
+                            semanticLabel: 'Retail Zim',
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          'Secure LPG cashier workspace',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF567196),
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 44),
-                        TextFormField(
-                          controller: username,
-                          enabled: !widget.state.busy,
-                          textInputAction: TextInputAction.next,
-                          autofillHints: const [AutofillHints.username],
-                          decoration: _loginInputDecoration(
-                            label: 'Username or employee ID',
-                            icon: Icons.person_outline_rounded,
-                          ),
-                          validator: (value) =>
-                              value == null || value.trim().isEmpty
-                                  ? 'Enter your username or employee ID'
-                                  : null,
-                        ),
-                        const SizedBox(height: 18),
-                        TextFormField(
-                          controller: password,
-                          enabled: !widget.state.busy,
-                          obscureText: obscurePassword,
-                          textInputAction: TextInputAction.done,
-                          autofillHints: const [AutofillHints.password],
-                          onFieldSubmitted: (_) => submit(),
-                          decoration: _loginInputDecoration(
-                            label: 'Password',
-                            icon: Icons.lock_outline_rounded,
-                            suffix: IconButton(
-                              tooltip: obscurePassword
-                                  ? 'Show password'
-                                  : 'Hide password',
-                              onPressed: () => setState(
-                                  () => obscurePassword = !obscurePassword),
-                              icon: Icon(
-                                obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: const Color(0xFF567196),
-                              ),
-                            ),
-                          ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? 'Enter your password'
-                              : null,
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 40,
-                                    child: Checkbox(
-                                      value: rememberMe,
-                                      onChanged: widget.state.busy
-                                          ? null
-                                          : (value) => setState(() =>
-                                              rememberMe = value ?? false),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                  ),
-                                  const Flexible(
-                                    child: Text(
-                                      'Remember me',
-                                      overflow: TextOverflow.ellipsis,
-                                      style:
-                                          TextStyle(color: navy, fontSize: 14),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            TextButton(
-                              style: TextButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                minimumSize: const Size(0, 40),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              onPressed:
-                                  widget.state.busy ? null : showPasswordHelp,
-                              child: const Text(
-                                'Forgot password?',
-                                maxLines: 1,
-                              ),
-                            ),
+                          const SizedBox(height: 46),
+                          if (loginError != null) ...[
+                            _LoginStatus(message: loginError!, error: true),
+                            const SizedBox(height: 16),
                           ],
-                        ),
-                        const SizedBox(height: 18),
-                        Semantics(
-                          button: true,
-                          label: 'Sign in',
-                          child: Opacity(
-                            opacity: widget.state.busy ? 0.72 : 1,
-                            child: Material(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(14),
-                              child: Ink(
-                                height: 58,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFF18B7EB),
-                                      Color(0xFF075DF2),
-                                      Color(0xFF123DE8),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0x33235FEA),
-                                      blurRadius: 18,
-                                      offset: Offset(0, 8),
-                                    ),
-                                  ],
-                                ),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(14),
-                                  onTap: widget.state.busy ? null : submit,
-                                  child: Center(
-                                    child: widget.state.busy
-                                        ? const SizedBox.square(
-                                            dimension: 24,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.5,
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : const Text(
-                                            'Sign in',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                              ),
+                          TextFormField(
+                            controller: username,
+                            enabled: !widget.state.busy,
+                            textInputAction: TextInputAction.next,
+                            autofillHints: const [AutofillHints.username],
+                            onChanged: clearLoginError,
+                            decoration: _loginInputDecoration(
+                              label: 'Cashier username',
+                              icon: Icons.person_outline_rounded,
                             ),
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                    ? 'Enter your cashier username'
+                                    : null,
                           ),
-                        ),
-                        const SizedBox(height: 28),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.cloud_done_outlined,
-                              size: 25,
-                              color: Color(0xFF13A342),
-                            ),
-                            SizedBox(width: 9),
-                            Flexible(
-                              child: Text(
-                                'Offline sales sync automatically',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFF385778),
-                                  fontSize: 13,
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: password,
+                            enabled: !widget.state.busy,
+                            obscureText: obscurePassword,
+                            textInputAction: TextInputAction.done,
+                            autofillHints: const [AutofillHints.password],
+                            onChanged: clearLoginError,
+                            onFieldSubmitted: (_) => submit(),
+                            decoration: _loginInputDecoration(
+                              label: 'Password',
+                              icon: Icons.lock_outline_rounded,
+                              suffix: IconButton(
+                                tooltip: obscurePassword
+                                    ? 'Show password'
+                                    : 'Hide password',
+                                onPressed: () => setState(
+                                    () => obscurePassword = !obscurePassword),
+                                icon: Icon(
+                                  obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  color: const Color(0xFF567196),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 60),
-                        const Text.rich(
-                          TextSpan(
-                            text: 'Powered by ',
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Enter your password'
+                                : null,
+                          ),
+                          const SizedBox(height: 12),
+                          const _LoginStatus(
+                            message:
+                                'Use an active cashier account assigned to this gas branch.',
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
                             children: [
-                              TextSpan(
-                                text: 'CN Technologies',
-                                style: TextStyle(
-                                  color: blue,
-                                  fontWeight: FontWeight.w600,
+                              Checkbox(
+                                value: rememberMe,
+                                onChanged: widget.state.busy
+                                    ? null
+                                    : (value) => setState(
+                                        () => rememberMe = value ?? false),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
+                              ),
+                              const Text(
+                                'Keep me signed in',
+                                style: TextStyle(color: navy, fontSize: 14),
                               ),
                             ],
                           ),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF567196),
-                            fontSize: 13,
+                          const SizedBox(height: 10),
+                          FilledButton(
+                            onPressed: widget.state.busy ? null : submit,
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size.fromHeight(56),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: widget.state.busy
+                                ? const SizedBox.square(
+                                    dimension: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Sign in',
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
+                          const Spacer(flex: 3),
+                          const Text(
+                            'Powered by CN TECH',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFF567196),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -414,6 +338,47 @@ InputDecoration _loginInputDecoration({
       ),
     );
 
+class _LoginStatus extends StatelessWidget {
+  const _LoginStatus({required this.message, this.error = false});
+
+  final String message;
+  final bool error;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        decoration: BoxDecoration(
+          color: error ? const Color(0xFFFFF1F1) : const Color(0xFFF2F7FD),
+          border: Border.all(
+            color: error ? const Color(0xFFF0B7B7) : const Color(0xFFD7E5F5),
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              error ? Icons.error_outline : Icons.info_outline,
+              size: 19,
+              color: error ? const Color(0xFFB42318) : blue,
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(
+                  color: error ? const Color(0xFF8A1C1C) : navy,
+                  fontSize: 12.5,
+                  height: 1.35,
+                  fontWeight: error ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+}
+
 class GasShell extends StatefulWidget {
   const GasShell({super.key, required this.state});
   final GasPosState state;
@@ -444,48 +409,63 @@ class _GasShellState extends State<GasShell> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final state = widget.state;
     final pages = [
-      SellPage(state: state),
+      SellPage(
+        state: state,
+        onOpenShift: () => setState(() => index = 3),
+      ),
       SalesPage(state: state),
       HeldChangePage(state: state),
       ShiftPage(state: state),
     ];
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 76,
-        backgroundColor: navy,
-        foregroundColor: Colors.white,
+        toolbarHeight: 72,
+        backgroundColor: Colors.white,
+        foregroundColor: navy,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        titleSpacing: 16,
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Row(children: [
-            Icon(Icons.local_fire_department_rounded, color: Color(0xFF45A1FF)),
-            SizedBox(width: 8),
-            Text('GasPOS RetailZW',
-                style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900))
-          ]),
+          Image.asset(
+            'assets/images/retail_zim_logo.png',
+            height: 29,
+            width: 120,
+            fit: BoxFit.contain,
+            alignment: Alignment.centerLeft,
+            semanticLabel: 'Retail Zim',
+          ),
           const SizedBox(height: 3),
-          Text('${state.user!.branchName}  •  ${state.user!.displayName}',
-              style:
-                  const TextStyle(fontSize: 11, fontWeight: FontWeight.w400)),
+          Text(
+            state.user!.branchName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF526985),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ]),
         actions: [
-          InkWell(
-            onTap: state.online ? state.syncPending : state.refresh,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(state.online ? Icons.cloud_done : Icons.cloud_off,
-                        color: state.online
-                            ? Colors.greenAccent
-                            : Colors.orangeAccent),
-                    Text(
-                        state.pending > 0
-                            ? '${state.pending} pending'
-                            : state.online
-                                ? 'Synced'
-                                : 'Offline',
-                        style: const TextStyle(fontSize: 9))
-                  ]),
+          IconButton(
+            tooltip: state.pending > 0
+                ? 'Sync ${state.pending} pending sales'
+                : state.online
+                    ? 'Sales are synced'
+                    : 'Retry connection',
+            onPressed: state.busy
+                ? null
+                : state.online
+                    ? state.syncPending
+                    : state.refresh,
+            icon: Badge(
+              isLabelVisible: state.pending > 0,
+              label: Text('${state.pending}'),
+              child: Icon(
+                state.online ? Icons.cloud_done_outlined : Icons.cloud_off,
+                color: state.online ? const Color(0xFF159C52) : Colors.orange,
+              ),
             ),
           ),
           PopupMenuButton<String>(
@@ -498,7 +478,37 @@ class _GasShellState extends State<GasShell> with WidgetsBindingObserver {
         ],
       ),
       body: Stack(children: [
-        dataGuard(state, pages[index]),
+        Column(children: [
+          if (!state.online || state.pending > 0)
+            Container(
+              width: double.infinity,
+              color: state.online
+                  ? const Color(0xFFFFF6E5)
+                  : const Color(0xFFFFEED8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              child: Row(children: [
+                Icon(
+                  state.online ? Icons.cloud_upload_outlined : Icons.cloud_off,
+                  size: 18,
+                  color: Colors.orange.shade800,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    state.online
+                        ? '${state.pending} sale${state.pending == 1 ? '' : 's'} waiting to sync'
+                        : 'Offline mode - sales remain safe on this device',
+                    style: TextStyle(
+                      color: Colors.orange.shade900,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          Expanded(child: dataGuard(state, pages[index])),
+        ]),
         if (state.busy)
           const Positioned(
               left: 0,
@@ -507,6 +517,7 @@ class _GasShellState extends State<GasShell> with WidgetsBindingObserver {
               child: LinearProgressIndicator(minHeight: 2))
       ]),
       bottomNavigationBar: NavigationBar(
+        height: 68,
         selectedIndex: index,
         onDestinationSelected: (value) => setState(() => index = value),
         destinations: [
@@ -521,7 +532,7 @@ class _GasShellState extends State<GasShell> with WidgetsBindingObserver {
                   isLabelVisible: (state.data?.heldChange.length ?? 0) > 0,
                   label: Text('${state.data?.heldChange.length ?? 0}'),
                   child: const Icon(Icons.savings_outlined)),
-              label: 'Held Change'),
+              label: 'Change'),
           const NavigationDestination(
               icon: Icon(Icons.schedule_outlined), label: 'Shift'),
         ],
@@ -549,8 +560,13 @@ Widget dataGuard(GasPosState state, Widget child) {
 }
 
 class SellPage extends StatefulWidget {
-  const SellPage({super.key, required this.state});
+  const SellPage({
+    super.key,
+    required this.state,
+    required this.onOpenShift,
+  });
   final GasPosState state;
+  final VoidCallback onOpenShift;
   @override
   State<SellPage> createState() => _SellPageState();
 }
@@ -560,16 +576,39 @@ class _SellPageState extends State<SellPage> {
   final selected = <int>{};
   String currency = 'USD';
 
-  List<GasTank> get available {
-    final allowed =
-        widget.state.data!.shiftTanks.map((item) => item.tankId).toSet();
-    return widget.state.data!.tanks
-        .where((tank) => allowed.contains(tank.id))
-        .toList();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || sellable.length != 1 || selected.isNotEmpty) return;
+      setState(() => selected.add(sellable.single.id));
+    });
   }
 
+  @override
+  void dispose() {
+    quantity.dispose();
+    super.dispose();
+  }
+
+  List<GasTank> get available => widget.state.data!.assignedShiftTanks;
+
+  List<GasTank> get sellable =>
+      available.where((tank) => tank.isActive && tank.hasStock).toList();
+
+  List<String> get currencies => widget.state.data!.prices.entries
+      .where((entry) => entry.value > 0)
+      .map((entry) => entry.key)
+      .toList();
+
+  List<String> get displayCurrencies =>
+      currencies.isEmpty ? const ['USD'] : currencies;
+
+  String get activeCurrency =>
+      displayCurrencies.contains(currency) ? currency : displayCurrencies.first;
+
   double get kg => double.tryParse(quantity.text) ?? 0;
-  double get price => widget.state.data!.prices[currency] ?? 0;
+  double get price => widget.state.data!.prices[activeCurrency] ?? 0;
   double get total => kg * price;
 
   Future<void> pay() async {
@@ -578,7 +617,12 @@ class _SellPageState extends State<SellPage> {
           error: true);
       return;
     }
-    final selectedStock = available
+    if (price <= 0) {
+      message(context, 'No active gas price is configured for this branch.',
+          error: true);
+      return;
+    }
+    final selectedStock = sellable
         .where((t) => selected.contains(t.id))
         .fold<double>(0, (sum, t) => sum + t.currentKg);
     if (kg > selectedStock) {
@@ -591,12 +635,12 @@ class _SellPageState extends State<SellPage> {
         context: context,
         isScrollControlled: true,
         useSafeArea: true,
-        builder: (_) => PaymentSheet(total: total, currency: currency));
+        builder: (_) => PaymentSheet(total: total, currency: activeCurrency));
     if (payment == null || !mounted) return;
     try {
       final sale = await widget.state.completeSale(
           quantityKg: kg,
-          currency: currency,
+          currency: activeCurrency,
           tankIds: selected.toList(),
           payments: payment.payments,
           amountReceived: payment.received,
@@ -616,6 +660,7 @@ class _SellPageState extends State<SellPage> {
               held: payment.holdChange));
       quantity.clear();
       selected.clear();
+      if (sellable.length == 1) selected.add(sellable.single.id);
       setState(() {});
     } catch (e) {
       if (mounted) message(context, cleanError(e), error: true);
@@ -626,13 +671,76 @@ class _SellPageState extends State<SellPage> {
   Widget build(BuildContext context) {
     final data = widget.state.data!;
     if (!data.hasOpenShift) {
+      return ListView(
+        padding: const EdgeInsets.all(14),
+        children: [
+          PageTitle(
+            'Open a gas shift to start selling',
+            data.tanks.isEmpty
+                ? 'No LPG tanks are configured for ${widget.state.user!.branchName}.'
+                : '${data.tanks.length} branch tank${data.tanks.length == 1 ? '' : 's'} found. Select the tanks connected to this cashier station.',
+          ),
+          if (data.tanks.isEmpty)
+            const Card(
+              child: ListTile(
+                leading: Icon(Icons.propane_tank_outlined,
+                    color: Colors.orange, size: 34),
+                title: Text('No tanks configured',
+                    style: TextStyle(fontWeight: FontWeight.w900)),
+                subtitle: Text(
+                    'Ask the shop administrator to add an LPG tank and opening stock in the RetailZW web dashboard.'),
+              ),
+            )
+          else
+            ...data.tanks.map(
+              (tank) => Card(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: tank.isActive
+                        ? const Color(0xFFEAF3FF)
+                        : const Color(0xFFF1F3F6),
+                    child: Icon(Icons.propane_tank,
+                        color: tank.isActive ? blue : Colors.blueGrey),
+                  ),
+                  title: Text(tank.name,
+                      style: const TextStyle(fontWeight: FontWeight.w900)),
+                  subtitle: Text(
+                    tank.isActive
+                        ? '${tank.currentKg.toStringAsFixed(3)} kg LPG available'
+                        : 'Tank is inactive',
+                  ),
+                  trailing: Chip(
+                    label: Text(tank.isActive && tank.hasStock
+                        ? 'Ready'
+                        : tank.isActive
+                            ? 'Empty'
+                            : 'Inactive'),
+                  ),
+                ),
+              ),
+            ),
+          const SizedBox(height: 6),
+          FilledButton.icon(
+            onPressed:
+                data.tanksEligibleForShift.isEmpty ? null : widget.onOpenShift,
+            icon: const Icon(Icons.schedule),
+            label: const Text('Select tanks and open shift'),
+            style:
+                FilledButton.styleFrom(minimumSize: const Size.fromHeight(54)),
+          ),
+        ],
+      );
+    }
+    if (available.isEmpty) {
       return EmptyAction(
-          icon: Icons.schedule,
-          title: 'Open a gas shift to start selling',
-          detail:
-              'Select the tanks connected to this selling station from the Shift tab.',
-          action: 'Go to Shift',
-          onTap: () => message(context, 'Select the Shift tab below.'));
+        icon: Icons.warning_amber_rounded,
+        title: 'This shift has no tanks assigned',
+        detail:
+            'This can happen with an older shift. Close it from the Shift tab, then open a new shift and select the branch tanks.',
+        action: 'Review shift',
+        onTap: widget.onOpenShift,
+      );
     }
     return ListView(padding: const EdgeInsets.all(14), children: [
       Row(children: [
@@ -653,15 +761,23 @@ class _SellPageState extends State<SellPage> {
           itemBuilder: (_, index) {
             final tank = available[index];
             final checked = selected.contains(tank.id);
+            final enabled = tank.isActive && tank.hasStock;
             return InkWell(
-              onTap: () => setState(() =>
-                  checked ? selected.remove(tank.id) : selected.add(tank.id)),
+              onTap: enabled
+                  ? () => setState(() => checked
+                      ? selected.remove(tank.id)
+                      : selected.add(tank.id))
+                  : null,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 width: 142,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                    color: checked ? const Color(0xFFEDF5FF) : Colors.white,
+                    color: !enabled
+                        ? const Color(0xFFF1F3F6)
+                        : checked
+                            ? const Color(0xFFEDF5FF)
+                            : Colors.white,
                     border: Border.all(
                         color: checked ? blue : const Color(0xFFD4DEEC),
                         width: checked ? 2 : 1),
@@ -686,8 +802,9 @@ class _SellPageState extends State<SellPage> {
                   Text('${tank.currentKg.toStringAsFixed(3)} kg',
                       style: const TextStyle(
                           fontSize: 17, fontWeight: FontWeight.w900)),
-                  const Text('net remaining',
-                      style: TextStyle(fontSize: 10, color: Colors.blueGrey))
+                  Text(enabled ? 'net remaining' : 'not available',
+                      style:
+                          const TextStyle(fontSize: 10, color: Colors.blueGrey))
                 ]),
               ),
             );
@@ -702,11 +819,11 @@ class _SellPageState extends State<SellPage> {
                 Row(children: [
                   Expanded(
                       child: SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(value: 'USD', label: Text('USD')),
-                      ButtonSegment(value: 'ZWG', label: Text('ZWG'))
-                    ],
-                    selected: {currency},
+                    segments: displayCurrencies
+                        .map((code) =>
+                            ButtonSegment(value: code, label: Text(code)))
+                        .toList(),
+                    selected: {activeCurrency},
                     onSelectionChanged: (value) =>
                         setState(() => currency = value.first),
                   )),
@@ -723,17 +840,34 @@ class _SellPageState extends State<SellPage> {
                         labelText: 'Gas weight',
                         suffixText: 'kg',
                         prefixIcon: Icon(Icons.scale))),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 7,
+                  runSpacing: 7,
+                  children: [1, 3, 5, 9, 19, 48]
+                      .map(
+                        (value) => ActionChip(
+                          label: Text('$value kg'),
+                          onPressed: () {
+                            quantity.text = '$value';
+                            setState(() {});
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
                 const SizedBox(height: 13),
                 Row(children: [
                   Expanded(
                       child: SummaryValue(
                           label: 'Price / kg',
-                          value: '$currency ${price.toStringAsFixed(2)}')),
+                          value:
+                              '$activeCurrency ${price.toStringAsFixed(2)}')),
                   const SizedBox(width: 10),
                   Expanded(
                       child: SummaryValue(
                           label: 'Total',
-                          value: '$currency ${total.toStringAsFixed(2)}',
+                          value: '$activeCurrency ${total.toStringAsFixed(2)}',
                           emphasized: true))
                 ])
               ]))),
@@ -742,7 +876,7 @@ class _SellPageState extends State<SellPage> {
           onPressed: pay,
           icon: const Icon(Icons.arrow_forward),
           label: Text(
-              'Continue to payment  •  $currency ${total.toStringAsFixed(2)}'),
+              'Continue to payment - $activeCurrency ${total.toStringAsFixed(2)}'),
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)))
     ]);
   }
@@ -808,7 +942,8 @@ class _PaymentSheetState extends State<PaymentSheet> {
     }
     final cashDue = (first == 'CASH' ? amount1 : 0) +
         (split && second == 'CASH' ? amount2 : 0);
-    final cashReceived = double.tryParse(received.text) ?? 0;
+    final cashReceived =
+        cashDue > 0 ? double.tryParse(received.text) ?? 0 : 0.0;
     if (cashReceived < cashDue) {
       message(context, 'Cash received is below the cash payment amount.',
           error: true);
@@ -894,7 +1029,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
                 value: second,
                 decoration: InputDecoration(
                     labelText:
-                        'Second method • ${widget.currency} ${amount2.toStringAsFixed(2)}'),
+                        'Second method - ${widget.currency} ${amount2.toStringAsFixed(2)}'),
                 items: methods
                     .where((method) => method != first)
                     .map((method) => DropdownMenuItem(
@@ -1000,7 +1135,7 @@ class SaleCompleteDialog extends StatelessWidget {
                     SizedBox(width: 8),
                     Expanded(
                         child: Text(
-                            'Saved offline — sync will run automatically.',
+                            'Saved offline - sync will run automatically.',
                             style: TextStyle(fontSize: 12)))
                   ])
                 ]
@@ -1049,7 +1184,7 @@ class SalesPage extends StatelessWidget {
                   title: Text('${sale['receiptNumber'] ?? 'Gas sale'}',
                       style: const TextStyle(fontWeight: FontWeight.w800)),
                   subtitle: Text(
-                      '${sale['quantityKg']} kg • ${sale['paymentMethod']}'),
+                      '${sale['quantityKg']} kg - ${sale['paymentMethod']}'),
                   trailing: Text(
                       '${sale['currency']} ${NumberFormat('#,##0.00').format(sale['total'] ?? 0)}',
                       style: const TextStyle(
@@ -1093,7 +1228,7 @@ class HeldChangePage extends StatelessWidget {
                           Text('${item['customerName']}',
                               style:
                                   const TextStyle(fontWeight: FontWeight.w900)),
-                          Text('${item['phone']} • ${item['referenceNumber']}',
+                          Text('${item['phone']} - ${item['referenceNumber']}',
                               style: const TextStyle(
                                   color: Colors.blueGrey, fontSize: 11))
                         ])),
@@ -1188,33 +1323,82 @@ class _ShiftPageState extends State<ShiftPage> {
       return ListView(padding: const EdgeInsets.all(14), children: [
         const PageTitle('Open gas shift',
             'Select all tanks connected to the selling machine'),
-        ...data.tanks.where((t) => t.status == 'ACTIVE' && t.currentKg > 0).map(
-              (tank) => CheckboxListTile(
-                value: selected.contains(tank.id),
-                onChanged: (checked) => setState(() => checked == true
-                    ? selected.add(tank.id)
-                    : selected.remove(tank.id)),
-                secondary: const CircleAvatar(
-                    backgroundColor: Color(0xFFEAF3FF),
-                    child: Icon(Icons.propane_tank, color: blue)),
-                title: Text(tank.name,
-                    style: const TextStyle(fontWeight: FontWeight.w800)),
-                subtitle: Text(
-                    '${tank.currentKg.toStringAsFixed(3)} kg net • ${tank.grossKg.toStringAsFixed(3)} kg gross'),
-              ),
+        if (data.tanks.isEmpty)
+          const Card(
+            child: ListTile(
+              leading: Icon(Icons.propane_tank_outlined,
+                  color: Colors.orange, size: 34),
+              title: Text('No branch tanks found',
+                  style: TextStyle(fontWeight: FontWeight.w900)),
+              subtitle: Text(
+                  'The shop administrator must configure a tank and opening LPG stock before a cashier can open a shift.'),
             ),
+          ),
+        ...data.tanks.map(
+          (tank) {
+            final enabled = tank.isActive && tank.hasStock;
+            return CheckboxListTile(
+              value: selected.contains(tank.id),
+              onChanged: enabled
+                  ? (checked) => setState(() => checked == true
+                      ? selected.add(tank.id)
+                      : selected.remove(tank.id))
+                  : null,
+              secondary: CircleAvatar(
+                  backgroundColor: enabled
+                      ? const Color(0xFFEAF3FF)
+                      : const Color(0xFFF1F3F6),
+                  child: Icon(Icons.propane_tank,
+                      color: enabled ? blue : Colors.blueGrey)),
+              title: Text(tank.name,
+                  style: const TextStyle(fontWeight: FontWeight.w800)),
+              subtitle: Text(enabled
+                  ? '${tank.currentKg.toStringAsFixed(3)} kg net - ${tank.grossKg.toStringAsFixed(3)} kg gross'
+                  : tank.isActive
+                      ? 'Empty tank - receive LPG stock before selling'
+                      : 'Inactive tank'),
+            );
+          },
+        ),
         const SizedBox(height: 12),
         FilledButton.icon(
-            onPressed: open,
+            onPressed: selected.isEmpty ? null : open,
             icon: const Icon(Icons.play_arrow),
             label: const Text('Open shift with selected tanks'),
             style:
                 FilledButton.styleFrom(minimumSize: const Size.fromHeight(54)))
       ]);
     }
+    if (data.shiftTanks.isEmpty) {
+      return ListView(
+        padding: const EdgeInsets.all(14),
+        children: [
+          const PageTitle('Legacy shift needs reopening',
+              'This open shift has no tanks assigned to it. Close it safely, then select tanks in a new shift.'),
+          const Card(
+            color: Color(0xFFFFF6E5),
+            child: ListTile(
+              leading: Icon(Icons.info_outline, color: Colors.orange),
+              title: Text('No tank reconciliation is required',
+                  style: TextStyle(fontWeight: FontWeight.w900)),
+              subtitle: Text(
+                  'Only shifts created before tank assignment was enabled are affected.'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          FilledButton.icon(
+            onPressed: widget.state.pending == 0 ? close : null,
+            icon: const Icon(Icons.restart_alt),
+            label: const Text('Close old shift and reopen'),
+            style:
+                FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+          ),
+        ],
+      );
+    }
     return ListView(padding: const EdgeInsets.all(14), children: [
       PageTitle('Close shift',
-          '${widget.state.pending} pending sales • weigh every tank used'),
+          '${widget.state.pending} pending sales - weigh every tank used'),
       if (widget.state.pending > 0)
         const Card(
             color: Color(0xFFFFF6E5),
@@ -1268,9 +1452,9 @@ class _ShiftPageState extends State<ShiftPage> {
                               labelText: 'Closing gross weight',
                               suffixText: 'kg',
                               helperText:
-                                  '${tank.tareKg.toStringAsFixed(3)}–${tank.fullGrossKg.toStringAsFixed(3)} kg',
+                                  '${tank.tareKg.toStringAsFixed(3)}-${tank.fullGrossKg.toStringAsFixed(3)} kg',
                               errorText: invalidGross
-                                  ? 'Weight is outside this tank’s physical range'
+                                  ? "Weight is outside this tank's physical range"
                                   : null)),
                       if (net != null && !invalidGross) ...[
                         const SizedBox(height: 8),
@@ -1378,3 +1562,42 @@ String cleanError(Object error) => error
     .replaceFirst('FormatException: ', '')
     .replaceFirst('Bad state: ', '')
     .replaceFirst('SocketException: ', '');
+
+String loginFailureMessage(Object error) {
+  if (error is TimeoutException) {
+    return 'The RetailZW server took too long to respond. Check your internet connection and try again.';
+  }
+  if (error is HandshakeException) {
+    return 'A secure connection to RetailZW could not be established. Check the phone date, time, and internet connection.';
+  }
+  if (error is SocketException) {
+    return 'The app cannot reach RetailZW. Turn on mobile data or Wi-Fi, then try again.';
+  }
+
+  final message = cleanError(error).trim();
+  final normalized = message.toLowerCase();
+  if (normalized.contains('clientexception') ||
+      normalized.contains('connection closed') ||
+      normalized.contains('failed host lookup')) {
+    return 'The app cannot reach RetailZW. Turn on mobile data or Wi-Fi, then try again.';
+  }
+  if (normalized.contains('only cashier')) {
+    return 'GasPOS accepts cashier accounts only. Ask the shop administrator to create or update your cashier account.';
+  }
+  if (normalized.contains('not assigned to a branch')) {
+    return 'This cashier is not assigned to a branch. Ask the shop administrator to assign the cashier to the gas branch.';
+  }
+  if (normalized.contains('not assigned to a gas branch')) {
+    return 'This cashier is assigned to a retail branch, not a gas branch. Ask the shop administrator to correct the branch assignment.';
+  }
+  if (normalized.contains('username exists in more than one shop')) {
+    return 'This username is used by more than one shop. Ask the administrator to give this cashier a unique username.';
+  }
+  if (normalized.contains('shop is not active')) {
+    return 'This shop account is inactive. The shop administrator must restore the subscription before cashiers can sign in.';
+  }
+  if (message.isEmpty) {
+    return 'Login could not be completed. Check the cashier account and try again.';
+  }
+  return message;
+}

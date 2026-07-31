@@ -3,7 +3,7 @@
     <item android:drawable="@android:color/white" />
     <item>
         <bitmap
-            android:gravity="fill"
+            android:gravity="center"
             android:src="@drawable/gaspos_splash" />
     </item>
 </layer-list>

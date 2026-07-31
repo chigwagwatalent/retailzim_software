@@ -41,3 +41,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android release signing keys stay local and must be backed up securely.
+/android/key.properties
+/android/app/*.jks
+/android/app/*.keystore
+
+# Locally generated distribution files.
+/releases/symbols/
+/releases/*-smoke*.png

@@ -100,16 +100,45 @@ class GasApi {
       };
 
   Map<String, dynamic> _decode(http.Response response) {
-    final envelope = jsonDecode(response.body) as Map<String, dynamic>;
+    final Map<String, dynamic> envelope;
+    try {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      if (decoded is! Map) {
+        throw const FormatException('Response is not an object');
+      }
+      envelope = Map<String, dynamic>.from(decoded);
+    } on FormatException {
+      throw HttpException(_statusMessage(response.statusCode));
+    }
     if (response.statusCode < 200 ||
         response.statusCode >= 300 ||
         envelope['success'] == false) {
-      throw HttpException(
-          envelope['message'] as String? ?? 'The server rejected the request.');
+      final message = envelope['message']?.toString().trim();
+      throw HttpException(message == null || message.isEmpty
+          ? _statusMessage(response.statusCode)
+          : message);
     }
     final data = envelope['data'];
     if (data == null) return <String, dynamic>{};
-    return Map<String, dynamic>.from(data as Map);
+    if (data is! Map) {
+      throw const HttpException(
+          'RetailZW returned an incomplete login response. Please contact support.');
+    }
+    return Map<String, dynamic>.from(data);
+  }
+
+  String _statusMessage(int statusCode) {
+    if (statusCode == 401) return 'Invalid username or password.';
+    if (statusCode == 403) {
+      return 'This account is not allowed to use the GasPOS app.';
+    }
+    if (statusCode == 404) {
+      return 'The GasPOS login service is not available on the server.';
+    }
+    if (statusCode >= 500) {
+      return 'RetailZW is temporarily unavailable. Please try again shortly.';
+    }
+    return 'RetailZW could not complete the login request (error $statusCode).';
   }
 }
 
@@ -132,20 +161,27 @@ class OfflineStore {
     return _database!;
   }
 
-  Future<void> saveBootstrap(Map<String, dynamic> data) async {
+  String _bootstrapKey(int tenantId, int branchId) =>
+      'bootstrap:$tenantId:$branchId';
+
+  Future<void> saveBootstrap(
+      int tenantId, int branchId, Map<String, dynamic> data) async {
     await (await db).insert(
         'cache',
         {
-          'key': 'bootstrap',
+          'key': _bootstrapKey(tenantId, branchId),
           'value': jsonEncode(data),
           'updated_at': DateTime.now().toUtc().toIso8601String(),
         },
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<Map<String, dynamic>?> cachedBootstrap() async {
-    final rows = await (await db)
-        .query('cache', where: 'key = ?', whereArgs: ['bootstrap'], limit: 1);
+  Future<Map<String, dynamic>?> cachedBootstrap(
+      int tenantId, int branchId) async {
+    final rows = await (await db).query('cache',
+        where: 'key = ?',
+        whereArgs: [_bootstrapKey(tenantId, branchId)],
+        limit: 1);
     if (rows.isEmpty) return null;
     return jsonDecode(rows.first['value'] as String) as Map<String, dynamic>;
   }

@@ -51,16 +51,24 @@ class GasPosState extends ChangeNotifier {
     if (user == null) return;
     try {
       final payload = await api.bootstrap(user!.branchId);
-      await offline.saveBootstrap(payload);
+      await offline.saveBootstrap(user!.tenantId, user!.branchId, payload);
       data = GasBootstrap.fromJson(payload);
       online = true;
       error = null;
       await syncPending();
-    } catch (_) {
-      online = false;
-      final cached = await offline.cachedBootstrap();
-      if (cached != null) data = GasBootstrap.fromJson(cached);
-      error = 'Offline mode: showing the last synchronized gas position.';
+    } catch (e) {
+      if (_networkError(e)) {
+        online = false;
+        final cached =
+            await offline.cachedBootstrap(user!.tenantId, user!.branchId);
+        if (cached != null) data = GasBootstrap.fromJson(cached);
+        error = cached == null
+            ? 'Connect once to download this branch tank setup.'
+            : 'Offline mode: showing the last synchronized gas position.';
+      } else {
+        online = true;
+        error = e.toString().replaceFirst('HttpException: ', '');
+      }
     }
     pending = await offline.pendingCount();
     notifyListeners();
@@ -83,7 +91,7 @@ class GasPosState extends ChangeNotifier {
     pending = await offline.pendingCount();
     if (online) {
       final payload = await api.bootstrap(user!.branchId);
-      await offline.saveBootstrap(payload);
+      await offline.saveBootstrap(user!.tenantId, user!.branchId, payload);
       data = GasBootstrap.fromJson(payload);
     }
     notifyListeners();
@@ -184,11 +192,10 @@ class GasPosState extends ChangeNotifier {
         .map((e) => (e['tankId'] as num).toInt())
         .toList();
     var remaining = (request['quantityKg'] as num).toDouble();
-    for (var index = 0; index < selected.length; index++) {
-      final tank = data!.tanks.firstWhere((t) => t.id == selected[index]);
-      final share = index == selected.length - 1
-          ? remaining
-          : (remaining / (selected.length - index)).clamp(0, tank.currentKg);
+    for (final tankId in selected) {
+      if (remaining <= 0) break;
+      final tank = data!.tanks.firstWhere((row) => row.id == tankId);
+      final share = remaining.clamp(0.0, tank.currentKg).toDouble();
       tank.currentKg -= share;
       remaining -= share;
     }

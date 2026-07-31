@@ -1,6 +1,7 @@
 class GasUser {
   const GasUser({
     required this.token,
+    required this.tenantId,
     required this.branchId,
     required this.branchName,
     required this.displayName,
@@ -8,6 +9,7 @@ class GasUser {
   });
 
   final String token;
+  final int tenantId;
   final int branchId;
   final String branchName;
   final String displayName;
@@ -15,19 +17,23 @@ class GasUser {
 
   factory GasUser.fromLogin(Map<String, dynamic> json) {
     if (json['branchModule'] != 'GAS_MODULE') {
-      throw const FormatException('This cashier is not assigned to a gas branch.');
+      throw const FormatException(
+          'This cashier is not assigned to a gas branch.');
     }
     return GasUser(
       token: json['accessToken'] as String? ?? '',
+      tenantId: (json['tenantId'] as num).toInt(),
       branchId: (json['branchId'] as num).toInt(),
       branchName: json['branchName'] as String? ?? 'Gas branch',
-      displayName: '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim(),
+      displayName:
+          '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim(),
       companyName: json['companyName'] as String? ?? 'RetailZW',
     );
   }
 
   Map<String, dynamic> toJson() => {
         'token': token,
+        'tenantId': tenantId,
         'branchId': branchId,
         'branchName': branchName,
         'displayName': displayName,
@@ -36,6 +42,7 @@ class GasUser {
 
   factory GasUser.fromJson(Map<String, dynamic> json) => GasUser(
         token: json['token'] as String,
+        tenantId: (json['tenantId'] as num?)?.toInt() ?? 0,
         branchId: (json['branchId'] as num).toInt(),
         branchName: json['branchName'] as String,
         displayName: json['displayName'] as String,
@@ -62,6 +69,8 @@ class GasTank {
   final double fullGrossKg;
   final String status;
   double get grossKg => currentKg + tareKg;
+  bool get isActive => status.toUpperCase() == 'ACTIVE';
+  bool get hasStock => currentKg > 0;
 
   factory GasTank.fromJson(Map<String, dynamic> json) => GasTank(
         id: (json['id'] as num).toInt(),
@@ -122,6 +131,14 @@ class GasBootstrap {
   final Map<String, dynamic>? shift;
 
   bool get hasOpenShift => shift != null;
+  List<GasTank> get activeTanks =>
+      tanks.where((tank) => tank.isActive).toList();
+  List<GasTank> get tanksEligibleForShift =>
+      tanks.where((tank) => tank.isActive && tank.hasStock).toList();
+  List<GasTank> get assignedShiftTanks {
+    final assigned = shiftTanks.map((item) => item.tankId).toSet();
+    return tanks.where((tank) => assigned.contains(tank.id)).toList();
+  }
 
   factory GasBootstrap.fromJson(Map<String, dynamic> json) {
     final priceMap = <String, double>{};
