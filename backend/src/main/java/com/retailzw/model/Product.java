@@ -1,5 +1,6 @@
 package com.retailzw.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -95,6 +96,16 @@ public class Product {
     @Builder.Default
     private Boolean expiryTracking = false;
 
+    @JsonIgnore
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pricing_mode", nullable = false, length = 20)
+    @Builder.Default
+    private PricingMode pricingMode = PricingMode.MANUAL;
+
+    @JsonIgnore
+    @Column(name = "exchange_rate_id")
+    private Long exchangeRateId;
+
     @Column(name = "created_by")
     private Long createdBy;
 
@@ -117,6 +128,10 @@ public class Product {
 
     public enum TrackingMode {
         NONE, BATCH, SERIAL
+    }
+
+    public enum PricingMode {
+        MANUAL, AUTO_FROM_USD, AUTO_FROM_ZWG
     }
 }
 

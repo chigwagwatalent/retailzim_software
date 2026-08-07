@@ -92,13 +92,16 @@ class AppProvider extends ChangeNotifier {
     if (idx >= 0) {
       if (_cart[idx].quantity + 1 > stock) return false;
       _cart[idx].quantity += 1;
+      _applyQuantityPrice(_cart[idx]);
     } else {
-      _cart.add(CartItem(
+      final item = CartItem(
         product: p,
         quantity: 1,
-        unitPrice: p.priceForCurrency(_currency),
+        unitPrice: p.priceForQuantity(_currency, 1),
         currency: _currency,
-      ));
+      );
+      _applyQuantityPrice(item);
+      _cart.add(item);
     }
     notifyListeners();
     return true;
@@ -112,6 +115,7 @@ class AppProvider extends ChangeNotifier {
       final stock = availableStockFor(_cart[index].product);
       if (stock <= 0 || qty > stock) return false;
       _cart[index].quantity = qty;
+      _applyQuantityPrice(_cart[index]);
     }
     notifyListeners();
     return true;
@@ -154,8 +158,8 @@ class AppProvider extends ChangeNotifier {
     _currency = c;
     // Recompute unit prices for all cart items when currency changes
     for (final item in _cart) {
-      item.unitPrice = item.product.priceForCurrency(c);
       item.currency = c;
+      _applyQuantityPrice(item);
     }
     notifyListeners();
   }
@@ -166,6 +170,15 @@ class AppProvider extends ChangeNotifier {
     if (_isOnline == online) return;
     _isOnline = online;
     notifyListeners();
+  }
+
+  void _applyQuantityPrice(CartItem item) {
+    final wholesale = item.product.qualifiesForWholesale(item.quantity);
+    item.unitPrice =
+        item.product.priceForQuantity(item.currency, item.quantity);
+    item.pricingTier = wholesale ? 'WHOLESALE' : 'RETAIL';
+    item.pricingVersion =
+        wholesale ? item.product.wholesalePricingVersion : null;
   }
 
   // ─── Notifications ────────────────────────────────────────────────────────

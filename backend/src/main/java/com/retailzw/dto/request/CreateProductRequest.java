@@ -46,6 +46,16 @@ public class CreateProductRequest {
     private Boolean hasVariants = false;
     private Boolean isService = false;
     private BigDecimal openingStock;
+    private Boolean wholesaleEnabled;
+
+    @PositiveOrZero
+    private BigDecimal wholesaleMinimumQuantity;
+
+    @PositiveOrZero
+    private BigDecimal wholesalePriceUsd;
+
+    @PositiveOrZero
+    private BigDecimal wholesalePriceZwg;
 
     public String getName() {
         return name;
@@ -197,6 +207,38 @@ public class CreateProductRequest {
 
     public void setOpeningStock(BigDecimal openingStock) {
         this.openingStock = openingStock;
+    }
+
+    public Boolean getWholesaleEnabled() {
+        return wholesaleEnabled;
+    }
+
+    public void setWholesaleEnabled(Boolean wholesaleEnabled) {
+        this.wholesaleEnabled = wholesaleEnabled;
+    }
+
+    public BigDecimal getWholesaleMinimumQuantity() {
+        return wholesaleMinimumQuantity;
+    }
+
+    public void setWholesaleMinimumQuantity(BigDecimal wholesaleMinimumQuantity) {
+        this.wholesaleMinimumQuantity = wholesaleMinimumQuantity;
+    }
+
+    public BigDecimal getWholesalePriceUsd() {
+        return wholesalePriceUsd;
+    }
+
+    public void setWholesalePriceUsd(BigDecimal wholesalePriceUsd) {
+        this.wholesalePriceUsd = wholesalePriceUsd;
+    }
+
+    public BigDecimal getWholesalePriceZwg() {
+        return wholesalePriceZwg;
+    }
+
+    public void setWholesalePriceZwg(BigDecimal wholesalePriceZwg) {
+        this.wholesalePriceZwg = wholesalePriceZwg;
     }
 }
 

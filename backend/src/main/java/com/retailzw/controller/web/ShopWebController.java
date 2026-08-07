@@ -11,6 +11,7 @@ import com.retailzw.model.*;
 import com.retailzw.repository.*;
 import com.retailzw.service.CurrentUserService;
 import com.retailzw.service.CreditAndChangeService;
+import com.retailzw.service.CurrencyConversionService;
 import com.retailzw.service.FinanceReportCalculator;
 import com.retailzw.service.BillingAccessService;
 import com.retailzw.service.GasOperationsService;
@@ -21,6 +22,7 @@ import com.retailzw.service.PackageModuleAccessService;
 import com.retailzw.service.ProductImportService;
 import com.retailzw.service.PurchaseOrderService;
 import com.retailzw.service.RetailOperationsService;
+import com.retailzw.service.WholesalePricingService;
 import com.retailzw.service.ReturnService;
 import com.retailzw.service.SmilePayCheckoutService;
 import jakarta.validation.Valid;
@@ -31,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -70,7 +73,10 @@ public class ShopWebController {
     private static final List<String> FINANCE_MODULES = List.of("suppliers", "purchasing", "reports");
     private static final List<String> SYSTEM_MODULES = List.of("branches", "company", "audit");
     private static final List<String> GAS_MODULES = List.of("gas", "gas-sales", "gas-change", "gas-restocking", "gas-expenses", "gas-tanks", "gas-accounting");
-    private static final List<UserRole> USER_MANAGEMENT_ROLES = List.of(UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT, UserRole.CASHIER);
+    private static final List<UserRole> USER_MANAGEMENT_ROLES = List.of(
+            UserRole.SUPER_ADMIN, UserRole.ACCOUNTANT, UserRole.SUPERVISOR, UserRole.CASHIER);
+    private static final Set<String> SUPERVISOR_VIEW_MODULES = Set.of(
+            "sales", "cash", "change", "returns", "purchasing", "notifications", "gas");
     private static final int DEFAULT_PAGE_SIZE = 25;
     private static final int MAX_PAGE_SIZE = 100;
     private static final List<String> GAS_EXPENSE_PAYMENT_METHODS = List.of(
@@ -194,6 +200,8 @@ public class ShopWebController {
     private final InventoryLotRepository inventoryLots;
     private final StockVarianceInvestigationRepository varianceInvestigations;
     private final GasOperationsService gasOperations;
+    private final CurrencyConversionService currencyConversionService;
+    private final WholesalePricingService wholesalePricingService;
 
     @GetMapping("/auth/shop/login")
     public String login() {
@@ -235,6 +243,9 @@ public class ShopWebController {
 
     @GetMapping("/shop/dashboard")
     public String dashboard(Model model) {
+        if (isSupervisor()) {
+            return "redirect:/shop/supervisor";
+        }
         Long tenantId = current.tenantId();
         Long branchId = activeBranch();
         LocalDate today = LocalDate.now();
@@ -291,6 +302,83 @@ public class ShopWebController {
         model.addAttribute("branchPerformance", dashboardBranchPerformance(tenantId, activeBranches, start, end));
         model.addAttribute("salesChart", dashboardSalesChart(tenantId, branchId, weekStart, today));
         return "shop/dashboard";
+    }
+
+    @GetMapping("/shop/supervisor")
+    public String supervisorDashboard(Model model) {
+        requireSupervisor();
+        Long tenantId = current.tenantId();
+        Long branchId = assignedSupervisorBranch();
+        Branch branch = branches.findById(branchId)
+                .filter(row -> row.getTenantId().equals(tenantId))
+                .filter(row -> Boolean.TRUE.equals(row.getIsActive()))
+                .orElseThrow(() -> new AccessDeniedException("Your assigned branch is not active."));
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        LocalDateTime tomorrowStart = todayStart.plusDays(1);
+
+        List<CashSession> branchSessions = cashSessions.findAllByTenantIdAndBranchIdOrderByOpenedAtDesc(tenantId, branchId);
+        List<CashSession> awaitingCollection = cashSessions.findUncollectedClosedSessions(tenantId, branchId);
+        List<CashSession> collectedToday = branchSessions.stream()
+                .filter(session -> Boolean.TRUE.equals(session.getCashCollected()))
+                .filter(session -> session.getCollectedAt() != null)
+                .filter(session -> !session.getCollectedAt().isBefore(todayStart)
+                        && session.getCollectedAt().isBefore(tomorrowStart))
+                .toList();
+        List<PurchaseOrder> readyToReceive = purchaseOrders.findAllByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId)
+                .stream()
+                .filter(po -> PurchaseOrder.PoStatus.APPROVED.equals(po.getStatus())
+                        || PurchaseOrder.PoStatus.ORDERED.equals(po.getStatus())
+                        || PurchaseOrder.PoStatus.PARTIAL.equals(po.getStatus()))
+                .limit(8)
+                .toList();
+        List<GoodsReceivedNote> recentReceipts = goodsReceivedNotes.findByTenantIdAndBranchId(tenantId, branchId)
+                .stream()
+                .sorted(Comparator.comparing(GoodsReceivedNote::getCreatedAt,
+                        Comparator.nullsLast(Comparator.reverseOrder())))
+                .limit(8)
+                .toList();
+        Page<HeldChange> openChange = creditAndChangeService.branchChangeRecords(
+                tenantId, branchId, HeldChange.Status.OPEN, null, null, null, 0, 8);
+        List<User> branchUsers = users.findByTenantIdAndBranchId(tenantId, branchId, PageRequest.of(0, 200)).getContent();
+        Map<Long, String> userNames = branchUsers.stream()
+                .collect(Collectors.toMap(User::getId, this::userDisplayName, (left, right) -> left));
+        Map<Long, String> supplierNames = suppliers.findByTenantId(tenantId, PageRequest.of(0, 500)).getContent().stream()
+                .collect(Collectors.toMap(Supplier::getId, Supplier::getName, (left, right) -> left));
+        DashboardMoney todaySales = moneyTotals(tenantId, branchId, todayStart, tomorrowStart);
+
+        model.addAttribute("module", "supervisor");
+        addNavigationModel(model);
+        model.addAttribute("selectedBranchId", branchId);
+        model.addAttribute("selectedBranchName", branch.getName());
+        model.addAttribute("todaySales", todaySales);
+        model.addAttribute("todayTransactions", sales.countByTenantIdAndBranchIdAndStatusAndCreatedAtBetween(
+                tenantId, branchId, Sale.SaleStatus.COMPLETED, todayStart, tomorrowStart));
+        model.addAttribute("openShiftCount", branchSessions.stream()
+                .filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus())).count());
+        model.addAttribute("awaitingCollection", awaitingCollection);
+        model.addAttribute("awaitingCollectionCount", awaitingCollection.size());
+        model.addAttribute("pendingCashUsd", sumCash(awaitingCollection, CashSession::getExpectedCashUsd));
+        model.addAttribute("pendingCashZwg", sumCash(awaitingCollection, CashSession::getExpectedCashZwg));
+        model.addAttribute("collectedTodayCount", collectedToday.size());
+        model.addAttribute("collectionVarianceUsd", sumCash(collectedToday, CashSession::getCollectionVarianceUsd));
+        model.addAttribute("collectionVarianceZwg", sumCash(collectedToday, CashSession::getCollectionVarianceZwg));
+        model.addAttribute("readyToReceive", readyToReceive);
+        model.addAttribute("readyToReceiveCount", readyToReceive.size());
+        model.addAttribute("recentGoodsReceipts", recentReceipts);
+        model.addAttribute("openChangeRecords", openChange.getContent());
+        model.addAttribute("openChangeCount", openChange.getTotalElements());
+        model.addAttribute("heldChangeUsd", creditAndChangeService.sumBranchChangeRecords(
+                tenantId, branchId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.USD));
+        model.addAttribute("heldChangeZwg", creditAndChangeService.sumBranchChangeRecords(
+                tenantId, branchId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.ZWG));
+        model.addAttribute("activeCashierCount", branchUsers.stream()
+                .filter(user -> Boolean.TRUE.equals(user.getIsActive()))
+                .filter(user -> hasRole(user, UserRole.CASHIER))
+                .count());
+        model.addAttribute("recentSales", operations.recentSales(tenantId, branchId).stream().limit(8).toList());
+        model.addAttribute("userNames", userNames);
+        model.addAttribute("supplierNames", supplierNames);
+        return "shop/supervisor";
     }
 
     @GetMapping("/shop/billing")
@@ -584,6 +672,7 @@ public class ShopWebController {
         int currentPage = safePage(page);
         int pageSize = safeSize(size);
         String activeModule = safeModule(module);
+        requireSupervisorModule(activeModule);
         if ("gas".equals(activeModule) && !packageModuleAccessService.hasGas(tenantId)) {
             return "redirect:/shop/billing";
         }
@@ -603,8 +692,12 @@ public class ShopWebController {
         model.addAttribute("uoms", uoms.findByTenantId(tenantId));
         model.addAttribute("customers", customers.findByTenantId(tenantId, PageRequest.of(0, 100)).getContent());
         model.addAttribute("suppliers", suppliers.findByTenantId(tenantId, PageRequest.of(0, 100)).getContent());
-        model.addAttribute("branches", branches.findByTenantIdAndIsActiveTrue(tenantId));
-        model.addAttribute("users", users.findByTenantId(tenantId));
+        model.addAttribute("branches", isSupervisor()
+                ? branches.findById(activeBranchId).stream().toList()
+                : branches.findByTenantIdAndIsActiveTrue(tenantId));
+        model.addAttribute("users", isSupervisor()
+                ? users.findByTenantIdAndBranchId(tenantId, activeBranchId, PageRequest.of(0, 200)).getContent()
+                : users.findByTenantId(tenantId));
         model.addAttribute("roles", roles.findAll());
         model.addAttribute("inventory", inventory.findByTenantIdAndBranchId(tenantId, activeBranchId));
         model.addAttribute("adjustments", adjustments.findByTenantIdAndBranchId(tenantId, activeBranchId, PageRequest.of(0, 50)).getContent());
@@ -680,8 +773,8 @@ public class ShopWebController {
             HeldChange.Status changeStatus = parseEnum(status, HeldChange.Status.class);
             LocalDateTime fromDate = parseDate(from, false);
             LocalDateTime toDate = parseDate(to, true);
-            var changePage = creditAndChangeService.changeRecords(
-                    tenantId, changeStatus, search, fromDate, toDate, currentPage, pageSize);
+            var changePage = creditAndChangeService.branchChangeRecords(
+                    tenantId, activeBranchId, changeStatus, search, fromDate, toDate, currentPage, pageSize);
             LocalDateTime todayStart = LocalDate.now().atStartOfDay();
             LocalDateTime tomorrowStart = todayStart.plusDays(1);
             model.addAttribute("changePage", changePage);
@@ -690,20 +783,21 @@ public class ShopWebController {
             model.addAttribute("changeStatus", status);
             model.addAttribute("changeDateFrom", from);
             model.addAttribute("changeDateTo", to);
-            model.addAttribute("openChangeCount", creditAndChangeService.changeRecordCount(tenantId, HeldChange.Status.OPEN));
+            model.addAttribute("openChangeCount", creditAndChangeService.branchChangeRecordCount(
+                    tenantId, activeBranchId, HeldChange.Status.OPEN));
             model.addAttribute("filteredChangeCount", changePage.getTotalElements());
-            model.addAttribute("heldChangeUsd", creditAndChangeService.sumChangeRecords(
-                    tenantId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.USD));
-            model.addAttribute("heldChangeZwg", creditAndChangeService.sumChangeRecords(
-                    tenantId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.ZWG));
-            model.addAttribute("collectedTodayUsd", creditAndChangeService.sumChangeRecords(
-                    tenantId, HeldChange.Status.COLLECTED, null, todayStart, tomorrowStart, CurrencyCode.USD));
-            model.addAttribute("collectedTodayZwg", creditAndChangeService.sumChangeRecords(
-                    tenantId, HeldChange.Status.COLLECTED, null, todayStart, tomorrowStart, CurrencyCode.ZWG));
-            model.addAttribute("filteredChangeUsd", creditAndChangeService.sumChangeRecords(
-                    tenantId, changeStatus, search, fromDate, toDate, CurrencyCode.USD));
-            model.addAttribute("filteredChangeZwg", creditAndChangeService.sumChangeRecords(
-                    tenantId, changeStatus, search, fromDate, toDate, CurrencyCode.ZWG));
+            model.addAttribute("heldChangeUsd", creditAndChangeService.sumBranchChangeRecords(
+                    tenantId, activeBranchId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.USD));
+            model.addAttribute("heldChangeZwg", creditAndChangeService.sumBranchChangeRecords(
+                    tenantId, activeBranchId, HeldChange.Status.OPEN, null, null, null, CurrencyCode.ZWG));
+            model.addAttribute("collectedTodayUsd", creditAndChangeService.sumBranchChangeRecords(
+                    tenantId, activeBranchId, HeldChange.Status.COLLECTED, null, todayStart, tomorrowStart, CurrencyCode.USD));
+            model.addAttribute("collectedTodayZwg", creditAndChangeService.sumBranchChangeRecords(
+                    tenantId, activeBranchId, HeldChange.Status.COLLECTED, null, todayStart, tomorrowStart, CurrencyCode.ZWG));
+            model.addAttribute("filteredChangeUsd", creditAndChangeService.sumBranchChangeRecords(
+                    tenantId, activeBranchId, changeStatus, search, fromDate, toDate, CurrencyCode.USD));
+            model.addAttribute("filteredChangeZwg", creditAndChangeService.sumBranchChangeRecords(
+                    tenantId, activeBranchId, changeStatus, search, fromDate, toDate, CurrencyCode.ZWG));
             addPaginationModel(model, "change", changePage, "/shop/change", params(
                     "search", search,
                     "from", from,
@@ -1092,13 +1186,16 @@ public class ShopWebController {
 
     @PostMapping("/shop/change/{id}/{action}")
     public String changeAction(@PathVariable Long id, @PathVariable String action,
+                               @RequestParam(required = false) Long branchId,
                                RedirectAttributes redirect) {
+        Long targetBranch = selectedBranch(branchId);
         try {
             if ("collect".equals(action)) {
-                creditAndChangeService.collectChange(current.tenantId(), activeBranch(), current.userId(), id, null);
+                creditAndChangeService.collectChange(current.tenantId(), targetBranch, current.userId(), id, null);
                 redirect.addFlashAttribute("message", "Held change marked as collected.");
             } else if ("cancel".equals(action)) {
-                creditAndChangeService.cancelChange(current.tenantId(), id, current.userId());
+                requireShopAdministrator();
+                creditAndChangeService.cancelChange(current.tenantId(), targetBranch, id, current.userId());
                 redirect.addFlashAttribute("message", "Held change cancelled.");
             } else {
                 throw new IllegalArgumentException("Unsupported change action.");
@@ -1106,7 +1203,7 @@ public class ShopWebController {
         } catch (RuntimeException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
         }
-        return "redirect:/shop/change";
+        return "redirect:/shop/change?branchId=" + targetBranch;
     }
 
     @PostMapping("/shop/gas/change/{id}/{action}")
@@ -1114,14 +1211,16 @@ public class ShopWebController {
                                   @PathVariable String action,
                                   @RequestParam Long branchId,
                                   RedirectAttributes redirect) {
+        Long targetBranch = selectedBranch(branchId);
         try {
             if ("collect".equals(action)) {
                 gasOperations.collectGasHeldChange(
-                        current.tenantId(), branchId, current.userId(), id);
+                        current.tenantId(), targetBranch, current.userId(), id);
                 redirect.addFlashAttribute("message", "Gas held change marked as collected.");
             } else if ("cancel".equals(action)) {
+                requireShopAdministrator();
                 gasOperations.cancelGasHeldChange(
-                        current.tenantId(), branchId, current.userId(), id);
+                        current.tenantId(), targetBranch, current.userId(), id);
                 redirect.addFlashAttribute("message", "Gas held change cancelled.");
             } else {
                 throw new IllegalArgumentException("Unsupported gas held-change action.");
@@ -1129,7 +1228,7 @@ public class ShopWebController {
         } catch (RuntimeException ex) {
             redirect.addFlashAttribute("message", ex.getMessage());
         }
-        return "redirect:/shop/gas/change?branchId=" + branchId;
+        return "redirect:/shop/gas/change?branchId=" + targetBranch;
     }
 
     @PostMapping("/shop/products/{id}/update")
@@ -1377,6 +1476,8 @@ public class ShopWebController {
                                  BindingResult bindingResult,
                                  @RequestParam(required = false) String returnTo,
                                  RedirectAttributes redirect) {
+        Long targetBranch = selectedBranch(request.getBranchId());
+        request.setBranchId(targetBranch);
         if (bindingResult.hasErrors()) {
             redirect.addFlashAttribute("message",
                     bindingResult.getAllErrors().get(0).getDefaultMessage());
@@ -1929,12 +2030,46 @@ public class ShopWebController {
         tenant.setCountry(request.getCountry());
         tenant.setLogoUrl(request.getLogoUrl());
         tenant.setWebsite(request.getWebsite());
-        tenant.setDefaultCurrency(request.getDefaultCurrency() == null ? CurrencyCode.USD : request.getDefaultCurrency());
-        tenant.setSecondaryCurrency(request.getSecondaryCurrency() == null ? CurrencyCode.ZWG : request.getSecondaryCurrency());
         tenant.setDefaultTaxRate(request.getDefaultTaxRate() == null ? BigDecimal.ZERO : request.getDefaultTaxRate());
         tenant.setReceiptFooter(request.getReceiptFooter());
         tenants.save(tenant);
         redirect.addFlashAttribute("message", "Company profile updated. Receipts and reports will use these details.");
+        return "redirect:/shop/company";
+    }
+
+    @PostMapping("/shop/company/exchange-rate")
+    public String updateExchangeRate(@RequestParam(defaultValue = "USD") CurrencyCode baseCurrency,
+                                     @RequestParam(required = false) BigDecimal usdToZwgRate,
+                                     @RequestParam(defaultValue = "2") Integer priceScale,
+                                     @RequestParam(defaultValue = "false") boolean automaticConversionEnabled,
+                                     @RequestParam(defaultValue = "false") boolean applyToExistingProducts,
+                                     @RequestParam(required = false) String changeReason,
+                                     RedirectAttributes redirect) {
+        try {
+            requireCurrencyAdministrator();
+            CurrencyConversionService.RateUpdateResult result = currencyConversionService.configure(
+                    current.tenantId(),
+                    current.userId(),
+                    baseCurrency,
+                    usdToZwgRate,
+                    priceScale,
+                    automaticConversionEnabled,
+                    applyToExistingProducts,
+                    changeReason);
+            if (!result.enabled()) {
+                redirect.addFlashAttribute("message",
+                        "Automatic price conversion disabled. Existing USD and ZWG prices were preserved.");
+            } else if (result.repricedProducts() == 0) {
+                redirect.addFlashAttribute("message",
+                        "Exchange rate saved. There were no products requiring recalculation.");
+            } else {
+                redirect.addFlashAttribute("message",
+                        "Exchange rate saved. " + result.repricedProducts()
+                                + " product price record(s) were recalculated. Sync products on each POS to refresh its local catalogue.");
+            }
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirect.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/shop/company";
     }
 
@@ -1979,11 +2114,17 @@ public class ShopWebController {
     }
 
     private Long activeBranch() {
+        if (isSupervisor()) {
+            return assignedSupervisorBranch();
+        }
         if (current.branchId() != null) return current.branchId();
         return branches.findByTenantIdAndIsActiveTrue(current.tenantId()).stream().findFirst().orElseThrow().getId();
     }
 
     private Long selectedBranch(Long requestedBranchId) {
+        if (isSupervisor()) {
+            return assignedSupervisorBranch();
+        }
         if (current.branchId() != null) return current.branchId();
         if (requestedBranchId == null) return activeBranch();
         return branches.findByTenantIdAndIsActiveTrue(current.tenantId()).stream()
@@ -1991,6 +2132,51 @@ public class ShopWebController {
                 .findFirst()
                 .map(Branch::getId)
                 .orElseGet(this::activeBranch);
+    }
+
+    private boolean isSupervisor() {
+        return UserRole.SUPERVISOR.name().equals(current.roleName());
+    }
+
+    private void requireSupervisor() {
+        if (!isSupervisor()) {
+            throw new AccessDeniedException("This workspace is available to branch supervisors.");
+        }
+    }
+
+    private Long assignedSupervisorBranch() {
+        Long branchId = current.branchId();
+        if (branchId == null) {
+            throw new AccessDeniedException("A Supervisor must be assigned to an active branch.");
+        }
+        return branches.findById(branchId)
+                .filter(branch -> branch.getTenantId().equals(current.tenantId()))
+                .filter(branch -> Boolean.TRUE.equals(branch.getIsActive()))
+                .map(Branch::getId)
+                .orElseThrow(() -> new AccessDeniedException("Your assigned branch is not active."));
+    }
+
+    private void requireSupervisorModule(String module) {
+        if (isSupervisor() && !SUPERVISOR_VIEW_MODULES.contains(module)) {
+            throw new AccessDeniedException("Supervisors cannot open this module.");
+        }
+    }
+
+    private void requireShopAdministrator() {
+        if (!UserRole.SUPER_ADMIN.name().equals(current.roleName())
+                && !UserRole.ACCOUNTANT.name().equals(current.roleName())) {
+            throw new AccessDeniedException("This action requires shop administrator access.");
+        }
+    }
+
+    private BigDecimal sumCash(List<CashSession> sessions, Function<CashSession, BigDecimal> amount) {
+        return sessions.stream().map(amount).map(this::nvl).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private String userDisplayName(User user) {
+        String name = ((user.getFirstName() == null ? "" : user.getFirstName()) + " "
+                + (user.getLastName() == null ? "" : user.getLastName())).trim();
+        return name.isBlank() ? user.getUsername() : name;
     }
 
     private String gasRedirect(String returnTo, Long branchId, String fallbackPath) {
@@ -2034,6 +2220,29 @@ public class ShopWebController {
         model.addAttribute("moduleLabels", MODULE_LABELS);
         model.addAttribute("moduleIcons", MODULE_ICONS);
         model.addAttribute("moduleUrls", MODULE_URLS);
+
+        if (isSupervisor()) {
+            model.addAttribute("salesModules", List.of("sales", "cash", "change", "returns"));
+            model.addAttribute("stockModules", List.of("purchasing"));
+            model.addAttribute("gasModules", gasEnabled
+                    ? List.of("gas", "gas-sales", "gas-change", "gas-restocking", "gas-tanks", "gas-accounting")
+                    : List.of());
+            model.addAttribute("peopleModules", List.of());
+            model.addAttribute("financeModules", List.of("purchasing"));
+            model.addAttribute("systemModules", List.of());
+            model.addAttribute("enabledBusinessModules", enabledBusinessModules);
+            model.addAttribute("gasModuleEnabled", gasEnabled);
+            model.addAttribute("shopModuleEnabled", shopEnabled);
+            model.addAttribute("billingAccessLocked", false);
+            model.addAttribute("supportChatMessages", chatMessages
+                    .findByTenantIdOrderByCreatedAtDesc(tenantId, PageRequest.of(0, 30)).stream()
+                    .sorted(java.util.Comparator.comparing(TenantChatMessage::getCreatedAt))
+                    .toList());
+            model.addAttribute("supportUnreadCount", chatMessages
+                    .countByTenantIdAndReadByShopFalseAndSenderType(
+                            tenantId, TenantChatMessage.SenderType.PLATFORM));
+            return;
+        }
 
         if (billingAccess.locked()) {
             model.addAttribute("salesModules", List.of());
@@ -2102,9 +2311,10 @@ public class ShopWebController {
         model.addAttribute("superAdminCount", allUsers.stream().filter(u -> hasRole(u, UserRole.SUPER_ADMIN)).count());
         model.addAttribute("accountsCount", allUsers.stream().filter(u -> hasRole(u, UserRole.ACCOUNTANT)).count());
         model.addAttribute("cashierCount", allUsers.stream().filter(u -> hasRole(u, UserRole.CASHIER)).count());
+        model.addAttribute("supervisorCount", allUsers.stream().filter(u -> hasRole(u, UserRole.SUPERVISOR)).count());
         model.addAttribute("activeUserCount", allUsers.stream().filter(u -> Boolean.TRUE.equals(u.getIsActive())).count());
         model.addAttribute("branchlessCashierCount", allUsers.stream()
-                .filter(u -> hasRole(u, UserRole.CASHIER))
+                .filter(u -> hasRole(u, UserRole.CASHIER) || hasRole(u, UserRole.SUPERVISOR))
                 .filter(u -> u.getBranchId() == null)
                 .count());
         model.addAttribute("invalidBranchUserCount", allUsers.stream()
@@ -2214,6 +2424,8 @@ public class ShopWebController {
         model.addAttribute("productSearch", search);
         model.addAttribute("selectedBranchStock", selectedBranchStock);
         model.addAttribute("totalStockByProduct", totalStockByProduct);
+        model.addAttribute("wholesalePricingByProduct",
+                wholesalePricingService.configurations(tenantId, allActiveProducts.keySet()));
         model.addAttribute("branchById", branchById(tenantId));
         model.addAttribute("selectedBranchName", branchById(tenantId).get(selectedBranchId));
         model.addAttribute("activeProductCount", productList.stream().filter(p -> Boolean.TRUE.equals(p.getIsActive())).count());
@@ -2893,6 +3105,15 @@ public class ShopWebController {
         model.addAttribute("tenantBranches", branches.findByTenantId(tenantId));
         model.addAttribute("branchCount", branches.countByTenantId(tenantId));
         model.addAttribute("userCount", users.findByTenantId(tenantId).size());
+        model.addAttribute("currentExchangeRate", currencyConversionService.activeRate(tenantId).orElse(null));
+        model.addAttribute("exchangeRateHistory", currencyConversionService.recentRates(tenantId));
+    }
+
+    private void requireCurrencyAdministrator() {
+        String role = current.roleName();
+        if (!UserRole.SUPER_ADMIN.name().equals(role) && !UserRole.ACCOUNTANT.name().equals(role)) {
+            throw new IllegalStateException("Only the shop owner or accountant can change currency rates.");
+        }
     }
 
     private Map<Long, String> branchById(Long tenantId) {
@@ -3383,6 +3604,7 @@ public class ShopWebController {
                                        String shiftQuery, GasShiftStatus shiftStatus) {
         List<Branch> gasBranches = branches.findByTenantIdAndIsActiveTrue(tenantId).stream()
                 .filter(branch -> BusinessModule.GAS_MODULE.equals(branch.getModuleType()))
+                .filter(branch -> !isSupervisor() || branch.getId().equals(assignedSupervisorBranch()))
                 .toList();
         Long gasBranchId = gasBranches.stream()
                 .filter(branch -> branch.getId().equals(selectedBranchId))

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -65,6 +66,34 @@ public class SecurityConfig {
             .securityMatcher("/shop/**", "/auth/shop/**")
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/shop/**").permitAll()
+                .requestMatchers(HttpMethod.GET,
+                        "/shop/dashboard",
+                        "/shop/supervisor",
+                        "/shop/sales",
+                        "/shop/cash",
+                        "/shop/change",
+                        "/shop/returns",
+                        "/shop/purchasing",
+                        "/shop/gas",
+                        "/shop/gas/sales",
+                        "/shop/gas/sales/export",
+                        "/shop/gas/change",
+                        "/shop/gas/restocking",
+                        "/shop/gas/restocking/export",
+                        "/shop/gas/tanks",
+                        "/shop/gas/accounting",
+                        "/shop/notifications",
+                        "/shop/support/chat/feed")
+                    .hasAnyRole("SUPER_ADMIN", "ACCOUNTANT", "SUPERVISOR")
+                .requestMatchers(HttpMethod.POST,
+                        "/shop/cash/shifts/collect",
+                        "/shop/change/*/collect",
+                        "/shop/purchasing/*/receive",
+                        "/shop/gas/change/*/collect",
+                        "/shop/gas/restocks",
+                        "/shop/notifications/read-all",
+                        "/shop/support/chat")
+                    .hasAnyRole("SUPER_ADMIN", "ACCOUNTANT", "SUPERVISOR")
                 .anyRequest().hasAnyRole("SUPER_ADMIN", "ACCOUNTANT")
             )
             .formLogin(form -> form

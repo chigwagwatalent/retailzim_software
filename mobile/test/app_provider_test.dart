@@ -77,5 +77,61 @@ void main() {
       expect(provider.cart.first.quantity, 2);
       expect(provider.validateCartStock(), isNull);
     });
+
+    test('wholesale stays disabled by default and activates at the threshold',
+        () {
+      final provider = AppProvider();
+      final retailOnly = Product(
+        id: 10,
+        name: 'Retail only',
+        sku: 'RETAIL',
+        sellingPriceUsd: 2.00,
+        sellingPriceZwg: 60.00,
+        costPriceUsd: 1.00,
+        taxRate: 0,
+        isTaxable: false,
+        quantityOnHand: 30,
+      );
+      final wholesale = Product(
+        id: 11,
+        name: 'Wholesale bread',
+        sku: 'WHOLESALE',
+        sellingPriceUsd: 2.00,
+        sellingPriceZwg: 60.00,
+        costPriceUsd: 1.00,
+        taxRate: 0,
+        isTaxable: false,
+        quantityOnHand: 30,
+        wholesaleEnabled: true,
+        wholesaleMinimumQuantity: 12,
+        wholesalePriceUsd: 1.70,
+        wholesalePriceZwg: 51.00,
+        wholesalePricingVersion: 4,
+        pricingProtocolVersion: 2,
+      );
+
+      provider.addToCart(retailOnly);
+      provider.updateQty(0, 20);
+      expect(provider.cart.first.unitPrice, 2.00);
+      expect(provider.cart.first.pricingTier, 'RETAIL');
+      provider.clearCart();
+
+      provider.addToCart(wholesale);
+      provider.updateQty(0, 11);
+      expect(provider.cart.first.unitPrice, 2.00);
+      expect(provider.cart.first.pricingTier, 'RETAIL');
+
+      provider.updateQty(0, 12);
+      expect(provider.cart.first.unitPrice, 1.70);
+      expect(provider.cart.first.pricingTier, 'WHOLESALE');
+      expect(provider.cart.first.pricingVersion, 4);
+
+      provider.setCurrency('ZWG');
+      expect(provider.cart.first.unitPrice, 51.00);
+
+      provider.updateQty(0, 10);
+      expect(provider.cart.first.unitPrice, 60.00);
+      expect(provider.cart.first.pricingTier, 'RETAIL');
+    });
   });
 }

@@ -75,7 +75,7 @@ public class BillingAccessInterceptor implements HandlerInterceptor {
             packageModules.syncAndGetEnabledModules(shopUser.getTenantId());
             return true;
         }
-        if ("dashboard".equals(module)) {
+        if ("dashboard".equals(module) || "supervisor".equals(module)) {
             if (packageModules.hasRetailShop(shopUser.getTenantId())) {
                 return true;
             }

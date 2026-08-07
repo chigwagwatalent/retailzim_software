@@ -64,5 +64,30 @@ public class SaleItem {
 
     @Column(name = "promotion_name", length = 200)
     private String promotionName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pricing_tier", nullable = false, length = 20)
+    @Builder.Default
+    private WholesalePricingTier pricingTier = WholesalePricingTier.RETAIL;
+
+    @Column(name = "retail_unit_price", precision = 15, scale = 4)
+    private BigDecimal retailUnitPrice;
+
+    @Column(name = "wholesale_minimum_quantity", precision = 15, scale = 4)
+    private BigDecimal wholesaleMinimumQuantity;
+
+    @Column(name = "pricing_version")
+    private Long pricingVersion;
+
+    @Column(name = "pricing_source", nullable = false, length = 30)
+    @Builder.Default
+    private String pricingSource = "LEGACY_RETAIL";
+
+    @Column(name = "pricing_exchange_rate_id")
+    private Long pricingExchangeRateId;
+
+    public enum WholesalePricingTier {
+        RETAIL, WHOLESALE
+    }
 }
 

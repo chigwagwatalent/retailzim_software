@@ -13,8 +13,11 @@ import com.retailzw.repository.CashSessionRepository;
 import com.retailzw.repository.HeldChangeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,5 +132,44 @@ public class CreditAndChangeServiceTest {
         assertThat(record.getAmount()).isEqualByComparingTo("2.50");
         assertThat(session.getExpectedCashUsd()).isEqualByComparingTo("42.50");
         verify(cashSessions).save(session);
+    }
+
+    @Test
+    public void branchChangeRegisterNeverUsesTenantWideQueries() {
+        LocalDateTime from = LocalDateTime.of(2026, 8, 1, 0, 0);
+        LocalDateTime to = from.plusDays(7);
+        when(heldChange.searchRetail(
+                2L, 3L, HeldChange.Status.OPEN, "jane", from, to, PageRequest.of(0, 25)))
+                .thenReturn(new PageImpl<>(List.of()));
+        when(heldChange.sumRetail(
+                2L, 3L, HeldChange.Status.OPEN, "jane", from, to, CurrencyCode.USD))
+                .thenReturn(new BigDecimal("4.50"));
+
+        service.branchChangeRecords(2L, 3L, HeldChange.Status.OPEN, " jane ", from, to, 0, 25);
+        BigDecimal total = service.sumBranchChangeRecords(
+                2L, 3L, HeldChange.Status.OPEN, " jane ", from, to, CurrencyCode.USD);
+
+        verify(heldChange).searchRetail(
+                2L, 3L, HeldChange.Status.OPEN, "jane", from, to, PageRequest.of(0, 25));
+        verify(heldChange).sumRetail(
+                2L, 3L, HeldChange.Status.OPEN, "jane", from, to, CurrencyCode.USD);
+        verify(heldChange, never()).searchWithDates(any(), any(), any(), any(), any(), any());
+        assertThat(total).isEqualByComparingTo("4.50");
+    }
+
+    @Test
+    public void heldChangeCannotBeCancelledFromAnotherBranch() {
+        HeldChange record = HeldChange.builder()
+                .id(10L)
+                .tenantId(2L)
+                .branchId(99L)
+                .status(HeldChange.Status.OPEN)
+                .build();
+        when(heldChange.lockById(2L, 10L)).thenReturn(Optional.of(record));
+
+        assertThatThrownBy(() -> service.cancelChange(2L, 3L, 10L, 7L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("another branch");
+        verify(heldChange, never()).save(any());
     }
 }

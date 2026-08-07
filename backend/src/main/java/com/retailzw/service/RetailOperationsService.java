@@ -22,6 +22,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +49,8 @@ public class RetailOperationsService {
     private final CashSessionRepository cashSessions;
     private final PasswordEncoder passwordEncoder;
     private final CreditAndChangeService creditAndChange;
+    private final CurrencyConversionService currencyConversion;
+    private final WholesalePricingService wholesalePricing;
 
     @Transactional
     public Product createProduct(Long tenantId, CreateProductRequest request, Long createdBy) {
@@ -62,10 +67,6 @@ public class RetailOperationsService {
                 .description(request.getDescription())
                 .category(request.getCategoryId() == null ? null : categories.findById(request.getCategoryId()).orElse(null))
                 .unitOfMeasure(request.getUomId() == null ? null : uoms.findById(request.getUomId()).orElse(null))
-                .costPriceUsd(nvl(request.getCostPriceUsd()))
-                .sellingPriceUsd(nvl(request.getSellingPriceUsd()))
-                .costPriceZwg(nvl(request.getCostPriceZwg()))
-                .sellingPriceZwg(nvl(request.getSellingPriceZwg()))
                 .taxRate(nvl(request.getTaxRate()))
                 .isTaxable(Boolean.TRUE.equals(request.getIsTaxable()))
                 .reorderLevel(nvl(request.getReorderLevel()))
@@ -76,7 +77,23 @@ public class RetailOperationsService {
                 .createdBy(createdBy)
                 .isActive(true)
                 .build();
+        currencyConversion.applyConfiguredPricing(
+                tenantId,
+                product,
+                request.getCostPriceUsd(),
+                request.getSellingPriceUsd(),
+                request.getCostPriceZwg(),
+                request.getSellingPriceZwg());
         Product saved = products.save(product);
+        wholesalePricing.configure(
+                tenantId,
+                saved,
+                request.getWholesaleEnabled(),
+                request.getWholesaleMinimumQuantity(),
+                request.getWholesalePriceUsd(),
+                request.getWholesalePriceZwg(),
+                createdBy,
+                false);
         assignProductToBranch(tenantId, targetBranchId, saved.getId(), nvl(request.getOpeningStock()));
         log.info("Product created tenant={} branch={} product={} sku={} openingStock={}",
                 tenantId, targetBranchId, saved.getId(), saved.getSku(), nvl(request.getOpeningStock()));
@@ -97,10 +114,13 @@ public class RetailOperationsService {
         product.setDescription(request.getDescription());
         product.setCategory(request.getCategoryId() == null ? null : categories.findById(request.getCategoryId()).orElse(null));
         product.setUnitOfMeasure(request.getUomId() == null ? null : uoms.findById(request.getUomId()).orElse(null));
-        product.setCostPriceUsd(nvl(request.getCostPriceUsd()));
-        product.setSellingPriceUsd(nvl(request.getSellingPriceUsd()));
-        product.setCostPriceZwg(nvl(request.getCostPriceZwg()));
-        product.setSellingPriceZwg(nvl(request.getSellingPriceZwg()));
+        currencyConversion.applyConfiguredPricing(
+                tenantId,
+                product,
+                request.getCostPriceUsd(),
+                request.getSellingPriceUsd(),
+                request.getCostPriceZwg(),
+                request.getSellingPriceZwg());
         product.setTaxRate(nvl(request.getTaxRate()));
         product.setIsTaxable(Boolean.TRUE.equals(request.getIsTaxable()));
         product.setReorderLevel(nvl(request.getReorderLevel()));
@@ -109,6 +129,15 @@ public class RetailOperationsService {
         product.setHasVariants(Boolean.TRUE.equals(request.getHasVariants()));
         product.setIsService(Boolean.TRUE.equals(request.getIsService()));
         Product saved = products.save(product);
+        wholesalePricing.configure(
+                tenantId,
+                saved,
+                request.getWholesaleEnabled(),
+                request.getWholesaleMinimumQuantity(),
+                request.getWholesalePriceUsd(),
+                request.getWholesalePriceZwg(),
+                null,
+                true);
         if (request.getBranchId() != null) {
             assignProductToBranch(tenantId, request.getBranchId(), saved.getId(), BigDecimal.ZERO);
         }
@@ -564,6 +593,15 @@ public class RetailOperationsService {
         BigDecimal subtotal = BigDecimal.ZERO;
         BigDecimal tax = BigDecimal.ZERO;
         BigDecimal cost = BigDecimal.ZERO;
+        Map<Long, BigDecimal> totalQuantityByProduct = new HashMap<>();
+        for (SaleItemRequest line : request.getItems()) {
+            if (line.getProductId() != null) {
+                totalQuantityByProduct.merge(line.getProductId(), nvl(line.getQuantity()), BigDecimal::add);
+            }
+        }
+        boolean wholesaleAware = request.getPricingProtocolVersion() != null
+                && request.getPricingProtocolVersion() >= WholesalePricingService.PRICING_PROTOCOL_VERSION;
+        boolean offlinePricingLocked = wholesaleAware && Boolean.TRUE.equals(request.getOfflinePricingLocked());
         for (SaleItemRequest line : request.getItems()) {
             Product product = products.findById(line.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product " + line.getProductId() + " was not found."));
@@ -579,10 +617,57 @@ public class RetailOperationsService {
                     throw new IllegalArgumentException(product.getName() + " has only " + available + " available at this branch.");
                 }
             }
-            BigDecimal unitPrice = nvl(CurrencyCode.ZWG.equals(request.getCurrency()) ? product.getSellingPriceZwg() : product.getSellingPriceUsd());
-            if (line.getUnitPrice() != null) unitPrice = line.getUnitPrice();
+            BigDecimal retailUnitPrice = nvl(CurrencyCode.ZWG.equals(request.getCurrency())
+                    ? product.getSellingPriceZwg() : product.getSellingPriceUsd());
+            WholesalePricingService.PriceQuote quote = wholesaleAware
+                    ? wholesalePricing.resolve(
+                            tenantId, product, totalQuantityByProduct.get(product.getId()), request.getCurrency())
+                    : null;
+            BigDecimal unitPrice;
+            SaleItem.WholesalePricingTier appliedTier;
+            String pricingSource;
+            BigDecimal wholesaleMinimum;
+            Long pricingVersion;
+            Long pricingExchangeRateId;
+            if (!wholesaleAware) {
+                unitPrice = line.getUnitPrice() == null ? retailUnitPrice : line.getUnitPrice();
+                appliedTier = SaleItem.WholesalePricingTier.RETAIL;
+                pricingSource = "LEGACY_RETAIL";
+                wholesaleMinimum = null;
+                pricingVersion = null;
+                pricingExchangeRateId = null;
+            } else if (offlinePricingLocked && line.getUnitPrice() != null) {
+                unitPrice = line.getUnitPrice();
+                appliedTier = parsePricingTier(line.getPricingTier());
+                pricingSource = "OFFLINE_CACHED";
+                wholesaleMinimum = quote.minimumQuantity();
+                pricingVersion = line.getPricingVersion();
+                pricingExchangeRateId = quote.exchangeRateId();
+            } else {
+                unitPrice = quote.unitPrice();
+                if (line.getUnitPrice() != null
+                        && line.getUnitPrice().setScale(4, RoundingMode.HALF_UP)
+                        .compareTo(unitPrice.setScale(4, RoundingMode.HALF_UP)) != 0) {
+                    throw new IllegalStateException(
+                            product.getName() + " pricing changed. Refresh products and review the sale before collecting payment.");
+                }
+                appliedTier = SaleItem.WholesalePricingTier.valueOf(quote.tier().name());
+                pricingSource = "SERVER_VERIFIED";
+                wholesaleMinimum = quote.minimumQuantity();
+                pricingVersion = quote.pricingVersion();
+                pricingExchangeRateId = quote.exchangeRateId();
+            }
+            if (unitPrice == null || unitPrice.compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException(product.getName() + " has an invalid selling price.");
+            }
             BigDecimal discount = nvl(line.getDiscountAmount());
+            if (discount.compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("Discount cannot be negative.");
+            }
             BigDecimal lineSubtotal = unitPrice.multiply(quantity).subtract(discount).setScale(2, RoundingMode.HALF_UP);
+            if (lineSubtotal.compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("Discount cannot exceed the line value for " + product.getName() + ".");
+            }
             BigDecimal lineTax = Boolean.TRUE.equals(product.getIsTaxable()) ? lineSubtotal.multiply(nvl(product.getTaxRate())).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
             subtotal = subtotal.add(lineSubtotal);
             tax = tax.add(lineTax);
@@ -603,6 +688,12 @@ public class RetailOperationsService {
                     .taxRate(product.getTaxRate())
                     .taxAmount(lineTax)
                     .lineTotal(lineSubtotal.add(lineTax))
+                    .pricingTier(appliedTier)
+                    .retailUnitPrice(retailUnitPrice)
+                    .wholesaleMinimumQuantity(wholesaleMinimum)
+                    .pricingVersion(pricingVersion)
+                    .pricingSource(pricingSource)
+                    .pricingExchangeRateId(pricingExchangeRateId)
                     .build();
             sale.getItems().add(item);
         }
@@ -612,15 +703,22 @@ public class RetailOperationsService {
         sale.setTotalCost(cost);
         sale.setGrossProfit(sale.getGrandTotal().subtract(cost));
 
+        Optional<TenantExchangeRate> configuredRate = offlineReceipt == null
+                ? currencyConversion.activeRate(tenantId)
+                : Optional.empty();
         for (SalePaymentRequest paymentRequest : request.getPayments()) {
+            BigDecimal paymentRate = paymentExchangeRate(paymentRequest, configuredRate);
             sale.getPayments().add(SalePayment.builder()
                     .sale(sale)
                     .paymentMethod(paymentRequest.getMethod())
                     .currency(paymentRequest.getCurrency())
                     .amount(paymentRequest.getAmount())
-                    .exchangeRate(paymentRequest.getExchangeRate() == null ? BigDecimal.ONE : paymentRequest.getExchangeRate())
+                    .exchangeRate(paymentRate)
+                    .exchangeRateConfigId(configuredRate.map(TenantExchangeRate::getId).orElse(null))
                     .referenceNumber(paymentRequest.getReference())
-                    .amountUsdEquivalent(CurrencyCode.USD.equals(paymentRequest.getCurrency()) ? paymentRequest.getAmount() : paymentRequest.getAmount().divide(paymentRequest.getExchangeRate() == null ? BigDecimal.ONE : paymentRequest.getExchangeRate(), 2, RoundingMode.HALF_UP))
+                    .amountUsdEquivalent(CurrencyCode.USD.equals(paymentRequest.getCurrency())
+                            ? paymentRequest.getAmount()
+                            : paymentRequest.getAmount().divide(paymentRate, 2, RoundingMode.HALF_UP))
                     .build());
         }
         Sale saved = sales.save(sale);
@@ -747,9 +845,37 @@ public class RetailOperationsService {
         return value == null ? BigDecimal.ZERO : value;
     }
 
+    private SaleItem.WholesalePricingTier parsePricingTier(String value) {
+        if (value == null || value.isBlank()) {
+            return SaleItem.WholesalePricingTier.RETAIL;
+        }
+        try {
+            return SaleItem.WholesalePricingTier.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return SaleItem.WholesalePricingTier.RETAIL;
+        }
+    }
+
+    private BigDecimal paymentExchangeRate(SalePaymentRequest payment,
+                                           Optional<TenantExchangeRate> configuredRate) {
+        if (CurrencyCode.USD.equals(payment.getCurrency())) {
+            return BigDecimal.ONE;
+        }
+        BigDecimal rate = configuredRate
+                .map(TenantExchangeRate::getUsdToZwgRate)
+                .orElse(payment.getExchangeRate());
+        if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("A positive USD to ZWG exchange rate is required for ZWG payments.");
+        }
+        return rate;
+    }
+
     private void validateUserBranch(Long tenantId, Role role, Long branchId) {
-        if (role != null && UserRole.CASHIER.equals(role.getName()) && branchId == null) {
-            throw new IllegalArgumentException("Cashier users must be assigned to an active branch.");
+        boolean branchRequired = role != null
+                && (UserRole.CASHIER.equals(role.getName()) || UserRole.SUPERVISOR.equals(role.getName()));
+        if (branchRequired && branchId == null) {
+            throw new IllegalArgumentException(role.getName().getDisplayName()
+                    + " users must be assigned to an active branch.");
         }
         if (branchId == null) {
             return;

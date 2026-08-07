@@ -2,6 +2,7 @@ package com.retailzw.enums;
 
 public enum UserRole {
     SUPER_ADMIN("Super Admin"),
+    SUPERVISOR("Supervisor"),
     BRANCH_MANAGER("Branch Manager"),
     INVENTORY_CLERK("Inventory Clerk"),
     CASHIER("Cashier"),

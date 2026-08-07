@@ -292,6 +292,12 @@ class Product {
   final int? categoryId;
   final String? imageUrl;
   final double quantityOnHand;
+  final bool wholesaleEnabled;
+  final double? wholesaleMinimumQuantity;
+  final double? wholesalePriceUsd;
+  final double? wholesalePriceZwg;
+  final int? wholesalePricingVersion;
+  final int pricingProtocolVersion;
 
   Product({
     required this.id,
@@ -306,6 +312,12 @@ class Product {
     this.categoryId,
     this.imageUrl,
     required this.quantityOnHand,
+    this.wholesaleEnabled = false,
+    this.wholesaleMinimumQuantity,
+    this.wholesalePriceUsd,
+    this.wholesalePriceZwg,
+    this.wholesalePricingVersion,
+    this.pricingProtocolVersion = 1,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -322,6 +334,21 @@ class Product {
       categoryId: (json['categoryId'] as num?)?.toInt(),
       imageUrl: json['imageUrl'] as String?,
       quantityOnHand: _toDouble(json['quantityOnHand']),
+      wholesaleEnabled: json['wholesaleEnabled'] as bool? ?? false,
+      wholesaleMinimumQuantity:
+          json['wholesaleMinimumQuantity'] == null
+              ? null
+              : _toDouble(json['wholesaleMinimumQuantity']),
+      wholesalePriceUsd: json['wholesalePriceUsd'] == null
+          ? null
+          : _toDouble(json['wholesalePriceUsd']),
+      wholesalePriceZwg: json['wholesalePriceZwg'] == null
+          ? null
+          : _toDouble(json['wholesalePriceZwg']),
+      wholesalePricingVersion:
+          (json['wholesalePricingVersion'] as num?)?.toInt(),
+      pricingProtocolVersion:
+          (json['pricingProtocolVersion'] as num?)?.toInt() ?? 1,
     );
   }
 
@@ -338,10 +365,33 @@ class Product {
         'categoryId': categoryId,
         'imageUrl': imageUrl,
         'quantityOnHand': quantityOnHand,
+        'wholesaleEnabled': wholesaleEnabled,
+        'wholesaleMinimumQuantity': wholesaleMinimumQuantity,
+        'wholesalePriceUsd': wholesalePriceUsd,
+        'wholesalePriceZwg': wholesalePriceZwg,
+        'wholesalePricingVersion': wholesalePricingVersion,
+        'pricingProtocolVersion': pricingProtocolVersion,
       };
 
   double priceForCurrency(String currency) =>
       currency == 'USD' ? sellingPriceUsd : sellingPriceZwg;
+
+  bool qualifiesForWholesale(double quantity) =>
+      wholesaleEnabled &&
+      wholesaleMinimumQuantity != null &&
+      wholesaleMinimumQuantity! > 1 &&
+      quantity >= wholesaleMinimumQuantity! &&
+      wholesalePriceUsd != null &&
+      wholesalePriceZwg != null &&
+      wholesalePriceUsd! > 0 &&
+      wholesalePriceZwg! > 0;
+
+  double priceForQuantity(String currency, double quantity) {
+    if (!qualifiesForWholesale(quantity)) {
+      return priceForCurrency(currency);
+    }
+    return currency == 'USD' ? wholesalePriceUsd! : wholesalePriceZwg!;
+  }
 }
 
 class Category {
@@ -368,6 +418,8 @@ class CartItem {
   double unitPrice;
   double discountAmount;
   String currency;
+  String pricingTier;
+  int? pricingVersion;
 
   CartItem({
     required this.product,
@@ -375,6 +427,8 @@ class CartItem {
     required this.unitPrice,
     this.discountAmount = 0,
     required this.currency,
+    this.pricingTier = 'RETAIL',
+    this.pricingVersion,
   });
 
   double get lineTotal => (quantity * unitPrice) - discountAmount;

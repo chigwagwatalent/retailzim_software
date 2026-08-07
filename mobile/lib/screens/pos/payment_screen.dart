@@ -936,6 +936,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final request = {
       'cashSessionId': widget.session.id,
       if (widget.session.branchId != null) 'branchId': widget.session.branchId,
+      'pricingProtocolVersion': 2,
       'currency': _currency,
       'items': provider.cart
           .map((item) => {
@@ -944,6 +945,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 'quantity': item.quantity,
                 'unitPrice': item.unitPrice,
                 'discountAmount': item.discountAmount,
+                'pricingTier': item.pricingTier,
+                if (item.pricingVersion != null)
+                  'pricingVersion': item.pricingVersion,
               })
           .toList(),
       'payments': [

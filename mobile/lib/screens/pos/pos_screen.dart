@@ -1615,10 +1615,33 @@ class _CartItem extends StatelessWidget {
                   style: const TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 13),
                 ),
-                Text(
-                  formatCurrency(item.unitPrice, item.currency),
-                  style:
-                      const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                Wrap(
+                  spacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      formatCurrency(item.unitPrice, item.currency),
+                      style: const TextStyle(
+                          color: AppColors.textMuted, fontSize: 11),
+                    ),
+                    if (item.pricingTier == 'WHOLESALE')
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.successGreen.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'WHOLESALE',
+                          style: TextStyle(
+                            color: AppColors.successGreen,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),

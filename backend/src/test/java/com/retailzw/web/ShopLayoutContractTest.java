@@ -55,6 +55,39 @@ class ShopLayoutContractTest {
         assertTrue(html.contains("/shop/gas/change"));
         assertTrue(html.contains("!#strings.startsWith(active, 'gas')"),
                 "Retail Held Change must stay hidden inside the gas workspace");
+        assertTrue(html.contains("supervisorUser == true"));
+        assertTrue(html.contains("Supervisor Desk"));
+        assertTrue(html.contains("Cash Collection"));
+        assertTrue(html.contains("Stock Receiving"));
+        assertTrue(html.contains("Gas Supervisor Desk"));
+        assertTrue(html.contains("LPG Receiving"));
+        assertTrue(html.contains("Assigned Branch"));
+    }
+
+    @Test
+    void supervisorWorkspaceShowsOnlyBranchOperationalWorkflows() throws IOException {
+        String dashboard = Files.readString(SHOP_TEMPLATES.resolve("supervisor.html"));
+        String purchasing = Files.readString(SHOP_TEMPLATES.resolve("purchasing.html"));
+        String returns = Files.readString(SHOP_TEMPLATES.resolve("returns.html"));
+
+        assertTrue(dashboard.contains("Shifts Awaiting Collection"));
+        assertTrue(dashboard.contains("Purchase Orders to Receive"));
+        assertTrue(dashboard.contains("Open Held Change"));
+        assertTrue(dashboard.contains("Latest Goods Received Notes"));
+        assertTrue(purchasing.contains("supervisorUser != true"));
+        assertTrue(returns.contains("supervisorUser != true"));
+    }
+
+    @Test
+    void supervisorGasPagesKeepConfigurationOwnerOnly() throws IOException {
+        String dashboard = Files.readString(SHOP_TEMPLATES.resolve("gas.html"));
+        String inventory = Files.readString(SHOP_TEMPLATES.resolve("gas-tanks.html"));
+        String change = Files.readString(SHOP_TEMPLATES.resolve("gas-change.html"));
+
+        assertTrue(dashboard.contains("supervisorUser != true"));
+        assertTrue(dashboard.contains("Receive LPG"));
+        assertTrue(inventory.contains("supervisorUser != true"));
+        assertTrue(change.contains("supervisorUser != true"));
     }
 
     @Test

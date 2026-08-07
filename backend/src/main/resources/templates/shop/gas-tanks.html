@@ -19,11 +19,11 @@
           <a class="btn btn-primary" th:href="@{/shop/gas/restocking(branchId=${gasBranchId})}">
             <i class="fa-solid fa-truck-droplet"></i>Receive Stock
           </a>
-          <a class="btn btn-light" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
+          <a th:if="${supervisorUser != true}" class="btn btn-light" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
           <details class="gas-inventory-more">
             <summary aria-label="More inventory actions"><i class="fa-solid fa-ellipsis-vertical"></i></summary>
             <div>
-              <a href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Update prices</a>
+              <a th:if="${supervisorUser != true}" href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Update prices</a>
               <a th:href="@{/shop/gas(branchId=${gasBranchId})}"><i class="fa-solid fa-gauge-high"></i>Gas dashboard</a>
             </div>
           </details>
@@ -96,7 +96,7 @@
               <span>available</span>
               <div><i th:style="${t.netCapacityKg > 0 ? 'width:' + (t.currentKg * 100 / t.netCapacityKg) + '%' : 'width:0%'}"></i></div>
             </div>
-            <div class="gas-inventory-tank-actions">
+            <div th:if="${supervisorUser != true}" class="gas-inventory-tank-actions">
               <a class="btn btn-light btn-compact" th:href="${'#modal-gas-reconcile-' + t.id}">Reconcile</a>
               <a class="icon-button" th:href="${'#modal-gas-tank-' + t.id}" th:attr="aria-label=${'Edit ' + t.name}" title="Edit tank"><i class="fa-solid fa-pen"></i></a>
             </div>
@@ -106,7 +106,7 @@
             <span><i class="fa-solid fa-gas-pump"></i></span>
             <h3>No LPG tanks configured</h3>
             <p>Add the first tank using its tare, full gross and current gross weights.</p>
-            <a class="btn btn-primary" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
+            <a th:if="${supervisorUser != true}" class="btn btn-primary" href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add Tank</a>
           </div>
         </div>
 
@@ -118,7 +118,7 @@
         <article class="panel gas-inventory-prices">
           <div class="gas-inventory-panel-head">
             <div><i class="fa-regular fa-file-lines"></i><h2>Active LPG prices</h2></div>
-            <a class="btn btn-light btn-compact" href="#modal-gas-price"><i class="fa-solid fa-pen"></i>Update prices</a>
+            <a th:if="${supervisorUser != true}" class="btn btn-light btn-compact" href="#modal-gas-price"><i class="fa-solid fa-pen"></i>Update prices</a>
           </div>
           <div class="gas-inventory-price-grid">
             <div th:each="p : ${gasPrices}">
@@ -155,7 +155,7 @@
       </div>
     </div>
 
-    <div id="modal-gas-tank" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" id="modal-gas-tank" class="modal"><div class="modal-content">
       <div class="modal-head"><h2>Add Gas Tank</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/gas/tanks}" class="form-grid gas-tank-weight-form">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
@@ -175,7 +175,7 @@
       </form>
     </div></div>
 
-    <div th:each="t : ${pagedGasTanks}" th:id="${'modal-gas-tank-' + t.id}" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" th:each="t : ${pagedGasTanks}" th:id="${'modal-gas-tank-' + t.id}" class="modal"><div class="modal-content">
       <div class="modal-head"><h2 th:text="${'Edit ' + t.name}">Edit Tank</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{'/shop/gas/tanks/' + ${t.id} + '/update'}" class="form-grid gas-tank-weight-form">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
@@ -195,7 +195,7 @@
       </form>
     </div></div>
 
-    <div th:each="t : ${pagedGasTanks}" th:id="${'modal-gas-reconcile-' + t.id}" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" th:each="t : ${pagedGasTanks}" th:id="${'modal-gas-reconcile-' + t.id}" class="modal"><div class="modal-content">
       <div class="modal-head"><h2 th:text="${'Reconcile ' + t.name}">Reconcile Gas Stock</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/gas/stock/reconcile}" class="form-grid gas-reconcile-weight-form">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
@@ -211,7 +211,7 @@
       </form>
     </div></div>
 
-    <div id="modal-gas-price" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" id="modal-gas-price" class="modal"><div class="modal-content">
       <div class="modal-head"><h2>Set LPG Price</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/gas/prices}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">

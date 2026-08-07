@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -48,11 +49,49 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     long countByTenantIdAndIsActiveTrue(Long tenantId);
 
+    long countByTenantIdAndPricingModeNot(Long tenantId, Product.PricingMode pricingMode);
+
     boolean existsByTenantIdAndBarcode(Long tenantId, String barcode);
 
     boolean existsByTenantIdAndSku(Long tenantId, String sku);
 
     @Query("SELECT p.tenantId, COUNT(p) FROM Product p WHERE p.tenantId IN :tenantIds AND p.isActive = true GROUP BY p.tenantId")
     List<Object[]> countActiveByTenantIds(@Param("tenantIds") List<Long> tenantIds);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+            UPDATE products
+            SET cost_price_zwg = ROUND(ROUND(cost_price_usd, :priceScale) * :rate, :priceScale),
+                selling_price_zwg = ROUND(ROUND(selling_price_usd, :priceScale) * :rate, :priceScale),
+                cost_price_usd = ROUND(cost_price_usd, :priceScale),
+                selling_price_usd = ROUND(selling_price_usd, :priceScale),
+                pricing_mode = 'AUTO_FROM_USD',
+                exchange_rate_id = :exchangeRateId
+            WHERE tenant_id = :tenantId
+              AND (:includeManual = 1 OR pricing_mode <> 'MANUAL')
+            """, nativeQuery = true)
+    int repriceFromUsd(@Param("tenantId") Long tenantId,
+                       @Param("rate") java.math.BigDecimal rate,
+                       @Param("priceScale") int priceScale,
+                       @Param("exchangeRateId") Long exchangeRateId,
+                       @Param("includeManual") int includeManual);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+            UPDATE products
+            SET cost_price_usd = ROUND(ROUND(cost_price_zwg, :priceScale) / :rate, :priceScale),
+                selling_price_usd = ROUND(ROUND(selling_price_zwg, :priceScale) / :rate, :priceScale),
+                cost_price_zwg = ROUND(cost_price_zwg, :priceScale),
+                selling_price_zwg = ROUND(selling_price_zwg, :priceScale),
+                pricing_mode = 'AUTO_FROM_ZWG',
+                exchange_rate_id = :exchangeRateId
+            WHERE tenant_id = :tenantId
+              AND (:includeManual = 1 OR pricing_mode <> 'MANUAL')
+            """, nativeQuery = true)
+    int repriceFromZwg(@Param("tenantId") Long tenantId,
+                       @Param("rate") java.math.BigDecimal rate,
+                       @Param("priceScale") int priceScale,
+                       @Param("exchangeRateId") Long exchangeRateId,
+                       @Param("includeManual") int includeManual);
 }
 

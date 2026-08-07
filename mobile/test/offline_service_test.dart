@@ -49,6 +49,12 @@ void main() {
           'taxRate': 15,
           'isTaxable': true,
           'quantityOnHand': 5,
+          'wholesaleEnabled': true,
+          'wholesaleMinimumQuantity': 2,
+          'wholesalePriceUsd': 3.80,
+          'wholesalePriceZwg': 57.00,
+          'wholesalePricingVersion': 4,
+          'pricingProtocolVersion': 2,
         },
         {
           'id': 102,
@@ -67,6 +73,8 @@ void main() {
       final search = await offline.getCachedProducts(search: 'cerevita');
       expect(search, hasLength(1));
       expect(search.first['quantityOnHand'], 5);
+      expect(search.first['wholesaleEnabled'], isTrue);
+      expect(search.first['wholesalePricingVersion'], 4);
       final barcodeProduct =
           await offline.getCachedProductByBarcode(' 263000000002 ');
       expect(barcodeProduct?['id'], 101);
@@ -74,6 +82,8 @@ void main() {
 
       final saleData = {
         'cashSessionId': 77,
+        'pricingProtocolVersion': 2,
+        'offlinePricingLocked': true,
         'currency': 'USD',
         'items': [
           {
@@ -82,6 +92,8 @@ void main() {
             'quantity': 2,
             'unitPrice': 4.25,
             'discountAmount': 0,
+            'pricingTier': 'WHOLESALE',
+            'pricingVersion': 4,
           }
         ],
         'payments': [
@@ -116,6 +128,11 @@ void main() {
       expect(await offline.getPendingCount(), 1);
       final pending = await offline.getPendingSales();
       expect(pending.single['offline_uuid'], 'offline-001');
+      final queuedSale = pending.single['sale_data'] as Map<String, dynamic>;
+      expect(queuedSale['offlinePricingLocked'], isTrue);
+      final queuedItems = queuedSale['items'] as List<dynamic>;
+      expect((queuedItems.single as Map<String, dynamic>)['pricingTier'],
+          'WHOLESALE');
 
       final productAfterSale =
           (await offline.getCachedProducts(search: 'cerevita')).single;

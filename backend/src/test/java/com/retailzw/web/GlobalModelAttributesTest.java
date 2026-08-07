@@ -86,6 +86,19 @@ class GlobalModelAttributesTest {
         verify(billingAccess, never()).renewalNotice(9L);
     }
 
+    @Test
+    void exposesSupervisorRoleFlagsToEverySharedShopLayout() {
+        signedInShopUser("SUPERVISOR");
+        ExtendedModelMap model = new ExtendedModelMap();
+
+        advice.addCurrentUser(model, new MockHttpServletRequest("GET", "/shop/supervisor"));
+
+        assertSame(Boolean.TRUE, model.get("supervisorUser"));
+        assertSame(Boolean.TRUE, model.get("branchRestrictedUser"));
+        assertSame(Boolean.FALSE, model.get("shopAdministrator"));
+        verify(billingAccess, never()).renewalNotice(9L);
+    }
+
     private CustomUserDetails signedInShopUser(String roleName) {
         CustomUserDetails principal = mock(CustomUserDetails.class);
         when(principal.getUserId()).thenReturn(7L);

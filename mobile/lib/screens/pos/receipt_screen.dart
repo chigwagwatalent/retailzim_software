@@ -490,7 +490,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       currency: currency,
     );
 
-    if (!mounted) return;
+    if (!context.mounted) return;
     setState(() => _printing = false);
 
     if (result.success) {

@@ -18,7 +18,7 @@
           </div>
         </div>
         <div class="returns-hero-actions">
-          <a class="btn btn-primary" href="#modal-create-return"><i class="fa-solid fa-rotate-left"></i>New Return</a>
+          <a th:if="${supervisorUser != true}" class="btn btn-primary" href="#modal-create-return"><i class="fa-solid fa-rotate-left"></i>New Return</a>
           <a class="btn btn-light" href="#returnable-receipts"><i class="fa-solid fa-magnifying-glass"></i>Find Receipt</a>
         </div>
       </section>
@@ -184,7 +184,7 @@
       </section>
     </section>
 
-    <div id="modal-create-return" class="modal"><div class="modal-content wide-modal returns-wizard-modal">
+    <div th:if="${supervisorUser != true}" id="modal-create-return" class="modal"><div class="modal-content wide-modal returns-wizard-modal">
       <div class="modal-head"><h2>New Return</h2><a class="close" href="#">&times;</a></div>
       <div class="returns-wizard-steps">
         <span class="is-active"><b>1</b>Find receipt</span>
@@ -205,7 +205,7 @@
       </div>
     </div></div>
 
-    <div th:each="sale : ${returnableSales}" th:id="${'modal-return-sale-' + sale.id}" class="modal"><div class="modal-content wide-modal returns-wizard-modal">
+    <div th:if="${supervisorUser != true}" th:each="sale : ${returnableSales}" th:id="${'modal-return-sale-' + sale.id}" class="modal"><div class="modal-content wide-modal returns-wizard-modal">
       <div class="modal-head"><h2 th:text="${'Return ' + sale.receiptNumber}">Return Sale</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/returns}" class="returns-return-form">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">

@@ -390,8 +390,14 @@ class ApiService {
 
   Future<Sale> _saveOffline(
       Map<String, dynamic> saleRequest, String uuid) async {
+    final wholesaleAware =
+        (saleRequest['pricingProtocolVersion'] as num?)?.toInt() == 2;
+    final offlineRequest = {
+      ...saleRequest,
+      if (wholesaleAware) 'offlinePricingLocked': true,
+    };
     final request = await _withResolvedItemPrices(await _withCachedSaleContext(
-        _saleRequestWithOfflineIdentity(saleRequest, uuid)));
+        _saleRequestWithOfflineIdentity(offlineRequest, uuid)));
     final payload = _offlineSalePayload(request, uuid);
     await _offline.queueSale(request, uuid);
     await _offline.saveShiftSale(

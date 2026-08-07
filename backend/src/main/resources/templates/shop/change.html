@@ -147,7 +147,8 @@
                   <a class="icon-button mini" th:href="${'#modal-collect-change-' + c.id}" title="Pay customer">
                     <i class="fa-solid fa-hand-holding-dollar"></i>
                   </a>
-                  <form method="post" th:action="@{'/shop/change/' + ${c.id} + '/cancel'}">
+                  <form th:if="${supervisorUser != true}" method="post" th:action="@{'/shop/change/' + ${c.id} + '/cancel'}">
+                    <input type="hidden" name="branchId" th:value="${selectedBranchId}">
                     <button class="icon-button mini danger" type="submit" title="Cancel record">
                       <i class="fa-solid fa-ban"></i>
                     </button>
@@ -193,6 +194,7 @@
           </div>
           <p class="change-modal-note">Confirm only after the customer has received the cash at the counter.</p>
           <form method="post" th:action="@{'/shop/change/' + ${c.id} + '/collect'}">
+            <input type="hidden" name="branchId" th:value="${selectedBranchId}">
             <div class="modal-actions">
               <button class="btn btn-primary" type="submit">
                 <i class="fa-solid fa-check"></i>Confirm Paid &amp; Collected

@@ -91,7 +91,7 @@
           <table>
             <thead><tr><th>Product</th><th>Category</th><th>Branch Stock</th><th>Total Stock</th><th>USD Price</th><th>ZWG Price</th><th>Tax</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody>
-            <tr th:each="p : ${productList}" th:with="stock=${selectedBranchStock.get(p.id)}, total=${totalStockByProduct.get(p.id)}, isLow=${stock != null and p.reorderLevel != null and stock.quantityOnHand <= p.reorderLevel}">
+            <tr th:each="p : ${productList}" th:with="stock=${selectedBranchStock.get(p.id)}, total=${totalStockByProduct.get(p.id)}, isLow=${stock != null and p.reorderLevel != null and stock.quantityOnHand <= p.reorderLevel}, wholesale=${wholesalePricingByProduct.get(p.id)}">
               <td>
                 <div class="products-product-cell">
                   <span class="products-product-image">
@@ -102,6 +102,9 @@
                     <strong th:text="${p.name}">Product</strong>
                     <small th:text="${'SKU: ' + (p.sku ?: 'N/A')}">SKU</small>
                     <small th:text="${'Barcode: ' + (p.barcode ?: 'N/A')}">Barcode</small>
+                    <small th:if="${wholesale != null and wholesale.isEnabled}"
+                           th:text="${'Wholesale from ' + #numbers.formatDecimal(wholesale.minimumQuantity, 1, 4)}"
+                           style="color:#087f5b;font-weight:700">Wholesale enabled</small>
                   </div>
                 </div>
               </td>
@@ -170,6 +173,18 @@
         <label><span th:text="${'Opening Stock for ' + selectedBranchName}">Opening Stock</span><input name="openingStock" type="number" step="0.0001" value="0"></label>
         <label>Image URL<input name="imageUrl"></label>
         <label style="grid-column:1/-1">Description<textarea name="description"></textarea></label>
+        <label style="grid-column:1/-1">Wholesale pricing
+          <select name="wholesaleEnabled" class="wholesale-toggle">
+            <option value="false" selected>Disabled - use retail pricing</option>
+            <option value="true">Enabled for this product</option>
+          </select>
+        </label>
+        <div class="wholesale-fields form-grid" style="grid-column:1/-1;display:none">
+          <label>Minimum wholesale quantity<input name="wholesaleMinimumQuantity" type="number" min="1.0001" step="0.0001"></label>
+          <label>Wholesale USD<input name="wholesalePriceUsd" type="number" min="0.0001" step="0.0001"></label>
+          <label>Wholesale ZWG (ZiG)<input name="wholesalePriceZwg" type="number" min="0.0001" step="0.0001"></label>
+          <p class="empty" style="grid-column:1/-1">Enter the price in the configured base currency. The other currency is calculated using Store Configuration.</p>
+        </div>
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Product</button></div>
       </form>
     </div></div>
@@ -190,7 +205,7 @@
       </form>
     </div></div>
 
-    <div th:each="p : ${productList}" th:id="${'modal-edit-product-' + p.id}" class="modal"><div class="modal-content">
+    <div th:each="p : ${productList}" th:with="wholesale=${wholesalePricingByProduct.get(p.id)}" th:id="${'modal-edit-product-' + p.id}" class="modal"><div class="modal-content">
       <div class="modal-head"><h2 th:text="${'Edit ' + p.name}">Edit Product</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{'/shop/products/' + ${p.id} + '/update'}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">
@@ -209,11 +224,41 @@
         <label>Max Stock<input name="maxStockLevel" type="number" step="0.0001" th:value="${p.maxStockLevel}"></label>
         <label>Image URL<input name="imageUrl" th:value="${p.imageUrl}"></label>
         <label style="grid-column:1/-1">Description<textarea name="description" th:text="${p.description}"></textarea></label>
+        <label style="grid-column:1/-1">Wholesale pricing
+          <select name="wholesaleEnabled" class="wholesale-toggle">
+            <option value="false" th:selected="${wholesale == null or wholesale.isEnabled != true}">Disabled - use retail pricing</option>
+            <option value="true" th:selected="${wholesale != null and wholesale.isEnabled}">Enabled for this product</option>
+          </select>
+        </label>
+        <div class="wholesale-fields form-grid"
+             th:style="${wholesale != null and wholesale.isEnabled ? 'grid-column:1/-1;display:grid' : 'grid-column:1/-1;display:none'}">
+          <label>Minimum wholesale quantity<input name="wholesaleMinimumQuantity" type="number" min="1.0001" step="0.0001" th:value="${wholesale != null ? wholesale.minimumQuantity : null}"></label>
+          <label>Wholesale USD<input name="wholesalePriceUsd" type="number" min="0.0001" step="0.0001" th:value="${wholesale != null ? wholesale.priceUsd : null}"></label>
+          <label>Wholesale ZWG (ZiG)<input name="wholesalePriceZwg" type="number" min="0.0001" step="0.0001" th:value="${wholesale != null ? wholesale.priceZwg : null}"></label>
+          <p class="empty" style="grid-column:1/-1">Wholesale applies to the full line when the combined product quantity reaches this minimum.</p>
+        </div>
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Update Product</button></div>
       </form>
     </div></div>
     <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>
 </div>
+<script>
+  document.querySelectorAll('.wholesale-toggle').forEach(function (toggle) {
+    function updateWholesaleFields() {
+      var form = toggle.closest('form');
+      var fields = form ? form.querySelector('.wholesale-fields') : null;
+      if (!fields) return;
+      var enabled = toggle.value === 'true';
+      fields.style.display = enabled ? 'grid' : 'none';
+      fields.querySelectorAll('input').forEach(function (input) {
+        input.required = enabled;
+        input.disabled = !enabled;
+      });
+    }
+    toggle.addEventListener('change', updateWholesaleFields);
+    updateWholesaleFields();
+  });
+</script>
 </body>
 </html>

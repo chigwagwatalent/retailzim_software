@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Branch Supervisor')}"></head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{common/layout :: shopSidebar('supervisor')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: shopTopbar('Branch Supervisor')}"></nav>
+
+    <section class="supervisor-page">
+      <header class="supervisor-hero">
+        <div>
+          <span class="supervisor-hero-icon"><i class="fa-solid fa-user-shield"></i></span>
+          <div>
+            <small>BRANCH OPERATIONS</small>
+            <h1>Supervisor Desk</h1>
+            <p>Cash accountability, stock receiving, cashier activity, and customer change for your assigned branch.</p>
+          </div>
+        </div>
+        <aside>
+          <i class="fa-solid fa-store"></i>
+          <span>Assigned branch</span>
+          <strong th:text="${selectedBranchName}">Harare CBD</strong>
+        </aside>
+      </header>
+
+      <section class="supervisor-kpi-grid">
+        <a class="supervisor-kpi cash" th:href="@{/shop/cash}">
+          <span><i class="fa-solid fa-hand-holding-dollar"></i></span>
+          <div><small>Cash Awaiting Collection</small><strong th:text="${awaitingCollectionCount}">0</strong><em th:text="${'USD ' + #numbers.formatDecimal(pendingCashUsd, 1, 2) + ' / ZWG ' + #numbers.formatDecimal(pendingCashZwg, 1, 2)}">USD 0.00 / ZWG 0.00</em></div>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a class="supervisor-kpi stock" th:href="@{/shop/purchasing}">
+          <span><i class="fa-solid fa-truck-ramp-box"></i></span>
+          <div><small>Ready to Receive</small><strong th:text="${readyToReceiveCount}">0</strong><em>Approved or dispatched purchase orders</em></div>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a class="supervisor-kpi change" th:href="@{/shop/change}">
+          <span><i class="fa-solid fa-coins"></i></span>
+          <div><small>Open Held Change</small><strong th:text="${openChangeCount}">0</strong><em th:text="${'USD ' + #numbers.formatDecimal(heldChangeUsd, 1, 2) + ' / ZWG ' + #numbers.formatDecimal(heldChangeZwg, 1, 2)}">USD 0.00 / ZWG 0.00</em></div>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a class="supervisor-kpi sales" th:href="@{/shop/sales}">
+          <span><i class="fa-solid fa-receipt"></i></span>
+          <div><small>Today Transactions</small><strong th:text="${todayTransactions}">0</strong><em th:text="${todaySales.usd + ' / ' + todaySales.zwg}">USD 0.00 / ZWG 0.00</em></div>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </section>
+
+      <section class="supervisor-status-strip">
+        <article><span>Open cashier shifts</span><strong th:text="${openShiftCount}">0</strong></article>
+        <article><span>Active cashiers</span><strong th:text="${activeCashierCount}">0</strong></article>
+        <article><span>Collections today</span><strong th:text="${collectedTodayCount}">0</strong></article>
+        <article><span>Collection variance</span><strong th:text="${'USD ' + #numbers.formatDecimal(collectionVarianceUsd, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(collectionVarianceZwg, 1, 2)}">ZWG 0.00</small></article>
+      </section>
+
+      <section class="supervisor-grid">
+        <article class="supervisor-panel">
+          <header>
+            <div><small>CASH CONTROL</small><h2>Shifts Awaiting Collection</h2></div>
+            <a th:href="@{/shop/cash}">Open desk <i class="fa-solid fa-arrow-right"></i></a>
+          </header>
+          <div class="supervisor-empty" th:if="${#lists.isEmpty(awaitingCollection)}">
+            <i class="fa-regular fa-circle-check"></i><strong>All cashier money is accounted for</strong><span>No closed shifts are waiting for collection.</span>
+          </div>
+          <div class="supervisor-list" th:if="${!#lists.isEmpty(awaitingCollection)}">
+            <a th:each="session : ${awaitingCollection}" th:href="@{/shop/cash(collectShiftId=${session.id})}">
+              <span class="list-icon"><i class="fa-solid fa-cash-register"></i></span>
+              <div><strong th:text="${userNames.get(session.cashierId) ?: 'Cashier #' + session.cashierId}">Cashier</strong><small th:text="${'Shift #' + session.id + ' closed ' + #temporals.format(session.closedAt, 'dd MMM HH:mm')}">Shift</small></div>
+              <div><strong th:text="${'USD ' + #numbers.formatDecimal(session.expectedCashUsd ?: 0, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(session.expectedCashZwg ?: 0, 1, 2)}">ZWG 0.00</small></div>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="supervisor-panel">
+          <header>
+            <div><small>STOCK CONTROL</small><h2>Purchase Orders to Receive</h2></div>
+            <a th:href="@{/shop/purchasing}">Receiving <i class="fa-solid fa-arrow-right"></i></a>
+          </header>
+          <div class="supervisor-empty" th:if="${#lists.isEmpty(readyToReceive)}">
+            <i class="fa-solid fa-boxes-stacked"></i><strong>No deliveries waiting</strong><span>Approved and ordered purchase orders will appear here.</span>
+          </div>
+          <div class="supervisor-list" th:if="${!#lists.isEmpty(readyToReceive)}">
+            <a th:each="po : ${readyToReceive}" th:href="@{/shop/purchasing}">
+              <span class="list-icon stock"><i class="fa-solid fa-truck-ramp-box"></i></span>
+              <div><strong th:text="${po.poNumber}">PO-001</strong><small th:text="${supplierNames.get(po.supplierId) ?: 'Supplier #' + po.supplierId}">Supplier</small></div>
+              <div><span class="badge status-pending" th:text="${po.status}">ORDERED</span><small th:text="${#lists.size(po.items) + ' lines'}">0 lines</small></div>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="supervisor-panel">
+          <header>
+            <div><small>SALES OVERSIGHT</small><h2>Recent Sales</h2></div>
+            <a th:href="@{/shop/sales}">View sales <i class="fa-solid fa-arrow-right"></i></a>
+          </header>
+          <div class="supervisor-empty" th:if="${#lists.isEmpty(recentSales)}">
+            <i class="fa-solid fa-receipt"></i><strong>No sales recorded yet</strong><span>Completed cashier sales will appear here.</span>
+          </div>
+          <div class="supervisor-table" th:if="${!#lists.isEmpty(recentSales)}">
+            <table>
+              <thead><tr><th>Receipt</th><th>Cashier</th><th>Total</th><th>Status</th><th>Time</th></tr></thead>
+              <tbody>
+              <tr th:each="sale : ${recentSales}">
+                <td><strong th:text="${sale.receiptNumber}">Receipt</strong></td>
+                <td th:text="${userNames.get(sale.cashierId) ?: 'Cashier #' + sale.cashierId}">Cashier</td>
+                <td th:text="${sale.currency + ' ' + #numbers.formatDecimal(sale.grandTotal, 1, 2)}">USD 0.00</td>
+                <td><span th:class="${sale.status.name() == 'COMPLETED' ? 'badge status-active' : 'badge status-pending'}" th:text="${sale.status}">COMPLETED</span></td>
+                <td th:text="${#temporals.format(sale.createdAt, 'dd MMM HH:mm')}">Time</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="supervisor-panel">
+          <header>
+            <div><small>CUSTOMER LIABILITY</small><h2>Open Held Change</h2></div>
+            <a th:href="@{/shop/change}">View register <i class="fa-solid fa-arrow-right"></i></a>
+          </header>
+          <div class="supervisor-empty" th:if="${#lists.isEmpty(openChangeRecords)}">
+            <i class="fa-solid fa-coins"></i><strong>No open change claims</strong><span>Customer-held change is fully settled.</span>
+          </div>
+          <div class="supervisor-list" th:if="${!#lists.isEmpty(openChangeRecords)}">
+            <a th:each="change : ${openChangeRecords}" th:href="@{/shop/change(search=${change.referenceNumber})}">
+              <span class="list-icon change"><i class="fa-solid fa-coins"></i></span>
+              <div><strong th:text="${change.customerName}">Customer</strong><small th:text="${change.referenceNumber + ' - ' + change.phone}">Reference</small></div>
+              <div><strong th:text="${change.currency + ' ' + #numbers.formatDecimal(change.amount, 1, 2)}">USD 0.00</strong><small th:text="${#temporals.format(change.createdAt, 'dd MMM HH:mm')}">Time</small></div>
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </div>
+        </article>
+      </section>
+
+      <section class="supervisor-panel receipts-panel">
+        <header>
+          <div><small>RECEIVING AUDIT</small><h2>Latest Goods Received Notes</h2></div>
+          <span class="badge" th:text="${#lists.size(recentGoodsReceipts) + ' recent'}">0 recent</span>
+        </header>
+        <div class="supervisor-empty" th:if="${#lists.isEmpty(recentGoodsReceipts)}">
+          <i class="fa-solid fa-clipboard-check"></i><strong>No stock receipts yet</strong><span>Confirmed supplier deliveries will create a goods received note.</span>
+        </div>
+        <div class="supervisor-table" th:if="${!#lists.isEmpty(recentGoodsReceipts)}">
+          <table>
+            <thead><tr><th>GRN</th><th>Purchase Order</th><th>Supplier</th><th>Received By</th><th>Received</th></tr></thead>
+            <tbody>
+            <tr th:each="grn : ${recentGoodsReceipts}">
+              <td><strong th:text="${grn.grnNumber}">GRN-001</strong></td>
+              <td th:text="${'#' + grn.purchaseOrderId}">#1</td>
+              <td th:text="${supplierNames.get(grn.supplierId) ?: 'Supplier #' + grn.supplierId}">Supplier</td>
+              <td th:text="${userNames.get(grn.receivedBy) ?: 'User #' + grn.receivedBy}">User</td>
+              <td th:text="${#temporals.format(grn.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <footer th:replace="~{common/layout :: shopFooter}"></footer>
+  </main>
+</div>
+</body>
+</html>

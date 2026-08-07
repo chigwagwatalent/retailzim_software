@@ -44,6 +44,10 @@ public class SaleRequest {
 
     private String heldChangeOfflineReference;
 
+    private Integer pricingProtocolVersion;
+
+    private Boolean offlinePricingLocked;
+
     public Long getCashSessionId() {
         return cashSessionId;
     }
@@ -162,6 +166,22 @@ public class SaleRequest {
 
     public void setHeldChangeOfflineReference(String heldChangeOfflineReference) {
         this.heldChangeOfflineReference = heldChangeOfflineReference;
+    }
+
+    public Integer getPricingProtocolVersion() {
+        return pricingProtocolVersion;
+    }
+
+    public void setPricingProtocolVersion(Integer pricingProtocolVersion) {
+        this.pricingProtocolVersion = pricingProtocolVersion;
+    }
+
+    public Boolean getOfflinePricingLocked() {
+        return offlinePricingLocked;
+    }
+
+    public void setOfflinePricingLocked(Boolean offlinePricingLocked) {
+        this.offlinePricingLocked = offlinePricingLocked;
     }
 }
 

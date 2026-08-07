@@ -41,13 +41,29 @@ public class CreditAndChangeService {
         return heldChange.searchWithDates(tenantId, status, clean(search), fromDate, toDate, PageRequest.of(page, size));
     }
 
+    public Page<HeldChange> branchChangeRecords(Long tenantId, Long branchId, HeldChange.Status status, String search,
+                                                LocalDateTime fromDate, LocalDateTime toDate, int page, int size) {
+        return heldChange.searchRetail(
+                tenantId, branchId, status, clean(search), fromDate, toDate, PageRequest.of(page, size));
+    }
+
     public long changeRecordCount(Long tenantId, HeldChange.Status status) {
         return heldChange.countByTenantIdAndStatus(tenantId, status);
+    }
+
+    public long branchChangeRecordCount(Long tenantId, Long branchId, HeldChange.Status status) {
+        return heldChange.countByTenantIdAndBranchIdAndGasShiftIdIsNullAndStatus(tenantId, branchId, status);
     }
 
     public BigDecimal sumChangeRecords(Long tenantId, HeldChange.Status status, String search,
                                        LocalDateTime fromDate, LocalDateTime toDate, CurrencyCode currency) {
         return nvl(heldChange.sumSearchWithDates(tenantId, status, clean(search), fromDate, toDate, currency));
+    }
+
+    public BigDecimal sumBranchChangeRecords(Long tenantId, Long branchId, HeldChange.Status status, String search,
+                                             LocalDateTime fromDate, LocalDateTime toDate, CurrencyCode currency) {
+        return nvl(heldChange.sumRetail(
+                tenantId, branchId, status, clean(search), fromDate, toDate, currency));
     }
 
     public List<BorrowerTransaction> borrowerTransactions(Long tenantId, Long borrowerId) {
@@ -217,9 +233,12 @@ public class CreditAndChangeService {
     }
 
     @Transactional
-    public HeldChange cancelChange(Long tenantId, Long changeId, Long userId) {
+    public HeldChange cancelChange(Long tenantId, Long branchId, Long changeId, Long userId) {
         HeldChange record = heldChange.lockById(tenantId, changeId)
                 .orElseThrow(() -> new IllegalArgumentException("Held change record not found."));
+        if (!record.getBranchId().equals(branchId)) {
+            throw new IllegalArgumentException("Held change belongs to another branch.");
+        }
         if (record.getStatus() != HeldChange.Status.OPEN) throw new IllegalStateException("Only open change can be cancelled.");
         record.setStatus(HeldChange.Status.CANCELLED);
         record.setCancelledBy(userId);

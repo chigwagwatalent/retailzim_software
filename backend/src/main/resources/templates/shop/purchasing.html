@@ -28,11 +28,11 @@
         </select>
       </form>
       <a class="btn btn-blue" href="#modal-search-po"><i class="fa-solid fa-magnifying-glass"></i>Find PO</a>
-      <form method="post" th:action="@{/shop/purchasing/auto-reorder}">
+      <form th:if="${supervisorUser != true}" method="post" th:action="@{/shop/purchasing/auto-reorder}">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">
         <button class="btn btn-light" type="submit"><i class="fa-solid fa-wand-magic-sparkles"></i>Auto Reorder</button>
       </form>
-      <a class="btn btn-primary" href="#modal-create-po"><i class="fa-solid fa-plus"></i>New PO</a>
+      <a th:if="${supervisorUser != true}" class="btn btn-primary" href="#modal-create-po"><i class="fa-solid fa-plus"></i>New PO</a>
     </div>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
 
@@ -75,16 +75,16 @@
         </div>
         <div class="branch-actions">
           <a class="btn btn-light" th:href="${'#modal-view-po-' + po.id}"><i class="fa-solid fa-eye"></i>View</a>
-          <form th:if="${po.status.name() == 'DRAFT'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/submit'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-paper-plane"></i>Submit</button></form>
-          <form th:if="${po.status.name() == 'SUBMITTED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/approve'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-check"></i>Approve</button></form>
-          <a th:if="${po.status.name() == 'SUBMITTED'}" class="btn btn-light" th:href="${'#modal-reject-po-' + po.id}"><i class="fa-solid fa-xmark"></i>Reject</a>
-          <form th:if="${po.status.name() == 'APPROVED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/order'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-truck"></i>Sent</button></form>
+          <form th:if="${supervisorUser != true and po.status.name() == 'DRAFT'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/submit'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-paper-plane"></i>Submit</button></form>
+          <form th:if="${supervisorUser != true and po.status.name() == 'SUBMITTED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/approve'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-check"></i>Approve</button></form>
+          <a th:if="${supervisorUser != true and po.status.name() == 'SUBMITTED'}" class="btn btn-light" th:href="${'#modal-reject-po-' + po.id}"><i class="fa-solid fa-xmark"></i>Reject</a>
+          <form th:if="${supervisorUser != true and po.status.name() == 'APPROVED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/order'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-truck"></i>Sent</button></form>
           <a th:if="${po.status.name() == 'APPROVED' or po.status.name() == 'ORDERED' or po.status.name() == 'PARTIAL'}" class="btn btn-primary" th:href="${'#modal-receive-po-' + po.id}"><i class="fa-solid fa-boxes-packing"></i>Receive</a>
         </div>
       </div>
     </section>
 
-    <div th:each="po : ${purchaseOrderList}" th:id="${'modal-reject-po-' + po.id}" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" th:each="po : ${purchaseOrderList}" th:id="${'modal-reject-po-' + po.id}" class="modal"><div class="modal-content">
       <div class="modal-head"><h2 th:text="${'Reject ' + po.poNumber}">Reject Purchase Order</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/reject'}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">
@@ -112,7 +112,7 @@
             <div class="action-row">
               <a class="icon-button mini" th:href="${'#modal-view-po-' + po.id}" title="View"><i class="fa-solid fa-eye"></i></a>
               <a th:if="${po.status.name() == 'APPROVED' or po.status.name() == 'ORDERED' or po.status.name() == 'PARTIAL'}" class="icon-button mini" th:href="${'#modal-receive-po-' + po.id}" title="Receive"><i class="fa-solid fa-boxes-packing"></i></a>
-              <form th:if="${po.status.name() != 'RECEIVED' and po.status.name() != 'CANCELLED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/cancel'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="icon-button mini danger" type="submit" title="Cancel"><i class="fa-solid fa-ban"></i></button></form>
+              <form th:if="${supervisorUser != true and po.status.name() != 'RECEIVED' and po.status.name() != 'CANCELLED'}" method="post" th:action="@{'/shop/purchasing/' + ${po.id} + '/cancel'}"><input type="hidden" name="branchId" th:value="${selectedBranchId}"><button class="icon-button mini danger" type="submit" title="Cancel"><i class="fa-solid fa-ban"></i></button></form>
             </div>
           </td>
         </tr>
@@ -132,7 +132,7 @@
       </form>
     </div></div>
 
-    <div id="modal-create-po" class="modal"><div class="modal-content wide-modal">
+    <div th:if="${supervisorUser != true}" id="modal-create-po" class="modal"><div class="modal-content wide-modal">
       <div class="modal-head"><h2>New Purchase Order</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/purchasing}" class="form-grid" id="po-create-form">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">

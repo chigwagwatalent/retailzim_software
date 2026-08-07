@@ -85,11 +85,12 @@
           <td>
             <span class="badge status-active" th:if="${u.role.name.name() == 'SUPER_ADMIN'}">WEB + APP</span>
             <span class="badge status-active" th:if="${u.role.name.name() == 'ACCOUNTANT'}">WEB ACCESS</span>
+            <span class="badge status-active" th:if="${u.role.name.name() == 'SUPERVISOR'}">BRANCH WEB</span>
             <span class="badge status-pending" th:if="${u.role.name.name() == 'CASHIER'}">APP ONLY</span>
           </td>
           <td>
-            <span th:if="${u.branchId == null && u.role.name.name() != 'CASHIER'}">Head Office</span>
-            <span th:if="${u.branchId == null && u.role.name.name() == 'CASHIER'}" class="badge status-suspended">ASSIGN BRANCH</span>
+            <span th:if="${u.branchId == null && u.role.name.name() != 'CASHIER' and u.role.name.name() != 'SUPERVISOR'}">Head Office</span>
+            <span th:if="${u.branchId == null && (u.role.name.name() == 'CASHIER' or u.role.name.name() == 'SUPERVISOR')}" class="badge status-suspended">ASSIGN BRANCH</span>
             <span th:if="${u.branchId != null && activeBranchIds.contains(u.branchId)}" th:text="${branchById.get(u.branchId)}">Branch</span>
             <span th:if="${u.branchId != null && !activeBranchIds.contains(u.branchId)}" class="badge status-suspended" th:text="${(branchById.get(u.branchId) != null ? branchById.get(u.branchId) : 'Branch #' + u.branchId) + ' inactive'}">Inactive branch</span>
           </td>
@@ -120,7 +121,7 @@
         <label>Password<input name="password" type="password" required></label>
         <label>Role
           <select name="roleId" required>
-            <option th:each="r : ${userRoleOptions}" th:value="${r.id}" th:attr="data-role-name=${r.name.name()}" th:text="${r.name.displayName + (r.name.name() == 'CASHIER' ? ' - App only' : '')}">Role</option>
+            <option th:each="r : ${userRoleOptions}" th:value="${r.id}" th:attr="data-role-name=${r.name.name()}" th:text="${r.name.displayName + (r.name.name() == 'CASHIER' ? ' - App only' : (r.name.name() == 'SUPERVISOR' ? ' - Branch web' : ''))}">Role</option>
           </select>
         </label>
         <label>Branch
@@ -145,7 +146,7 @@
         <label>New Password<input name="password" type="password" placeholder="Leave blank to keep current password"></label>
         <label>Role
           <select name="roleId" required>
-            <option th:each="r : ${userRoleOptions}" th:value="${r.id}" th:selected="${u.role.id == r.id}" th:attr="data-role-name=${r.name.name()}" th:text="${r.name.displayName + (r.name.name() == 'CASHIER' ? ' - App only' : '')}">Role</option>
+            <option th:each="r : ${userRoleOptions}" th:value="${r.id}" th:selected="${u.role.id == r.id}" th:attr="data-role-name=${r.name.name()}" th:text="${r.name.displayName + (r.name.name() == 'CASHIER' ? ' - App only' : (r.name.name() == 'SUPERVISOR' ? ' - Branch web' : ''))}">Role</option>
           </select>
         </label>
         <label>Branch
@@ -168,9 +169,9 @@
 
     const syncBranchRule = () => {
       const selected = role.options[role.selectedIndex];
-      const cashier = selected && selected.dataset.roleName === 'CASHIER';
-      branch.required = cashier;
-      branch.setCustomValidity(cashier && !branch.value ? 'Cashier users must be assigned to an active branch.' : '');
+      const branchRequired = selected && ['CASHIER', 'SUPERVISOR'].includes(selected.dataset.roleName);
+      branch.required = branchRequired;
+      branch.setCustomValidity(branchRequired && !branch.value ? 'Cashier and Supervisor users must be assigned to an active branch.' : '');
     };
 
     role.addEventListener('change', syncBranchRule);

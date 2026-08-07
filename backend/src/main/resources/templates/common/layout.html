@@ -17,12 +17,55 @@
 <body>
 <aside class="sidebar tenant-shell-sidebar" th:fragment="shopSidebar(active)">
   <div class="brand sidebar-brand">
-    <a class="tenant-sidebar-logo-link" th:href="${shopModuleEnabled == true ? '/shop/dashboard' : '/shop/gas'}" aria-label="Retail Zim workspace">
+    <a class="tenant-sidebar-logo-link" th:href="${supervisorUser == true ? (shopModuleEnabled == true ? '/shop/supervisor' : '/shop/gas') : (shopModuleEnabled == true ? '/shop/dashboard' : '/shop/gas')}" aria-label="Retail Zim workspace">
       <img class="tenant-sidebar-logo" th:src="@{/img/retail-zim-logo-transparent.png}" alt="Retail Zim">
     </a>
     <span class="tenant-sidebar-menu"><i class="fa-solid fa-bars"></i></span>
   </div>
   <nav class="tenant-sidebar-nav">
+    <th:block th:if="${supervisorUser == true and shopModuleEnabled == true}">
+      <a th:class="${active == 'supervisor' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/supervisor}">
+        <i class="fa-solid fa-table-cells-large"></i><span>Supervisor Desk</span>
+      </a>
+      <a th:class="${active == 'cash' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/cash}">
+        <i class="fa-solid fa-hand-holding-dollar"></i><span>Cash Collection</span>
+      </a>
+      <a th:class="${active == 'sales' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/sales}">
+        <i class="fa-solid fa-receipt"></i><span>Sales Oversight</span>
+      </a>
+      <a th:class="${active == 'purchasing' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/purchasing}">
+        <i class="fa-solid fa-truck-ramp-box"></i><span>Stock Receiving</span>
+      </a>
+      <a th:class="${active == 'change' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/change}">
+        <i class="fa-solid fa-coins"></i><span>Held Change</span>
+      </a>
+      <a th:class="${active == 'returns' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/returns}">
+        <i class="fa-solid fa-arrow-rotate-left"></i><span>Returns History</span>
+      </a>
+    </th:block>
+
+    <th:block th:if="${supervisorUser == true and gasModuleEnabled == true}">
+      <a th:class="${active == 'gas' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/gas}">
+        <i class="fa-solid fa-gauge-high"></i><span>Gas Supervisor Desk</span>
+      </a>
+      <a th:class="${active == 'gas-sales' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/gas/sales}">
+        <i class="fa-solid fa-scale-balanced"></i><span>Gas Sales Oversight</span>
+      </a>
+      <a th:class="${active == 'gas-accounting' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/gas/accounting}">
+        <i class="fa-solid fa-hand-holding-dollar"></i><span>Shift Oversight</span>
+      </a>
+      <a th:class="${active == 'gas-restocking' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/gas/restocking}">
+        <i class="fa-solid fa-truck-droplet"></i><span>LPG Receiving</span>
+      </a>
+      <a th:class="${active == 'gas-tanks' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/gas/tanks}">
+        <i class="fa-solid fa-database"></i><span>Gas Inventory</span>
+      </a>
+      <a th:class="${active == 'gas-change' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/gas/change}">
+        <i class="fa-solid fa-coins"></i><span>Held Change</span>
+      </a>
+    </th:block>
+
+    <th:block th:if="${supervisorUser != true}">
     <a th:if="${tenantBillingOnly != true and shopModuleEnabled == true}" th:class="${active == 'dashboard' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/dashboard}">
       <i class="fa-solid fa-house"></i><span>Dashboard</span>
     </a>
@@ -108,19 +151,25 @@
       <i class="fa-solid fa-credit-card"></i><span>Subscription</span>
       <small class="sidebar-dot" th:if="${tenantStatus != null and tenantStatus.name() != 'ACTIVE'}"></small>
     </a>
+    </th:block>
   </nav>
   <div class="tenant-sidebar-bottom">
     <a class="sidebar-utility" th:if="${tenantBillingOnly != true}" th:href="@{/shop/notifications}">
       <i class="fa-regular fa-circle-question"></i><span>Help & Support</span>
     </a>
-    <a class="sidebar-utility" th:if="${tenantBillingOnly != true}" th:href="@{/shop/company}">
+    <a class="sidebar-utility" th:if="${tenantBillingOnly != true and supervisorUser != true}" th:href="@{/shop/company}">
       <i class="fa-solid fa-gear"></i><span>Settings</span>
     </a>
-    <a class="tenant-branch-card" th:href="@{/shop/branches}" th:if="${tenantBillingOnly != true}">
+    <a class="tenant-branch-card" th:href="@{/shop/branches}" th:if="${tenantBillingOnly != true and supervisorUser != true}">
       <span><i class="fa-solid fa-store"></i></span>
       <strong>Branch<small th:text="${tenantActiveBranchName ?: 'Main Shop'}">Main Shop</small></strong>
       <i class="fa-solid fa-chevron-down"></i>
     </a>
+    <div class="tenant-branch-card" th:if="${tenantBillingOnly != true and supervisorUser == true}">
+      <span><i class="fa-solid fa-store"></i></span>
+      <strong>Assigned Branch<small th:text="${tenantActiveBranchName ?: 'Main Shop'}">Main Shop</small></strong>
+      <i class="fa-solid fa-lock"></i>
+    </div>
     <details class="tenant-sidebar-user">
       <summary>
         <span class="tenant-user-avatar" th:text="${currentUser != null ? currentUser.initials : 'U'}">U</span>
@@ -131,7 +180,7 @@
         <i class="fa-solid fa-chevron-right"></i>
       </summary>
       <div>
-        <a th:if="${tenantBillingOnly != true}" th:href="@{/shop/users}">Profile</a>
+        <a th:if="${tenantBillingOnly != true and supervisorUser != true}" th:href="@{/shop/users}">Profile</a>
         <form method="post" th:action="@{/auth/shop/logout}">
           <button type="submit">Logout</button>
         </form>
@@ -183,17 +232,22 @@
 </aside>
 
 <nav class="app-topbar tenant-shell-topbar" th:fragment="shopTopbar(title)" th:attr="aria-label=${title + ' workspace navigation'}">
-  <a class="tenant-branch-pill" th:if="${tenantBillingOnly != true}" th:href="@{/shop/branches}">
+  <a class="tenant-branch-pill" th:if="${tenantBillingOnly != true and supervisorUser != true}" th:href="@{/shop/branches}">
     <i class="fa-solid fa-building-columns"></i>
     <span th:text="${tenantActiveBranchName ?: 'Main Shop'}">Harare CBD</span>
     <i class="fa-solid fa-chevron-down"></i>
   </a>
-  <form class="topbar-search" th:if="${tenantBillingOnly != true and shopModuleEnabled == true}" method="get" th:action="@{/shop/products}">
+  <span class="tenant-branch-pill" th:if="${tenantBillingOnly != true and supervisorUser == true}">
+    <i class="fa-solid fa-building-columns"></i>
+    <span th:text="${tenantActiveBranchName ?: 'Main Shop'}">Harare CBD</span>
+    <i class="fa-solid fa-lock"></i>
+  </span>
+  <form class="topbar-search" th:if="${tenantBillingOnly != true and shopModuleEnabled == true and supervisorUser != true}" method="get" th:action="@{/shop/products}">
     <input name="search" placeholder="Search sales, collections, products..." aria-label="Search">
     <button type="submit" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
   </form>
   <div class="topbar-actions">
-    <details class="quick-links" th:if="${tenantBillingOnly != true}">
+    <details class="quick-links" th:if="${tenantBillingOnly != true and supervisorUser != true}">
       <summary class="icon-button" title="Quick links"><i class="fa-solid fa-grip"></i></summary>
       <div class="quick-menu">
         <strong>Quick Links</strong>
@@ -215,7 +269,7 @@
        th:href="@{/shop/notifications}" title="Notifications">
       <i class="fa-regular fa-bell"></i><span th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">3</span>
     </a>
-    <a class="tenant-plan-card" th:href="@{/shop/billing}">
+    <a class="tenant-plan-card" th:if="${supervisorUser != true}" th:href="@{/shop/billing}">
       <span th:text="${tenantPackageLabel ?: 'Professional Plan'}">Professional Plan</span>
     </a>
     <details class="account-menu">
@@ -238,8 +292,8 @@
             <small th:text="${currentUser != null ? currentUser.roleLabel + ' - ' + currentUser.branchLabel : ''}">Role</small>
           </div>
         </div>
-        <a th:if="${tenantBillingOnly != true}" th:href="@{/shop/users}"><i class="fa-regular fa-user"></i><span>Profile</span></a>
-        <a th:if="${tenantBillingOnly != true}" th:href="@{/shop/company}"><i class="fa-solid fa-building"></i><span>Company Profile</span></a>
+        <a th:if="${tenantBillingOnly != true and supervisorUser != true}" th:href="@{/shop/users}"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+        <a th:if="${tenantBillingOnly != true and supervisorUser != true}" th:href="@{/shop/company}"><i class="fa-solid fa-building"></i><span>Company Profile</span></a>
         <a th:if="${tenantBillingOnly == true}" th:href="@{/shop/billing}"><i class="fa-solid fa-credit-card"></i><span>Billing</span></a>
         <button class="theme-toggle account-action" type="button"><i class="fa-solid fa-moon"></i><span>Light / Dark Mode</span></button>
         <form method="post" th:action="@{/auth/shop/logout}">

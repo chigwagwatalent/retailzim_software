@@ -39,9 +39,13 @@ public class SalePayment {
     @Column(name = "amount_usd_equivalent", precision = 15, scale = 2)
     private BigDecimal amountUsdEquivalent;
 
-    @Column(name = "exchange_rate", precision = 10, scale = 4)
+    @Column(name = "exchange_rate", precision = 19, scale = 6)
     @Builder.Default
     private BigDecimal exchangeRate = BigDecimal.ONE;
+
+    @JsonIgnore
+    @Column(name = "exchange_rate_config_id")
+    private Long exchangeRateConfigId;
 
     @Column(name = "reference_number", length = 100)
     private String referenceNumber;

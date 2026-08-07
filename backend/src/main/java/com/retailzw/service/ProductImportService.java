@@ -6,6 +6,7 @@ import com.retailzw.model.Inventory;
 import com.retailzw.model.Product;
 import com.retailzw.model.ProductCategory;
 import com.retailzw.model.UnitOfMeasure;
+import com.retailzw.model.TenantExchangeRate;
 import com.retailzw.repository.BranchRepository;
 import com.retailzw.repository.InventoryRepository;
 import com.retailzw.repository.ProductCategoryRepository;
@@ -41,6 +42,8 @@ public class ProductImportService {
     private final UnitOfMeasureRepository uoms;
     private final InventoryRepository inventory;
     private final BranchRepository branches;
+    private final CurrencyConversionService currencyConversion;
+    private final WholesalePricingService wholesalePricing;
 
     @Transactional
     public ProductImportResult importProducts(Long tenantId, Long branchId, Long userId, MultipartFile file) {
@@ -63,6 +66,7 @@ public class ProductImportService {
             }
             Map<String, Integer> headers = findHeaders(sheet, formatter);
             requireHeader(headers, "name");
+            Optional<TenantExchangeRate> activeRate = currencyConversion.activeRate(tenantId);
 
             for (int rowNumber = headerRowIndex(sheet, formatter) + 1; rowNumber <= sheet.getLastRowNum(); rowNumber++) {
                 Row row = sheet.getRow(rowNumber);
@@ -71,7 +75,7 @@ public class ProductImportService {
                 }
                 result.setProcessedRows(result.getProcessedRows() + 1);
                 try {
-                    importRow(tenantId, branch.getId(), userId, row, headers, formatter, result);
+                    importRow(tenantId, branch.getId(), userId, row, headers, formatter, activeRate, result);
                 } catch (Exception ex) {
                     result.setSkippedRows(result.getSkippedRows() + 1);
                     addError(result, "Row " + (rowNumber + 1) + ": " + ex.getMessage());
@@ -87,7 +91,8 @@ public class ProductImportService {
     }
 
     private void importRow(Long tenantId, Long branchId, Long userId, Row row, Map<String, Integer> headers,
-                           DataFormatter formatter, ProductImportResult result) {
+                           DataFormatter formatter, Optional<TenantExchangeRate> activeRate,
+                           ProductImportResult result) {
         String name = value(row, headers, formatter, "name");
         String sku = value(row, headers, formatter, "sku");
         String barcode = value(row, headers, formatter, "barcode");
@@ -116,10 +121,12 @@ public class ProductImportService {
         product.setDescription(value(row, headers, formatter, "description"));
         product.setCategory(resolveCategory(tenantId, value(row, headers, formatter, "category")));
         product.setUnitOfMeasure(resolveUom(tenantId, value(row, headers, formatter, "uom")));
-        product.setCostPriceUsd(decimal(row, headers, formatter, "costusd", BigDecimal.ZERO));
-        product.setSellingPriceUsd(decimal(row, headers, formatter, "sellingusd", BigDecimal.ZERO));
-        product.setCostPriceZwg(decimal(row, headers, formatter, "costzwg", BigDecimal.ZERO));
-        product.setSellingPriceZwg(decimal(row, headers, formatter, "sellingzwg", BigDecimal.ZERO));
+        BigDecimal costUsd = decimal(row, headers, formatter, "costusd", BigDecimal.ZERO);
+        BigDecimal sellingUsd = decimal(row, headers, formatter, "sellingusd", BigDecimal.ZERO);
+        BigDecimal costZwg = decimal(row, headers, formatter, "costzwg", BigDecimal.ZERO);
+        BigDecimal sellingZwg = decimal(row, headers, formatter, "sellingzwg", BigDecimal.ZERO);
+        currencyConversion.applyConfiguredPricing(
+                product, costUsd, sellingUsd, costZwg, sellingZwg, activeRate);
         product.setTaxRate(decimal(row, headers, formatter, "taxrate", BigDecimal.ZERO));
         product.setIsTaxable(bool(row, headers, formatter, "taxable", true));
         product.setReorderLevel(decimal(row, headers, formatter, "reorderlevel", BigDecimal.ZERO));
@@ -133,6 +140,18 @@ public class ProductImportService {
 
         boolean created = product.getId() == null;
         Product saved = products.save(product);
+        Boolean wholesaleEnabled = headers.containsKey("wholesaleenabled")
+                ? bool(row, headers, formatter, "wholesaleenabled", false)
+                : null;
+        wholesalePricing.configure(
+                tenantId,
+                saved,
+                wholesaleEnabled,
+                decimal(row, headers, formatter, "wholesaleminimumquantity", null),
+                decimal(row, headers, formatter, "wholesalepriceusd", null),
+                decimal(row, headers, formatter, "wholesalepricezwg", null),
+                userId,
+                !created);
         if (created) {
             result.setCreatedProducts(result.getCreatedProducts() + 1);
         } else {
@@ -289,6 +308,10 @@ public class ProductImportService {
             case "sellingpriceusd", "priceusd", "sellusd" -> "sellingusd";
             case "costpricezwg", "costzig", "costpricezig" -> "costzwg";
             case "sellingpricezwg", "pricezwg", "sellzwg", "sellingpricezig", "pricezig" -> "sellingzwg";
+            case "wholesale", "enablewholesale", "wholesaleactive" -> "wholesaleenabled";
+            case "wholesaleminimum", "wholesaleminimumqty", "wholesalequantity", "wholesaleqty", "minimumwholesalequantity" -> "wholesaleminimumquantity";
+            case "wholesaleusd", "wholesaleusdprice", "wholesalepriceus" -> "wholesalepriceusd";
+            case "wholesalezwg", "wholesalezig", "wholesalezwgprice", "wholesalezigprice" -> "wholesalepricezwg";
             case "taxrate", "taxratepercent" -> "taxrate";
             case "reorder", "reorderstock" -> "reorderlevel";
             case "maxstocklevel" -> "maxstock";

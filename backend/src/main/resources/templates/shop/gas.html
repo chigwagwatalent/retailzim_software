@@ -26,7 +26,7 @@
         </span>
       </div>
       <div class="gas-command-actions">
-        <details class="gas-actions-menu">
+        <details th:if="${supervisorUser != true}" class="gas-actions-menu">
           <summary><i class="fa-solid fa-gear"></i> Operational actions <i class="fa-solid fa-chevron-down"></i></summary>
           <div>
             <a href="#modal-gas-price"><i class="fa-solid fa-tag"></i>Set selling price</a>
@@ -35,7 +35,8 @@
             <a href="#modal-gas-tank"><i class="fa-solid fa-plus"></i>Add gas tank</a>
           </div>
         </details>
-        <a class="btn btn-primary gas-pos-button" href="/shop/gas/sales"><i class="fa-solid fa-calculator"></i> Open Gas POS</a>
+        <a th:if="${supervisorUser == true}" class="btn btn-light gas-pos-button" th:href="@{/shop/gas/restocking(branchId=${gasBranchId})}"><i class="fa-solid fa-truck-droplet"></i> Receive LPG</a>
+        <a class="btn btn-primary gas-pos-button" href="/shop/gas/sales"><i class="fa-solid fa-calculator"></i> <span th:text="${supervisorUser == true ? 'View Gas Sales' : 'Open Gas POS'}">Open Gas POS</span></a>
       </div>
     </section>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
@@ -59,12 +60,12 @@
         </div>
       </div>
       <div class="gas-stock-stat"><i class="fa-solid fa-coins"></i><span>Stock value</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.stockValueUsd,1,2) : 'USD 0.00'}">USD 0.00</strong></div>
-      <div class="gas-stock-stat"><i class="fa-solid fa-tag"></i><span>Selling price</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.sellingPriceUsd,1,2) + ' /kg' : 'Not set'}">Not set</strong><a href="#modal-gas-price">Update price</a></div>
+      <div class="gas-stock-stat"><i class="fa-solid fa-tag"></i><span>Selling price</span><strong th:text="${gasDashboard != null ? 'USD ' + #numbers.formatDecimal(gasDashboard.sellingPriceUsd,1,2) + ' /kg' : 'Not set'}">Not set</strong><a th:if="${supervisorUser != true}" href="#modal-gas-price">Update price</a></div>
       <div class="gas-stock-stat warning"><i class="fa-solid fa-triangle-exclamation"></i><span>Reorder at</span><strong th:text="${gasDashboard != null ? #numbers.formatDecimal(gasDashboard.aggregateReorderLevelKg,1,3) + ' kg' : '0 kg'}">0 kg</strong><a href="#modal-gas-restock">Receive stock</a></div>
     </section>
 
     <section class="gas-tanks panel">
-      <div class="gas-section-heading"><div><span class="gas-eyebrow">LIVE INVENTORY</span><h2>Tanks in operation</h2></div><a href="#modal-gas-tank">Manage tanks <i class="fa-solid fa-arrow-right"></i></a></div>
+        <div class="gas-section-heading"><div><span class="gas-eyebrow">LIVE INVENTORY</span><h2>Tanks in operation</h2></div><a th:if="${supervisorUser != true}" href="#modal-gas-tank">Manage tanks <i class="fa-solid fa-arrow-right"></i></a></div>
       <div class="gas-tank-grid">
         <article th:each="t : ${gasTanks}" class="gas-tank-card">
           <div class="gas-cylinder"><i class="fa-solid fa-gas-pump"></i></div>
@@ -78,7 +79,7 @@
               <div><dt>Net LPG</dt><dd th:text="${#numbers.formatDecimal(t.currentKg ?: 0,1,3) + ' kg'}">0 kg</dd></div>
             </dl>
           </div>
-          <a class="gas-tank-edit" th:href="${'#modal-gas-tank-' + t.id}" title="Edit tank"><i class="fa-solid fa-pen"></i></a>
+          <a th:if="${supervisorUser != true}" class="gas-tank-edit" th:href="${'#modal-gas-tank-' + t.id}" title="Edit tank"><i class="fa-solid fa-pen"></i></a>
         </article>
         <div class="empty" th:if="${#lists.isEmpty(gasTanks)}">No LPG tanks configured for this branch.</div>
       </div>
@@ -106,7 +107,7 @@
       </article>
     </section>
 
-    <div id="modal-gas-tank" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" id="modal-gas-tank" class="modal"><div class="modal-content">
       <div class="modal-head"><h2>Add Gas Tank</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/gas/tanks}" class="form-grid gas-tank-weight-form">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
@@ -125,7 +126,7 @@
       </form>
     </div></div>
 
-    <div th:each="t : ${gasTanks}" th:id="${'modal-gas-tank-' + t.id}" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" th:each="t : ${gasTanks}" th:id="${'modal-gas-tank-' + t.id}" class="modal"><div class="modal-content">
       <div class="modal-head"><h2 th:text="${'Edit ' + t.name}">Edit Tank</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{'/shop/gas/tanks/' + ${t.id} + '/update'}" class="form-grid gas-tank-weight-form">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
@@ -144,7 +145,7 @@
       </form>
     </div></div>
 
-    <div id="modal-gas-price" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" id="modal-gas-price" class="modal"><div class="modal-content">
       <div class="modal-head"><h2>Set Gas Price</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/gas/prices}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">
@@ -169,7 +170,7 @@
       </form>
     </div></div>
 
-    <div id="modal-gas-expense" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" id="modal-gas-expense" class="modal"><div class="modal-content">
       <div class="modal-head"><h2>Record Gas Expense</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/gas/expenses}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${gasBranchId}">

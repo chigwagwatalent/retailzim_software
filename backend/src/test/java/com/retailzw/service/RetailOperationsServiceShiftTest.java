@@ -57,7 +57,9 @@ public class RetailOperationsServiceShiftTest {
                 mock(CashDrawerRepository.class),
                 cashSessions,
                 mock(PasswordEncoder.class),
-                mock(CreditAndChangeService.class)
+                mock(CreditAndChangeService.class),
+                mock(CurrencyConversionService.class),
+                mock(WholesalePricingService.class)
         );
     }
 

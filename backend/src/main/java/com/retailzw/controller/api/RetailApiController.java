@@ -11,6 +11,7 @@ import com.retailzw.service.NotificationService;
 import com.retailzw.service.PackageModuleAccessService;
 import com.retailzw.service.ProductImportService;
 import com.retailzw.service.RetailOperationsService;
+import com.retailzw.service.WholesalePricingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -42,6 +43,7 @@ public class RetailApiController {
     private final CreditAndChangeService creditAndChangeService;
     private final ProductImportService productImportService;
     private final PackageModuleAccessService packageModuleAccessService;
+    private final WholesalePricingService wholesalePricingService;
 
     @GetMapping("/me")
     public ApiResponse<Map<String, Object>> me() {
@@ -89,8 +91,9 @@ public class RetailApiController {
     }
 
     @GetMapping("/products/barcode/{barcode}")
-    public ApiResponse<Product> barcode(@PathVariable String barcode) {
-        return ApiResponse.success(products.findByTenantIdAndBarcode(current.tenantId(), barcode).orElseThrow());
+    public ApiResponse<Map<String, Object>> barcode(@PathVariable String barcode) {
+        Product product = products.findByTenantIdAndBarcode(current.tenantId(), barcode).orElseThrow();
+        return ApiResponse.success(branchProductRow(product, activeBranch()));
     }
 
     @PostMapping("/products")
@@ -156,8 +159,9 @@ public class RetailApiController {
     public ApiResponse<?> openChange(@RequestParam(required = false) String search,
                                      @RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "50") int size) {
-        return ApiResponse.success(creditAndChangeService.changeRecords(
-                current.tenantId(), HeldChange.Status.OPEN, blank(search), page, size));
+        return ApiResponse.success(creditAndChangeService.branchChangeRecords(
+                current.tenantId(), activeBranch(), HeldChange.Status.OPEN, blank(search),
+                null, null, page, size));
     }
 
     @PostMapping("/change/{id}/collect")
@@ -303,6 +307,16 @@ public class RetailApiController {
         row.put("quantityReserved", reserved);
         row.put("quantityAvailable", onHand.subtract(reserved));
         row.put("lowStock", product.getReorderLevel() != null && product.getReorderLevel().compareTo(BigDecimal.ZERO) > 0 && onHand.compareTo(product.getReorderLevel()) <= 0);
+        ProductWholesalePricing wholesale = wholesalePricingService
+                .configuration(current.tenantId(), product.getId())
+                .orElse(null);
+        boolean wholesaleEnabled = wholesale != null && Boolean.TRUE.equals(wholesale.getIsEnabled());
+        row.put("wholesaleEnabled", wholesaleEnabled);
+        row.put("wholesaleMinimumQuantity", wholesaleEnabled ? wholesale.getMinimumQuantity() : null);
+        row.put("wholesalePriceUsd", wholesaleEnabled ? wholesale.getPriceUsd() : null);
+        row.put("wholesalePriceZwg", wholesaleEnabled ? wholesale.getPriceZwg() : null);
+        row.put("wholesalePricingVersion", wholesaleEnabled ? wholesale.getVersion() : null);
+        row.put("pricingProtocolVersion", WholesalePricingService.PRICING_PROTOCOL_VERSION);
         return row;
     }
 

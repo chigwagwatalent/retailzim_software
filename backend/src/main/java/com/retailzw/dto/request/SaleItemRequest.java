@@ -17,6 +17,10 @@ public class SaleItemRequest {
 
     private BigDecimal discountAmount;
 
+    private String pricingTier;
+
+    private Long pricingVersion;
+
     public Long getProductId() {
         return productId;
     }
@@ -47,6 +51,22 @@ public class SaleItemRequest {
 
     public void setDiscountAmount(BigDecimal discountAmount) {
         this.discountAmount = discountAmount;
+    }
+
+    public String getPricingTier() {
+        return pricingTier;
+    }
+
+    public void setPricingTier(String pricingTier) {
+        this.pricingTier = pricingTier;
+    }
+
+    public Long getPricingVersion() {
+        return pricingVersion;
+    }
+
+    public void setPricingVersion(Long pricingVersion) {
+        this.pricingVersion = pricingVersion;
     }
 }
 

@@ -123,7 +123,7 @@
                      th:href="${'#modal-collect-gas-change-' + change.id}"
                      title="Pay customer"><i class="fa-solid fa-hand-holding-dollar"></i></a>
                   <button class="icon-button mini disabled" th:if="${currentGasShift == null}" type="button" disabled title="Open a Gas POS shift first"><i class="fa-solid fa-lock"></i></button>
-                  <form method="post" th:action="@{'/shop/gas/change/' + ${change.id} + '/cancel'}">
+                  <form th:if="${supervisorUser != true}" method="post" th:action="@{'/shop/gas/change/' + ${change.id} + '/cancel'}">
                     <input type="hidden" name="branchId" th:value="${gasBranchId}">
                     <button class="icon-button mini danger" type="submit" title="Cancel record"><i class="fa-solid fa-ban"></i></button>
                   </form>

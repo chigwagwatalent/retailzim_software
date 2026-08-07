@@ -27,6 +27,7 @@
       <button class="btn btn-primary" type="submit" form="company-profile-form"><i class="fa-solid fa-floppy-disk"></i>Save Profile</button>
     </div>
     <div th:if="${message}" class="alert" th:text="${message}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
     <section class="company-profile-grid">
       <form id="company-profile-form" method="post" th:action="@{/shop/company}" class="panel company-profile-form">
@@ -42,8 +43,6 @@
           <label>Country<input name="country" th:value="${tenant.country ?: 'Zimbabwe'}"></label>
           <label>Website<input name="website" th:value="${tenant.website}" placeholder="https://example.co.zw"></label>
           <label>Logo URL<input name="logoUrl" th:value="${tenant.logoUrl}" placeholder="https://.../logo.png"></label>
-          <label>Default Currency<select name="defaultCurrency"><option th:each="c : ${currencyCodes}" th:value="${c}" th:text="${c}" th:selected="${c == tenant.defaultCurrency}"></option></select></label>
-          <label>Secondary Currency<select name="secondaryCurrency"><option th:each="c : ${currencyCodes}" th:value="${c}" th:text="${c}" th:selected="${c == tenant.secondaryCurrency}"></option></select></label>
           <label>Default Tax Rate %<input name="defaultTaxRate" type="number" step="0.01" min="0" th:value="${tenant.defaultTaxRate}"></label>
           <label>Subscription Package<input th:value="${tenantPlan != null ? tenantPlan.name + ' - ' + tenantPlan.code : 'No package selected'}" readonly></label>
           <label style="grid-column:1/-1">Address<textarea name="address" th:text="${tenant.address}" placeholder="Street, suburb, city"></textarea></label>
@@ -79,6 +78,94 @@
           </tbody>
         </table>
       </aside>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <div>
+          <p class="eyebrow">Currency &amp; Product Pricing</p>
+          <h2>Shop Exchange Rate</h2>
+          <small>Set the authoritative shop rate used by Spring when product prices are created, edited, or imported.</small>
+        </div>
+        <span th:class="${currentExchangeRate != null ? 'badge status-active' : 'badge'}"
+              th:text="${currentExchangeRate != null ? 'AUTOMATIC CONVERSION ON' : 'MANUAL PRICING'}">MANUAL PRICING</span>
+      </div>
+
+      <form method="post" th:action="@{/shop/company/exchange-rate}" class="form-grid">
+        <label>Base Currency
+          <select name="baseCurrency">
+            <option th:each="c : ${currencyCodes}"
+                    th:value="${c}"
+                    th:text="${c + ' - ' + c.displayName}"
+                    th:selected="${currentExchangeRate != null ? c == currentExchangeRate.baseCurrency : c == tenant.defaultCurrency}"></option>
+          </select>
+        </label>
+        <label>USD to ZWG Rate
+          <input name="usdToZwgRate" type="number" step="0.000001" min="0.000001" max="1000000"
+                 th:value="${currentExchangeRate != null ? currentExchangeRate.usdToZwgRate : null}"
+                 placeholder="Example: 30.000000">
+          <small>Always entered as 1 USD equals this amount in ZWG.</small>
+        </label>
+        <label>Price Decimal Places
+          <select name="priceScale">
+            <option th:each="scale : ${#numbers.sequence(0,4)}"
+                    th:value="${scale}"
+                    th:text="${scale}"
+                    th:selected="${currentExchangeRate != null ? scale == currentExchangeRate.priceScale : scale == 2}"></option>
+          </select>
+        </label>
+        <label>Change Reason
+          <input name="changeReason" maxlength="500" placeholder="Example: Updated daily shop rate">
+        </label>
+        <label class="check-field">
+          <input name="automaticConversionEnabled" type="checkbox" value="true"
+                 th:checked="${currentExchangeRate != null}">
+          <span>Automatically calculate the secondary product price</span>
+        </label>
+        <label class="check-field">
+          <input name="applyToExistingProducts" type="checkbox" value="true" checked>
+          <span>Recalculate all existing products from this base currency</span>
+          <small>Recommended when enabling automatic conversion for an existing catalogue.</small>
+        </label>
+        <div style="grid-column:1/-1">
+          <div class="alert" th:if="${currentExchangeRate != null}">
+            Current quote: <strong th:text="${'1 USD = ' + #numbers.formatDecimal(currentExchangeRate.usdToZwgRate, 1, 6) + ' ZWG'}">1 USD = 0 ZWG</strong>.
+            Automatically priced products will follow a new saved rate. Completed sales remain unchanged.
+          </div>
+          <button class="btn btn-primary" type="submit">
+            <i class="fa-solid fa-arrows-rotate"></i> Save Currency Configuration
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="toolbar">
+        <h2>Exchange Rate Audit History</h2>
+        <span class="badge" th:text="${#lists.size(exchangeRateHistory) + ' changes'}">0 changes</span>
+      </div>
+      <table>
+        <thead>
+        <tr><th>Effective</th><th>Base</th><th>USD to ZWG</th><th>Rounding</th><th>Reason</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="rate : ${exchangeRateHistory}">
+          <td>
+            <strong th:text="${#temporals.format(rate.effectiveFrom, 'dd MMM yyyy HH:mm')}">Date</strong>
+            <small th:if="${rate.effectiveTo != null}" th:text="${'Ended ' + #temporals.format(rate.effectiveTo, 'dd MMM yyyy HH:mm')}">Ended</small>
+          </td>
+          <td th:text="${rate.baseCurrency}">USD</td>
+          <td th:text="${#numbers.formatDecimal(rate.usdToZwgRate, 1, 6)}">0.000000</td>
+          <td th:text="${rate.priceScale + ' decimals'}">2 decimals</td>
+          <td th:text="${rate.changeReason}">Reason</td>
+          <td><span th:class="${rate.isActive ? 'badge status-active' : 'badge'}"
+                    th:text="${rate.isActive ? 'ACTIVE' : 'HISTORICAL'}">ACTIVE</span></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(exchangeRateHistory)}">
+          <td colspan="6">No exchange rate has been configured. Product prices remain manually managed.</td>
+        </tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="panel table-panel">

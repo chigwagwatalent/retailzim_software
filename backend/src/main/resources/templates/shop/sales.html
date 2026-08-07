@@ -144,8 +144,8 @@
               <td>
                 <div class="action-row">
                   <a class="icon-button mini" th:href="${'#modal-sale-' + sale.id}" title="View"><i class="fa-solid fa-eye"></i></a>
-                  <a class="icon-button mini" th:if="${sale.status.name() == 'COMPLETED'}" th:href="${'#modal-return-sale-' + sale.id}" title="Return"><i class="fa-solid fa-rotate-left"></i></a>
-                  <a class="icon-button mini danger" th:if="${sale.status.name() == 'COMPLETED'}" th:href="${'#modal-void-sale-' + sale.id}" title="Void"><i class="fa-solid fa-ban"></i></a>
+                  <a class="icon-button mini" th:if="${supervisorUser != true and sale.status.name() == 'COMPLETED'}" th:href="${'#modal-return-sale-' + sale.id}" title="Return"><i class="fa-solid fa-rotate-left"></i></a>
+                  <a class="icon-button mini danger" th:if="${supervisorUser != true and sale.status.name() == 'COMPLETED'}" th:href="${'#modal-void-sale-' + sale.id}" title="Void"><i class="fa-solid fa-ban"></i></a>
                 </div>
               </td>
             </tr>
@@ -176,7 +176,7 @@
       </div>
     </div></div>
 
-    <div th:each="sale : ${saleList}" th:id="${'modal-return-sale-' + sale.id}" class="modal"><div class="modal-content wide-modal">
+    <div th:if="${supervisorUser != true}" th:each="sale : ${saleList}" th:id="${'modal-return-sale-' + sale.id}" class="modal"><div class="modal-content wide-modal">
       <div class="modal-head"><h2 th:text="${'Return ' + sale.receiptNumber}">Return Sale</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{/shop/returns}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">
@@ -198,7 +198,7 @@
       </form>
     </div></div>
 
-    <div th:each="sale : ${saleList}" th:id="${'modal-void-sale-' + sale.id}" class="modal"><div class="modal-content">
+    <div th:if="${supervisorUser != true}" th:each="sale : ${saleList}" th:id="${'modal-void-sale-' + sale.id}" class="modal"><div class="modal-content">
       <div class="modal-head"><h2 th:text="${'Void ' + sale.receiptNumber}">Void Sale</h2><a class="close" href="#">&times;</a></div>
       <form method="post" th:action="@{'/shop/sales/' + ${sale.id} + '/void'}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">

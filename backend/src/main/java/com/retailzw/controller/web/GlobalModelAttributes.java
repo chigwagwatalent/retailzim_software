@@ -40,6 +40,11 @@ public class GlobalModelAttributes {
             users.findById(shopUser.getUserId())
                     .map(user -> UserMenuDetails.fromShopUser(user, branchLabel(user)))
                     .ifPresent(user -> model.addAttribute("currentUser", user));
+            boolean supervisor = "SUPERVISOR".equals(shopUser.getRoleName());
+            model.addAttribute("supervisorUser", supervisor);
+            model.addAttribute("branchRestrictedUser", supervisor || "CASHIER".equals(shopUser.getRoleName()));
+            model.addAttribute("shopAdministrator",
+                    "SUPER_ADMIN".equals(shopUser.getRoleName()) || "ACCOUNTANT".equals(shopUser.getRoleName()));
             model.addAttribute("unreadNotificationCount", notifications.countByUserIdAndIsReadFalse(shopUser.getUserId()));
             addBillingRenewalToast(model, request, shopUser);
             return;

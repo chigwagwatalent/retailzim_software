@@ -373,7 +373,7 @@ class _CashScreenState extends State<CashScreen> {
     pdf.addPage(
       pw.Page(
         pageFormat: _shiftReportFormat(productTotals.length),
-        margin: pw.EdgeInsets.fromLTRB(
+        margin: const pw.EdgeInsets.fromLTRB(
           _thermalLeftMarginMm * PdfPageFormat.mm,
           _thermalVerticalMarginMm * PdfPageFormat.mm,
           _thermalRightMarginMm * PdfPageFormat.mm,

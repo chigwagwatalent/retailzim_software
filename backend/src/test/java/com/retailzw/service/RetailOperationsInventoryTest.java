@@ -37,7 +37,8 @@ public class RetailOperationsInventoryTest {
         branches = mock(BranchRepository.class);
         service = new RetailOperationsService(
                 products, null, null, inventory, inventoryTransactions, adjustments, branches,
-                mock(TenantEnabledModuleRepository.class), null, null, null, null, null, null, null, null, null, null);
+                mock(TenantEnabledModuleRepository.class), null, null, null, null, null, null, null, null, null, null,
+                mock(CurrencyConversionService.class), mock(WholesalePricingService.class));
     }
 
     @Test

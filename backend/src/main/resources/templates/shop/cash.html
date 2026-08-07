@@ -38,7 +38,7 @@
             <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.name}" th:selected="${b.id == selectedBranchId}">Branch</option>
           </select>
         </form>
-        <a class="btn btn-light" th:href="@{/shop/reports(branchId=${selectedBranchId})}"><i class="fa-regular fa-chart-bar"></i>Open Shift Report</a>
+        <a th:if="${supervisorUser != true}" class="btn btn-light" th:href="@{/shop/reports(branchId=${selectedBranchId})}"><i class="fa-regular fa-chart-bar"></i>Open Shift Report</a>
       </div>
 
       <div th:if="${message}" class="alert" th:text="${message}"></div>
@@ -231,9 +231,9 @@
         <div class="metric-card metric-blue"><span>Total Sales</span><strong th:text="${completedSalesBySession.get(cashSession.id) ?: 0}">0</strong><small>Completed transactions</small></div>
         <div class="metric-card metric-green"><span>Gross Revenue USD</span><strong th:text="${'USD ' + #numbers.formatDecimal(sessionGrossRevenueUsd.get(cashSession.id) ?: 0, 1, 2)}">USD 0.00</strong></div>
         <div class="metric-card metric-orange"><span>Gross Revenue ZWG</span><strong th:text="${'ZWG ' + #numbers.formatDecimal(sessionGrossRevenueZwg.get(cashSession.id) ?: 0, 1, 2)}">ZWG 0.00</strong></div>
-        <div class="metric-card metric-red"><span>Net Profit</span><strong th:text="${'USD ' + #numbers.formatDecimal(sessionGrossProfitUsd.get(cashSession.id) ?: 0, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(sessionGrossProfitZwg.get(cashSession.id) ?: 0, 1, 2)}">ZWG 0.00</small></div>
+        <div th:if="${supervisorUser != true}" class="metric-card metric-red"><span>Net Profit</span><strong th:text="${'USD ' + #numbers.formatDecimal(sessionGrossProfitUsd.get(cashSession.id) ?: 0, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(sessionGrossProfitZwg.get(cashSession.id) ?: 0, 1, 2)}">ZWG 0.00</small></div>
       </section>
-      <section class="metric-grid compact-grid">
+      <section th:if="${supervisorUser != true}" class="metric-grid compact-grid">
         <div class="metric-card metric-blue"><span>Net Revenue USD</span><strong th:text="${'USD ' + #numbers.formatDecimal(sessionNetRevenueUsd.get(cashSession.id) ?: 0, 1, 2)}">USD 0.00</strong></div>
         <div class="metric-card metric-green"><span>Net Revenue ZWG</span><strong th:text="${'ZWG ' + #numbers.formatDecimal(sessionNetRevenueZwg.get(cashSession.id) ?: 0, 1, 2)}">ZWG 0.00</strong></div>
         <div class="metric-card metric-orange"><span>Cost USD</span><strong th:text="${'USD ' + #numbers.formatDecimal(sessionCostUsd.get(cashSession.id) ?: 0, 1, 2)}">USD 0.00</strong></div>
@@ -241,14 +241,14 @@
       </section>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Receipt</th><th>Items</th><th>Currency</th><th>Total</th><th>Gross Profit</th><th>Payments</th><th>Status</th><th>Created</th></tr></thead>
+          <thead><tr><th>Receipt</th><th>Items</th><th>Currency</th><th>Total</th><th th:if="${supervisorUser != true}">Gross Profit</th><th>Payments</th><th>Status</th><th>Created</th></tr></thead>
           <tbody>
           <tr th:each="sale : ${salesBySession.get(cashSession.id)}">
             <td><strong th:text="${sale.receiptNumber}">Receipt</strong><small th:text="${sale.isOfflineSale ? 'Offline synced' : 'Cloud sale'}">Source</small></td>
             <td th:text="${#lists.size(sale.items)}">0</td>
             <td><span class="badge" th:text="${sale.currency}">USD</span></td>
             <td th:text="${#numbers.formatDecimal(sale.grandTotal, 1, 2)}">0.00</td>
-            <td th:text="${#numbers.formatDecimal(sale.grossProfit ?: 0, 1, 2)}">0.00</td>
+            <td th:if="${supervisorUser != true}" th:text="${#numbers.formatDecimal(sale.grossProfit ?: 0, 1, 2)}">0.00</td>
             <td><span class="badge status-active" th:each="payment : ${sessionPaymentsBySale.get(sale.id)}" th:text="${payment}">CASH USD</span></td>
             <td><span th:class="${sale.status.name() == 'COMPLETED' ? 'badge status-active' : (sale.status.name() == 'VOIDED' ? 'badge status-suspended' : 'badge status-pending')}" th:text="${sale.status}">Status</span></td>
             <td th:text="${#temporals.format(sale.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
