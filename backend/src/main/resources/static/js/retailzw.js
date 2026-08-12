@@ -46,9 +46,131 @@ document.addEventListener('DOMContentLoaded', () => {
   setupShiftCloseForms();
   setupGasTankWeightForms();
   setupGasReconciliationForms();
+  setupPurchaseOrderTotals();
   openRequestedModal();
   enhanceForms();
 });
+
+function setupPurchaseOrderTotals() {
+  const money = (currency, value) => `${currency} ${value.toFixed(2)}`;
+  const roundMoney = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
+  const decimal = (value) => {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+  };
+
+  const orderForm = document.querySelector('[data-purchase-order-form]');
+  if (orderForm) {
+    const builder = orderForm.querySelector('.po-line-builder');
+    const currencySelect = orderForm.querySelector('[data-po-currency]');
+
+    const calculateOrder = () => {
+      let subtotalUsd = 0;
+      let taxUsd = 0;
+      let subtotalZwg = 0;
+      const primaryCurrency = currencySelect?.value === 'ZWG' ? 'ZWG' : 'USD';
+
+      builder.querySelectorAll('[data-po-line]').forEach((row) => {
+        const quantity = decimal(row.querySelector('.po-qty')?.value);
+        const costUsd = decimal(row.querySelector('.po-cost-usd')?.value);
+        const costZwg = decimal(row.querySelector('.po-cost-zwg')?.value);
+        const taxRate = decimal(row.querySelector('.po-tax-rate')?.value);
+        const lineSubtotalUsd = roundMoney(quantity * costUsd);
+        const lineTaxUsd = roundMoney(lineSubtotalUsd * taxRate / 100);
+        const lineTotalUsd = lineSubtotalUsd + lineTaxUsd;
+        const lineTotalZwg = roundMoney(quantity * costZwg);
+        subtotalUsd += lineSubtotalUsd;
+        taxUsd += lineTaxUsd;
+        subtotalZwg += lineTotalZwg;
+
+        const primary = row.querySelector('[data-po-line-primary]');
+        const secondary = row.querySelector('[data-po-line-secondary]');
+        if (primaryCurrency === 'USD') {
+          if (primary) primary.textContent = money('USD', lineTotalUsd);
+          if (secondary) secondary.textContent = money('ZWG', lineTotalZwg);
+        } else {
+          if (primary) primary.textContent = money('ZWG', lineTotalZwg);
+          if (secondary) secondary.textContent = money('USD', lineTotalUsd);
+        }
+      });
+
+      const totalUsd = subtotalUsd + taxUsd;
+      const set = (selector, value) => {
+        const output = orderForm.querySelector(selector);
+        if (output) output.textContent = value;
+      };
+      if (primaryCurrency === 'USD') {
+        set('[data-po-subtotal]', money('USD', subtotalUsd));
+        set('[data-po-tax]', money('USD', taxUsd));
+        set('[data-po-total]', money('USD', totalUsd));
+        set('[data-po-secondary-total]', money('ZWG', subtotalZwg));
+      } else {
+        set('[data-po-subtotal]', money('ZWG', subtotalZwg));
+        set('[data-po-tax]', 'ZWG 0.00');
+        set('[data-po-total]', money('ZWG', subtotalZwg));
+        set('[data-po-secondary-total]', money('USD', totalUsd));
+      }
+    };
+
+    orderForm.addEventListener('input', calculateOrder);
+    orderForm.addEventListener('change', calculateOrder);
+    orderForm.querySelector('#po-add-line')?.addEventListener('click', () => {
+      const source = builder.querySelector('[data-po-line]');
+      if (!source) return;
+      const clone = source.cloneNode(true);
+      clone.querySelectorAll('input, select').forEach((field) => {
+        if (field.name === 'quantity') field.value = '1';
+        else if (['unitCostUsd', 'unitCostZwg', 'taxRate'].includes(field.name)) field.value = '0';
+        else field.value = '';
+      });
+      builder.appendChild(clone);
+      calculateOrder();
+    });
+    builder.addEventListener('click', (event) => {
+      const remove = event.target.closest('.po-remove-line');
+      if (!remove) return;
+      const rows = builder.querySelectorAll('[data-po-line]');
+      if (rows.length > 1) {
+        remove.closest('[data-po-line]')?.remove();
+        calculateOrder();
+      }
+    });
+    calculateOrder();
+  }
+
+  document.querySelectorAll('[data-po-receive-form]').forEach((form) => {
+    const calculateReceipt = () => {
+      let quantityTotal = 0;
+      let totalUsd = 0;
+      let totalZwg = 0;
+      form.querySelectorAll('[data-po-receive-line]').forEach((row) => {
+        const quantity = decimal(row.querySelector('.po-receive-qty')?.value);
+        const unitCostUsd = decimal(row.dataset.unitCostUsd);
+        const unitCostZwg = decimal(row.dataset.unitCostZwg);
+        const taxRate = decimal(row.dataset.taxRate);
+        const lineSubtotalUsd = roundMoney(quantity * unitCostUsd);
+        const lineUsd = lineSubtotalUsd + roundMoney(lineSubtotalUsd * taxRate / 100);
+        const lineZwg = roundMoney(quantity * unitCostZwg);
+        quantityTotal += quantity;
+        totalUsd += lineUsd;
+        totalZwg += lineZwg;
+        const usdOutput = row.querySelector('[data-po-receive-line-usd]');
+        const zwgOutput = row.querySelector('[data-po-receive-line-zwg]');
+        if (usdOutput) usdOutput.textContent = money('USD', lineUsd);
+        if (zwgOutput) zwgOutput.textContent = money('ZWG', lineZwg);
+      });
+      const quantityOutput = form.querySelector('[data-po-receive-quantity]');
+      const usdOutput = form.querySelector('[data-po-receive-total-usd]');
+      const zwgOutput = form.querySelector('[data-po-receive-total-zwg]');
+      if (quantityOutput) quantityOutput.textContent = quantityTotal.toFixed(4).replace(/\.?0+$/, '');
+      if (usdOutput) usdOutput.textContent = money('USD', totalUsd);
+      if (zwgOutput) zwgOutput.textContent = money('ZWG', totalZwg);
+    };
+    form.addEventListener('input', calculateReceipt);
+    form.addEventListener('change', calculateReceipt);
+    calculateReceipt();
+  });
+}
 
 function setupBillingRenewalToast() {
   const toast = document.querySelector('[data-billing-renewal-toast]');

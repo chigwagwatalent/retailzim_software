@@ -1,6 +1,7 @@
 package com.retailzw.service;
 
 import com.retailzw.enums.CurrencyCode;
+import com.retailzw.dto.request.CreatePurchaseOrderRequest;
 import com.retailzw.model.*;
 import com.retailzw.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,47 @@ public class PurchaseOrderServiceTest {
                 purchaseOrders, purchaseOrderItems, inventory, inventoryTransactions,
                 goodsReceivedNotes, branches, products, suppliers,
                 mock(NotificationService.class), mock(PurchaseOrderApprovalRepository.class));
+    }
+
+    @Test
+    public void creatingPurchaseOrderCalculatesSavedUsdTaxAndZwgTotals() {
+        Branch branch = Branch.builder().id(3L).tenantId(2L).branchCode("BR1").isActive(true).build();
+        Supplier supplier = Supplier.builder().id(9L).tenantId(2L).name("Main Supplier").isActive(true).build();
+        Product product = Product.builder().id(101L).tenantId(2L).name("Sugar").isActive(true).build();
+        Inventory stock = Inventory.builder().id(33L).tenantId(2L).branchId(3L).productId(101L).build();
+        CreatePurchaseOrderRequest.PoItemRequest line = new CreatePurchaseOrderRequest.PoItemRequest();
+        line.setProductId(101L);
+        line.setQuantity(new BigDecimal("3"));
+        line.setUnitCostUsd(new BigDecimal("2.50"));
+        line.setUnitCostZwg(new BigDecimal("75"));
+        line.setTaxRate(new BigDecimal("15"));
+        CreatePurchaseOrderRequest request = new CreatePurchaseOrderRequest();
+        request.setSupplierId(9L);
+        request.setCurrency(CurrencyCode.USD);
+        request.setItems(List.of(line));
+
+        when(branches.findById(3L)).thenReturn(Optional.of(branch));
+        when(suppliers.findById(9L)).thenReturn(Optional.of(supplier));
+        when(products.findById(101L)).thenReturn(Optional.of(product));
+        when(inventory.findByTenantIdAndBranchIdAndProductId(2L, 3L, 101L)).thenReturn(Optional.of(stock));
+        when(purchaseOrders.save(any())).thenAnswer(invocation -> {
+            PurchaseOrder value = invocation.getArgument(0);
+            if (value.getId() == null) value.setId(7L);
+            return value;
+        });
+        when(purchaseOrderItems.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        PurchaseOrder result = service.createPurchaseOrder(2L, 3L, 4L, request);
+
+        assertThat(result.getSubtotalUsd()).isEqualByComparingTo("7.50");
+        assertThat(result.getTaxAmountUsd()).isEqualByComparingTo("1.13");
+        assertThat(result.getTotalUsd()).isEqualByComparingTo("8.63");
+        assertThat(result.getSubtotalZwg()).isEqualByComparingTo("225.00");
+        assertThat(result.getTotalZwg()).isEqualByComparingTo("225.00");
+        ArgumentCaptor<PurchaseOrderItem> savedLine = ArgumentCaptor.forClass(PurchaseOrderItem.class);
+        verify(purchaseOrderItems).save(savedLine.capture());
+        assertThat(savedLine.getValue().getLineTotalUsd()).isEqualByComparingTo("8.63");
+        assertThat(savedLine.getValue().getLineTotalZwg()).isEqualByComparingTo("225.00");
     }
 
     @Test
