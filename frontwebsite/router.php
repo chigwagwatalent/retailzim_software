@@ -1,4 +1,10 @@
 <?php
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$staticPath = realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, $requestPath));
+if ($requestPath !== '/' && $staticPath !== false && is_file($staticPath) && str_starts_with($staticPath, __DIR__)) {
+    return false;
+}
+
 $routes = [
     '' => 'index.php',
     'home' => 'index.php',
@@ -12,13 +18,14 @@ $routes = [
     'analytics' => 'analytics.php',
     'community-post' => 'community-post.php',
     'community-engage' => 'community-engage.php',
+    'community-comment' => 'community-comment.php',
     'track' => 'track.php',
     'api/community/posts' => 'api-community-posts.php',
     'api/community/answer' => 'api-community-answer.php',
     'api/visits/stats' => 'api-visit-stats.php',
 ];
 
-$path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$path = $requestPath;
 $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
 if ($base !== '' && $base !== '/' && strpos($path, $base) === 0) {
     $path = substr($path, strlen($base));

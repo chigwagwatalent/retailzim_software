@@ -1,0 +1,274 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-07-28 23:58:29.413 INFO  [main] com.retailzw.RetailSaasApplication - Starting RetailSaasApplication v1.0.0 using Java 17.0.11 with PID 23896 (C:\Users\talen\Desktop\JAVA PROJECTS\retailzim_software\backend\target\retail-saas-backend-1.0.0-exec.jar started by talen in C:\Users\talen\Desktop\JAVA PROJECTS\retailzim_software\backend)
+2026-07-28 23:58:29.417 INFO  [main] com.retailzw.RetailSaasApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-28 23:58:33.032 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-28 23:58:33.636 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 589 ms. Found 67 JPA repository interfaces.
+2026-07-28 23:58:37.198 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-28 23:58:37.213 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-28 23:58:37.213 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-07-28 23:58:37.320 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-28 23:58:37.321 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 7766 ms
+2026-07-28 23:58:38.490 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-07-28 23:58:38.888 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@5600a278
+2026-07-28 23:58:38.894 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-07-28 23:58:39.162 INFO  [main] o.f.c.i.license.VersionPrinter - Flyway Community Edition 9.22.3 by Redgate
+2026-07-28 23:58:39.163 INFO  [main] o.f.c.i.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2026-07-28 23:58:39.163 INFO  [main] o.f.c.i.license.VersionPrinter - 
+2026-07-28 23:58:39.210 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/retail_zw (MySQL 8.0)
+2026-07-28 23:58:39.303 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 42 migrations (execution time 00:00.066s)
+2026-07-28 23:58:39.323 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema `retail_zw`: 42
+2026-07-28 23:58:39.329 INFO  [main] o.f.core.internal.command.DbMigrate - Schema `retail_zw` is up to date. No migration necessary.
+2026-07-28 23:58:39.544 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-28 23:58:39.681 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-07-28 23:58:39.769 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-07-28 23:58:40.300 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-28 23:58:40.427 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-28 23:58:45.709 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-28 23:58:46.388 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-28 23:58:47.308 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-28 23:58:52.994 INFO  [main] com.retailzw.service.EmailService - SMTP configured host=mail.retailzw.co.zw port=587 support=support@retailzw.co.zw billing=sales@retailzw.co.zw notifications=info@retailzw.co.zw
+2026-07-28 23:59:05.398 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-07-28 23:59:11.841 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-07-28 23:59:11.890 INFO  [main] com.retailzw.RetailSaasApplication - Started RetailSaasApplication in 43.619 seconds (process running for 44.434)
+2026-07-28 23:59:24.000 INFO  [http-nio-0.0.0.0-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-28 23:59:24.002 INFO  [http-nio-0.0.0.0-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-28 23:59:24.005 INFO  [http-nio-0.0.0.0-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-07-28 23:59:24.554 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (506 ms) client=0:0:0:0:0:0:0:1 requestId=6c58c699
+2026-07-28 23:59:25.447 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (188 ms) client=0:0:0:0:0:0:0:1 requestId=d302b6c7
+2026-07-28 23:59:25.689 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /admin/subscriptions -> 200 (200 ms) client=0:0:0:0:0:0:0:1 requestId=1b705fde
+2026-07-28 23:59:25.902 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (188 ms) client=0:0:0:0:0:0:0:1 requestId=3197c617
+2026-07-28 23:59:57.019 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (13 ms) client=192.168.1.220 requestId=8ef3cbb0
+2026-07-29 00:00:04.767 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (5 ms) client=192.168.1.220 requestId=4c01f70c
+2026-07-29 00:00:11.267 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (2 ms) client=0:0:0:0:0:0:0:1 requestId=d6dd3635
+2026-07-29 00:00:11.646 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (31 ms) client=0:0:0:0:0:0:0:1 requestId=8238e4fc
+2026-07-29 00:00:11.737 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (55 ms) client=0:0:0:0:0:0:0:1 requestId=3b1ffdc3
+2026-07-29 00:00:17.087 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (24 ms) client=192.168.1.220 requestId=b0d9873b
+2026-07-29 00:00:21.374 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (2 ms) client=0:0:0:0:0:0:0:1 requestId=272209de
+2026-07-29 00:00:21.732 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (24 ms) client=0:0:0:0:0:0:0:1 requestId=73f8407f
+2026-07-29 00:00:21.826 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (56 ms) client=0:0:0:0:0:0:0:1 requestId=38e3fb2b
+2026-07-29 00:00:25.109 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (33 ms) client=192.168.1.220 requestId=7533152b
+2026-07-29 00:00:27.538 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (83 ms) client=192.168.1.220 requestId=fa696ca2
+2026-07-29 00:00:33.770 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (2 ms) client=0:0:0:0:0:0:0:1 requestId=1096e410
+2026-07-29 00:00:34.143 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (27 ms) client=0:0:0:0:0:0:0:1 requestId=b7a98a4b
+2026-07-29 00:00:34.222 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (49 ms) client=0:0:0:0:0:0:0:1 requestId=e7fd1d7c
+2026-07-29 00:00:44.630 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP POST /admin/tenants/4/billing-period -> 302 (94 ms) client=192.168.1.220 requestId=518c4ea2
+2026-07-29 00:00:44.727 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (61 ms) client=192.168.1.220 requestId=55f2e2c7
+2026-07-29 00:00:46.020 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (2 ms) client=0:0:0:0:0:0:0:1 requestId=b22bd147
+2026-07-29 00:00:46.388 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (23 ms) client=0:0:0:0:0:0:0:1 requestId=00d31c46
+2026-07-29 00:00:46.454 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (39 ms) client=0:0:0:0:0:0:0:1 requestId=a18b63e9
+2026-07-29 00:00:57.536 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (1 ms) client=0:0:0:0:0:0:0:1 requestId=0a9b86b1
+2026-07-29 00:00:57.964 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=98cb87d2
+2026-07-29 00:00:58.060 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (68 ms) client=0:0:0:0:0:0:0:1 requestId=3fdb16b3
+2026-07-29 00:00:58.094 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP POST /admin/tenants/4/billing-period -> 302 (9 ms) client=0:0:0:0:0:0:0:1 requestId=1b76f7a8
+2026-07-29 00:00:58.564 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.service.EmailService - Email sent from=support@retailzw.co.zw to=chigwagwatalent@gmail.com subject=RetailZW account activated
+2026-07-29 00:00:58.565 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP POST /admin/tenants/4/activate -> 302 (8713 ms) client=192.168.1.220 requestId=9ab4142f
+2026-07-29 00:00:58.882 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (303 ms) client=192.168.1.220 requestId=a15cbfc6
+2026-07-29 00:01:01.293 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (100 ms) client=192.168.1.220 requestId=e101a810
+2026-07-29 00:01:02.532 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /admin/subscriptions -> 200 (60 ms) client=192.168.1.220 requestId=927d4cfb
+2026-07-29 00:01:08.694 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (1 ms) client=0:0:0:0:0:0:0:1 requestId=c84719e9
+2026-07-29 00:01:09.076 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /admin/dashboard -> 200 (33 ms) client=0:0:0:0:0:0:0:1 requestId=e62d8b52
+2026-07-29 00:01:09.154 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (42 ms) client=0:0:0:0:0:0:0:1 requestId=d6b45c66
+2026-07-29 00:01:09.214 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP POST /admin/tenants/4/billing-period -> 302 (19 ms) client=0:0:0:0:0:0:0:1 requestId=07398931
+2026-07-29 00:01:09.269 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (52 ms) client=0:0:0:0:0:0:0:1 requestId=7a2452e9
+2026-07-29 00:01:13.820 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (86 ms) client=192.168.1.220 requestId=21fb4d9b
+2026-07-29 00:01:20.756 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (8 ms) client=0:0:0:0:0:0:0:1 requestId=7d605b52
+2026-07-29 00:01:27.376 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (173 ms) client=0:0:0:0:0:0:0:1 requestId=2795d0b7
+2026-07-29 00:01:33.736 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew -> 200 (142 ms) client=0:0:0:0:0:0:0:1 requestId=6f19e131
+2026-07-29 00:01:51.059 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (92 ms) client=192.168.1.220 requestId=9bca7c2f
+2026-07-29 00:02:27.965 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (97 ms) client=192.168.1.220 requestId=9b83c5bf
+2026-07-29 00:02:35.578 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/gas -> 302 (12 ms) client=0:0:0:0:0:0:0:1 requestId=0ce28e7a
+2026-07-29 00:02:35.644 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (62 ms) client=0:0:0:0:0:0:0:1 requestId=1455d5d9
+2026-07-29 00:02:37.142 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (58 ms) client=0:0:0:0:0:0:0:1 requestId=c1b0f1be
+2026-07-29 00:02:38.472 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (61 ms) client=0:0:0:0:0:0:0:1 requestId=2b01c5a9
+2026-07-29 00:03:25.272 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/gas -> 302 (9 ms) client=0:0:0:0:0:0:0:1 requestId=ee01d564
+2026-07-29 00:03:25.340 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (62 ms) client=0:0:0:0:0:0:0:1 requestId=e28179c1
+2026-07-29 00:08:24.532 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (58 ms) client=0:0:0:0:0:0:0:1 requestId=c32e4139
+2026-07-29 00:08:25.670 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (65 ms) client=0:0:0:0:0:0:0:1 requestId=5406a693
+2026-07-29 00:08:26.407 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (52 ms) client=0:0:0:0:0:0:0:1 requestId=d90b3062
+2026-07-29 00:10:25.347 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew -> 200 (44 ms) client=0:0:0:0:0:0:0:1 requestId=7caef37e
+2026-07-29 00:10:28.518 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP POST /shop/billing/renew -> 302 (94 ms) client=0:0:0:0:0:0:0:1 requestId=1194b017
+2026-07-29 00:10:28.633 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785276628445AE6347337E2B -> 200 (56 ms) client=0:0:0:0:0:0:0:1 requestId=db28670f
+2026-07-29 00:10:45.255 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP POST /shop/billing/renew/RZW41785276628445AE6347337E2B/initiate -> 302 (2431 ms) client=0:0:0:0:0:0:0:1 requestId=5a921bf0
+2026-07-29 00:10:45.293 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785276628445AE6347337E2B -> 200 (34 ms) client=0:0:0:0:0:0:0:1 requestId=512efbb6
+2026-07-29 00:10:47.830 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785276628445AE6347337E2B/status -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=3b378d2e
+2026-07-29 00:10:52.862 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785276628445AE6347337E2B/status -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=b68d48a6
+2026-07-29 00:10:57.878 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785276628445AE6347337E2B/status -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=cf7af336
+2026-07-29 00:10:59.287 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (56 ms) client=0:0:0:0:0:0:0:1 requestId=256a60e6
+2026-07-29 00:11:58.341 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (56 ms) client=0:0:0:0:0:0:0:1 requestId=a2c8a941
+2026-07-29 00:11:59.335 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (74 ms) client=0:0:0:0:0:0:0:1 requestId=bbe71c6d
+2026-07-29 00:13:09.750 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (1 ms) client=0:0:0:0:0:0:0:1 requestId=be8ec09a
+2026-07-29 00:13:22.610 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=8ecd0c73
+2026-07-29 00:13:31.636 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/dashboard -> 302 (5 ms) client=0:0:0:0:0:0:0:1 requestId=3215630a
+2026-07-29 00:13:31.694 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (50 ms) client=0:0:0:0:0:0:0:1 requestId=e3b3e57c
+2026-07-29 00:13:34.132 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (3 ms) client=0:0:0:0:0:0:0:1 requestId=5832fb30
+2026-07-29 00:14:00.205 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=5738eada
+2026-07-29 00:14:32.063 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /admin/tenants -> 200 (39 ms) client=192.168.1.220 requestId=e61974ee
+2026-07-29 00:14:34.800 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /admin/accounting -> 200 (169 ms) client=192.168.1.220 requestId=0f85b3d5
+2026-07-29 00:14:35.317 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /admin/subscriptions -> 200 (164 ms) client=192.168.1.220 requestId=ca057135
+2026-07-29 00:14:51.741 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP POST /admin/packages/4/edit -> 302 (44 ms) client=192.168.1.220 requestId=ab24da72
+2026-07-29 00:14:51.759 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /admin/subscriptions -> 200 (14 ms) client=192.168.1.220 requestId=4b20abbe
+2026-07-29 00:14:59.933 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/dashboard -> 302 (4 ms) client=0:0:0:0:0:0:0:1 requestId=021747be
+2026-07-29 00:14:59.978 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (41 ms) client=0:0:0:0:0:0:0:1 requestId=ec574a82
+2026-07-29 00:15:03.068 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew -> 200 (47 ms) client=0:0:0:0:0:0:0:1 requestId=4c243d96
+2026-07-29 00:15:11.394 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew -> 200 (45 ms) client=0:0:0:0:0:0:0:1 requestId=8f7dbdb5
+2026-07-29 00:15:13.529 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP POST /shop/billing/renew -> 302 (18 ms) client=0:0:0:0:0:0:0:1 requestId=2ef50fcb
+2026-07-29 00:15:13.570 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4 -> 200 (36 ms) client=0:0:0:0:0:0:0:1 requestId=94c16476
+2026-07-29 00:15:20.660 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP POST /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/initiate -> 302 (4658 ms) client=0:0:0:0:0:0:0:1 requestId=155f6ead
+2026-07-29 00:15:20.696 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4 -> 200 (29 ms) client=0:0:0:0:0:0:0:1 requestId=e2d6cfdb
+2026-07-29 00:15:23.228 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=f9228349
+2026-07-29 00:15:28.253 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=cdf0a50e
+2026-07-29 00:15:33.271 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=0cb72f02
+2026-07-29 00:15:38.290 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=5759f8a0
+2026-07-29 00:15:43.306 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=bceb4bb1
+2026-07-29 00:15:48.325 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=33ddbd9a
+2026-07-29 00:15:53.339 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (9 ms) client=0:0:0:0:0:0:0:1 requestId=068597f7
+2026-07-29 00:15:58.360 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=f0c4a8f2
+2026-07-29 00:16:03.377 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=42394e6a
+2026-07-29 00:16:03.433 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4 -> 200 (41 ms) client=0:0:0:0:0:0:0:1 requestId=2748041d
+2026-07-29 00:16:11.868 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP POST /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/initiate -> 302 (1036 ms) client=0:0:0:0:0:0:0:1 requestId=569249f7
+2026-07-29 00:16:11.904 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4 -> 200 (31 ms) client=0:0:0:0:0:0:0:1 requestId=d9777382
+2026-07-29 00:16:14.440 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=66e38d8f
+2026-07-29 00:16:19.460 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=10694749
+2026-07-29 00:16:24.484 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=a52ff343
+2026-07-29 00:16:24.567 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4 -> 200 (68 ms) client=0:0:0:0:0:0:0:1 requestId=a2087ab6
+2026-07-29 00:16:47.030 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP POST /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/initiate -> 302 (1061 ms) client=0:0:0:0:0:0:0:1 requestId=83b54c74
+2026-07-29 00:16:47.064 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4 -> 200 (29 ms) client=0:0:0:0:0:0:0:1 requestId=24e569e1
+2026-07-29 00:16:49.620 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=a259f5d8
+2026-07-29 00:16:54.639 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=15c68109
+2026-07-29 00:16:59.656 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4/status -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=707f154d
+2026-07-29 00:16:59.707 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW417852769135206B2B9DD0F4A4 -> 200 (41 ms) client=0:0:0:0:0:0:0:1 requestId=6a745725
+2026-07-29 00:18:37.696 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (48 ms) client=0:0:0:0:0:0:0:1 requestId=5f57c05f
+2026-07-29 00:18:41.342 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew -> 200 (39 ms) client=0:0:0:0:0:0:0:1 requestId=b879c52a
+2026-07-29 00:18:44.049 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP POST /shop/billing/renew -> 302 (19 ms) client=0:0:0:0:0:0:0:1 requestId=94f70363
+2026-07-29 00:18:44.099 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B -> 200 (47 ms) client=0:0:0:0:0:0:0:1 requestId=8f0968b1
+2026-07-29 00:18:49.058 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP POST /shop/billing/renew/RZW41785277124043062FC27E9B4B/initiate -> 302 (2133 ms) client=0:0:0:0:0:0:0:1 requestId=ac70b594
+2026-07-29 00:18:49.095 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B -> 200 (32 ms) client=0:0:0:0:0:0:0:1 requestId=2b3059cb
+2026-07-29 00:18:51.629 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=e1c8306e
+2026-07-29 00:18:56.648 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=822f8e07
+2026-07-29 00:19:01.668 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (9 ms) client=0:0:0:0:0:0:0:1 requestId=7afec743
+2026-07-29 00:19:06.688 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=90f2d39e
+2026-07-29 00:19:11.716 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=25ebdf0f
+2026-07-29 00:19:16.743 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=01d9c862
+2026-07-29 00:19:22.369 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=414a5619
+2026-07-29 00:19:24.115 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /admin/website-community -> 200 (1404 ms) client=192.168.1.220 requestId=0b0b601d
+2026-07-29 00:19:27.455 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=bcfde736
+2026-07-29 00:19:32.488 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing/renew/RZW41785277124043062FC27E9B4B/status -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=82e3ee52
+2026-07-29 00:19:32.580 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/billing -> 200 (75 ms) client=0:0:0:0:0:0:0:1 requestId=ced5aa0b
+2026-07-29 00:19:32.638 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (32 ms) client=0:0:0:0:0:0:0:1 requestId=dca340d0
+2026-07-29 00:19:36.123 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=c7ea671f
+2026-07-29 00:19:39.640 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (38 ms) client=0:0:0:0:0:0:0:1 requestId=d7bcfdc0
+2026-07-29 00:19:41.170 WARN  [http-nio-0.0.0.0-8080-exec-1] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-07-29 00:19:41.297 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/users -> 200 (319 ms) client=0:0:0:0:0:0:0:1 requestId=2728c6e9
+2026-07-29 00:19:41.470 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (42 ms) client=0:0:0:0:0:0:0:1 requestId=a2bd2d59
+2026-07-29 00:19:44.863 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (25 ms) client=0:0:0:0:0:0:0:1 requestId=e323b23f
+2026-07-29 00:19:48.367 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=bc265fb9
+2026-07-29 00:19:49.590 INFO  [scheduling-1] com.retailzw.service.EmailService - Email sent from=sales@retailzw.co.zw to=chigwagwatalent@gmail.com subject=RetailZW payment confirmed - INV-RZW41785277124043062FC27E9B4B
+2026-07-29 00:19:51.866 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=1a3dd07b
+2026-07-29 00:19:55.362 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=0ed9cea3
+2026-07-29 00:19:58.859 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=1ec4de75
+2026-07-29 00:20:02.368 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=bdea03af
+2026-07-29 00:20:05.873 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (23 ms) client=0:0:0:0:0:0:0:1 requestId=f3c097e7
+2026-07-29 00:20:09.371 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=44d9218d
+2026-07-29 00:20:12.862 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=49c051b7
+2026-07-29 00:20:16.364 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (27 ms) client=0:0:0:0:0:0:0:1 requestId=815fd185
+2026-07-29 00:20:18.048 WARN  [http-nio-0.0.0.0-8080-exec-10] o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1062, SQLState: 23000
+2026-07-29 00:20:18.048 ERROR [http-nio-0.0.0.0-8080-exec-10] o.h.e.jdbc.spi.SqlExceptionHelper - Duplicate entry '4-talent@gmail.com' for key 'users.uk_email_tenant'
+2026-07-29 00:20:18.069 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP POST /shop/users -> 302 (588 ms) client=0:0:0:0:0:0:0:1 requestId=e634a7af
+2026-07-29 00:20:18.148 WARN  [http-nio-0.0.0.0-8080-exec-3] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-07-29 00:20:18.174 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/users -> 200 (98 ms) client=0:0:0:0:0:0:0:1 requestId=a9e2a83a
+2026-07-29 00:20:18.264 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (38 ms) client=0:0:0:0:0:0:0:1 requestId=fac637eb
+2026-07-29 00:20:21.725 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=ca723fba
+2026-07-29 00:20:25.217 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=eafd3e8a
+2026-07-29 00:20:28.720 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=f3a1f657
+2026-07-29 00:20:32.230 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=55b0ef9f
+2026-07-29 00:20:35.720 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=0bc4773c
+2026-07-29 00:20:39.226 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=8af767c4
+2026-07-29 00:20:42.721 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=3b3a02d6
+2026-07-29 00:20:46.220 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=d93739e9
+2026-07-29 00:20:49.722 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=1182e055
+2026-07-29 00:20:53.222 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=827a9e46
+2026-07-29 00:20:56.723 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=035eeb7c
+2026-07-29 00:21:00.223 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=97b9c206
+2026-07-29 00:21:03.726 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=d8868c31
+2026-07-29 00:21:07.224 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=1b1aed56
+2026-07-29 00:21:10.721 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=9f0d4afd
+2026-07-29 00:21:14.219 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=6de83af7
+2026-07-29 00:21:17.731 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=0e57558c
+2026-07-29 00:21:21.223 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=c5bc67b8
+2026-07-29 00:21:24.725 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=09589c28
+2026-07-29 00:21:28.215 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=5e7f5ab3
+2026-07-29 00:21:31.729 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=4d031761
+2026-07-29 00:21:35.224 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=d5fed661
+2026-07-29 00:21:38.749 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (32 ms) client=0:0:0:0:0:0:0:1 requestId=4f7e6446
+2026-07-29 00:21:42.230 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=fbfffbc4
+2026-07-29 00:21:45.733 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (24 ms) client=0:0:0:0:0:0:0:1 requestId=70cf0561
+2026-07-29 00:21:49.217 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=e24b2d34
+2026-07-29 00:21:52.714 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=77168772
+2026-07-29 00:21:56.217 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=ec8d8d2f
+2026-07-29 00:21:59.720 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=b006b0f9
+2026-07-29 00:22:03.222 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=3de4383d
+2026-07-29 00:22:06.716 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=226abbfc
+2026-07-29 00:22:10.219 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=f0455520
+2026-07-29 00:22:13.802 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (44 ms) client=0:0:0:0:0:0:0:1 requestId=afa28719
+2026-07-29 00:22:17.218 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=382771e3
+2026-07-29 00:22:20.722 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=08a26881
+2026-07-29 00:22:24.223 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=3b38178a
+2026-07-29 00:22:27.729 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=2a7ae76e
+2026-07-29 00:22:31.228 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=6a060a0d
+2026-07-29 00:22:34.723 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=e538699a
+2026-07-29 00:22:38.296 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (84 ms) client=0:0:0:0:0:0:0:1 requestId=4e2c739f
+2026-07-29 00:22:41.729 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=bdfd1053
+2026-07-29 00:22:45.231 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=08aef121
+2026-07-29 00:22:48.720 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=db063f35
+2026-07-29 00:22:52.219 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=666f4d0e
+2026-07-29 00:22:55.742 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=e420a935
+2026-07-29 00:22:59.225 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=0e44ad3f
+2026-07-29 00:23:02.760 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (55 ms) client=0:0:0:0:0:0:0:1 requestId=179d7f79
+2026-07-29 00:23:06.223 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=e4a7d9b4
+2026-07-29 00:23:09.726 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=1aa457fe
+2026-07-29 00:23:13.225 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=ae872820
+2026-07-29 00:23:16.723 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=7f5f371a
+2026-07-29 00:23:16.830 WARN  [http-nio-0.0.0.0-8080-exec-8] c.r.c.api.ApiExceptionHandler - API request rejected: Only cashier accounts can sign in on the mobile app.
+2026-07-29 00:23:16.845 WARN  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP POST /api/auth/mobile-login -> 400 (537 ms) client=192.168.1.113 requestId=3227cd7a
+2026-07-29 00:23:20.223 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=78b6bbb8
+2026-07-29 00:23:23.734 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (23 ms) client=0:0:0:0:0:0:0:1 requestId=22d37c3d
+2026-07-29 00:23:27.216 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=557f2cb9
+2026-07-29 00:23:30.723 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=079184a8
+2026-07-29 00:23:33.870 WARN  [http-nio-0.0.0.0-8080-exec-5] c.r.c.api.ApiExceptionHandler - API request rejected: Only cashier accounts can sign in on the mobile app.
+2026-07-29 00:23:33.872 WARN  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP POST /api/auth/mobile-login -> 400 (301 ms) client=192.168.1.113 requestId=81541ac7
+2026-07-29 00:23:34.220 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=ba705141
+2026-07-29 00:23:37.722 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=40687022
+2026-07-29 00:23:41.222 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=54fd1b74
+2026-07-29 00:23:43.064 WARN  [http-nio-0.0.0.0-8080-exec-10] c.r.c.api.ApiExceptionHandler - API request rejected: Invalid username or password.
+2026-07-29 00:23:43.066 WARN  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP POST /api/auth/mobile-login -> 400 (5 ms) client=192.168.1.113 requestId=64656e53
+2026-07-29 00:23:44.718 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=654c7386
+2026-07-29 00:23:48.218 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=e5702728
+2026-07-29 00:23:51.723 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=960316cb
+2026-07-29 00:23:55.219 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=2bf90de6
+2026-07-29 00:24:01.375 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=e99d7d09
+2026-07-29 00:24:02.380 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=2a1401a1
+2026-07-29 00:24:06.392 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=1d61dca5
+2026-07-29 00:24:09.383 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=a8d808a6
+2026-07-29 00:24:13.376 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=d99ff247
+2026-07-29 00:24:16.386 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=b4e23251
+2026-07-29 00:24:20.375 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=9f77f855
+2026-07-29 00:24:23.371 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=7583a9e5
+2026-07-29 00:24:27.376 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=75eaed67
+2026-07-29 00:24:30.385 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=abbbc27b
+2026-07-29 00:24:34.381 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=e9acee2d
+2026-07-29 00:24:37.377 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=9e42a798
+2026-07-29 00:24:41.381 INFO  [http-nio-0.0.0.0-8080-exec-9] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=4c01dc7b
+2026-07-29 00:24:44.375 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=0270095e
+2026-07-29 00:24:48.729 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=ecac6fac
+2026-07-29 00:24:51.447 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=cb6fec75
+2026-07-29 00:25:10.973 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=e9e389e1
+2026-07-29 00:25:44.952 INFO  [http-nio-0.0.0.0-8080-exec-3] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (33 ms) client=0:0:0:0:0:0:0:1 requestId=98948bde
+2026-07-29 00:26:40.385 INFO  [http-nio-0.0.0.0-8080-exec-7] c.r.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=0206d644

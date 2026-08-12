@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../providers/app_provider.dart';
 import '../../services/api_service.dart';
-import '../../widgets/brand_mark.dart';
 import '../../widgets/common_widgets.dart';
 import '../home_screen.dart';
 
@@ -119,19 +118,17 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const RetailZwMark(size: 68),
-                        const SizedBox(height: 24),
-                        const Text(
-                          'RetailZW',
-                          style: TextStyle(
-                            color: AppColors.textDark,
-                            fontSize: 38,
-                            height: 1,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0,
+                        Semantics(
+                          label: 'RetailZW',
+                          image: true,
+                          child: Image.asset(
+                            'assets/images/retailzw_logo.png',
+                            width: 260,
+                            height: 98,
+                            fit: BoxFit.contain,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         Text(
                           'Clean POS access for today\'s shift.',
                           textAlign: TextAlign.center,

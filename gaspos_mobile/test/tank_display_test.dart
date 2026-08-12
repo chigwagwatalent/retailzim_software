@@ -5,6 +5,32 @@ import 'package:gaspos_retailzw/main.dart';
 import 'package:gaspos_retailzw/models.dart';
 
 void main() {
+  testWidgets('signed-in shell displays the captured cashier name',
+      (tester) async {
+    final state = GasPosState()
+      ..user = const GasUser(
+        token: 'token',
+        tenantId: 7,
+        branchId: 11,
+        branchName: 'Harare Gas',
+        displayName: 'Tendai Moyo',
+        companyName: 'Retail Zim',
+        username: 'tendai',
+      )
+      ..data = GasBootstrap(
+        tanks: [],
+        shiftTanks: const [],
+        prices: const {'USD': 2},
+        sales: [],
+        heldChange: [],
+      );
+
+    await tester.pumpWidget(MaterialApp(home: GasShell(state: state)));
+
+    expect(find.text('Harare Gas  •  Tendai Moyo'), findsOneWidget);
+    expect(find.byTooltip('Cashier account: Tendai Moyo'), findsOneWidget);
+  });
+
   testWidgets('configured branch tanks are visible before opening a shift',
       (tester) async {
     var openedShiftSetup = false;

@@ -2,6 +2,43 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gaspos_retailzw/models.dart';
 
 void main() {
+  test('cashier identity captures username and survives local persistence', () {
+    final user = GasUser.fromLogin({
+      'accessToken': 'signed-token',
+      'tenantId': 7,
+      'branchId': 11,
+      'branchName': 'Harare Gas',
+      'branchModule': 'GAS_MODULE',
+      'username': 'tendai',
+      'firstName': 'Tendai',
+      'lastName': 'Moyo',
+      'companyName': 'Retail Zim',
+    });
+
+    expect(user.username, 'tendai');
+    expect(user.cashierName, 'Tendai Moyo');
+
+    final restored = GasUser.fromJson(user.toJson());
+    expect(restored.username, 'tendai');
+    expect(restored.cashierName, 'Tendai Moyo');
+  });
+
+  test('cashier username is used when the profile name is blank', () {
+    final user = GasUser.fromLogin({
+      'accessToken': 'signed-token',
+      'tenantId': 7,
+      'branchId': 11,
+      'branchName': 'Harare Gas',
+      'branchModule': 'GAS_MODULE',
+      'username': 'cashier-one',
+      'firstName': '',
+      'lastName': '',
+    });
+
+    expect(user.displayName, 'cashier-one');
+    expect(user.cashierName, 'cashier-one');
+  });
+
   test('gas bootstrap preserves tare, net and gross stock evidence', () {
     final bootstrap = GasBootstrap.fromJson({
       'tanks': [

@@ -1,0 +1,1878 @@
+[Sun Aug  9 11:35:22 2026] PHP 8.2.22 Development Server (http://127.0.0.1:8090) started
+[Sun Aug  9 11:35:31 2026] 127.0.0.1:65416 Accepted
+[Sun Aug  9 11:35:31 2026] Retail Zim database connection failed: SQLSTATE[HY000] [1049] Unknown database 'connecte_retail_comunity'
+[Sun Aug  9 11:35:31 2026] 127.0.0.1:65416 Closing
+[Sun Aug  9 11:36:19 2026] 127.0.0.1:51800 Accepted
+[Sun Aug  9 11:36:19 2026] 127.0.0.1:51800 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:60582 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:60582 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:53090 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:59787 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:53090 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:61403 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:59787 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:56956 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:61403 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:52544 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:56956 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:53196 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:52544 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:60937 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:53196 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:60937 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:57384 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:57384 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:58548 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:58548 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:52263 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:52263 Closing
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:60731 Accepted
+[Sun Aug  9 11:37:02 2026] 127.0.0.1:55386 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:60731 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:60584 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:55386 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:54605 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:60584 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:59722 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:54605 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:59722 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:64887 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:64887 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:63106 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:54311 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:63106 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:51024 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:54311 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:51858 Accepted
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:51024 Closing
+[Sun Aug  9 11:37:03 2026] 127.0.0.1:51858 Closing
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:60523 Accepted
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:60523 Closing
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:50948 Accepted
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:50948 Closing
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:55506 Accepted
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:50355 Accepted
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:55506 Closing
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:61360 Accepted
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:50355 Closing
+[Sun Aug  9 11:37:04 2026] 127.0.0.1:61360 Closing
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:50380 Accepted
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:50380 Closing
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:60471 Accepted
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:54189 Accepted
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:54053 Accepted
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:62720 Accepted
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:60471 Closing
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:49998 Accepted
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:54189 Closing
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:54053 Closing
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:62720 Closing
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:54960 Accepted
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:49998 Closing
+[Sun Aug  9 11:37:05 2026] 127.0.0.1:54960 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:61108 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:61108 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:52730 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:52730 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:59706 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:55930 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:59706 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:65521 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:55930 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:65521 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:49699 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:49699 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:53888 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:53888 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:63413 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:58696 Accepted
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:63413 Closing
+[Sun Aug  9 11:37:06 2026] 127.0.0.1:64540 Accepted
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:58696 Closing
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:64540 Closing
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:54906 Accepted
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:54906 Closing
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:55561 Accepted
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:55561 Closing
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:61110 Accepted
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:59937 Accepted
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:61110 Closing
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:62328 Accepted
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:59937 Closing
+[Sun Aug  9 11:37:07 2026] 127.0.0.1:62328 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:49499 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:49499 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:58587 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:55355 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:55958 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:59478 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:58587 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:55355 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:55958 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:59478 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:55355 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:55958 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:59478 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:61800 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:50372 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:61800 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:50372 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:58587 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:60625 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:61800 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:50372 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:60625 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:60625 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:65429 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:65429 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:64391 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:64391 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:64391 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:55544 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:55544 Closing
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:57277 Accepted
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:57277 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:34 2026] 127.0.0.1:57277 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:65286 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:65286 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:61318 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:57914 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:64768 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:54877 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:61318 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:57914 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:64768 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:54877 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:57914 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:64768 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:54877 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:63624 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:65454 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:61318 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:49751 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:63624 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:65454 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:49751 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:63624 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:65454 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:49751 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:57717 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:57717 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:61089 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:61089 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:61594 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:60488 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:61594 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:60488 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:60488 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:57717 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:58407 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:65095 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:56361 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:57906 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:63178 Accepted
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:63178 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:58407 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:65095 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:56361 Closing
+[Sun Aug  9 11:37:45 2026] 127.0.0.1:57906 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:63363 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:63363 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:50906 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:50906 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:49288 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:52057 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:56563 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:49288 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:52057 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:56563 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:49288 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:52057 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:56563 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:50906 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:49537 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:54379 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:49537 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:54379 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:49537 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:54379 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:57164 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:57164 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:57662 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:57662 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:57662 Closing
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:51581 Accepted
+[Sun Aug  9 11:37:46 2026] 127.0.0.1:51581 Closing
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:55776 Accepted
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:55776 Closing
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:61028 Accepted
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:61028 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:49801 Accepted
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:49801 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:49801 Closing
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:53865 Accepted
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:53865 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:53865 Closing
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:61028 Closing
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:55561 Accepted
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:55561 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:55561 Closing
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:55915 Accepted
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:55915 Closing
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:57725 Accepted
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:57725 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:47 2026] 127.0.0.1:57725 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:51989 Accepted
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:51989 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:50756 Accepted
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:50756 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:58694 Accepted
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:64942 Accepted
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:59630 Accepted
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:54028 Accepted
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:58694 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:64942 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:59630 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:54028 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:64942 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:59630 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:54028 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:58694 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:54012 Accepted
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:54012 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:65198 Accepted
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:65198 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:65198 Closing
+[Sun Aug  9 11:37:48 2026] 127.0.0.1:52567 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:52567 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:49436 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:49436 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:63886 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:51120 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:63072 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:64603 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:61307 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:53540 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:63886 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:51120 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:63072 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:64603 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:61307 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:53540 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:51120 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:63072 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:64603 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:61307 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:53540 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:63886 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:59800 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:59800 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:50996 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:50996 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:50996 Closing
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:64138 Accepted
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:64138 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:49 2026] 127.0.0.1:64138 Closing
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:51386 Accepted
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:51386 Closing
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:50461 Accepted
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:63663 Accepted
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:61084 Accepted
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:50735 Accepted
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:50461 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:63663 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:61084 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:50735 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:63663 Closing
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:61084 Closing
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:50735 Closing
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:50461 Closing
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:64867 Accepted
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:64867 Closing
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:52001 Accepted
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:52001 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:54005 Accepted
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:54005 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:54005 Closing
+[Sun Aug  9 11:37:50 2026] 127.0.0.1:52001 Closing
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:60087 Accepted
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:60087 Closing
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:61113 Accepted
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:61113 Closing
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:57611 Accepted
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:57611 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:62568 Accepted
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:62334 Accepted
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:57934 Accepted
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:62568 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:62334 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:57934 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:62568 Closing
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:62334 Closing
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:57934 Closing
+[Sun Aug  9 11:37:51 2026] 127.0.0.1:57611 Closing
+[Sun Aug  9 11:37:52 2026] 127.0.0.1:65406 Accepted
+[Sun Aug  9 11:37:52 2026] 127.0.0.1:65406 Closing
+[Sun Aug  9 11:37:52 2026] 127.0.0.1:63760 Accepted
+[Sun Aug  9 11:37:52 2026] 127.0.0.1:63760 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:52 2026] 127.0.0.1:63760 Closing
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:58176 Accepted
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:58176 Closing
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:52151 Accepted
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:52151 [200]: GET /css/all.min.css
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:52151 Closing
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:52074 Accepted
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:51133 Accepted
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:55062 Accepted
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:52074 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:51133 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:55062 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:52074 Closing
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:51133 Closing
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:55062 Closing
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:51857 Accepted
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:51857 Closing
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:62794 Accepted
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:62794 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:37:53 2026] 127.0.0.1:62794 Closing
+[Sun Aug  9 11:37:54 2026] 127.0.0.1:58407 Accepted
+[Sun Aug  9 11:37:55 2026] 127.0.0.1:58407 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:60885 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:60885 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:60320 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:60320 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:60872 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:53549 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:64323 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:57322 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:58521 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:60872 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:53549 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:64323 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:57322 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:58521 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:60872 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:53549 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:64323 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:57322 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:58521 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:60320 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:63152 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:63152 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:63152 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:54759 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:54759 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:51261 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:51261 Closing
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:58317 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:58317 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:65312 Accepted
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:65312 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:15 2026] 127.0.0.1:65312 Closing
+[Sun Aug  9 11:38:16 2026] 127.0.0.1:58317 Closing
+[Sun Aug  9 11:38:27 2026] 127.0.0.1:64981 Accepted
+[Sun Aug  9 11:38:27 2026] 127.0.0.1:64981 Closing
+[Sun Aug  9 11:38:27 2026] 127.0.0.1:58897 Accepted
+[Sun Aug  9 11:38:27 2026] 127.0.0.1:58897 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:27 2026] 127.0.0.1:62537 Accepted
+[Sun Aug  9 11:38:27 2026] 127.0.0.1:62537 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:27 2026] 127.0.0.1:62537 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:64184 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:59861 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:64184 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:59861 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:64184 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:59861 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63856 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:54378 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63856 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:54378 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63856 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:54378 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:58897 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50149 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50149 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50149 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:52760 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:52760 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:51073 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:51073 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:58506 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:58506 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:58506 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:56371 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:56371 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63318 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63344 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50887 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:61976 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63318 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63344 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50887 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:61976 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63344 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50887 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:61976 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:56974 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50998 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:56974 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50998 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:56974 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:50998 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:63318 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:59739 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:59739 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:53813 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:53813 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:53813 Closing
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:53080 Accepted
+[Sun Aug  9 11:38:28 2026] 127.0.0.1:53080 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:52585 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:60177 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:52585 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:54734 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:60177 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:61209 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:54734 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:61209 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:60177 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:54734 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:61209 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:52585 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:53192 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:53192 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:64422 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:64422 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:64422 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:57013 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:57013 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:56247 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:61706 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:55053 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:50368 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:56247 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:61706 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:55053 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:50368 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:61706 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:55053 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:50368 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:56247 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:58343 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:58343 Closing
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:64904 Accepted
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:64904 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:29 2026] 127.0.0.1:64904 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:57516 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:57516 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:50458 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:50458 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:60803 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:60803 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:60803 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:59556 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:59556 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:59556 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:57740 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:57740 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:53227 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:53227 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:57740 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:60487 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:60487 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:53227 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:60487 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:50458 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:56705 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:56705 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:62502 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:64909 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:62502 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:64909 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:64909 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:62502 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:56226 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:56226 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:59653 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:52689 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:57441 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:59653 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:51206 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:52689 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:57441 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:51206 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:52689 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:57441 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:51206 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:59653 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:64343 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:64343 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:62194 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:62194 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:62194 Closing
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:54461 Accepted
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:54461 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 11:38:30 2026] 127.0.0.1:54461 Closing
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:54136 Accepted
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:54136 Closing
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:50203 Accepted
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:56819 Accepted
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:62572 Accepted
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:50203 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:63806 Accepted
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:56819 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:62572 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:63806 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:56819 Closing
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:62572 Closing
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:63806 Closing
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:50203 Closing
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:63756 Accepted
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:63756 Closing
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:54213 Accepted
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:54213 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:31 2026] 127.0.0.1:54213 Closing
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:54086 Accepted
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:54086 Closing
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55633 Accepted
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:50568 Accepted
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55922 Accepted
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:63710 Accepted
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55633 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:50568 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55922 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:63710 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:50568 Closing
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55922 Closing
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:63710 Closing
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55633 Closing
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:58851 Accepted
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:58851 Closing
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55786 Accepted
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55786 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:32 2026] 127.0.0.1:55786 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:61943 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:61943 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:63189 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:61196 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:50288 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:50397 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:56722 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:54070 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:63189 [200]: GET /css/all.min.css
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:61196 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:50288 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:50397 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:56722 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:54070 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:61196 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:50288 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:50397 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:56722 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:54070 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:63189 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:54971 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:54971 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:64200 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:63403 Accepted
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:64200 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:63403 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:64200 Closing
+[Sun Aug  9 11:38:41 2026] 127.0.0.1:63403 Closing
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:49403 Accepted
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:49403 Closing
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:58176 Accepted
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:58627 Accepted
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60428 Accepted
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60354 Accepted
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60402 Accepted
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:61184 Accepted
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:58176 [200]: GET /css/all.min.css
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:58627 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60428 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60354 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60402 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:61184 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:58627 Closing
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60428 Closing
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60354 Closing
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:60402 Closing
+[Sun Aug  9 11:39:01 2026] 127.0.0.1:61184 Closing
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:58176 Closing
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:63375 Accepted
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:63375 Closing
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:64077 Accepted
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:51321 Accepted
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:64077 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:51321 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:51321 Closing
+[Sun Aug  9 11:39:02 2026] 127.0.0.1:64077 Closing
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:61722 Accepted
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:61722 Closing
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:60714 Accepted
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:56875 Accepted
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:49811 Accepted
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:64017 Accepted
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:60714 [200]: GET /css/all.min.css
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:56875 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:49811 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:64017 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:56875 Closing
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:49811 Closing
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:64017 Closing
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:60714 Closing
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:65189 Accepted
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:65189 Closing
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:52609 Accepted
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:52609 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:39:31 2026] 127.0.0.1:52609 Closing
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:50972 Accepted
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:50972 Closing
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:64544 Accepted
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:61380 Accepted
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:49238 Accepted
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:61265 Accepted
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:64544 [200]: GET /css/all.min.css
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:61380 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:49238 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:61265 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:61380 Closing
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:49238 Closing
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:61265 Closing
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:64544 Closing
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:52009 Accepted
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:52009 Closing
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:60402 Accepted
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:51570 Accepted
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:60402 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:51570 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:60402 Closing
+[Sun Aug  9 11:39:46 2026] 127.0.0.1:51570 Closing
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:51685 Accepted
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:51685 Closing
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:54196 Accepted
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:54196 Closing
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:49817 Accepted
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:49817 Closing
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:50266 Accepted
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:59203 Accepted
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:56258 Accepted
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:50723 Accepted
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:50266 [200]: GET /css/all.min.css
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:59203 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:56258 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:50723 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:59203 Closing
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:56258 Closing
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:50723 Closing
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:50266 Closing
+[Sun Aug  9 11:40:04 2026] 127.0.0.1:63586 Accepted
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:63586 Closing
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:50097 Accepted
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:50616 Accepted
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:50097 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:50616 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:50097 Closing
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:50616 Closing
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:59979 Accepted
+[Sun Aug  9 11:40:05 2026] 127.0.0.1:59979 Closing
+[Sun Aug  9 11:40:15 2026] 127.0.0.1:61429 Accepted
+[Sun Aug  9 11:40:15 2026] 127.0.0.1:61429 Closing
+[Sun Aug  9 11:40:16 2026] 127.0.0.1:50060 Accepted
+[Sun Aug  9 11:40:16 2026] 127.0.0.1:50060 Closing
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:54033 Accepted
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:54033 Closing
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:51456 Accepted
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:50711 Accepted
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:51456 [200]: GET /css/all.min.css
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:50711 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:57605 Accepted
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:53552 Accepted
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:57605 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:53552 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:50711 Closing
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:57605 Closing
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:53552 Closing
+[Sun Aug  9 11:40:27 2026] 127.0.0.1:51456 Closing
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:57234 Accepted
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:57234 Closing
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:52993 Accepted
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:52993 Closing
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:64611 Accepted
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:64611 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:63828 Accepted
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:63828 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:63828 Closing
+[Sun Aug  9 11:40:28 2026] 127.0.0.1:64611 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:57638 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:57638 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:59597 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:59597 [200]: GET /css/all.min.css
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:62799 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:62799 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:51463 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:63099 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:51463 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:63099 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:62799 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:51463 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:63099 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:59597 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:53660 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:53660 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:60777 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:60777 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:57918 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:57918 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:62330 Accepted
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:62330 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:62330 Closing
+[Sun Aug  9 11:40:37 2026] 127.0.0.1:57918 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:54246 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:54246 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:51091 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:51091 [200]: GET /css/all.min.css
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:63058 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:55783 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:54402 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:63058 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:60586 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:63058 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:64964 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:55783 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:54402 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:60586 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:64964 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:51091 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:55783 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:54402 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:60586 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:60924 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:64964 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:60924 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:60924 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:58962 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:58962 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:62913 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:62913 Closing
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:55919 Accepted
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:55919 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:40:56 2026] 127.0.0.1:55919 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:54450 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:54450 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:52005 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:50420 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:65284 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:49993 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:52005 [200]: GET /css/all.min.css
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:50420 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:65284 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:49993 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:50420 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:65284 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:49993 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:57751 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:57010 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:57751 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:57010 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:57751 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:57010 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:52005 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:65453 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:65453 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:65453 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:55746 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:55746 Closing
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:59262 Accepted
+[Sun Aug  9 11:41:04 2026] 127.0.0.1:59262 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:53846 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:53846 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:53846 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:55734 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:55734 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54994 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:60419 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54994 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:60419 [200]: GET /css/all.min.css
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54994 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:59223 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:59223 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:59223 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54483 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54483 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54483 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:60419 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:63931 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54870 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:63931 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54870 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:63931 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54870 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:50664 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:50664 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:58705 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:58705 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:58705 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:53323 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:53323 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:63177 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:56925 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54674 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:59725 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:63177 [200]: GET /css/all.min.css
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:56925 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54674 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:59725 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:56925 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:54674 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:59725 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:63177 Closing
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:59150 Accepted
+[Sun Aug  9 11:41:05 2026] 127.0.0.1:59150 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:50562 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:50562 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:50562 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:53535 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:53535 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:64232 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:64232 [200]: GET /css/all.min.css
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:58505 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:58505 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:58505 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:52728 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:52728 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:52728 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:51399 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:51399 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:51399 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:64232 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:59726 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:59726 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57747 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57747 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57747 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57335 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57335 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:50834 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:50834 [200]: GET /css/all.min.css
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:60657 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:60657 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:60657 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:54114 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57031 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:54114 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57031 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:54114 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57031 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57938 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:59905 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57938 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:59905 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:57938 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:59905 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:50834 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:60958 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:60958 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:54114 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:54114 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:54114 Closing
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:62383 Accepted
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:62383 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 11:41:06 2026] 127.0.0.1:62383 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61681 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61681 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:57014 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:54051 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:58765 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62746 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:57014 [200]: GET /css/all.min.css
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:54051 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:58765 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62746 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:54051 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:58765 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62746 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:57014 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:55179 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:55179 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:60919 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:52118 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:60919 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:52118 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:60919 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:52118 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61583 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61583 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62296 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62760 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50649 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62296 [200]: GET /css/all.min.css
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50564 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62760 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50649 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50564 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62760 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50649 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50564 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:62296 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:65359 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:65359 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:60786 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:60786 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:60786 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:64681 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:64681 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61892 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61892 [200]: GET /css/all.min.css
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61038 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:52292 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61038 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:52292 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61038 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:52292 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50387 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50387 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:50387 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:61892 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:58851 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:58851 Closing
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:65191 Accepted
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:65191 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:41:07 2026] 127.0.0.1:65191 Closing
+[Sun Aug  9 11:42:07 2026] 127.0.0.1:49906 Accepted
+[Sun Aug  9 11:42:07 2026] 127.0.0.1:49906 Closing
+[Sun Aug  9 11:42:07 2026] 127.0.0.1:49908 Accepted
+[Sun Aug  9 11:42:07 2026] 127.0.0.1:49908 Closing
+[Sun Aug  9 11:42:07 2026] 127.0.0.1:49910 Accepted
+[Sun Aug  9 11:42:07 2026] 127.0.0.1:49910 Closing
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49912 Accepted
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49912 Closing
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49914 Accepted
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49914 Closing
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49916 Accepted
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49916 Closing
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49918 Accepted
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49918 Closing
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49920 Accepted
+[Sun Aug  9 11:42:08 2026] 127.0.0.1:49920 Closing
+[Sun Aug  9 11:43:53 2026] 127.0.0.1:61039 Accepted
+[Sun Aug  9 11:43:53 2026] 127.0.0.1:61039 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:57919 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:57919 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:53336 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:56261 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:63766 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:50695 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:53336 [200]: GET /css/all.min.css
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:56261 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:63766 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:50695 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:60903 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:65483 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:60903 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:65483 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:56261 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:63766 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:50695 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:60903 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:65483 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61350 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61350 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61350 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:53336 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:63352 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:63352 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:63352 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:52675 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:52675 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:52675 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:64191 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:64191 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:60838 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:60838 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61529 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61529 [200]: GET /img/favicon.png
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61529 Closing
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61023 Accepted
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61023 [200]: GET /img/favicon.png
+[Sun Aug  9 11:44:32 2026] 127.0.0.1:61023 Closing
+[Sun Aug  9 11:44:42 2026] 127.0.0.1:63965 Accepted
+[Sun Aug  9 11:44:42 2026] 127.0.0.1:63965 Closing
+[Sun Aug  9 11:44:43 2026] 127.0.0.1:51973 Accepted
+[Sun Aug  9 11:44:43 2026] 127.0.0.1:51973 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:54150 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:54150 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50279 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50279 [200]: GET /css/all.min.css
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50061 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:49305 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50061 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:60742 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:49305 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:60742 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50061 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50279 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:49305 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:60742 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:62296 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:62296 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:62296 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:63478 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:63478 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50332 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:63478 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50332 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:50332 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:51823 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:51823 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:55359 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:55359 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:56318 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:56318 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:55359 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:56318 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:65392 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:65392 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:63898 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:63898 [200]: GET /img/favicon.png
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:63898 Closing
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:54465 Accepted
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:54465 [200]: GET /img/favicon.png
+[Sun Aug  9 11:44:55 2026] 127.0.0.1:54465 Closing
+[Sun Aug  9 11:44:57 2026] 127.0.0.1:55914 Accepted
+[Sun Aug  9 11:44:57 2026] 127.0.0.1:55914 Closing
+[Sun Aug  9 11:44:59 2026] 127.0.0.1:62691 Accepted
+[Sun Aug  9 11:44:59 2026] 127.0.0.1:62691 Closing
+[Sun Aug  9 11:45:00 2026] 127.0.0.1:50766 Accepted
+[Sun Aug  9 11:45:00 2026] 127.0.0.1:50766 Closing
+[Sun Aug  9 11:45:01 2026] 127.0.0.1:58416 Accepted
+[Sun Aug  9 11:45:01 2026] 127.0.0.1:58416 Closing
+[Sun Aug  9 11:45:04 2026] 127.0.0.1:65510 Accepted
+[Sun Aug  9 11:45:04 2026] 127.0.0.1:65510 Closing
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:57396 Accepted
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:57396 Closing
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:58919 Accepted
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:58919 [200]: GET /css/all.min.css
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:58278 Accepted
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:64647 Accepted
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:62442 Accepted
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:58278 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:64647 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:62442 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:58919 Closing
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:58278 Closing
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:64647 Closing
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:62442 Closing
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:61919 Accepted
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:61919 Closing
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:50962 Accepted
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:50962 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:45:20 2026] 127.0.0.1:50962 Closing
+[Sun Aug  9 11:45:24 2026] 127.0.0.1:49404 Accepted
+[Sun Aug  9 11:45:24 2026] 127.0.0.1:49404 Closing
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:53654 Accepted
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:53654 Closing
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:54270 Accepted
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:54270 [200]: GET /css/all.min.css
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:58497 Accepted
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:58497 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:58497 Closing
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:49617 Accepted
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:54715 Accepted
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:49617 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:54715 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:49617 Closing
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:54715 Closing
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:54270 Closing
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:52205 Accepted
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:52205 Closing
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:64178 Accepted
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:64178 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:45:29 2026] 127.0.0.1:64178 Closing
+[Sun Aug  9 11:45:35 2026] 127.0.0.1:54456 Accepted
+[Sun Aug  9 11:45:35 2026] 127.0.0.1:54456 Closing
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:60456 Accepted
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:60456 Closing
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:53054 Accepted
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:53054 [200]: GET /css/all.min.css
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:60654 Accepted
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:64717 Accepted
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:60654 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:64717 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:60654 Closing
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:64717 Closing
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:60488 Accepted
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:60488 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:60488 Closing
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:53420 Accepted
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:63527 Accepted
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:53420 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:63527 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:53420 Closing
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:63527 Closing
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:53054 Closing
+[Sun Aug  9 11:45:42 2026] 127.0.0.1:65343 Accepted
+[Sun Aug  9 11:45:43 2026] 127.0.0.1:65343 Closing
+[Sun Aug  9 11:45:43 2026] 127.0.0.1:60539 Accepted
+[Sun Aug  9 11:45:43 2026] 127.0.0.1:60539 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 11:45:43 2026] 127.0.0.1:60539 Closing
+[Sun Aug  9 11:45:43 2026] 127.0.0.1:64874 Accepted
+[Sun Aug  9 11:45:43 2026] 127.0.0.1:64874 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:45:43 2026] 127.0.0.1:64874 Closing
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:50172 Accepted
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:50172 Closing
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:51768 Accepted
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:51768 [200]: GET /css/all.min.css
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:61673 Accepted
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:59665 Accepted
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:51351 Accepted
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:61673 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:59665 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:51351 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:51768 Closing
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:61673 Closing
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:59665 Closing
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:51351 Closing
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:54817 Accepted
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:54817 Closing
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:57634 Accepted
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:57634 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:46:07 2026] 127.0.0.1:57634 Closing
+[Sun Aug  9 11:49:33 2026] 127.0.0.1:56807 Accepted
+[Sun Aug  9 11:49:33 2026] 127.0.0.1:56807 Closing
+[Sun Aug  9 11:50:48 2026] 127.0.0.1:54854 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:54854 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52980 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52980 [200]: GET /css/all.min.css
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52161 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52161 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52605 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:57621 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52605 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:57621 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52161 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52980 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52605 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:57621 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:64404 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:64404 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:63747 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:63747 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:63747 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52717 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:52717 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:61322 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:61322 [200]: GET /img/favicon.png
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:61322 Closing
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:53428 Accepted
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:53428 [200]: GET /img/favicon.png
+[Sun Aug  9 11:50:49 2026] 127.0.0.1:53428 Closing
+[Sun Aug  9 11:51:05 2026] 127.0.0.1:55892 Accepted
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:55892 Closing
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:62633 Accepted
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:62633 [200]: GET /css/all.min.css
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:60927 Accepted
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:63249 Accepted
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:52903 Accepted
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:60927 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:63249 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:52903 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:60927 Closing
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:63249 Closing
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:52903 Closing
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:62633 Closing
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:62215 Accepted
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:62215 Closing
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:62850 Accepted
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:62850 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:62850 Closing
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:49581 Accepted
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:49581 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:51:10 2026] 127.0.0.1:49581 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:65182 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:65182 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:64434 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:64434 [200]: GET /css/all.min.css
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:52813 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:62552 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:52813 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:62552 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:53498 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:53498 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:52813 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:62552 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:53498 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:65337 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:65337 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:65337 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:64423 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:64423 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:64423 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:64434 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:53807 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:53807 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:54988 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:63819 Accepted
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:54988 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:63819 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:54988 Closing
+[Sun Aug  9 11:51:11 2026] 127.0.0.1:63819 Closing
+[Sun Aug  9 12:00:55 2026] 127.0.0.1:50220 Accepted
+[Sun Aug  9 12:00:55 2026] 127.0.0.1:56125 Accepted
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:50220 Closing
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:56125 [200]: GET /css/all.min.css
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55592 Accepted
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55253 Accepted
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55592 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55772 Accepted
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55253 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55772 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55592 Closing
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:56125 Closing
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55253 Closing
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:55772 Closing
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:54505 Accepted
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:54505 Closing
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:63342 Accepted
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:63342 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:63055 Accepted
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:63055 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:63055 Closing
+[Sun Aug  9 12:00:56 2026] 127.0.0.1:63342 Closing
+[Sun Aug  9 12:00:58 2026] 127.0.0.1:61623 Accepted
+[Sun Aug  9 12:00:58 2026] 127.0.0.1:61623 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:52544 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:52544 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:49966 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:49966 [200]: GET /css/all.min.css
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:50788 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:64584 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:56901 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:56901 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:50788 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:64584 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:56901 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:50788 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:64584 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:49966 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:55343 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:55343 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:56562 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:56562 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:56562 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:59857 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:59857 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:59857 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:65239 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:65239 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:50509 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:50509 [200]: GET /img/favicon.png
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:50509 Closing
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:58244 Accepted
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:58244 [200]: GET /img/favicon.png
+[Sun Aug  9 12:07:41 2026] 127.0.0.1:58244 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:62979 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:62979 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:51311 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:51311 [200]: GET /css/all.min.css
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:59566 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:49564 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:59566 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:49564 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:59566 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:49564 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:54192 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:54192 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:54192 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:51311 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:58131 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:50504 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:58131 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:50504 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:58131 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:50504 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:62858 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:62858 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:61963 Accepted
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:61963 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:61963 Closing
+[Sun Aug  9 12:07:43 2026] 127.0.0.1:63503 Accepted
+[Sun Aug  9 12:07:44 2026] 127.0.0.1:63503 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 12:07:44 2026] 127.0.0.1:63503 Closing
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:61762 Accepted
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:61762 Closing
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:54823 Accepted
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:54823 [200]: GET /css/all.min.css
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:49185 Accepted
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:49185 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:49185 Closing
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:59454 Accepted
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:61602 Accepted
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:59454 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:61602 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:59454 Closing
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:61602 Closing
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:54823 Closing
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:52204 Accepted
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:52204 Closing
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:51570 Accepted
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:51570 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:50798 Accepted
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:50798 Closing
+[Sun Aug  9 12:07:53 2026] 127.0.0.1:51570 Closing
+[Sun Aug  9 12:08:03 2026] 127.0.0.1:51280 Accepted
+[Sun Aug  9 12:08:03 2026] 127.0.0.1:51280 Closing
+[Sun Aug  9 12:08:03 2026] 127.0.0.1:64964 Accepted
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:64964 [200]: GET /css/all.min.css
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:62687 Accepted
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:62687 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:62687 Closing
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:62575 Accepted
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:64537 Accepted
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:62575 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:64537 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:62575 Closing
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:64537 Closing
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:64964 Closing
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:63391 Accepted
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:63391 Closing
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:52587 Accepted
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:52587 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:52587 Closing
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:63597 Accepted
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:63597 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:63597 Closing
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:53213 Accepted
+[Sun Aug  9 12:08:04 2026] 127.0.0.1:53213 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53442 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53442 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:63291 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:63291 [200]: GET /css/all.min.css
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:60121 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:60121 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:60121 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:55168 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53612 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:55168 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53612 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:59741 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:55168 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:59741 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53612 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53860 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:63291 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:57983 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53860 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:57983 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:59741 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53860 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:57983 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:64394 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:64394 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:58884 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:58884 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:58884 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:62055 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:62055 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53976 Accepted
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:53976 Closing
+[Sun Aug  9 12:08:14 2026] 127.0.0.1:62055 Closing
+[Sun Aug  9 12:08:27 2026] 127.0.0.1:61438 Accepted
+[Sun Aug  9 12:08:27 2026] 127.0.0.1:61438 Closing
+[Sun Aug  9 12:08:29 2026] 127.0.0.1:61875 Accepted
+[Sun Aug  9 12:08:29 2026] 127.0.0.1:61875 Closing
+[Sun Aug  9 12:08:47 2026] 127.0.0.1:52736 Accepted
+[Sun Aug  9 12:08:47 2026] 127.0.0.1:52736 Closing
+[Sun Aug  9 12:08:49 2026] 127.0.0.1:57495 Accepted
+[Sun Aug  9 12:08:49 2026] 127.0.0.1:57495 Closing
+[Sun Aug  9 12:09:09 2026] 127.0.0.1:53760 Accepted
+[Sun Aug  9 12:09:09 2026] 127.0.0.1:53760 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:64790 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:64790 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:51955 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:51955 [200]: GET /css/all.min.css
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:49546 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:60831 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:64764 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:55023 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:49546 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:53628 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:60831 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:64764 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:55023 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:53628 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:49546 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:60831 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:64764 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:55023 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:53628 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:51955 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:52567 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:52567 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:52567 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:52422 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:52422 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:52422 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:63808 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:63808 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:57250 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:57250 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:57250 Closing
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:63046 Accepted
+[Sun Aug  9 12:09:21 2026] 127.0.0.1:63046 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:50449 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:52526 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:50449 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:52526 [200]: GET /css/all.min.css
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:54069 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:54069 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:62555 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:52001 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:62555 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:50188 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:52001 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:54069 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:50929 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:50188 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:50929 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:52526 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:62555 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:52001 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:50188 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:50929 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:62985 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:62985 Closing
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:65253 Accepted
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:65253 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:09:23 2026] 127.0.0.1:65253 Closing
+[Sun Aug  9 12:09:24 2026] 127.0.0.1:51202 Accepted
+[Sun Aug  9 12:09:24 2026] 127.0.0.1:51202 Closing
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:55578 Accepted
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:63332 Accepted
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:55578 Closing
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:63332 [200]: GET /css/all.min.css
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:59091 Accepted
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:59091 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:55486 Accepted
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:55486 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:51719 Accepted
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:59091 Closing
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:51719 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:55486 Closing
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:51719 Closing
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:63332 Closing
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:50192 Accepted
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:50192 Closing
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:50318 Accepted
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:50318 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:09:47 2026] 127.0.0.1:50318 Closing
+[Sun Aug  9 12:09:48 2026] 127.0.0.1:56098 Accepted
+[Sun Aug  9 12:09:48 2026] 127.0.0.1:56098 Closing
+[Sun Aug  9 12:10:08 2026] 127.0.0.1:53028 Accepted
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:53028 Closing
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:57525 Accepted
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:57525 [200]: GET /css/all.min.css
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:49657 Accepted
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:49657 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:63504 Accepted
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:58739 Accepted
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:63504 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:58739 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:49657 Closing
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:63504 Closing
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:58739 Closing
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:57525 Closing
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:54520 Accepted
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:54520 Closing
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:51174 Accepted
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:51174 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:51174 Closing
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:53529 Accepted
+[Sun Aug  9 12:10:09 2026] 127.0.0.1:53529 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:58699 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:58699 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:50162 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:50162 [200]: GET /css/all.min.css
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:53792 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:53792 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:51299 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:53103 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:51299 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:53103 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:53792 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:58231 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:59253 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:58231 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:51299 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:59253 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:53103 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:58231 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:59253 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:50162 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:59967 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:59967 Closing
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:57501 Accepted
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:57501 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:11:26 2026] 127.0.0.1:57501 Closing
+[Sun Aug  9 12:11:28 2026] 127.0.0.1:62856 Accepted
+[Sun Aug  9 12:11:28 2026] 127.0.0.1:62856 Closing
+[Sun Aug  9 12:11:32 2026] 127.0.0.1:56362 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:56362 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:64644 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:64644 [200]: GET /css/all.min.css
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:56010 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:50328 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:56010 [200]: GET /css/retailzim-front.css?v=20
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:50328 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:61866 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:56010 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:61866 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:50328 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:61866 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:62321 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:53258 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:62321 [200]: GET /js/retailzim-front.js?v=10
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:53258 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:62321 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:53258 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:64644 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:55061 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:55061 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:55061 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:61121 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:61121 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:49877 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:49877 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:49294 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:49294 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:49294 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:64792 Accepted
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:64792 Closing
+[Sun Aug  9 12:11:33 2026] 127.0.0.1:49877 Closing
+[Sun Aug  9 12:11:52 2026] 127.0.0.1:62966 Accepted
+[Sun Aug  9 12:11:52 2026] 127.0.0.1:62966 Closing
+[Sun Aug  9 12:11:58 2026] 127.0.0.1:53596 Accepted
+[Sun Aug  9 12:11:58 2026] 127.0.0.1:53596 Closing
+[Sun Aug  9 12:11:59 2026] 127.0.0.1:62036 Accepted
+[Sun Aug  9 12:11:59 2026] 127.0.0.1:62036 Closing
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:64111 Accepted
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:64111 Closing
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:57055 Accepted
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:52512 Accepted
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:57055 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:52512 [200]: GET /css/all.min.css
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:63136 Accepted
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:63561 Accepted
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:63136 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:62855 Accepted
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:63561 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:57055 Closing
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:51324 Accepted
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:62855 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:51324 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:63136 Closing
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:52512 Closing
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:63561 Closing
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:62855 Closing
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:51324 Closing
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:59454 Accepted
+[Sun Aug  9 12:20:19 2026] 127.0.0.1:59454 Closing
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:53027 Accepted
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:54155 Accepted
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:53601 Accepted
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:53027 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:54155 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:53601 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:54155 Closing
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:53027 Closing
+[Sun Aug  9 12:20:20 2026] 127.0.0.1:53601 Closing
+[Sun Aug  9 12:20:41 2026] 127.0.0.1:56056 Accepted
+[Sun Aug  9 12:20:41 2026] 127.0.0.1:56056 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:63615 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:63615 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:52602 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:52602 [200]: GET /css/all.min.css
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:52513 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:52513 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:52513 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:50978 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:50978 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:50978 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:62283 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:55452 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:61062 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:62283 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:55452 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:61062 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:62283 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:55452 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:61062 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:52602 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:62221 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:62221 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:51024 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:62646 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:51024 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:50688 Accepted
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:62646 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:50688 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:62646 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:51024 Closing
+[Sun Aug  9 12:21:03 2026] 127.0.0.1:50688 Closing
+[Sun Aug  9 12:21:04 2026] 127.0.0.1:62431 Accepted
+[Sun Aug  9 12:21:04 2026] 127.0.0.1:62431 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:54900 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:54900 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:52951 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:52951 [200]: GET /css/all.min.css
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:54805 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:54805 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:64574 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61210 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:64574 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61644 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61210 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:52951 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:54805 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:62667 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61644 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:62667 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:64574 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61210 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61644 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:62667 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:54617 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:54617 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:50871 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:57231 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:50871 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61818 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:57231 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:53941 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61818 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:53941 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:61818 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:57231 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:53941 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:60697 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:60697 [200]: GET /img/favicon.png
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:60697 Closing
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:49717 Accepted
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:49717 [200]: GET /img/favicon.png
+[Sun Aug  9 12:22:39 2026] 127.0.0.1:49717 Closing
+[Sun Aug  9 12:28:55 2026] 127.0.0.1:63934 Accepted
+[Sun Aug  9 12:28:55 2026] 127.0.0.1:63934 Closing
+[Sun Aug  9 15:49:12 2026] 127.0.0.1:54549 Accepted
+[Sun Aug  9 15:49:13 2026] 127.0.0.1:54549 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:50186 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:50186 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:61781 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:61781 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:54209 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:55878 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:54209 [200]: GET /css/all.min.css
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:50534 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:55878 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:61781 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:63992 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:50534 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:56696 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:63992 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:59720 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:56696 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:55878 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:59720 [200]: GET /img/showcase/shop-dashboard.png
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:50534 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:54209 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:63992 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:56696 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:59720 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:53339 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:53339 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:56797 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:56797 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:63852 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:63852 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:56797 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:53339 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:57611 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:60632 Accepted
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:57611 Closing
+[Sun Aug  9 15:49:16 2026] 127.0.0.1:60632 Closing
+[Sun Aug  9 15:49:17 2026] 127.0.0.1:63990 Accepted
+[Sun Aug  9 15:49:17 2026] 127.0.0.1:63990 [200]: GET /img/favicon.png
+[Sun Aug  9 15:49:17 2026] 127.0.0.1:63990 Closing
+[Sun Aug  9 15:49:17 2026] 127.0.0.1:56437 Accepted
+[Sun Aug  9 15:49:17 2026] 127.0.0.1:56437 [200]: GET /img/favicon.png
+[Sun Aug  9 15:49:17 2026] 127.0.0.1:56437 Closing
+[Sun Aug  9 15:49:18 2026] 127.0.0.1:65282 Accepted
+[Sun Aug  9 15:49:18 2026] 127.0.0.1:65282 Closing
+[Sun Aug  9 15:49:19 2026] 127.0.0.1:58979 Accepted
+[Sun Aug  9 15:49:19 2026] 127.0.0.1:58979 Closing
+[Sun Aug  9 15:49:22 2026] 127.0.0.1:64842 Accepted
+[Sun Aug  9 15:49:22 2026] 127.0.0.1:64842 Closing
+[Sun Aug  9 15:49:23 2026] 127.0.0.1:60309 Accepted
+[Sun Aug  9 15:49:23 2026] 127.0.0.1:60309 Closing
+[Sun Aug  9 15:50:07 2026] 127.0.0.1:60311 Accepted
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:60311 Closing
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:56283 Accepted
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:56283 [200]: GET /css/all.min.css
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:55250 Accepted
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:55250 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:54669 Accepted
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:49396 Accepted
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:54669 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:49396 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:55250 Closing
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:54669 Closing
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:49396 Closing
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:56283 Closing
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:51943 Accepted
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:51943 Closing
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:58746 Accepted
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:55108 Accepted
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:58746 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:55108 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:58746 Closing
+[Sun Aug  9 15:50:08 2026] 127.0.0.1:55108 Closing
+[Sun Aug  9 15:50:11 2026] 127.0.0.1:51144 Accepted
+[Sun Aug  9 15:50:11 2026] 127.0.0.1:51144 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:63476 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:63476 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:60167 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:60167 [200]: GET /css/all.min.css
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:56654 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:56654 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:56654 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:63210 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:63210 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:63210 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:55140 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:55140 [200]: GET /img/showcase/windows-pos-checkout.png
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:55140 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:64133 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:52888 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:64133 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:52888 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:64133 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:52888 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:60167 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:59344 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:59344 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:63421 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:63421 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:63421 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:57275 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:62502 Accepted
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:62502 [200]: GET /webfonts/fa-brands-400.woff2
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:57275 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:62502 Closing
+[Sun Aug  9 15:50:19 2026] 127.0.0.1:57275 Closing
+[Sun Aug  9 15:50:20 2026] 127.0.0.1:62224 Accepted
+[Sun Aug  9 15:50:20 2026] 127.0.0.1:62224 Closing
+[Sun Aug  9 15:50:55 2026] 127.0.0.1:51118 Accepted
+[Sun Aug  9 15:52:38 2026] 127.0.0.1:51118 Closed without sending a request; it was probably just an unused speculative preconnection
+[Sun Aug  9 15:52:38 2026] 127.0.0.1:51118 Closing
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:65179 Accepted
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:65179 Closing
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54706 Accepted
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54706 [200]: GET /css/all.min.css
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54726 Accepted
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54726 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54726 Closing
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:61270 Accepted
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:61033 Accepted
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:61270 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:61033 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:61270 Closing
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:61033 Closing
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54706 Closing
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:52279 Accepted
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:52279 Closing
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54394 Accepted
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54394 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:54394 Closing
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:50470 Accepted
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:50470 [200]: GET /webfonts/fa-regular-400.woff2
+[Sun Aug  9 16:00:37 2026] 127.0.0.1:50470 Closing
+[Sun Aug  9 16:00:39 2026] 127.0.0.1:64841 Accepted
+[Sun Aug  9 16:00:39 2026] 127.0.0.1:64841 Closing
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:62823 Accepted
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:62823 Closing
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:53213 Accepted
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:53213 [200]: GET /css/all.min.css
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:56526 Accepted
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:62235 Accepted
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:49975 Accepted
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:56526 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:62235 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:49975 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:53213 Closing
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:56526 Closing
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:62235 Closing
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:49975 Closing
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:54282 Accepted
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:54282 Closing
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:61614 Accepted
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:61614 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:61614 Closing
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:58887 Accepted
+[Sun Aug  9 16:04:14 2026] 127.0.0.1:58887 Closing
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:65377 Accepted
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:60603 Accepted
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:65377 Closing
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:60603 [200]: GET /css/all.min.css
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:51492 Accepted
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:59605 Accepted
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:51492 [200]: GET /css/retailzim-front.css?v=21
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:61736 Accepted
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:59605 [200]: GET /js/retailzim-front.js?v=11
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:61736 [200]: GET /img/retailzim-logo-clean.png
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:51492 Closing
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:60603 Closing
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:59605 Closing
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:61736 Closing
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:55393 Accepted
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:55393 Closing
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:53967 Accepted
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:53967 [200]: GET /webfonts/fa-solid-900.woff2
+[Sun Aug  9 16:05:54 2026] 127.0.0.1:53967 Closing
+[Sun Aug  9 16:05:55 2026] 127.0.0.1:63486 Accepted
+[Sun Aug  9 16:05:55 2026] 127.0.0.1:63486 Closing
+[Sun Aug  9 16:32:02 2026] 127.0.0.1:51378 Accepted
+[Sun Aug  9 16:32:02 2026] 127.0.0.1:51154 Accepted
+[Sun Aug  9 16:32:02 2026] 127.0.0.1:51378 Closing
+[Sun Aug  9 16:32:02 2026] 127.0.0.1:51154 Closing
+[Mon Aug 10 23:29:34 2026] 127.0.0.1:56277 Accepted
+[Mon Aug 10 23:29:35 2026] 127.0.0.1:56277 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:50252 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:50252 [200]: GET /css/all.min.css
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:61585 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:53430 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:61585 [200]: GET /css/retailzim-front.css?v=21
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:58463 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:53430 [200]: GET /img/retailzim-logo-clean.png
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:58463 [200]: GET /img/showcase/windows-pos-checkout.png
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:61585 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:53430 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:58463 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:64541 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:62310 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:50252 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:60194 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:64541 [200]: GET /js/retailzim-front.js?v=11
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:62310 [200]: GET /img/showcase/mobile-pos-checkout.png
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:60194 [200]: GET /img/showcase/shop-dashboard.png
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:64541 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:62310 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:60194 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:51664 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:51664 [200]: GET /img/banners/retail-counter-windows-pos.png
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:51664 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:63784 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:63784 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:63840 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:62142 Accepted
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:63840 Closing
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:62142 [200]: GET /webfonts/fa-solid-900.woff2
+[Mon Aug 10 23:29:41 2026] 127.0.0.1:62142 Closing

@@ -1,0 +1,30 @@
+2026-07-26 00:13:06.366 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-07-26 00:13:06.380 WARN  [scheduling-1] com.retailzw.service.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=12 reason=Email provider did not accept the confirmation.
+2026-07-26 04:29:19.428 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-07-26 04:29:19.433 WARN  [scheduling-1] com.retailzw.service.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=13 reason=Email provider did not accept the confirmation.
+2026-07-26 08:45:32.750 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-07-26 08:45:32.757 WARN  [scheduling-1] com.retailzw.service.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=14 reason=Email provider did not accept the confirmation.
+2026-07-26 13:01:46.050 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-07-26 13:01:46.057 WARN  [scheduling-1] com.retailzw.service.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=15 reason=Email provider did not accept the confirmation.
+2026-07-26 17:17:59.556 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-07-26 17:17:59.563 WARN  [scheduling-1] com.retailzw.service.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=16 reason=Email provider did not accept the confirmation.
+2026-07-26 21:34:12.014 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-07-26 21:34:12.019 WARN  [scheduling-1] com.retailzw.service.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=17 reason=Email provider did not accept the confirmation.

@@ -1,0 +1,49 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-07-28 23:15:43.264 INFO  [main] com.retailzw.RetailSaasApplication - Starting RetailSaasApplication v1.0.0 using Java 17.0.11 with PID 10720 (C:\Users\talen\Desktop\JAVA PROJECTS\retailzim_software\backend\target\retail-saas-backend-1.0.0-exec.jar started by talen in C:\Users\talen\Desktop\JAVA PROJECTS\retailzim_software\backend)
+2026-07-28 23:15:43.280 INFO  [main] com.retailzw.RetailSaasApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-28 23:15:49.561 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-28 23:15:50.114 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 531 ms. Found 67 JPA repository interfaces.
+2026-07-28 23:15:55.369 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-28 23:15:55.389 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-28 23:15:55.391 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-07-28 23:15:55.559 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-28 23:15:55.559 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 12085 ms
+2026-07-28 23:15:57.913 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-07-28 23:15:58.789 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@45f0038
+2026-07-28 23:15:58.793 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-07-28 23:15:59.632 INFO  [main] o.f.c.i.license.VersionPrinter - Flyway Community Edition 9.22.3 by Redgate
+2026-07-28 23:15:59.636 INFO  [main] o.f.c.i.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2026-07-28 23:15:59.637 INFO  [main] o.f.c.i.license.VersionPrinter - 
+2026-07-28 23:15:59.735 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/retail_zw (MySQL 8.0)
+2026-07-28 23:15:59.992 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 42 migrations (execution time 00:00.185s)
+2026-07-28 23:16:00.015 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema `retail_zw`: 42
+2026-07-28 23:16:00.023 INFO  [main] o.f.core.internal.command.DbMigrate - Schema `retail_zw` is up to date. No migration necessary.
+2026-07-28 23:16:00.701 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-28 23:16:00.913 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-07-28 23:16:01.174 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-07-28 23:16:01.934 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-28 23:16:02.152 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-28 23:16:12.831 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-28 23:16:13.556 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-28 23:16:16.167 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-28 23:16:27.472 INFO  [main] com.retailzw.service.EmailService - SMTP configured host=mail.retailzw.co.zw port=587 support=support@retailzw.co.zw billing=sales@retailzw.co.zw notifications=info@retailzw.co.zw
+2026-07-28 23:16:35.139 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-07-28 23:16:36.618 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-07-28 23:16:36.701 INFO  [main] com.retailzw.RetailSaasApplication - Started RetailSaasApplication in 54.815 seconds (process running for 55.924)
+2026-07-28 23:17:01.473 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-07-28 23:17:01.480 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=22 reason=Email provider did not accept the confirmation.
+2026-07-28 23:18:34.424 INFO  [http-nio-0.0.0.0-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-28 23:18:34.425 INFO  [http-nio-0.0.0.0-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-28 23:18:34.435 INFO  [http-nio-0.0.0.0-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 9 ms
+2026-07-28 23:18:37.159 INFO  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /auth/admin/login -> 200 (2128 ms) client=0:0:0:0:0:0:0:1 requestId=ce05e0f7

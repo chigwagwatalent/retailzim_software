@@ -121,6 +121,20 @@ function retailzim_ensure_schema(PDO $db): void
             FOREIGN KEY (post_id) REFERENCES community_posts(id)
             ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $db->exec("CREATE TABLE IF NOT EXISTS community_comments (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        post_id BIGINT UNSIGNED NOT NULL,
+        name VARCHAR(80) NOT NULL,
+        comment TEXT NOT NULL,
+        visitor_hash CHAR(64) NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_community_comments_post (post_id),
+        CONSTRAINT fk_community_comments_post
+            FOREIGN KEY (post_id) REFERENCES community_posts(id)
+            ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
 function retailzim_now(): string
@@ -168,9 +182,9 @@ function retailzim_record_visit(string $page = 'home', ?string $section = null):
 function retailzim_seed_posts(): array
 {
     return [
-        ['id' => 0, 'name' => 'Retail Zim Team', 'shop' => 'Platform', 'category' => 'Guide', 'message' => 'Start here: register your shop, import products from Excel, open a shift, sell, then close the shift report.', 'status' => 'featured', 'likes' => 18, 'replies' => 4, 'created_at' => retailzim_now()],
-        ['id' => 0, 'name' => 'MSN Grocery', 'shop' => 'Harare', 'category' => 'Receipts', 'message' => 'How do I keep 80mm receipts centered on my thermal printer?', 'status' => 'answered', 'likes' => 12, 'replies' => 3, 'created_at' => retailzim_now()],
-        ['id' => 0, 'name' => 'Tariro', 'shop' => 'Bottle Store', 'category' => 'Products', 'message' => 'Can I import product quantities, prices, and categories from one Excel document?', 'status' => 'solved', 'likes' => 9, 'replies' => 2, 'created_at' => retailzim_now()],
+        ['id' => 0, 'name' => 'Retail Zim Team', 'shop' => 'Official update', 'category' => 'Guide', 'message' => 'Start here: register your shop, import products from Excel, open a shift, sell, then close the shift report.', 'status' => 'featured', 'likes' => 18, 'replies' => 4, 'created_at' => retailzim_now(), 'answers' => [], 'comments' => [['name' => 'Tariro Mini Mart', 'comment' => 'The product import guide made our setup much faster.', 'created_at' => retailzim_now()]]],
+        ['id' => 0, 'name' => 'MSN Grocery', 'shop' => 'Harare', 'category' => 'Receipts', 'message' => 'How do I keep 80mm receipts centered on my thermal printer?', 'status' => 'answered', 'likes' => 12, 'replies' => 3, 'created_at' => retailzim_now(), 'answers' => [['responder' => 'Retail Zim Support', 'answer' => 'Open printer settings, choose 80mm paper width, keep margins at zero, and print a test receipt.', 'created_at' => retailzim_now()]], 'comments' => [['name' => 'Kwekwe Hardware', 'comment' => 'Setting the margins to zero fixed ours.', 'created_at' => retailzim_now()]]],
+        ['id' => 0, 'name' => 'Tariro', 'shop' => 'Bottle Store', 'category' => 'Products', 'message' => 'Can I import product quantities, prices, and categories from one Excel document?', 'status' => 'solved', 'likes' => 9, 'replies' => 2, 'created_at' => retailzim_now(), 'answers' => [['responder' => 'Retail Zim Support', 'answer' => 'Yes. Use the product Excel template, preview the matched columns, then confirm the import.', 'created_at' => retailzim_now()]], 'comments' => []],
     ];
 }
 
@@ -191,7 +205,7 @@ function retailzim_posts_with_answers(int $limit = 50, ?string $status = null): 
 {
     $db = retailzim_db();
     if (!$db) {
-        return array_map(fn ($post) => $post + ['answers' => []], retailzim_seed_posts());
+        return retailzim_seed_posts();
     }
 
     $sql = 'SELECT id, name, shop, category, message, status, likes, replies, created_at, updated_at
@@ -211,15 +225,42 @@ function retailzim_posts_with_answers(int $limit = 50, ?string $status = null): 
     $stmt->execute();
     $posts = $stmt->fetchAll();
     if (!$posts) {
-        return [];
+        return retailzim_seed_posts();
     }
 
     $ids = array_map('intval', array_column($posts, 'id'));
     $answersByPost = retailzim_answers_for_posts($ids);
-    return array_map(function (array $post) use ($answersByPost): array {
+    $commentsByPost = retailzim_comments_for_posts($ids);
+    return array_map(function (array $post) use ($answersByPost, $commentsByPost): array {
         $post['answers'] = $answersByPost[(int)$post['id']] ?? [];
+        $post['comments'] = $commentsByPost[(int)$post['id']] ?? [];
         return $post;
     }, $posts);
+}
+
+function retailzim_comments_for_posts(array $postIds): array
+{
+    $db = retailzim_db();
+    $postIds = array_values(array_filter(array_map('intval', $postIds), fn ($id) => $id > 0));
+    if (!$db || !$postIds) {
+        return [];
+    }
+
+    $placeholders = implode(',', array_fill(0, count($postIds), '?'));
+    $stmt = $db->prepare("SELECT id, post_id, name, comment, created_at
+        FROM community_comments
+        WHERE post_id IN ({$placeholders})
+        ORDER BY id ASC");
+    foreach ($postIds as $index => $postId) {
+        $stmt->bindValue($index + 1, $postId, PDO::PARAM_INT);
+    }
+    $stmt->execute();
+
+    $comments = [];
+    foreach ($stmt->fetchAll() as $comment) {
+        $comments[(int)$comment['post_id']][] = $comment;
+    }
+    return $comments;
 }
 
 function retailzim_answers_for_posts(array $postIds): array
@@ -300,6 +341,40 @@ function retailzim_engage(int $postId, string $action): bool
         }
         error_log('Retail Zim engagement failed: ' . $error->getMessage());
         return false;
+    }
+}
+
+function retailzim_add_comment(int $postId, string $name, string $comment): array
+{
+    $db = retailzim_db();
+    $name = retailzim_limit_string($name, 80);
+    $comment = retailzim_limit_string($comment, 1200);
+    if (!$db || $postId <= 0 || $name === '' || $comment === '') {
+        return ['ok' => false, 'message' => 'Enter your name and comment.'];
+    }
+
+    try {
+        $db->beginTransaction();
+        $stmt = $db->prepare('INSERT INTO community_comments (post_id, name, comment, visitor_hash, created_at)
+            VALUES (:post_id, :name, :comment, :visitor_hash, :created_at)');
+        $createdAt = retailzim_now();
+        $stmt->execute([
+            ':post_id' => $postId,
+            ':name' => $name,
+            ':comment' => $comment,
+            ':visitor_hash' => retailzim_visitor_hash(),
+            ':created_at' => $createdAt,
+        ]);
+        $stmt = $db->prepare('UPDATE community_posts SET replies = replies + 1, updated_at = :updated_at WHERE id = :post_id');
+        $stmt->execute([':updated_at' => $createdAt, ':post_id' => $postId]);
+        $db->commit();
+        return ['ok' => true, 'comment' => ['name' => $name, 'comment' => $comment, 'created_at' => $createdAt]];
+    } catch (Throwable $error) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        error_log('Retail Zim comment failed: ' . $error->getMessage());
+        return ['ok' => false, 'message' => 'Your comment could not be saved.'];
     }
 }
 

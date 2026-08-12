@@ -64,10 +64,10 @@
             <i class="fa-regular fa-circle-check"></i><strong>All cashier money is accounted for</strong><span>No closed shifts are waiting for collection.</span>
           </div>
           <div class="supervisor-list" th:if="${!#lists.isEmpty(awaitingCollection)}">
-            <a th:each="session : ${awaitingCollection}" th:href="@{/shop/cash(collectShiftId=${session.id})}">
+            <a th:each="cashSession : ${awaitingCollection}" th:href="@{/shop/cash(collectShiftId=${cashSession.id})}">
               <span class="list-icon"><i class="fa-solid fa-cash-register"></i></span>
-              <div><strong th:text="${userNames.get(session.cashierId) ?: 'Cashier #' + session.cashierId}">Cashier</strong><small th:text="${'Shift #' + session.id + ' closed ' + #temporals.format(session.closedAt, 'dd MMM HH:mm')}">Shift</small></div>
-              <div><strong th:text="${'USD ' + #numbers.formatDecimal(session.expectedCashUsd ?: 0, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(session.expectedCashZwg ?: 0, 1, 2)}">ZWG 0.00</small></div>
+              <div><strong th:text="${userNames.get(cashSession.cashierId) ?: 'Cashier #' + cashSession.cashierId}">Cashier</strong><small th:text="${'Shift #' + cashSession.id + ' closed ' + #temporals.format(cashSession.closedAt, 'dd MMM HH:mm')}">Shift</small></div>
+              <div><strong th:text="${'USD ' + #numbers.formatDecimal(cashSession.expectedCashUsd ?: 0, 1, 2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(cashSession.expectedCashZwg ?: 0, 1, 2)}">ZWG 0.00</small></div>
               <i class="fa-solid fa-chevron-right"></i>
             </a>
           </div>
@@ -85,7 +85,7 @@
             <a th:each="po : ${readyToReceive}" th:href="@{/shop/purchasing}">
               <span class="list-icon stock"><i class="fa-solid fa-truck-ramp-box"></i></span>
               <div><strong th:text="${po.poNumber}">PO-001</strong><small th:text="${supplierNames.get(po.supplierId) ?: 'Supplier #' + po.supplierId}">Supplier</small></div>
-              <div><span class="badge status-pending" th:text="${po.status}">ORDERED</span><small th:text="${#lists.size(po.items) + ' lines'}">0 lines</small></div>
+              <div><span class="badge status-pending" th:text="${po.status}">ORDERED</span><small th:text="${po.itemCount + ' lines'}">0 lines</small></div>
               <i class="fa-solid fa-chevron-right"></i>
             </a>
           </div>

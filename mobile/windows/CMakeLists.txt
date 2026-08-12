@@ -29,8 +29,13 @@ set(CMAKE_SHARED_LINKER_FLAGS_PROFILE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_PROFILE "${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 
-# Use Unicode for all projects.
-add_definitions(-DUNICODE -D_UNICODE)
+# Use Unicode for all projects. permission_handler_windows 0.2.x still uses
+# Microsoft's deprecated experimental coroutine shim, so keep that plugin
+# buildable with current Visual Studio releases until the package is upgraded.
+add_definitions(
+  -DUNICODE
+  -D_UNICODE
+  -D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
 
 # Compilation settings that should be applied to most targets.
 #
@@ -61,19 +66,27 @@ include(flutter/generated_plugins.cmake)
 # flutter_secure_storage_windows uses CString, so expose the installed ATL
 # include directory explicitly while keeping credentials in Windows storage.
 file(GLOB RETAILZW_ATL_INCLUDE_DIRS
+  "${CMAKE_CURRENT_SOURCE_DIR}/../build/toolchain/atl/headers/Contents/VC/Tools/MSVC/*/atlmfc/include"
   "C:/Program Files/Microsoft Visual Studio/*/*/VC/Tools/MSVC/*/atlmfc/include"
   "C:/Program Files (x86)/Microsoft Visual Studio/*/*/VC/Tools/MSVC/*/atlmfc/include")
 file(GLOB RETAILZW_ATL_LIBRARY_DIRS
+  "${CMAKE_CURRENT_SOURCE_DIR}/../build/toolchain/atl/x64/Contents/VC/Tools/MSVC/*/atlmfc/lib/x64"
   "C:/Program Files/Microsoft Visual Studio/*/*/VC/Tools/MSVC/*/atlmfc/lib/x64"
   "C:/Program Files (x86)/Microsoft Visual Studio/*/*/VC/Tools/MSVC/*/atlmfc/lib/x64")
-if(TARGET flutter_secure_storage_windows_plugin AND RETAILZW_ATL_INCLUDE_DIRS)
-  list(GET RETAILZW_ATL_INCLUDE_DIRS 0 RETAILZW_ATL_INCLUDE_DIR)
-  target_include_directories(flutter_secure_storage_windows_plugin
-    PRIVATE "${RETAILZW_ATL_INCLUDE_DIR}")
-  if(RETAILZW_ATL_LIBRARY_DIRS)
-    list(GET RETAILZW_ATL_LIBRARY_DIRS 0 RETAILZW_ATL_LIBRARY_DIR)
-    target_link_directories(flutter_secure_storage_windows_plugin
-      PRIVATE "${RETAILZW_ATL_LIBRARY_DIR}")
+if(TARGET flutter_secure_storage_windows_plugin)
+  if(RETAILZW_ATL_INCLUDE_DIRS)
+    list(GET RETAILZW_ATL_INCLUDE_DIRS 0 RETAILZW_ATL_INCLUDE_DIR)
+    target_include_directories(flutter_secure_storage_windows_plugin
+      PRIVATE "${RETAILZW_ATL_INCLUDE_DIR}")
+    if(RETAILZW_ATL_LIBRARY_DIRS)
+      list(GET RETAILZW_ATL_LIBRARY_DIRS 0 RETAILZW_ATL_LIBRARY_DIR)
+      target_link_directories(flutter_secure_storage_windows_plugin
+        PRIVATE "${RETAILZW_ATL_LIBRARY_DIR}")
+    endif()
+  else()
+    message(FATAL_ERROR
+      "ATL headers are required. Run packaging/windows/build_windows.ps1 "
+      "to restore the verified build-only ATL package.")
   endif()
 endif()
 

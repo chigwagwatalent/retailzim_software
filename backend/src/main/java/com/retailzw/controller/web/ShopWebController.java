@@ -324,13 +324,15 @@ public class ShopWebController {
                 .filter(session -> !session.getCollectedAt().isBefore(todayStart)
                         && session.getCollectedAt().isBefore(tomorrowStart))
                 .toList();
-        List<PurchaseOrder> readyToReceive = purchaseOrders.findAllByTenantIdAndBranchIdOrderByCreatedAtDesc(tenantId, branchId)
-                .stream()
-                .filter(po -> PurchaseOrder.PoStatus.APPROVED.equals(po.getStatus())
-                        || PurchaseOrder.PoStatus.ORDERED.equals(po.getStatus())
-                        || PurchaseOrder.PoStatus.PARTIAL.equals(po.getStatus()))
-                .limit(8)
-                .toList();
+        List<PurchaseOrderRepository.SupervisorReadyOrderView> readyToReceive =
+                purchaseOrders.findSupervisorReadyOrders(
+                        tenantId,
+                        branchId,
+                        List.of(
+                                PurchaseOrder.PoStatus.APPROVED,
+                                PurchaseOrder.PoStatus.ORDERED,
+                                PurchaseOrder.PoStatus.PARTIAL),
+                        PageRequest.of(0, 8));
         List<GoodsReceivedNote> recentReceipts = goodsReceivedNotes.findByTenantIdAndBranchId(tenantId, branchId)
                 .stream()
                 .sorted(Comparator.comparing(GoodsReceivedNote::getCreatedAt,

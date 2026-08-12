@@ -74,6 +74,12 @@ class ShopLayoutContractTest {
         assertTrue(dashboard.contains("Purchase Orders to Receive"));
         assertTrue(dashboard.contains("Open Held Change"));
         assertTrue(dashboard.contains("Latest Goods Received Notes"));
+        assertTrue(dashboard.contains("po.itemCount"));
+        assertTrue(!dashboard.contains("po.items"),
+                "The production supervisor view must not initialize lazy purchase-order items");
+        assertTrue(!dashboard.contains("th:each=\"session :"),
+                "Thymeleaf reserves the web-context variable name 'session'");
+        assertTrue(dashboard.contains("th:each=\"cashSession : ${awaitingCollection}\""));
         assertTrue(purchasing.contains("supervisorUser != true"));
         assertTrue(returns.contains("supervisorUser != true"));
     }

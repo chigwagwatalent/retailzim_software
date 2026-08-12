@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'models/models.dart';
 import 'providers/app_provider.dart';
 import 'screens/auth/splash_screen.dart';
-import 'services/api_service.dart';
 import 'services/local_database.dart';
 import 'widgets/common_widgets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LocalDatabase.ensureInitialized();
-  await ApiService().isLoggedIn();
   runApp(const RetailZwApp());
 }
 
 class RetailZwApp extends StatelessWidget {
-  const RetailZwApp({super.key});
+  const RetailZwApp({super.key, this.restoreUser});
+
+  final Future<UserInfo?> Function()? restoreUser;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,8 @@ class RetailZwApp extends StatelessWidget {
           cardTheme: CardThemeData(
             color: Colors.white,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           inputDecorationTheme: InputDecorationTheme(
             filled: true,
@@ -52,7 +54,7 @@ class RetailZwApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const SplashScreen(),
+        home: SplashScreen(restoreUser: restoreUser),
       ),
     );
   }

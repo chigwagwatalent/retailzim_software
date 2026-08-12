@@ -6,6 +6,7 @@ class GasUser {
     required this.branchName,
     required this.displayName,
     required this.companyName,
+    this.username = '',
   });
 
   final String token;
@@ -14,20 +15,36 @@ class GasUser {
   final String branchName;
   final String displayName;
   final String companyName;
+  final String username;
+
+  String get cashierName {
+    final name = displayName.trim();
+    if (name.isNotEmpty) return name;
+    final login = username.trim();
+    return login.isEmpty ? 'Cashier' : login;
+  }
 
   factory GasUser.fromLogin(Map<String, dynamic> json) {
     if (json['branchModule'] != 'GAS_MODULE') {
       throw const FormatException(
           'This cashier is not assigned to a gas branch.');
     }
+    final username = json['username']?.toString().trim() ?? '';
+    final displayName =
+        '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim();
+    final accessToken = json['accessToken']?.toString().trim() ?? '';
+    if (accessToken.isEmpty) {
+      throw const FormatException(
+          'RetailZW did not return a valid cashier session.');
+    }
     return GasUser(
-      token: json['accessToken'] as String? ?? '',
+      token: accessToken,
       tenantId: (json['tenantId'] as num).toInt(),
       branchId: (json['branchId'] as num).toInt(),
       branchName: json['branchName'] as String? ?? 'Gas branch',
-      displayName:
-          '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim(),
+      displayName: displayName.isEmpty ? username : displayName,
       companyName: json['companyName'] as String? ?? 'RetailZW',
+      username: username,
     );
   }
 
@@ -38,6 +55,7 @@ class GasUser {
         'branchName': branchName,
         'displayName': displayName,
         'companyName': companyName,
+        'username': username,
       };
 
   factory GasUser.fromJson(Map<String, dynamic> json) => GasUser(
@@ -47,6 +65,7 @@ class GasUser {
         branchName: json['branchName'] as String,
         displayName: json['displayName'] as String,
         companyName: json['companyName'] as String,
+        username: json['username'] as String? ?? '',
       );
 }
 

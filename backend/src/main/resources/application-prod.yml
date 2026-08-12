@@ -1,11 +1,11 @@
 spring:
   application:
-    name: RetailZW SaaS Platform
+    name: RetailZW Platform
 
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/retail_zw?useSSL=false&serverTimezone=Africa/Harare&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:cHigwagwa1t}
+    url: jdbc:mysql://localhost:3306/retail_zw_v?useSSL=false&serverTimezone=Africa/Harare&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:espus}
+    password: ${DB_PASSWORD:@cHigwagwa1t@}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 50
@@ -23,7 +23,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: ${DDL_AUTO:update}
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -41,16 +41,16 @@ spring:
     baseline-on-migrate: true
 
   thymeleaf:
-    cache: ${THYMELEAF_CACHE:true}
+    cache: true
     encoding: UTF-8
     mode: HTML
     prefix: classpath:/templates/
     suffix: .html
 
   mail:
-    host: ${MAIL_HOST:mail.retailzw.co.zw}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:support@retailzw.co.zw}
+    host: mail.retailzw.co.zw
+    port: 587
+    username: support@retailzw.co.zw
     password: ${MAIL_PASSWORD:cHigwagwa1t}
     properties:
       mail:
@@ -68,8 +68,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 20MB
+      max-file-size: 300MB
+      max-request-size: 310MB
 
 management:
   health:
@@ -77,7 +77,8 @@ management:
       enabled: false
 
 server:
-  port: ${PORT:8080}
+  port: 8080
+  address: 0.0.0.0
   forward-headers-strategy: framework
   servlet:
     context-path: /
@@ -89,14 +90,14 @@ server:
       enabled: false
 
 jwt:
-  secret: ${JWT_SECRET:RetailZW-SaaS-Super-Secret-Key-2024-Zimbabwe-Retail-Platform-Key-Must-Be-Long-Enough}
-  access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY:604800000}
-  refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY:604800000}
+  secret: RetailZW-SaaS-Super-Secret-Key-2024-Zimbabwe-Retail-Platform-Key-Must-Be-Long-Enough
+  access-token-expiry: 604800000
+  refresh-token-expiry: 604800000
 
 app:
   name: RetailZW
   version: 1.0.0
-  base-url: ${APP_BASE_URL:https://retailzw.co.zw}
+  base-url: https://admin.retailzw.co.zw
   currencies:
     - code: USD
       name: US Dollar
@@ -106,31 +107,37 @@ app:
       symbol: ZWG
   default-currency: USD
   default-timezone: Africa/Harare
-  upload-dir: ${UPLOAD_DIR:uploads/}
+  upload-dir: uploads/
+  release-upload-dir: ${RETAILZW_RELEASE_UPLOAD_DIR:uploads/releases}
+  release-max-file-size-bytes: ${RETAILZW_RELEASE_MAX_FILE_SIZE_BYTES:314572800}
   max-login-attempts: 5
   lockout-duration-minutes: 15
   session-timeout-minutes: 5
   support-email: support@retailzw.co.zw
   mail:
-    from-name: ${MAIL_FROM_NAME:RetailZW}
-    support-from: ${MAIL_SUPPORT_FROM:support@retailzw.co.zw}
+    from-name: RetailZW
+    support-from: support@retailzw.co.zw
     support-password: ${MAIL_SUPPORT_PASSWORD:${MAIL_PASSWORD:cHigwagwa1t}}
-    billing-from: ${MAIL_BILLING_FROM:sales@retailzw.co.zw}
+    billing-from: sales@retailzw.co.zw
     billing-password: ${MAIL_BILLING_PASSWORD:${MAIL_PASSWORD:cHigwagwa1t}}
-    notifications-from: ${MAIL_NOTIFICATIONS_FROM:info@retailzw.co.zw}
+    notifications-from: info@retailzw.co.zw
     notifications-password: ${MAIL_NOTIFICATIONS_PASSWORD:${MAIL_PASSWORD:cHigwagwa1t}}
-    reply-to: ${MAIL_REPLY_TO:support@retailzw.co.zw}
+    reply-to: support@retailzw.co.zw
 
 smilepay:
-  base-url: ${SMILEPAY_BASE_URL:https://zbnet.zb.co.zw/wallet_gateway/payments-gateway}
-  api-key: ${SMILEPAY_API_KEY:66ab728f-563b-4a4e-9fc7-1743e549aa66}
-  api-secret: ${SMILEPAY_API_SECRET:c4b74356-55e8-45d2-b0ea-a132e3895784}
+  base-url: https://zbnet.zb.co.zw/wallet_gateway/payments-gateway
+  api-key: 66ab728f-563b-4a4e-9fc7-1743e549aa66
+  api-secret: c4b74356-55e8-45d2-b0ea-a132e3895784
 
 billing:
-  reminder-days: ${BILLING_REMINDER_DAYS:14,7,3,1,0,-1,-3}
-  in-app-reminder-days: ${BILLING_IN_APP_REMINDER_DAYS:14}
-  reminder-cron: "${BILLING_REMINDER_CRON:0 0 8 * * *}"
-  grace-days: ${BILLING_GRACE_DAYS:3}
+  reminder-days: 14,7,3,1,0,-1,-3
+  reminder-cron: "0 0 8 * * *"
+  grace-days: 3
+
+retailzim:
+  front-site:
+    base-url: ${RETAILZIM_FRONT_SITE_BASE_URL:https://retailzw.co.zw/}
+    api-key: ${RETAILZIM_FRONT_SITE_API_KEY:}
 
 logging:
   level:
@@ -144,11 +151,14 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: WARN
     com.zaxxer.hikari: INFO
     org.flywaydb: INFO
+
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} - %msg%n"
+
   file:
     name: logs/retailzw.log
+
   logback:
     rollingpolicy:
       file-name-pattern: logs/retailzw-%d{yyyy-MM-dd}.%i.log

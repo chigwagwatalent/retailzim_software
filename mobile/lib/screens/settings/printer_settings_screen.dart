@@ -398,7 +398,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: _printer.cutterCommand,
+                  initialValue: _printer.cutterCommand,
                   decoration: const InputDecoration(
                     labelText: 'Paper cutter profile',
                     prefixIcon: Icon(Icons.content_cut_rounded),

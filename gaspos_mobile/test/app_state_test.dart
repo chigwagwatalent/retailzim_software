@@ -24,7 +24,45 @@ class MemoryOfflineStore extends OfflineStore {
   Future<int> pendingCount() async => queued.length;
 }
 
+class ExpiredSessionApi extends GasApi {
+  bool loggedOut = false;
+
+  @override
+  Future<GasUser?> restoreUser() async => const GasUser(
+        token: 'expired-token',
+        tenantId: 7,
+        branchId: 1,
+        branchName: 'Gas Branch',
+        displayName: 'Tendai Moyo',
+        companyName: 'Retail Zim',
+        username: 'tendai',
+      );
+
+  @override
+  Future<Map<String, dynamic>> bootstrap(int branchId) {
+    throw const GasApiException(401, 'Authentication token has expired.');
+  }
+
+  @override
+  Future<void> logout() async {
+    loggedOut = true;
+  }
+}
+
 void main() {
+  test('expired saved session is cleared and returns to login', () async {
+    final api = ExpiredSessionApi();
+    final state = GasPosState(api: api, offline: MemoryOfflineStore());
+
+    await state.restore();
+
+    expect(api.loggedOut, isTrue);
+    expect(state.user, isNull);
+    expect(state.data, isNull);
+    expect(state.busy, isFalse);
+    expect(state.error, contains('saved sign-in has expired'));
+  });
+
   test('offline sale never makes a selected tank negative', () async {
     final offline = MemoryOfflineStore();
     final state = GasPosState(api: OfflineGasApi(), offline: offline)

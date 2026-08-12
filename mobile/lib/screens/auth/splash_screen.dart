@@ -1,9 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../models/models.dart';
+import '../../providers/app_provider.dart';
+import '../../services/api_service.dart';
 import '../../widgets/brand_mark.dart';
 import '../../widgets/common_widgets.dart';
+import '../home_screen.dart';
 import 'login_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -12,7 +17,10 @@ import 'login_screen.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({super.key, this.restoreUser});
+
+  /// Injectable for startup tests. Production restores the encrypted session.
+  final Future<UserInfo?> Function()? restoreUser;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -20,6 +28,8 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
+  final ApiService _api = ApiService();
+
   // Logo entrance
   late final AnimationController _logoCtrl;
   late final Animation<double> _logoScale;
@@ -78,18 +88,42 @@ class _SplashScreenState extends State<SplashScreen>
     )..forward();
 
     // ── Navigate — same timing as before ────────────────────────────────────
-    Future.delayed(const Duration(milliseconds: 1450), () {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 420),
-          pageBuilder: (_, animation, __) => FadeTransition(
-            opacity: animation,
-            child: const LoginScreen(),
-          ),
+    _continueStartup();
+  }
+
+  Future<UserInfo?> _restoreUser() async {
+    try {
+      if (widget.restoreUser != null) return widget.restoreUser!();
+      if (!await _api.isLoggedIn()) return null;
+      return _api.getSavedUser();
+    } catch (_) {
+      // Corrupt or unavailable secure storage must never trap startup.
+      return null;
+    }
+  }
+
+  Future<void> _continueStartup() async {
+    final results = await Future.wait<Object?>([
+      Future<void>.delayed(const Duration(milliseconds: 1450)),
+      _restoreUser(),
+    ]);
+    if (!mounted) return;
+
+    final user = results[1] as UserInfo?;
+    if (user != null) {
+      context.read<AppProvider>().setUser(user);
+    }
+    final destination = user == null ? const LoginScreen() : const HomeScreen();
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 420),
+        pageBuilder: (_, animation, __) => FadeTransition(
+          opacity: animation,
+          child: destination,
         ),
-      );
-    });
+      ),
+    );
   }
 
   @override

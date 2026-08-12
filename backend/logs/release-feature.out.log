@@ -1,0 +1,91 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-08-09 12:27:54.123 INFO  [main] com.retailzw.RetailSaasApplication - Starting RetailSaasApplication v1.0.0 using Java 17.0.11 with PID 4588 (C:\Users\talen\Desktop\JAVA PROJECTS\retailzim_software\backend\target\retail-saas-backend-1.0.0-exec.jar started by talen in C:\Users\talen\Desktop\JAVA PROJECTS\retailzim_software\backend)
+2026-08-09 12:27:54.133 INFO  [main] com.retailzw.RetailSaasApplication - No active profile set, falling back to 1 default profile: "default"
+2026-08-09 12:27:57.592 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-09 12:27:58.212 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 601 ms. Found 70 JPA repository interfaces.
+2026-08-09 12:28:02.655 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-08-09 12:28:02.671 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-08-09 12:28:02.671 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-08-09 12:28:02.792 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-08-09 12:28:02.793 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 8495 ms
+2026-08-09 12:28:04.180 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-08-09 12:28:04.941 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@1e7d3d87
+2026-08-09 12:28:04.944 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-08-09 12:28:05.243 INFO  [main] o.f.c.i.license.VersionPrinter - Flyway Community Edition 9.22.3 by Redgate
+2026-08-09 12:28:05.244 INFO  [main] o.f.c.i.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2026-08-09 12:28:05.244 INFO  [main] o.f.c.i.license.VersionPrinter - 
+2026-08-09 12:28:05.279 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/retail_zw (MySQL 8.0)
+2026-08-09 12:28:05.430 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 47 migrations (execution time 00:00.116s)
+2026-08-09 12:28:05.460 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema `retail_zw`: 47
+2026-08-09 12:28:05.466 INFO  [main] o.f.core.internal.command.DbMigrate - Schema `retail_zw` is up to date. No migration necessary.
+2026-08-09 12:28:05.656 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-09 12:28:05.779 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-08-09 12:28:05.843 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-08-09 12:28:06.266 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-09 12:28:06.357 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-09 12:28:10.810 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-09 12:28:11.156 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-09 12:28:12.798 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-09 12:28:15.484 INFO  [main] com.retailzw.service.EmailService - SMTP configured host=mail.retailzw.co.zw port=587 support=support@retailzw.co.zw billing=sales@retailzw.co.zw notifications=info@retailzw.co.zw
+2026-08-09 12:28:22.599 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-08-09 12:28:24.184 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-08-09 12:28:24.267 INFO  [main] com.retailzw.RetailSaasApplication - Started RetailSaasApplication in 31.248 seconds (process running for 32.05)
+2026-08-09 12:28:30.784 INFO  [http-nio-0.0.0.0-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-09 12:28:30.784 INFO  [http-nio-0.0.0.0-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-08-09 12:28:30.786 INFO  [http-nio-0.0.0.0-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-08-09 12:28:30.948 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /api/public/releases -> 200 (113 ms) client=127.0.0.1 requestId=6e64c694
+2026-08-09 12:28:31.035 WARN  [http-nio-0.0.0.0-8080-exec-2] c.r.config.RequestLoggingFilter - HTTP GET /api/public/releases/999999/download -> 404 (39 ms) client=127.0.0.1 requestId=9e9d8dc7
+2026-08-09 12:28:55.665 INFO  [http-nio-0.0.0.0-8080-exec-4] c.r.config.RequestLoggingFilter - HTTP GET /api/public/releases -> 200 (4 ms) client=127.0.0.1 requestId=c457ab6d
+2026-08-09 12:28:55.698 INFO  [http-nio-0.0.0.0-8080-exec-5] c.r.config.RequestLoggingFilter - HTTP GET /api/public/releases -> 200 (4 ms) client=127.0.0.1 requestId=e00397c1
+2026-08-09 12:28:55.971 INFO  [http-nio-0.0.0.0-8080-exec-6] c.r.config.RequestLoggingFilter - HTTP GET /api/public/releases/1/download -> 200 (229 ms) client=127.0.0.1 requestId=77769965
+2026-08-09 12:29:14.360 INFO  [http-nio-0.0.0.0-8080-exec-8] c.r.config.RequestLoggingFilter - HTTP GET /api/public/releases -> 200 (7 ms) client=127.0.0.1 requestId=8fba8866
+2026-08-09 15:38:09.011 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-08-09 15:38:09.018 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=27 reason=Email provider did not accept the confirmation.
+2026-08-09 15:50:19.176 INFO  [http-nio-0.0.0.0-8080-exec-10] c.r.config.RequestLoggingFilter - HTTP GET /api/public/releases -> 200 (3 ms) client=127.0.0.1 requestId=5263605b
+2026-08-09 15:50:56.331 INFO  [http-nio-0.0.0.0-8080-exec-1] c.r.config.RequestLoggingFilter - HTTP GET /api/public/releases/1/download -> 200 (549 ms) client=127.0.0.1 requestId=16522d33
+2026-08-09 19:54:22.069 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-08-09 19:54:22.075 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=28 reason=Email provider did not accept the confirmation.
+2026-08-10 00:10:35.394 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-08-10 00:10:35.413 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=29 reason=Email provider did not accept the confirmation.
+2026-08-10 04:26:49.209 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-08-10 04:26:49.215 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=30 reason=Email provider did not accept the confirmation.
+2026-08-10 08:43:02.246 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-08-10 08:43:02.251 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=31 reason=Email provider did not accept the confirmation.
+2026-08-10 12:59:16.012 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-08-10 12:59:16.018 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=32 reason=Email provider did not accept the confirmation.
+2026-08-10 17:15:29.620 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-08-10 17:15:29.625 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=33 reason=Email provider did not accept the confirmation.
+2026-08-10 21:31:42.530 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
+  nested exception is:
+	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+
+2026-08-10 21:31:42.535 WARN  [scheduling-1] c.r.s.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=34 reason=Email provider did not accept the confirmation.

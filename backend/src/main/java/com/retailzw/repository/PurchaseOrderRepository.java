@@ -27,8 +27,36 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
 
     List<PurchaseOrder> findAllByTenantIdAndBranchIdOrderByCreatedAtDesc(Long tenantId, Long branchId);
 
+    @Query("""
+            select po.id as id,
+                   po.poNumber as poNumber,
+                   po.supplierId as supplierId,
+                   po.status as status,
+                   count(item.id) as itemCount
+            from PurchaseOrder po
+            left join po.items item
+            where po.tenantId = :tenantId
+              and po.branchId = :branchId
+              and po.status in :statuses
+            group by po.id, po.poNumber, po.supplierId, po.status, po.createdAt
+            order by po.createdAt desc
+            """)
+    List<SupervisorReadyOrderView> findSupervisorReadyOrders(
+            @Param("tenantId") Long tenantId,
+            @Param("branchId") Long branchId,
+            @Param("statuses") List<PurchaseOrder.PoStatus> statuses,
+            Pageable pageable);
+
     List<PurchaseOrder> findByTenantIdAndSupplierId(Long tenantId, Long supplierId);
 
     boolean existsByPoNumber(String poNumber);
+
+    interface SupervisorReadyOrderView {
+        Long getId();
+        String getPoNumber();
+        Long getSupplierId();
+        PurchaseOrder.PoStatus getStatus();
+        Long getItemCount();
+    }
 }
 

@@ -26,17 +26,47 @@ class GasPosState extends ChangeNotifier {
   Future<void> restore() async {
     busy = true;
     notifyListeners();
-    user = await api.restoreUser();
-    if (user != null) await refresh();
-    busy = false;
-    notifyListeners();
+    try {
+      user = await api.restoreUser();
+      if (user != null) {
+        await refresh(rethrowAuthenticationFailure: true);
+      }
+    } on GasApiException catch (e) {
+      if (e.isAuthenticationFailure) {
+        await _clearSession(
+          'Your saved sign-in has expired. Enter your cashier credentials again.',
+        );
+      } else {
+        await _clearSession(
+          'Your saved sign-in could not be verified. Please sign in again.',
+        );
+      }
+    } catch (_) {
+      await _clearSession(
+        'Your saved sign-in could not be restored. Please sign in again.',
+      );
+    } finally {
+      busy = false;
+      notifyListeners();
+    }
   }
 
   Future<void> login(String username, String password,
       {bool rememberMe = true}) async {
     await _run(() async {
       user = await api.login(username, password, rememberMe: rememberMe);
-      await refresh();
+      try {
+        await refresh(rethrowAuthenticationFailure: true);
+      } catch (_) {
+        try {
+          await api.logout();
+        } catch (_) {
+          // The failed in-memory session must still be discarded.
+        }
+        user = null;
+        data = null;
+        rethrow;
+      }
     });
   }
 
@@ -44,10 +74,11 @@ class GasPosState extends ChangeNotifier {
     await api.logout();
     user = null;
     data = null;
+    error = null;
     notifyListeners();
   }
 
-  Future<void> refresh() async {
+  Future<void> refresh({bool rethrowAuthenticationFailure = false}) async {
     if (user == null) return;
     try {
       final payload = await api.bootstrap(user!.branchId);
@@ -56,6 +87,16 @@ class GasPosState extends ChangeNotifier {
       online = true;
       error = null;
       await syncPending();
+    } on GasApiException catch (e) {
+      if (e.isAuthenticationFailure) {
+        if (rethrowAuthenticationFailure) rethrow;
+        await _clearSession(
+          'Your session has expired. Sign in again to continue.',
+        );
+        return;
+      }
+      online = true;
+      error = e.message;
     } catch (e) {
       if (_networkError(e)) {
         online = false;
@@ -71,6 +112,20 @@ class GasPosState extends ChangeNotifier {
       }
     }
     pending = await offline.pendingCount();
+    notifyListeners();
+  }
+
+  Future<void> _clearSession(String message) async {
+    try {
+      await api.logout();
+    } catch (_) {
+      // The in-memory session still has to be cleared even when device
+      // credential storage is temporarily unavailable.
+    }
+    user = null;
+    data = null;
+    online = true;
+    error = message;
     notifyListeners();
   }
 

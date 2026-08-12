@@ -7,7 +7,7 @@
   <script>
     document.documentElement.dataset.theme = localStorage.getItem('retailzw-theme') || 'light';
   </script>
-  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=58)}">
+  <link rel="stylesheet" th:href="@{/css/retailzw.css(v=60)}">
   <link rel="stylesheet" th:href="@{/css/billing.css(v=3)}">
   <link rel="icon" type="image/png" th:href="@{/img/favicon.png}">
   <link rel="shortcut icon" th:href="@{/img/favicon.png}">
@@ -205,6 +205,7 @@
       <small th:if="${supportUnreadCount != null and supportUnreadCount > 0}" class="nav-pill" th:text="${supportUnreadCount}">0</small>
     </a>
     <a th:class="${active == 'community' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/website-community}"><i class="fa-solid fa-users"></i><span>Community</span></a>
+    <a th:class="${active == 'releases' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/releases}"><i class="fa-solid fa-cloud-arrow-up"></i><span>App Releases</span></a>
     <a th:class="${active == 'subscriptions' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/subscriptions}"><i class="fa-solid fa-receipt"></i><span>Subscriptions</span></a>
     <a th:class="${active == 'accounting' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/accounting}"><i class="fa-solid fa-chart-line"></i><span>Accounting</span></a>
     <a th:class="${active == 'reports' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/dashboard}"><i class="fa-solid fa-chart-column"></i><span>Reports</span></a>

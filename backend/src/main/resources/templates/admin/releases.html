@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('App Releases')}"></head>
+<body>
+<div class="app-shell platform-shell release-admin-page">
+  <aside th:replace="~{common/layout :: platformSidebar('releases')}"></aside>
+  <main class="main">
+    <nav th:replace="~{common/layout :: platformTopbar('App Releases')}"></nav>
+
+    <section class="release-page-header">
+      <div>
+        <p class="eyebrow">Distribution centre</p>
+        <h1>App Releases</h1>
+        <span>Manage, publish and monitor application versions.</span>
+      </div>
+      <button class="btn btn-primary release-new-button" type="button" data-release-modal-open data-modal-target="release-upload">
+        <i class="fa-solid fa-plus"></i>New release
+      </button>
+    </section>
+
+    <div th:if="${message}" class="alert release-alert success"><i class="fa-solid fa-circle-check"></i><span th:text="${message}">Saved.</span></div>
+    <div th:if="${error}" class="alert release-alert error"><i class="fa-solid fa-triangle-exclamation"></i><span th:text="${error}">Error.</span></div>
+
+    <section class="release-metric-grid" aria-label="Release summary">
+      <article><span class="release-metric-icon all"><i class="fa-solid fa-cube"></i></span><div><small>All releases</small><strong th:text="${#lists.size(releases)}">0</strong><em>Stored packages</em></div></article>
+      <article><span class="release-metric-icon live"><i class="fa-solid fa-circle-check"></i></span><div><small>Published</small><strong th:text="${publishedCount}">0</strong><em>Visible publicly</em></div></article>
+      <article><span class="release-metric-icon windows"><i class="fa-brands fa-windows"></i></span><div><small>Windows builds</small><strong th:text="${windowsCount}">0</strong><em>Installer and portable</em></div></article>
+      <article><span class="release-metric-icon android"><i class="fa-brands fa-android"></i></span><div><small>Android builds</small><strong th:text="${androidCount}">0</strong><em>Mobile APK packages</em></div></article>
+    </section>
+
+    <section class="release-table-panel">
+      <header class="release-table-heading">
+        <div><p class="eyebrow">Release library</p><h2>Application versions</h2><span>Review every build and control what customers can download.</span></div>
+        <span class="release-record-count"><b th:text="${#lists.size(releases)}">0</b> releases</span>
+      </header>
+
+      <div class="release-table-toolbar">
+        <label class="release-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" placeholder="Search version or title" aria-label="Search releases" data-release-search></label>
+        <label><span class="sr-only">Platform</span><select data-release-platform-filter><option value="">All platforms</option><option value="WINDOWS">Windows</option><option value="ANDROID">Android</option></select></label>
+        <label><span class="sr-only">Status</span><select data-release-status-filter><option value="">All statuses</option><option value="PUBLISHED">Published</option><option value="DRAFT">Draft</option></select></label>
+      </div>
+
+      <div class="release-table-wrap" th:unless="${#lists.isEmpty(releases)}">
+        <table class="release-management-table">
+          <thead><tr><th>Version</th><th>Platform</th><th>Package</th><th>Status</th><th>Published</th><th>Downloads</th><th>Created</th><th><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody data-release-table-body data-page-size="8">
+          <tr th:each="release : ${releases}" data-release-table-row
+              th:attr="data-search=${#strings.toLowerCase(release.version + ' ' + release.title + ' ' + release.originalFileName)},data-platform=${release.platform.name()},data-status=${release.published ? 'PUBLISHED' : 'DRAFT'}">
+            <td><div class="release-version-cell"><strong th:text="${release.version}">1.0.0</strong><small th:text="${release.title}">Retail Zim POS</small></div></td>
+            <td><span th:class="${release.platform.name() == 'ANDROID' ? 'release-platform android' : 'release-platform windows'}"><i th:class="${release.platform.name() == 'ANDROID' ? 'fa-brands fa-android' : 'fa-brands fa-windows'}"></i><b th:text="${#strings.capitalize(#strings.toLowerCase(release.platform.name()))}">Windows</b></span></td>
+            <td><div class="release-package-cell"><strong th:text="${#strings.replace(#strings.capitalize(#strings.toLowerCase(release.packageType.name())), '_', ' ')}">Installer</strong><small th:text="${#numbers.formatDecimal(release.fileSize / 1048576.0, 1, 1) + ' MB'}">0 MB</small></div></td>
+            <td><span th:class="${release.published ? 'release-status published' : 'release-status draft'}" th:text="${release.published ? 'Published' : 'Draft'}">Draft</span><span class="release-latest-badge" th:if="${release.latest}">Latest</span></td>
+            <td><div class="release-date-cell" th:if="${release.publishedAt != null}"><strong th:text="${#temporals.format(release.publishedAt, 'dd MMM yyyy')}">01 Jan 2026</strong><small th:text="${#temporals.format(release.publishedAt, 'HH:mm')}">10:00</small></div><span class="release-not-published" th:unless="${release.publishedAt != null}">Not published</span></td>
+            <td><strong class="release-download-count" th:text="${#numbers.formatInteger(release.downloadCount, 1, 'COMMA')}">0</strong></td>
+            <td><div class="release-date-cell"><strong th:text="${#temporals.format(release.createdAt, 'dd MMM yyyy')}">01 Jan 2026</strong><small th:text="${#temporals.format(release.createdAt, 'HH:mm')}">10:00</small></div></td>
+            <td class="release-actions-cell">
+              <details class="release-row-actions">
+                <summary aria-label="Release actions"><i class="fa-solid fa-ellipsis"></i></summary>
+                <div>
+                  <button type="button" data-release-edit-open th:attr="data-modal-target=${'release-edit-' + release.id}"><i class="fa-solid fa-pen"></i>Edit details</button>
+                  <form method="post" th:action="@{/admin/releases/{id}/publish(id=${release.id})}"><input type="hidden" name="published" th:value="${!release.published}"><button type="submit"><i th:class="${release.published ? 'fa-solid fa-eye-slash' : 'fa-solid fa-paper-plane'}"></i><span th:text="${release.published ? 'Unpublish' : 'Publish'}">Publish</span></button></form>
+                  <form method="post" th:if="${release.published and !release.latest}" th:action="@{/admin/releases/{id}/latest(id=${release.id})}"><button type="submit"><i class="fa-solid fa-star"></i>Mark as latest</button></form>
+                </div>
+              </details>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="release-empty" th:if="${#lists.isEmpty(releases)}"><i class="fa-solid fa-box-open"></i><h3>No releases yet</h3><p>Upload the first validated Windows or Android package.</p><button type="button" class="btn btn-primary" data-release-modal-open data-modal-target="release-upload">New release</button></div>
+      <div class="release-empty release-filter-empty" hidden data-release-filter-empty><i class="fa-solid fa-filter-circle-xmark"></i><h3>No matching releases</h3><p>Try a different search term or filter.</p></div>
+
+      <footer class="release-table-footer" th:unless="${#lists.isEmpty(releases)}">
+        <span data-release-page-summary>Showing releases</span>
+        <nav aria-label="Release pages" data-release-pages></nav>
+      </footer>
+    </section>
+
+    <div id="release-upload" class="release-modal" data-release-modal th:classappend="${error != null ? ' is-open' : ''}" th:attr="aria-hidden=${error == null}">
+      <button class="release-modal-backdrop" type="button" aria-label="Close new release dialog" data-release-modal-close></button>
+      <section class="release-modal-card release-create-modal" role="dialog" aria-modal="true" aria-labelledby="release-upload-title">
+        <header class="release-modal-header"><div><p class="eyebrow">New release</p><h2 id="release-upload-title">Publish new release</h2><span>Upload and configure a production application build.</span></div><button type="button" aria-label="Close" data-release-modal-close><i class="fa-solid fa-xmark"></i></button></header>
+        <form class="release-upload-form" method="post" enctype="multipart/form-data" th:action="@{/admin/releases/upload}" data-release-upload-form>
+          <div class="release-modal-body">
+            <div class="release-modal-form-row release-platform-row">
+              <fieldset class="release-platform-picker"><legend>Platform</legend><label><input type="radio" name="platform" value="WINDOWS" checked><span><i class="fa-brands fa-windows"></i><b>Windows</b></span></label><label><input type="radio" name="platform" value="ANDROID"><span><i class="fa-brands fa-android"></i><b>Android</b></span></label></fieldset>
+              <label class="release-field"><span>Package type</span><select name="packageType" required data-release-package-type><option value="INSTALLER">Installer (.exe or .msi)</option><option value="PORTABLE_ZIP">Portable ZIP (.zip)</option></select></label>
+            </div>
+            <div class="release-modal-form-row"><label class="release-field"><span>Version</span><input name="version" required maxlength="50" placeholder="1.2.0"></label><label class="release-field"><span>Display title</span><input name="title" required maxlength="160" placeholder="Retail Zim POS 1.2"></label></div>
+            <label class="release-field"><span>Short description</span><input name="description" required maxlength="500" placeholder="Summarise this build for customers."></label>
+            <label class="release-field"><span>Release notes</span><textarea name="releaseNotes" rows="3" placeholder="List the important improvements and fixes."></textarea></label>
+            <label class="release-field"><span>Minimum requirements</span><input name="minimumRequirements" maxlength="500" value="Windows 10/11, 4 GB RAM" data-release-requirements></label>
+            <label class="release-dropzone" data-release-dropzone><input type="file" name="file" required accept=".exe,.msi,.zip" data-release-file><span class="release-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span><strong>Drop installer or <b>click to browse</b></strong><small>EXE, MSI, ZIP or APK · maximum 300 MB</small><em data-release-file-name>No file selected</em></label>
+            <div class="release-publish-options"><label><span class="release-option-icon"><i class="fa-solid fa-bolt"></i></span><span><b>Publish immediately</b><small>Make this release available on the download website.</small></span><input class="release-toggle" type="checkbox" name="published" value="true"></label><label><span class="release-option-icon"><i class="fa-regular fa-star"></i></span><span><b>Mark as latest</b><small>Show this as the recommended release.</small></span><input class="release-toggle" type="checkbox" name="latest" value="true"></label></div>
+            <p class="release-security-note"><i class="fa-solid fa-shield-halved"></i><span><b>Security verification</b>SHA-256 checksum and package signature will be verified.</span></p>
+          </div>
+          <footer class="release-modal-footer"><button class="btn btn-light" type="button" data-release-modal-close>Cancel</button><button class="btn btn-primary release-submit" type="submit" data-release-submit><i class="fa-solid fa-shield-halved"></i>Validate &amp; publish</button></footer>
+        </form>
+      </section>
+    </div>
+
+    <div th:each="release : ${releases}" th:id="${'release-edit-' + release.id}" class="release-modal" data-release-modal aria-hidden="true">
+      <button class="release-modal-backdrop" type="button" aria-label="Close edit dialog" data-release-modal-close></button>
+      <section class="release-modal-card release-edit-modal" role="dialog" aria-modal="true">
+        <header class="release-modal-header"><div><p class="eyebrow">Release metadata</p><h2>Edit release details</h2><span th:text="${release.originalFileName}">package.exe</span></div><button type="button" aria-label="Close" data-release-modal-close><i class="fa-solid fa-xmark"></i></button></header>
+        <form method="post" th:action="@{/admin/releases/{id}/metadata(id=${release.id})}">
+          <div class="release-modal-body">
+            <div class="release-modal-form-row"><label class="release-field"><span>Version</span><input name="version" required th:value="${release.version}"></label><label class="release-field"><span>Display title</span><input name="title" required th:value="${release.title}"></label></div>
+            <label class="release-field"><span>Short description</span><textarea name="description" required rows="3" th:text="${release.description}"></textarea></label>
+            <label class="release-field"><span>Release notes</span><textarea name="releaseNotes" rows="4" th:text="${release.releaseNotes}"></textarea></label>
+            <label class="release-field"><span>Minimum requirements</span><input name="minimumRequirements" th:value="${release.minimumRequirements}"></label>
+            <p class="release-checksum"><i class="fa-solid fa-fingerprint"></i><span><b>SHA-256 checksum</b><code th:text="${release.sha256Checksum}">checksum</code></span></p>
+          </div>
+          <footer class="release-modal-footer"><button class="btn btn-light" type="button" data-release-modal-close>Cancel</button><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save details</button></footer>
+        </form>
+      </section>
+    </div>
+  </main>
+</div>
+<script th:src="@{/js/release-admin.js(v=2)}"></script>
+</body>
+</html>

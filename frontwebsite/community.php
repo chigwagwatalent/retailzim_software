@@ -1,126 +1,81 @@
 <?php
 require_once __DIR__ . '/lib/site-content.php';
 retailzim_record_visit('community');
-$posts = retailzim_posts_with_answers(8);
-rz_header('Retail Zim Community | Questions, Guides and Product Help', 'Ask questions, share ideas, read guides, and follow Retail Zim product updates in the customer community.', 'community');
+$posts = retailzim_posts_with_answers(20);
+rz_header('Retail Zim Community | Questions, Comments and Product Help', 'Join the Retail Zim community to post questions, comment on discussions, react to posts, read guides, and get product support.', 'community');
+
+function rz_initials(string $name): string {
+    $parts = preg_split('/\s+/', trim($name));
+    $first = strtoupper(substr($parts[0] ?? 'R', 0, 1));
+    $second = strtoupper(substr($parts[1] ?? 'Z', 0, 1));
+    return $first . $second;
+}
 ?>
-<main>
+<main class="community-page">
   <section class="community-hero">
-    <div class="community-hero-copy">
-      <span class="eyebrow">Retail Zim Community</span>
-      <h1>Learn retail faster with people using the same system.</h1>
-      <p>Ask questions, follow product updates, read setup guides, and get practical answers for POS, stock, payments, receipts, and shift reports.</p>
-      <div class="community-pills">
-        <span>Questions</span>
-        <span>Guides</span>
-        <span>News</span>
-        <span>Feature ideas</span>
-        <span>Support answers</span>
-      </div>
-    </div>
-    <div class="community-spotlight">
-      <article>
-        <span class="support-badge">Solved by Retail Zim Support</span>
-        <h2>How do I import products from Excel?</h2>
-        <p>Upload your product sheet, match columns, preview the changes, then confirm the import.</p>
-        <div class="answer-preview"><b>Step-by-step answer</b><span>Download template -> fill products -> import -> review stock quantities.</span></div>
-      </article>
-    </div>
+    <div class="community-hero-copy"><span class="eyebrow">Retail Zim Community</span><h1>Shop owners helping shop owners.</h1><p>Share questions, comment on real retail discussions, follow product updates, and get practical answers from the Retail Zim support team.</p><div class="community-pills"><span><i class="fa-solid fa-comments"></i> Discussions</span><span><i class="fa-solid fa-circle-check"></i> Solved answers</span><span><i class="fa-solid fa-book-open"></i> Guides</span><span><i class="fa-solid fa-lightbulb"></i> Ideas</span></div></div>
+    <div class="community-hero-card"><div class="community-hero-avatars"><span>RZ</span><span>TM</span><span>MG</span><span>KH</span></div><strong>One connected retail community</strong><p>Ask clearly. Learn quickly. Run your shop better.</p><a href="#create-post">Start a discussion <i class="fa-solid fa-arrow-down"></i></a></div>
   </section>
 
   <section class="community-layout">
-    <aside class="community-panel community-topics">
-      <h2>Browse topics</h2>
-      <a class="topic-card active" href="#community-feed"><i>?</i><span><b>Help questions</b><small>POS, setup, and daily use</small></span><strong>42</strong></a>
-      <a class="topic-card" href="#community-feed"><i>$</i><span><b>Payments</b><small>Cash, card, mobile money</small></span><strong>8</strong></a>
-      <a class="topic-card" href="#community-feed"><i>#</i><span><b>Stock control</b><small>Imports and quantities</small></span><strong>16</strong></a>
-      <a class="topic-card" href="#community-feed"><i>R</i><span><b>Receipts</b><small>Thermal printer setup</small></span><strong>7</strong></a>
-      <a class="topic-card" href="#community-feed"><i>N</i><span><b>News</b><small>Product updates</small></span><strong>5</strong></a>
+    <aside class="community-left">
+      <article class="community-panel community-profile"><div class="community-avatar large-avatar">RZ</div><h2>Retail Zim Community</h2><p>A practical space for customers, retailers and support.</p><div><span><strong><?= count($posts) ?></strong> discussions</span><span><strong>6</strong> topics</span></div></article>
+      <nav class="community-panel topic-nav" aria-label="Community topics"><h2>Explore</h2><button class="active" type="button" data-feed-filter="all"><i class="fa-solid fa-house"></i>All discussions</button><button type="button" data-feed-filter="Question"><i class="fa-solid fa-circle-question"></i>Questions</button><button type="button" data-feed-filter="Stock control"><i class="fa-solid fa-boxes-stacked"></i>Stock control</button><button type="button" data-feed-filter="Payment"><i class="fa-solid fa-wallet"></i>Payments</button><button type="button" data-feed-filter="Guide"><i class="fa-solid fa-book-open"></i>Guides</button><button type="button" data-feed-filter="Feature request"><i class="fa-solid fa-lightbulb"></i>Feature ideas</button></nav>
     </aside>
 
     <section class="community-main" id="community-feed">
-      <form class="community-composer" action="<?= htmlspecialchars(rz_url('community-post')) ?>" method="post">
-        <div class="composer-row">
-          <div class="community-avatar">RZ</div>
-          <input name="message" required placeholder="Ask about your shop, POS, stock, payments, or reports...">
-          <button class="btn btn-primary" type="submit">Post</button>
+      <form class="community-composer" id="create-post" action="<?= htmlspecialchars(rz_url('community-post')) ?>" method="post" data-community-composer>
+        <div class="composer-row"><div class="community-avatar">YOU</div><button type="button" class="composer-prompt" data-composer-expand>What would you like to ask the community?</button></div>
+        <div class="composer-fields" data-composer-fields>
+          <textarea name="message" required maxlength="1200" placeholder="Share a question, tip, idea or update..."></textarea>
+          <div><input name="name" required maxlength="80" placeholder="Your name"><input name="shop" maxlength="80" placeholder="Shop name or city"><select name="category"><option>Question</option><option>Stock control</option><option>Payment</option><option>Receipts</option><option>Products</option><option>Guide</option><option>Feature request</option><option>Support</option></select></div>
+          <footer><span><i class="fa-solid fa-image"></i> Screenshots can be described in your post</span><button class="btn btn-primary" type="submit">Post discussion <i class="fa-solid fa-paper-plane"></i></button></footer>
         </div>
-        <div class="composer-more">
-          <input name="name" required placeholder="Your name">
-          <input name="shop" placeholder="Shop name or city">
-          <select name="category">
-            <option>Question</option>
-            <option>Guide</option>
-            <option>Feature request</option>
-            <option>Payment</option>
-            <option>Support</option>
-          </select>
-        </div>
-        <div class="composer-actions"><span>Add screenshot</span><span>Choose category</span><span>Mark urgent</span></div>
       </form>
 
-      <nav class="community-tabs" aria-label="Community filters">
-        <a class="active" href="#community-feed">Featured</a>
-        <a href="#community-feed">Latest</a>
-        <a href="#community-feed">Answered</a>
-        <a href="#community-guides">Guides</a>
-        <a href="#community-feed">Ideas</a>
-      </nav>
+      <div class="community-tabs"><button class="active" type="button" data-feed-sort="latest">Latest</button><button type="button" data-feed-sort="popular">Popular</button><button type="button" data-feed-filter="answered">Answered</button></div>
 
       <div class="community-feed community-feed-rich">
-        <article class="community-post featured-post">
-          <header>
-            <div class="member"><div class="community-avatar">MG</div><span><b>MSN Grocery</b><small>Harare - 12 minutes ago</small></span></div>
-            <em class="status answered">Answered</em>
-          </header>
-          <h2>My 80mm receipt is printing too far to the right. What should I check?</h2>
-          <p>The prices are being cut on the right side of the paper when we print from the Windows POS.</p>
-          <blockquote><b>Retail Zim Support:</b> Open printer settings, choose 80mm paper width, then use the Retail Zim receipt alignment option. Keep margins at zero and print a test receipt.</blockquote>
-          <footer><span><button type="button">24 likes</button><button type="button">8 replies</button><button type="button">Follow</button></span><strong>Receipts</strong></footer>
-        </article>
-
         <?php foreach ($posts as $post): ?>
-          <article class="community-post">
-            <header>
-              <div class="member"><div class="community-avatar"><?= htmlspecialchars(strtoupper(substr($post['name'], 0, 1) . (!empty($post['shop']) ? substr($post['shop'], 0, 1) : ''))) ?></div><span><b><?= htmlspecialchars($post['name']) ?></b><small><?= !empty($post['shop']) ? htmlspecialchars($post['shop']) . ' - ' : '' ?>Community post</small></span></div>
-              <em class="status"><?= htmlspecialchars($post['status']) ?></em>
-            </header>
-            <h2><?= htmlspecialchars($post['category']) ?></h2>
-            <p><?= htmlspecialchars($post['message']) ?></p>
+          <?php $postId = (int)$post['id']; $postCategory = (string)$post['category']; ?>
+          <article class="community-post" data-community-post data-category="<?= htmlspecialchars($postCategory) ?>" data-status="<?= htmlspecialchars((string)$post['status']) ?>" data-likes="<?= (int)$post['likes'] ?>">
+            <header><div class="member"><div class="community-avatar"><?= htmlspecialchars(rz_initials((string)$post['name'])) ?></div><span><b><?= htmlspecialchars((string)$post['name']) ?></b><small><?= htmlspecialchars((string)($post['shop'] ?: $postCategory)) ?> · <?= htmlspecialchars(date('j M Y', strtotime((string)$post['created_at']))) ?></small></span></div><em class="status <?= in_array($post['status'], ['answered','solved'], true) ? 'answered' : '' ?>"><?= htmlspecialchars(ucfirst((string)$post['status'])) ?></em></header>
+            <span class="post-category"><?= htmlspecialchars($postCategory) ?></span>
+            <p class="post-message"><?= nl2br(htmlspecialchars((string)$post['message'])) ?></p>
+
             <?php if (!empty($post['answers'])): ?>
-              <?php foreach ($post['answers'] as $answer): ?>
-                <blockquote><b><?= htmlspecialchars($answer['responder']) ?>:</b> <?= htmlspecialchars($answer['answer']) ?></blockquote>
-              <?php endforeach; ?>
+              <div class="support-answer-list">
+                <?php foreach ($post['answers'] as $answer): ?>
+                  <div class="support-answer"><div class="community-avatar support-avatar"><i class="fa-solid fa-headset"></i></div><div><b><?= htmlspecialchars((string)$answer['responder']) ?> <span><i class="fa-solid fa-circle-check"></i> Official answer</span></b><p><?= nl2br(htmlspecialchars((string)$answer['answer'])) ?></p></div></div>
+                <?php endforeach; ?>
+              </div>
             <?php endif; ?>
-            <footer><span><button type="button" data-engage-post="<?= (int)$post['id'] ?>" data-action="like"><?= (int)$post['likes'] ?> likes</button><button type="button" data-engage-post="<?= (int)$post['id'] ?>" data-action="reply"><?= (int)$post['replies'] ?> replies</button><button type="button">Follow</button></span><strong><?= htmlspecialchars($post['category']) ?></strong></footer>
+
+            <div class="engagement-summary"><span data-like-summary><i class="fa-solid fa-thumbs-up"></i> <?= (int)$post['likes'] ?></span><span data-comment-summary><?= (int)$post['replies'] ?> comments</span></div>
+            <div class="post-actions">
+              <button type="button" data-engage-post="<?= $postId ?>" data-action="like"><i class="fa-regular fa-thumbs-up"></i><span>Like</span></button>
+              <button type="button" data-comment-toggle><i class="fa-regular fa-comment"></i><span>Comment</span></button>
+              <button type="button" data-share-post><i class="fa-solid fa-share"></i><span>Share</span></button>
+            </div>
+
+            <div class="comment-thread" data-comment-thread>
+              <?php foreach (($post['comments'] ?? []) as $comment): ?>
+                <div class="community-comment"><div class="community-avatar small-avatar"><?= htmlspecialchars(rz_initials((string)$comment['name'])) ?></div><div><b><?= htmlspecialchars((string)$comment['name']) ?></b><p><?= nl2br(htmlspecialchars((string)$comment['comment'])) ?></p><small><?= htmlspecialchars(date('j M · H:i', strtotime((string)$comment['created_at']))) ?></small></div></div>
+              <?php endforeach; ?>
+            </div>
+            <form class="comment-form" data-comment-form data-demo="<?= $postId > 0 ? 'false' : 'true' ?>">
+              <input type="hidden" name="post_id" value="<?= $postId ?>"><input name="name" required maxlength="80" placeholder="Your name"><div><input name="comment" required maxlength="1200" placeholder="Write a comment..."><button type="submit" aria-label="Post comment"><i class="fa-solid fa-paper-plane"></i></button></div><small data-comment-message></small>
+            </form>
           </article>
         <?php endforeach; ?>
       </div>
+      <div class="feed-empty" hidden data-feed-empty><i class="fa-solid fa-comments"></i><h2>No discussions in this view yet.</h2><p>Start a new post and help build the conversation.</p></div>
     </section>
 
-    <aside class="community-side">
-      <article class="community-news-card">
-        <span class="eyebrow">Product news</span>
-        <h2>Windows POS installer is ready</h2>
-        <p>Download the latest POS build, install it on your counter machine, and connect your shop account.</p>
-        <a class="btn btn-light" href="<?= htmlspecialchars(rz_url('downloads')) ?>">View downloads</a>
-      </article>
-      <article class="community-panel" id="community-guides">
-        <h2>Popular guides</h2>
-        <div class="guide-list">
-          <a href="<?= htmlspecialchars(rz_url('how-it-works')) ?>"><b>1</b><span><strong>Open and close a shift</strong><small>Cashier daily workflow</small></span></a>
-          <a href="<?= htmlspecialchars(rz_url('resources')) ?>"><b>2</b><span><strong>Import products</strong><small>Excel template setup</small></span></a>
-          <a href="<?= htmlspecialchars(rz_url('payments')) ?>"><b>3</b><span><strong>Set up payments</strong><small>Cash, swipe, mobile money</small></span></a>
-        </div>
-      </article>
-      <article class="community-panel">
-        <h2>Active members</h2>
-        <div class="guide-list">
-          <a href="#community-feed"><b>RZ</b><span><strong>Retail Zim Support</strong><small>Official answers</small></span></a>
-          <a href="#community-feed"><b>MG</b><span><strong>MSN Grocery</strong><small>Receipt setup</small></span></a>
-          <a href="#community-feed"><b>TM</b><span><strong>Tariro Mini Mart</strong><small>Stock imports</small></span></a>
-        </div>
-      </article>
+    <aside class="community-right">
+      <article class="community-panel community-news"><span class="section-kicker">Product news</span><i class="fa-solid fa-laptop-code"></i><h2>Windows POS and mobile selling work together.</h2><p>Use one shop account across the counter, phone and management dashboard.</p><a href="<?= htmlspecialchars(rz_url('downloads')) ?>">View downloads <i class="fa-solid fa-arrow-right"></i></a></article>
+      <article class="community-panel"><h2>Popular guides</h2><div class="guide-list"><a href="<?= htmlspecialchars(rz_url('resources')) ?>"><b>01</b><span><strong>Import products</strong><small>Excel setup</small></span></a><a href="<?= htmlspecialchars(rz_url('how-it-works')) ?>"><b>02</b><span><strong>Run a shift</strong><small>Cashier workflow</small></span></a><a href="<?= htmlspecialchars(rz_url('payments')) ?>"><b>03</b><span><strong>Set up payments</strong><small>Cash, card and mobile money</small></span></a></div></article>
+      <article class="community-panel community-rules"><h2>Community values</h2><p><i class="fa-solid fa-check"></i> Be practical and respectful</p><p><i class="fa-solid fa-check"></i> Protect customer information</p><p><i class="fa-solid fa-check"></i> Share enough detail to help</p></article>
     </aside>
   </section>
 </main>

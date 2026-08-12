@@ -10,11 +10,16 @@ import org.springframework.web.client.RestClient;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Slf4j
 public class FrontWebsiteCommunityService {
+    private static final Set<String> ANSWER_STATUSES = Set.of("answered", "solved", "featured");
+    private static final int MAX_ANSWER_LENGTH = 4_000;
+
     private final RestClient restClient;
     private final String apiKey;
 
@@ -27,10 +32,16 @@ public class FrontWebsiteCommunityService {
     }
 
     public CommunityDashboard dashboard(String status, int days) {
-        return new CommunityDashboard(fetchPosts(status), fetchStats(days));
+        FetchResult<List<CommunityPost>> posts = loadPosts(status);
+        FetchResult<VisitStats> stats = loadStats(days);
+        return new CommunityDashboard(posts.value(), stats.value(), posts.available() && stats.available());
     }
 
     public List<CommunityPost> fetchPosts(String status) {
+        return loadPosts(status).value();
+    }
+
+    private FetchResult<List<CommunityPost>> loadPosts(String status) {
         try {
             String uri = status == null || status.isBlank()
                     ? "/api/community/posts?limit=100"
@@ -38,28 +49,41 @@ public class FrontWebsiteCommunityService {
             CommunityPostsResponse response = status == null || status.isBlank()
                     ? restClient.get().uri(uri).retrieve().body(CommunityPostsResponse.class)
                     : restClient.get().uri(uri, status).retrieve().body(CommunityPostsResponse.class);
-            return response == null || response.posts() == null ? List.of() : response.posts();
+            if (response == null || !Boolean.TRUE.equals(response.ok())) {
+                return new FetchResult<>(List.of(), false);
+            }
+            return new FetchResult<>(response.posts() == null ? List.of() : response.posts(), true);
         } catch (Exception ex) {
             log.warn("Could not fetch Retail Zim front website community posts: {}", ex.getMessage());
-            return List.of();
+            return new FetchResult<>(List.of(), false);
         }
     }
 
     public VisitStats fetchStats(int days) {
+        return loadStats(days).value();
+    }
+
+    private FetchResult<VisitStats> loadStats(int days) {
         try {
             VisitStatsResponse response = restClient.get()
                     .uri("/api/visits/stats?days={days}", Math.max(1, Math.min(days, 365)))
                     .retrieve()
                     .body(VisitStatsResponse.class);
-            return response == null || response.stats() == null ? VisitStats.empty() : response.stats();
+            if (response == null || !Boolean.TRUE.equals(response.ok()) || response.stats() == null) {
+                return new FetchResult<>(VisitStats.empty(), false);
+            }
+            return new FetchResult<>(response.stats(), true);
         } catch (Exception ex) {
             log.warn("Could not fetch Retail Zim front website visit stats: {}", ex.getMessage());
-            return VisitStats.empty();
+            return new FetchResult<>(VisitStats.empty(), false);
         }
     }
 
     public boolean answerPost(Long postId, String answer, String responder, String status) {
-        if (postId == null || postId <= 0 || answer == null || answer.isBlank()) {
+        String cleanAnswer = answer == null ? "" : answer.trim();
+        String cleanStatus = status == null ? "answered" : status.trim().toLowerCase(Locale.ROOT);
+        if (postId == null || postId <= 0 || cleanAnswer.isBlank()
+                || cleanAnswer.length() > MAX_ANSWER_LENGTH || !ANSWER_STATUSES.contains(cleanStatus)) {
             return false;
         }
         try {
@@ -69,9 +93,9 @@ public class FrontWebsiteCommunityService {
                     .header("X-RetailZim-Admin-Key", apiKey)
                     .body(Map.of(
                             "post_id", postId,
-                            "answer", answer,
+                            "answer", cleanAnswer,
                             "responder", responder == null || responder.isBlank() ? "Retail Zim Support" : responder,
-                            "status", status == null || status.isBlank() ? "answered" : status
+                            "status", cleanStatus
                     ))
                     .retrieve()
                     .body(AnswerResponse.class);
@@ -87,7 +111,10 @@ public class FrontWebsiteCommunityService {
         return clean.endsWith("/") ? clean.substring(0, clean.length() - 1) : clean;
     }
 
-    public record CommunityDashboard(List<CommunityPost> posts, VisitStats stats) {
+    private record FetchResult<T>(T value, boolean available) {
+    }
+
+    public record CommunityDashboard(List<CommunityPost> posts, VisitStats stats, boolean online) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -127,6 +154,30 @@ public class FrontWebsiteCommunityService {
         public String shopTimeLabel() {
             String time = createdAt == null ? "" : createdAt;
             return shop == null || shop.isBlank() ? time : shop + " - " + time;
+        }
+
+        public String safeStatus() {
+            if (status == null || status.isBlank()) {
+                return "open";
+            }
+            String normalized = status.trim().toLowerCase(Locale.ROOT);
+            return switch (normalized) {
+                case "answered", "solved", "featured" -> normalized;
+                default -> "open";
+            };
+        }
+
+        public boolean isOpen() {
+            return "open".equals(safeStatus());
+        }
+
+        public String statusLabel() {
+            return switch (safeStatus()) {
+                case "answered" -> "Answered";
+                case "solved" -> "Solved";
+                case "featured" -> "Featured";
+                default -> "Needs reply";
+            };
         }
     }
 

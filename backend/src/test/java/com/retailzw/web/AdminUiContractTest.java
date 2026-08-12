@@ -134,4 +134,68 @@ class AdminUiContractTest {
                 .contains(".billing-period-modal")
                 .contains(".legacy-package-review");
     }
+
+    @Test
+    void appReleasesUseTableLibraryAndModalPublishing() throws IOException {
+        String releases = Files.readString(ADMIN_ROOT.resolve("releases.html"));
+        String css = Files.readString(STYLES);
+        String javascript = Files.readString(
+                Path.of("src/main/resources/static/js/release-admin.js"));
+
+        assertThat(releases)
+                .contains("Release library")
+                .contains("release-management-table")
+                .contains("Search version or title")
+                .contains("data-release-pages")
+                .contains("Publish new release")
+                .contains("data-release-modal")
+                .contains("Validate &amp; publish")
+                .contains("/publish")
+                .contains("/latest")
+                .contains("/metadata")
+                .doesNotContain("release-admin-layout")
+                .doesNotContain("release-workflow-panel");
+        assertThat(css)
+                .contains(".release-table-panel")
+                .contains(".release-management-table")
+                .contains(".release-modal-card")
+                .contains(".release-table-footer");
+        assertThat(javascript)
+                .contains("data-release-modal-open")
+                .contains("data-release-platform-filter")
+                .contains("renderTable()")
+                .contains("release-modal-open");
+    }
+
+    @Test
+    void communityUsesTheProductionInboxAndConversationWorkspace() throws IOException {
+        String community = Files.readString(ADMIN_ROOT.resolve("website-community.html"));
+        String css = Files.readString(STYLES);
+        String javascript = Files.readString(
+                Path.of("src/main/resources/static/js/community-admin.js"));
+
+        assertThat(community)
+                .contains("Community Command Center")
+                .contains("community-kpi-grid")
+                .contains("community-inbox-panel")
+                .contains("community-conversation-panel")
+                .contains("community-reply-composer")
+                .contains("Community activity")
+                .contains("Top pages")
+                .contains("data-community-thread")
+                .contains("/answer")
+                .contains("maxlength=\"4000\"")
+                .doesNotContain("website-question-card");
+        assertThat(css)
+                .contains("Community Command Center")
+                .contains(".community-workspace")
+                .contains(".community-inbox-row")
+                .contains(".community-reply-composer")
+                .contains(".community-insights-grid");
+        assertThat(javascript)
+                .contains("selectConversation")
+                .contains("data-community-chart")
+                .contains("data-topic-value")
+                .contains("Sending...");
+    }
 }

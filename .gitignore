@@ -1,1 +1,5 @@
 /backend/target/
+/backend/uploads/
+
+# Local debug package exceeds GitHub's per-file size limit.
+/gaspos_mobile/releases/GasPOS-RetailZW-v1.0.4-auth-fix-debug.apk

@@ -17,27 +17,39 @@ void main() {
 }
 
 class GasPosApp extends StatefulWidget {
-  const GasPosApp({super.key});
+  const GasPosApp({
+    super.key,
+    this.appState,
+    this.minimumSplashDuration = const Duration(milliseconds: 700),
+  });
+
+  final GasPosState? appState;
+  final Duration minimumSplashDuration;
+
   @override
   State<GasPosApp> createState() => _GasPosAppState();
 }
 
 class _GasPosAppState extends State<GasPosApp> {
-  final state = GasPosState();
+  late final GasPosState state;
   bool showingSplash = true;
 
   @override
   void initState() {
     super.initState();
+    state = widget.appState ?? GasPosState();
     _restore();
   }
 
   Future<void> _restore() async {
-    await Future.wait([
-      state.restore(),
-      Future<void>.delayed(const Duration(milliseconds: 700)),
-    ]);
-    if (mounted) setState(() => showingSplash = false);
+    try {
+      await Future.wait([
+        state.restore(),
+        Future<void>.delayed(widget.minimumSplashDuration),
+      ]);
+    } finally {
+      if (mounted) setState(() => showingSplash = false);
+    }
   }
 
   @override
@@ -65,7 +77,7 @@ class _GasPosAppState extends State<GasPosApp> {
                     side: BorderSide(color: Color(0xFFD9E3F1)),
                     borderRadius: BorderRadius.all(Radius.circular(14)))),
           ),
-          home: showingSplash || (state.busy && state.user == null)
+          home: showingSplash
               ? const Splash()
               : state.user == null
                   ? LoginScreen(state: state)
@@ -131,6 +143,12 @@ class _LoginScreenState extends State<LoginScreen> {
   bool rememberMe = true;
   bool obscurePassword = true;
   String? loginError;
+
+  @override
+  void initState() {
+    super.initState();
+    loginError = widget.state.error;
+  }
 
   Future<void> submit() async {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -437,7 +455,7 @@ class _GasShellState extends State<GasShell> with WidgetsBindingObserver {
           ),
           const SizedBox(height: 3),
           Text(
-            state.user!.branchName,
+            '${state.user!.branchName}  •  ${state.user!.cashierName}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -469,11 +487,45 @@ class _GasShellState extends State<GasShell> with WidgetsBindingObserver {
             ),
           ),
           PopupMenuButton<String>(
+              tooltip: 'Cashier account: ${state.user!.cashierName}',
               onSelected: (value) {
                 if (value == 'logout') state.logout();
               },
-              itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'logout', child: Text('Sign out'))
+              itemBuilder: (_) => [
+                    PopupMenuItem<String>(
+                      enabled: false,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            state.user!.cashierName,
+                            style: const TextStyle(
+                              color: navy,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          if (state.user!.username.trim().isNotEmpty)
+                            Text(
+                              '@${state.user!.username}',
+                              style: const TextStyle(
+                                color: Color(0xFF526985),
+                                fontSize: 12,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    const PopupMenuItem(
+                      value: 'logout',
+                      child: Row(
+                        children: [
+                          Icon(Icons.logout_rounded, size: 19),
+                          SizedBox(width: 10),
+                          Text('Sign out'),
+                        ],
+                      ),
+                    ),
                   ])
         ],
       ),
@@ -1002,7 +1054,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
               style: const TextStyle(color: Colors.blueGrey)),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-              value: first,
+              initialValue: first,
               decoration: const InputDecoration(labelText: 'Payment method'),
               items: methods
                   .map((method) => DropdownMenuItem(
@@ -1026,7 +1078,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
                     const InputDecoration(labelText: 'First payment amount')),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
-                value: second,
+                initialValue: second,
                 decoration: InputDecoration(
                     labelText:
                         'Second method - ${widget.currency} ${amount2.toStringAsFixed(2)}'),

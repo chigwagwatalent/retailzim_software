@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,18 @@ class CashierOnlyApi extends GasApi {
     throw const HttpException(
         'Only cashier accounts can sign in on the mobile app.');
   }
+}
+
+class DelayedLoginApi extends GasApi {
+  final loginResult = Completer<GasUser>();
+
+  @override
+  Future<GasUser?> restoreUser() async => null;
+
+  @override
+  Future<GasUser> login(String username, String password,
+          {bool rememberMe = true}) =>
+      loginResult.future;
 }
 
 void main() {
@@ -65,5 +78,38 @@ void main() {
           'GasPOS accepts cashier accounts only. Ask the shop administrator to create or update your cashier account.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets(
+      'signing in keeps the login page mounted and shows invalid credentials',
+      (tester) async {
+    final api = DelayedLoginApi();
+    final state = GasPosState(api: api);
+    await tester.pumpWidget(
+      GasPosApp(
+        appState: state,
+        minimumSplashDuration: Duration.zero,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Cashier username'), 'cashier');
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Password'), 'wrong-password');
+    await tester.tap(find.text('Sign in'));
+    await tester.pump();
+
+    expect(find.byType(Splash), findsNothing);
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    api.loginResult.completeError(
+      const GasApiException(400, 'Invalid username or password.'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Invalid username or password.'), findsOneWidget);
+    expect(find.byType(LoginScreen), findsOneWidget);
   });
 }

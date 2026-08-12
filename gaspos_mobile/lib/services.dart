@@ -8,6 +8,14 @@ import 'package:sqflite/sqflite.dart';
 
 import 'models.dart';
 
+class GasApiException extends HttpException {
+  const GasApiException(this.statusCode, String message) : super(message);
+
+  final int statusCode;
+
+  bool get isAuthenticationFailure => statusCode == 401 || statusCode == 403;
+}
+
 class GasApi {
   GasApi({http.Client? client}) : _client = client ?? http.Client();
 
@@ -45,6 +53,10 @@ class GasApi {
     if (raw == null) return null;
     final user = GasUser.fromJson(jsonDecode(raw) as Map<String, dynamic>);
     token = await _secure.read(key: 'gaspos_token') ?? user.token;
+    if (token == null || token!.trim().isEmpty) {
+      await logout();
+      return null;
+    }
     return user;
   }
 
@@ -108,15 +120,19 @@ class GasApi {
       }
       envelope = Map<String, dynamic>.from(decoded);
     } on FormatException {
-      throw HttpException(_statusMessage(response.statusCode));
+      throw GasApiException(
+          response.statusCode, _statusMessage(response.statusCode));
     }
     if (response.statusCode < 200 ||
         response.statusCode >= 300 ||
         envelope['success'] == false) {
       final message = envelope['message']?.toString().trim();
-      throw HttpException(message == null || message.isEmpty
-          ? _statusMessage(response.statusCode)
-          : message);
+      throw GasApiException(
+        response.statusCode,
+        message == null || message.isEmpty
+            ? _statusMessage(response.statusCode)
+            : message,
+      );
     }
     final data = envelope['data'];
     if (data == null) return <String, dynamic>{};

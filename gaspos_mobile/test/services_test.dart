@@ -47,4 +47,26 @@ void main() {
       ),
     );
   });
+
+  test('API authentication failures retain their HTTP status', () async {
+    final api = GasApi(
+      client: MockClient(
+        (_) async => http.Response(
+          '{"success":false,"message":"Authentication token has expired."}',
+          401,
+          headers: {'content-type': 'application/json'},
+        ),
+      ),
+    );
+
+    await expectLater(
+      api.bootstrap(4),
+      throwsA(
+        isA<GasApiException>()
+            .having((error) => error.statusCode, 'statusCode', 401)
+            .having(
+                (error) => error.isAuthenticationFailure, 'auth failure', true),
+      ),
+    );
+  });
 }
