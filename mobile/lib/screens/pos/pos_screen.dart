@@ -10,17 +10,21 @@ import '../../models/models.dart';
 import '../../providers/app_provider.dart';
 import '../../services/api_service.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/product_picture.dart';
 import 'payment_screen.dart';
 
 class PosScreen extends StatefulWidget {
-  const PosScreen({super.key});
+  const PosScreen({super.key, this.sidebarHeader, this.api});
+
+  final Widget? sidebarHeader;
+  final ApiService? api;
 
   @override
   State<PosScreen> createState() => _PosScreenState();
 }
 
 class _PosScreenState extends State<PosScreen> {
-  final ApiService _api = ApiService();
+  late final ApiService _api = widget.api ?? ApiService();
   final TextEditingController _search = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
   Timer? _barcodeDebounce;
@@ -113,7 +117,7 @@ class _PosScreenState extends State<PosScreen> {
     final session = provider.activeSession;
 
     if (session == null) {
-      return Center(
+      final emptyShift = Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
@@ -145,6 +149,14 @@ class _PosScreenState extends State<PosScreen> {
           ),
         ),
       );
+      if (widget.sidebarHeader == null) return emptyShift;
+      return Row(children: [
+        SizedBox(
+            width: 190,
+            child: Column(
+                children: [const SizedBox(height: 12), widget.sidebarHeader!])),
+        Expanded(child: emptyShift),
+      ]);
     }
 
     return CallbackShortcuts(
@@ -170,15 +182,24 @@ class _PosScreenState extends State<PosScreen> {
         autofocus: true,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final desktop = constraints.maxWidth >= 1180;
+            final desktop = constraints.maxWidth >= 1000;
             final wide = constraints.maxWidth >= 840;
             if (desktop) {
               return Row(
                 children: [
-                  SizedBox(width: 182, child: _categoryPane(provider)),
+                  SizedBox(
+                      width: 190,
+                      child: Column(children: [
+                        if (widget.sidebarHeader != null) ...[
+                          const SizedBox(height: 12),
+                          widget.sidebarHeader!,
+                          const Divider(indent: 14, endIndent: 14)
+                        ],
+                        Expanded(child: _categoryPane(provider)),
+                      ])),
                   Expanded(child: _productPane(provider, desktop: true)),
                   Container(
-                    width: 500,
+                    width: constraints.maxWidth >= 1400 ? 460 : 410,
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       border: Border(
@@ -229,7 +250,7 @@ class _PosScreenState extends State<PosScreen> {
   Widget _categoryPane(AppProvider provider) {
     final products = provider.products;
     return Container(
-      color: const Color(0xFFF8FAFC),
+      color: Colors.white,
       padding: const EdgeInsets.fromLTRB(14, 18, 14, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,24 +270,27 @@ class _PosScreenState extends State<PosScreen> {
             selected: _selectedCategoryId == null,
             onTap: () => setState(() => _selectedCategoryId = null),
           ),
-          ..._categories.map((category) => _CategoryButton(
-                label: category.name,
-                count: products
-                    .where((product) => product.categoryId == category.id)
-                    .length,
-                selected: _selectedCategoryId == category.id,
-                onTap: () => setState(() => _selectedCategoryId = category.id),
-              )),
-          if (_categories.isEmpty) ...[
-            const SizedBox(height: 10),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('Categories appear after the next online sync.',
-                  style: TextStyle(
-                      color: AppColors.textMuted, fontSize: 11, height: 1.4)),
-            ),
-          ],
-          const Spacer(),
+          Expanded(
+              child: ListView(children: [
+            ..._categories.map((category) => _CategoryButton(
+                  label: category.name,
+                  count: products
+                      .where((product) => product.categoryId == category.id)
+                      .length,
+                  selected: _selectedCategoryId == category.id,
+                  onTap: () =>
+                      setState(() => _selectedCategoryId = category.id),
+                )),
+            if (_categories.isEmpty) ...[
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Text('Categories appear after the next online sync.',
+                    style: TextStyle(
+                        color: AppColors.textMuted, fontSize: 11, height: 1.4)),
+              ),
+            ],
+          ])),
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -313,6 +337,35 @@ class _PosScreenState extends State<PosScreen> {
 
     return Column(
       children: [
+        if (desktop)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 20, 18, 0),
+            child: Row(children: [
+              const Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Text('Point of sale',
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF102447))),
+                    SizedBox(height: 4),
+                    Text('Find a product or scan a barcode',
+                        style: TextStyle(
+                            fontSize: 12, color: AppColors.textMuted)),
+                  ])),
+              IconButton(
+                  tooltip: 'Sync products from server',
+                  onPressed: _loading ? null : () => _loadProducts(),
+                  icon: const Icon(Icons.sync_rounded,
+                      color: AppColors.primaryBlue)),
+              OutlinedButton.icon(
+                  onPressed: (_loading || _importing) ? null : _importProducts,
+                  icon: const Icon(Icons.upload_file_outlined, size: 17),
+                  label: Text(_importing ? 'Importing…' : 'Import Excel')),
+            ]),
+          ),
         // Search + sync bar
         Container(
           color: AppColors.background,
@@ -365,54 +418,56 @@ class _PosScreenState extends State<PosScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
-              Tooltip(
-                message: 'Import products from Excel',
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: (_loading || _importing) ? null : _importProducts,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F766E),
-                      borderRadius: BorderRadius.circular(8),
+              if (!desktop) ...[
+                const SizedBox(width: 10),
+                Tooltip(
+                  message: 'Import products from Excel',
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: (_loading || _importing) ? null : _importProducts,
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F766E),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: _importing
+                          ? const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Icon(Icons.file_upload_rounded,
+                              color: Colors.white, size: 20),
                     ),
-                    child: _importing
-                        ? const Padding(
-                            padding: EdgeInsets.all(12),
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.file_upload_rounded,
-                            color: Colors.white, size: 20),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Tooltip(
-                message: 'Sync products from server',
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: _loading ? null : () => _loadProducts(),
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryBlue,
-                      borderRadius: BorderRadius.circular(8),
+                const SizedBox(width: 10),
+                Tooltip(
+                  message: 'Sync products from server',
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: _loading ? null : () => _loadProducts(),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryBlue,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: _loading
+                          ? const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Icon(Icons.cloud_sync_rounded,
+                              color: Colors.white, size: 20),
                     ),
-                    child: _loading
-                        ? const Padding(
-                            padding: EdgeInsets.all(12),
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.cloud_sync_rounded,
-                            color: Colors.white, size: 20),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ),
@@ -443,14 +498,21 @@ class _PosScreenState extends State<PosScreen> {
                     padding: EdgeInsets.fromLTRB(
                         desktop ? 18 : 14, 0, desktop ? 18 : 14, 14),
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: desktop ? 168 : 200,
-                      childAspectRatio: desktop ? 0.88 : 0.78,
+                      maxCrossAxisExtent: desktop ? 280 : 200,
+                      mainAxisExtent: desktop ? 174 : null,
+                      childAspectRatio: 0.78,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                     ),
                     itemCount: searched.length,
                     itemBuilder: (context, index) {
                       final product = searched[index];
+                      if (desktop) {
+                        return _DesktopProductTile(
+                            product: product,
+                            currency: provider.currency,
+                            onTap: () => _addProduct(product));
+                      }
                       return _ProductTile(
                         product: product,
                         currency: provider.currency,
@@ -487,8 +549,9 @@ class _PosScreenState extends State<PosScreen> {
             decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(color: Color(0xFFEDF2F7))),
             ),
-            child: Row(
-              children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
                 const Icon(Icons.shopping_cart_rounded,
                     color: AppColors.primaryBlue, size: 20),
                 const SizedBox(width: 8),
@@ -512,7 +575,9 @@ class _PosScreenState extends State<PosScreen> {
                             fontSize: 11,
                             fontWeight: FontWeight.w700)),
                   ),
-                const Spacer(),
+              ]),
+              const SizedBox(height: 10),
+              Row(children: [
                 // Currency toggle
                 Container(
                   decoration: BoxDecoration(
@@ -548,6 +613,7 @@ class _PosScreenState extends State<PosScreen> {
                     }).toList(),
                   ),
                 ),
+                const Spacer(),
                 if (provider.cart.isNotEmpty) ...[
                   const SizedBox(width: 8),
                   IconButton(
@@ -560,8 +626,8 @@ class _PosScreenState extends State<PosScreen> {
                         const BoxConstraints(minWidth: 32, minHeight: 32),
                   ),
                 ],
-              ],
-            ),
+              ]),
+            ]),
           ),
 
           InkWell(
@@ -725,13 +791,13 @@ class _PosScreenState extends State<PosScreen> {
                         : () => _openPayment(provider),
                     icon: const Icon(Icons.payments_rounded, size: 20),
                     label: Text(
-                      'Pay  ${provider.cart.isEmpty ? '' : formatCurrency(total, provider.currency)}',
+                      'Charge  ${provider.cart.isEmpty ? '' : formatCurrency(total, provider.currency)}',
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w800),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accentYellow,
-                      foregroundColor: AppColors.primaryBlue,
+                      backgroundColor: AppColors.primaryBlue,
+                      foregroundColor: Colors.white,
                       disabledBackgroundColor: const Color(0xFFE8ECF0),
                       disabledForegroundColor: AppColors.textMuted,
                       elevation: 0,
@@ -1449,6 +1515,81 @@ class _CartActionButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
         side: const BorderSide(color: Color(0xFFDDE5EF)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+}
+
+class _DesktopProductTile extends StatelessWidget {
+  const _DesktopProductTile(
+      {required this.product, required this.currency, required this.onTap});
+  final Product product;
+  final String currency;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final inStock = product.quantityOnHand > 0;
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: Color(0xFFDCE7F2))),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: inStock ? onTap : null,
+        child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(children: [
+              Expanded(
+                  flex: 4,
+                  child: SizedBox(
+                      height: 110, child: ProductPicture(product: product))),
+              const SizedBox(width: 12),
+              Expanded(
+                  flex: 6,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(product.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF102447))),
+                        const SizedBox(height: 9),
+                        FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                                formatCurrency(
+                                    product.priceForCurrency(currency),
+                                    currency),
+                                style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF102447)))),
+                        const SizedBox(height: 8),
+                        Text(
+                            inStock
+                                ? 'In stock: ${product.quantityOnHand.toStringAsFixed(0)}'
+                                : 'Out of stock',
+                            style: TextStyle(
+                                fontSize: 11,
+                                color: inStock
+                                    ? AppColors.successGreen
+                                    : AppColors.errorRed)),
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: Icon(
+                                inStock ? Icons.add_circle : Icons.block,
+                                size: 30,
+                                color: inStock
+                                    ? AppColors.primaryBlue
+                                    : AppColors.textMuted)),
+                      ])),
+            ])),
       ),
     );
   }

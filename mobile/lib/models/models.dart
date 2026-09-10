@@ -31,6 +31,7 @@ class UserInfo {
   final String lastName;
   final String role;
   final int? branchId;
+  final String branchName;
   final int? tenantId;
   final String tenantCode;
   final String branchModule;
@@ -55,6 +56,7 @@ class UserInfo {
     required this.lastName,
     required this.role,
     this.branchId,
+    this.branchName = '',
     this.tenantId,
     this.tenantCode = '',
     this.branchModule = 'SHOP_MODULE',
@@ -83,6 +85,7 @@ class UserInfo {
       lastName: json['lastName'] as String? ?? '',
       role: json['role'] as String? ?? '',
       branchId: (json['branchId'] as num?)?.toInt(),
+      branchName: (json['branchName'] as String? ?? '').trim(),
       tenantId: (json['tenantId'] as num?)?.toInt(),
       tenantCode: json['tenantCode'] as String? ?? '',
       branchModule: json['branchModule'] as String? ?? 'SHOP_MODULE',
@@ -110,6 +113,7 @@ class UserInfo {
         'lastName': lastName,
         'role': role,
         'branchId': branchId,
+        'branchName': branchName,
         'tenantId': tenantId,
         'tenantCode': tenantCode,
         'branchModule': branchModule,
@@ -335,10 +339,9 @@ class Product {
       imageUrl: json['imageUrl'] as String?,
       quantityOnHand: _toDouble(json['quantityOnHand']),
       wholesaleEnabled: json['wholesaleEnabled'] as bool? ?? false,
-      wholesaleMinimumQuantity:
-          json['wholesaleMinimumQuantity'] == null
-              ? null
-              : _toDouble(json['wholesaleMinimumQuantity']),
+      wholesaleMinimumQuantity: json['wholesaleMinimumQuantity'] == null
+          ? null
+          : _toDouble(json['wholesaleMinimumQuantity']),
       wholesalePriceUsd: json['wholesalePriceUsd'] == null
           ? null
           : _toDouble(json['wholesalePriceUsd']),

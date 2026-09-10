@@ -45,6 +45,8 @@ class _LoginScreenState extends State<LoginScreen>
       if (mounted && value != null && value.isNotEmpty) {
         setState(() => _usernameCtrl.text = value);
       }
+    }).catchError((Object _) {
+      // A missing/unavailable credential store must not prevent manual login.
     });
   }
 
@@ -57,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _signIn() async {
+    if (_busy) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() {
       _busy = true;
@@ -94,6 +97,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    if (width >= 1000) return _desktopLogin();
     final maxWidth = width >= 720 ? 420.0 : double.infinity;
 
     return Scaffold(
@@ -263,6 +267,153 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _desktopLogin() {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Row(children: [
+        Expanded(
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFDFF2FF), Color(0xFFF0F8FF)]),
+            ),
+            child: LayoutBuilder(builder: (context, bounds) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(44, 30, 36, 24),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Semantics(
+                          label: 'RetailZW',
+                          image: true,
+                          child: Image.asset('assets/images/retailzw_logo.png',
+                              width: 340, height: 120, fit: BoxFit.contain)),
+                      const SizedBox(height: 18),
+                      Text('Every sale.\nA smoother shift.',
+                          style: TextStyle(
+                              fontSize: bounds.maxHeight < 700 ? 36 : 48,
+                              height: 1.08,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF102447))),
+                      const SizedBox(height: 20),
+                      Container(
+                          width: 72, height: 5, color: const Color(0xFF00B6E9)),
+                      const SizedBox(height: 12),
+                      Expanded(
+                          child: Image.asset(
+                              'assets/images/windows_login_hero.png',
+                              fit: BoxFit.contain)),
+                      const Text('Built for your everyday retail.',
+                          style: TextStyle(
+                              color: AppColors.textMuted, letterSpacing: 1.2)),
+                    ]),
+              );
+            }),
+          ),
+        ),
+        Expanded(
+            child: Center(
+                child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 32),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Form(
+                key: _formKey,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Welcome back',
+                          style: TextStyle(
+                              fontSize: 42,
+                              height: 1.15,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF102447))),
+                      const SizedBox(height: 12),
+                      const Text('Clean POS access for today\'s shift.',
+                          style: TextStyle(
+                              fontSize: 18, color: AppColors.textMuted)),
+                      const SizedBox(height: 36),
+                      if (_error != null) ...[
+                        _ErrorBanner(message: _error!),
+                        const SizedBox(height: 18)
+                      ],
+                      _LoginField(
+                          controller: _usernameCtrl,
+                          label: 'Username',
+                          icon: Icons.person_outline_rounded,
+                          validator: (value) => (value?.trim().isEmpty ?? true)
+                              ? 'Enter username'
+                              : null),
+                      const SizedBox(height: 22),
+                      _LoginField(
+                          controller: _passwordCtrl,
+                          label: 'Password',
+                          icon: Icons.lock_outline_rounded,
+                          obscure: _obscure,
+                          action: TextInputAction.done,
+                          onSubmit: (_) => _signIn(),
+                          trailing: IconButton(
+                              tooltip:
+                                  _obscure ? 'Show password' : 'Hide password',
+                              onPressed: () =>
+                                  setState(() => _obscure = !_obscure),
+                              icon: Icon(_obscure
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined)),
+                          validator: (value) => (value?.isEmpty ?? true)
+                              ? 'Enter password'
+                              : null),
+                      const SizedBox(height: 26),
+                      SizedBox(
+                          width: double.infinity,
+                          height: 60,
+                          child: FilledButton(
+                              onPressed: _busy ? null : _signIn,
+                              style: FilledButton.styleFrom(
+                                  backgroundColor: const Color(0xFF087DDF),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10))),
+                              child: _busy
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
+                                  : const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                          Text('Sign In',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700)),
+                                          SizedBox(width: 20),
+                                          Icon(Icons.arrow_forward_rounded)
+                                        ]))),
+                      const SizedBox(height: 20),
+                      const Center(
+                          child: Text('Press Enter to sign in',
+                              style: TextStyle(color: AppColors.textMuted))),
+                      const SizedBox(height: 42),
+                      const Divider(color: Color(0xFFE1E8F0)),
+                      const SizedBox(height: 22),
+                      const Row(children: [
+                        Icon(Icons.offline_bolt_outlined,
+                            color: Color(0xFF087DDF)),
+                        SizedBox(width: 12),
+                        Expanded(
+                            child: Text('Online and offline shift ready',
+                                style: TextStyle(color: AppColors.textMuted)))
+                      ]),
+                    ])),
+          ),
+        ))),
+      ]),
     );
   }
 }

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
 
 import 'models/models.dart';
 import 'providers/app_provider.dart';
 import 'screens/auth/splash_screen.dart';
 import 'services/local_database.dart';
+import 'services/tls_trust.dart';
 import 'widgets/common_widgets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await TlsTrust.initialize();
   LocalDatabase.ensureInitialized();
   runApp(const RetailZwApp());
 }
@@ -32,6 +35,13 @@ class RetailZwApp extends StatelessWidget {
             secondary: AppColors.accentYellow,
           ),
           useMaterial3: true,
+          fontFamily: Platform.isWindows ? 'Segoe UI' : null,
+          outlinedButtonTheme: OutlinedButtonThemeData(
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.textDark,
+                  side: const BorderSide(color: Color(0xFFCCDCEA)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)))),
           scaffoldBackgroundColor: AppColors.background,
           appBarTheme: const AppBarTheme(
             backgroundColor: AppColors.primaryBlue,

@@ -1,13 +1,21 @@
 #define MyAppName "RetailZW POS"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.1.0"
+  #define MyAppVersion "1.2.4"
 #endif
 #define MyAppPublisher "RetailZW"
 #define MyAppURL "https://retailzw.co.zw"
 #define MyAppExeName "RetailZWPOS.exe"
 
 [Setup]
+#ifdef InstallerSmokeTest
+AppId=RetailZW-POS-Installer-Smoke-Test
+DefaultDirName={localappdata}\RetailZW-Installer-Smoke-Test
+PrivilegesRequired=lowest
+#else
 AppId={{B7D98743-7C56-4D83-AC71-9CA524FCB1C8}
+DefaultDirName={autopf64}\RetailZW POS
+PrivilegesRequired=admin
+#endif
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
@@ -15,7 +23,6 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf64}\RetailZW POS
 DefaultGroupName=RetailZW POS
 DisableProgramGroupPage=yes
 OutputDir=..\..\dist
@@ -27,7 +34,6 @@ WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.17763
-PrivilegesRequired=admin
 UninstallDisplayIcon={app}\{#MyAppExeName}
 UninstallDisplayName={#MyAppName}
 CloseApplications=yes
@@ -46,14 +52,15 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 
 [Files]
 Source: "..\..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\..\REDISTRUTABLE\vc_redist.x64.exe"; DestDir: "{tmp}"; DestName: "vc_redist.x64.exe"; Flags: deleteafterinstall
+Source: "..\..\..\REDISTRUTABLE\vc_redist.x64.exe"; Flags: dontcopy
 
 [Icons]
+#ifndef InstallerSmokeTest
 Name: "{autoprograms}\RetailZW POS"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\RetailZW POS"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+#endif
 
 [Run]
-Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "Installing Microsoft Visual C++ Runtime..."; Flags: runhidden waituntilterminated
 Filename: "{app}\{#MyAppExeName}"; Description: "Launch RetailZW POS"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
@@ -62,50 +69,56 @@ Type: dirifempty; Name: "{app}"
 
 [Code]
 var
-  ServerPage: TInputQueryWizardPage;
+  RuntimeRestartRequired: Boolean;
 
-procedure InitializeWizard;
+function RuntimeInstalled: Boolean;
+var
+  Installed, Major, Minor, Build: Cardinal;
+  Key: String;
 begin
-  ServerPage := CreateInputQueryPage(
-    wpSelectDir,
-    'RetailZW Server',
-    'Connect this till to your RetailZW backend',
-    'Enter the full server URL used by this shop. The production URL is already selected.'
-  );
-  ServerPage.Add('Server base URL:', False);
-  ServerPage.Values[0] := 'https://admin.retailzw.co.zw';
+  Key := 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64';
+  Result := RegQueryDWordValue(HKLM64, Key, 'Installed', Installed) and (Installed = 1)
+    and RegQueryDWordValue(HKLM64, Key, 'Major', Major)
+    and RegQueryDWordValue(HKLM64, Key, 'Minor', Minor)
+    and RegQueryDWordValue(HKLM64, Key, 'Bld', Build);
+  if Result then
+    Result := (Major > 14) or ((Major = 14) and ((Minor > 51) or ((Minor = 51) and (Build >= 36247))));
 end;
 
-function NextButtonClick(CurPageID: Integer): Boolean;
+function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
-  Value: String;
-  LowerValue: String;
+  ExitCode: Integer;
 begin
-  Result := True;
-  if CurPageID = ServerPage.ID then
+  Result := '';
+  if RuntimeInstalled then exit;
+  ExtractTemporaryFile('vc_redist.x64.exe');
+  if not Exec(ExpandConstant('{tmp}\vc_redist.x64.exe'), '/install /quiet /norestart',
+      '', SW_HIDE, ewWaitUntilTerminated, ExitCode) then
   begin
-    Value := Trim(ServerPage.Values[0]);
-    LowerValue := Lowercase(Value);
-    if (Value = '') or
-       ((Pos('http://', LowerValue) <> 1) and
-        (Pos('https://', LowerValue) <> 1)) then
-    begin
-      MsgBox(
-        'Enter a complete URL beginning with http:// or https://.',
-        mbError,
-        MB_OK
-      );
-      Result := False;
-    end;
+    Result := 'Could not start the Microsoft Visual C++ runtime installer. Restart Windows and run setup again.';
+    exit;
   end;
+  if (ExitCode = 3010) or (ExitCode = 1641) then
+    RuntimeRestartRequired := True
+  else if (ExitCode <> 0) and not ((ExitCode = 1638) and RuntimeInstalled) then
+    Result := Format('Microsoft Visual C++ runtime installation failed (code %d). Restart Windows and retry setup.', [ExitCode]);
+end;
+
+function NeedRestart: Boolean;
+begin
+  Result := RuntimeRestartRequired;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ConfigPath: String;
 begin
   if CurStep = ssPostInstall then
-    SaveStringToFile(
-      ExpandConstant('{app}\retailzw-server.txt'),
-      Trim(ServerPage.Values[0]),
-      False
-    );
+  begin
+    ConfigPath := ExpandConstant('{app}\retailzw-server.txt');
+    { Preserve shop-specific settings on upgrade; configure new tills automatically. }
+    if not FileExists(ConfigPath) then
+      if not SaveStringToFile(ConfigPath, 'https://admin.retailzw.co.zw', False) then
+        RaiseException('Could not save the server configuration. Please run setup again.');
+  end;
 end;

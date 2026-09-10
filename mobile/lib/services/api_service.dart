@@ -47,6 +47,11 @@ class ApiService {
       await _storeOnlineLogin(loginResp, cleanUsername, password);
       lastLoginUsedOfflineCache = false;
       return loginResp;
+    } on HandshakeException {
+      throw ApiException(
+          'The server’s security certificate could not be verified. Check this PC’s date and time, '
+          'then try another network. If this continues, ask support to check the server certificate or HTTPS inspection.',
+          statusCode: 0);
     } on SocketException {
       return _loginFromDeviceCache(cleanUsername, password);
     } on TimeoutException {

@@ -1,6 +1,6 @@
 param(
     [string]$ApiBaseUrl = "https://admin.retailzw.co.zw",
-    [string]$Version = "1.1.0",
+    [string]$Version = "1.2.4",
     [string]$SigningCertificatePath = "",
     [Security.SecureString]$SigningCertificatePassword,
     [switch]$SkipInstaller,
@@ -140,11 +140,11 @@ try {
     }
 
     if (-not $SkipTests) {
-        & $flutter analyze --no-fatal-infos | Out-Host
+        & $flutter analyze --no-pub --no-fatal-infos | Out-Host
         if ($LASTEXITCODE -ne 0) {
             throw "Flutter analysis failed."
         }
-        & $flutter test | Out-Host
+        & $flutter test --no-pub | Out-Host
         if ($LASTEXITCODE -ne 0) {
             throw "Flutter tests failed."
         }
@@ -154,9 +154,9 @@ try {
     New-Item -ItemType Directory -Path $distDir -Force | Out-Null
     New-Item -ItemType Directory -Path $symbolDir -Force | Out-Null
 
-    & $flutter build windows --release `
+    & $flutter build windows --release --no-pub `
         --build-name=$Version `
-        --build-number=3 `
+        --build-number=5 `
         --obfuscate `
         --split-debug-info="$symbolDir" `
         --dart-define="RETAILZW_API_BASE_URL=$ApiBaseUrl" | Out-Host
@@ -168,6 +168,42 @@ try {
     }
 
     Invoke-CodeSigning @((Join-Path $releaseDir "RetailZWPOS.exe"))
+
+    # Validate and restore the generated font registration manifest after the
+    # native install/copy step. A zero-filled manifest silently removes icons.
+    $sourceAssets = Join-Path $projectRoot 'build\flutter_assets'
+    $releaseAssets = Join-Path $releaseDir 'data\flutter_assets'
+    $fontManifest = Join-Path $sourceAssets 'FontManifest.json'
+    $fonts = Get-Content -LiteralPath $fontManifest -Raw | ConvertFrom-Json
+    if (-not ($fonts | Where-Object { $_.family -eq 'MaterialIcons' })) {
+        throw 'The generated font manifest does not register MaterialIcons.'
+    }
+    Copy-Item -LiteralPath $fontManifest -Destination (Join-Path $releaseAssets 'FontManifest.json') -Force
+    foreach ($asset in Get-ChildItem -LiteralPath $sourceAssets -File -Recurse) {
+        $relative = $asset.FullName.Substring($sourceAssets.Length + 1)
+        $packaged = Join-Path $releaseAssets $relative
+        if (-not (Test-Path -LiteralPath $packaged) -or
+            (Get-FileHash -LiteralPath $asset.FullName).Hash -ne (Get-FileHash -LiteralPath $packaged).Hash) {
+            throw "Packaged Flutter asset is missing or corrupt: $relative"
+        }
+    }
+
+    # sqflite_common_ffi loads this from its package only in debug builds.
+    # Release builds need the pinned package's DLL alongside the application.
+    $configPath = Join-Path $projectRoot '.dart_tool\package_config.json'
+    $packageConfig = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+    $sqlitePackage = $packageConfig.packages | Where-Object { $_.name -eq 'sqflite_common_ffi' }
+    if (-not $sqlitePackage) { throw 'SQLite FFI package was not resolved.' }
+    $sqliteRoot = ([Uri]::new([Uri]$configPath, [string]$sqlitePackage.rootUri)).LocalPath
+    $sqliteDll = Join-Path $sqliteRoot 'lib\src\windows\sqlite3.dll'
+    if (-not (Test-Path -LiteralPath $sqliteDll)) { throw 'The SQLite runtime DLL is missing.' }
+    Copy-Item -LiteralPath $sqliteDll -Destination (Join-Path $releaseDir 'sqlite3.dll') -Force
+
+    foreach ($required in @('RetailZWPOS.exe', 'flutter_windows.dll', 'sqlite3.dll', 'data\icudtl.dat', 'data\flutter_assets\AssetManifest.bin', 'data\flutter_assets\assets\certificates\isrgrootx1.pem', 'data\flutter_assets\assets\images\windows_login_hero.png')) {
+        if (-not (Test-Path -LiteralPath (Join-Path $releaseDir $required))) {
+            throw "Release payload is incomplete: $required"
+        }
+    }
 
     if (-not $SkipInstaller) {
         $iscc = Resolve-Iscc
@@ -181,6 +217,7 @@ try {
         }
         Invoke-CodeSigning @($installerPath)
         Write-Host "Production installer: $installerPath" -ForegroundColor Green
+        Get-FileHash -Algorithm SHA256 -LiteralPath $installerPath | Format-List | Out-Host
     }
 }
 finally {

@@ -89,9 +89,11 @@ class MoreScreen extends StatelessWidget {
                 leading: const Icon(Icons.storefront_outlined,
                     color: AppColors.primaryBlue),
                 title: const Text('Branch'),
-                subtitle: Text(user?.branchId == null
-                    ? 'No branch assigned'
-                    : 'Branch #${user!.branchId}'),
+                subtitle: Text(user?.branchName.isNotEmpty == true
+                    ? user!.branchName
+                    : user?.branchId == null
+                        ? 'No branch assigned'
+                        : 'Sign in online to load branch name'),
               ),
               const Divider(height: 1),
               ListTile(
@@ -162,9 +164,14 @@ class MoreScreen extends StatelessWidget {
               ),
               const Divider(height: 1),
               ListTile(
-                leading: Icon(user?.isGasBranch == true ? Icons.local_gas_station : Icons.store,
+                leading: Icon(
+                    user?.isGasBranch == true
+                        ? Icons.local_gas_station
+                        : Icons.store,
                     color: AppColors.primaryBlue),
-                title: Text(user?.isGasBranch == true ? 'Zimbabwe LPG gas mode' : 'Zimbabwe retail mode'),
+                title: Text(user?.isGasBranch == true
+                    ? 'Zimbabwe LPG gas mode'
+                    : 'Zimbabwe retail mode'),
                 subtitle: Text(user?.isGasBranch == true
                     ? 'Gas shifts, kilogram pricing and tank-aware sales'
                     : 'Multi-currency, branch-aware POS workflows'),

@@ -72,7 +72,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       return const [GasPosScreen(), MoreScreen()];
     }
     return [
-      const PosScreen(),
+      PosScreen(
+          sidebarHeader: MediaQuery.of(context).size.width >= 1100
+              ? Column(
+                  children: _retailTabs
+                      .asMap()
+                      .entries
+                      .map((entry) => _RailItem(
+                          icon: entry.value.icon,
+                          label: entry.value.label,
+                          selected: _currentIndex == entry.key,
+                          extended: true,
+                          onTap: () =>
+                              setState(() => _currentIndex = entry.key)))
+                      .toList())
+              : null),
       const SalesScreen(),
       const CashScreen(),
       const MoreScreen(),
@@ -255,12 +269,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             child: Row(
               children: [
                 // Navigation Rail
-                _SideRail(
-                  currentIndex: _currentIndex,
-                  tabs: tabs,
-                  extended: false,
-                  onTap: (i) => setState(() => _currentIndex = i),
-                ),
+                if (!isDesktop || _currentIndex != 0 || isGas)
+                  _SideRail(
+                    currentIndex: _currentIndex,
+                    tabs: tabs,
+                    extended: isDesktop,
+                    onTap: (i) => setState(() => _currentIndex = i),
+                  ),
                 // Content
                 Expanded(
                   child: IndexedStack(
@@ -271,6 +286,32 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ],
             ),
           ),
+          if (isDesktop)
+            Container(
+              height: 30,
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Row(children: [
+                Icon(
+                    provider.isOnline
+                        ? Icons.cloud_done_outlined
+                        : Icons.cloud_off_outlined,
+                    size: 16,
+                    color: provider.isOnline
+                        ? AppColors.successGreen
+                        : AppColors.warningOrange),
+                const SizedBox(width: 8),
+                Text(
+                    provider.isOnline
+                        ? 'Connected • Automatic sync enabled'
+                        : 'Offline • Sales saved on this device',
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.textMuted)),
+                const Spacer(),
+                const Text('RetailZim for Windows',
+                    style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+              ]),
+            ),
         ],
       ),
     );
@@ -345,7 +386,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   fontSize: 13)),
         ),
         const SizedBox(width: 8),
-        Text(provider.currentUser?.isGasBranch == true ? 'RetailZW Gas POS' : 'RetailZW POS',
+        Text(
+            provider.currentUser?.isGasBranch == true
+                ? 'RetailZW Gas POS'
+                : 'RetailZW POS',
             style: const TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 16,
@@ -428,129 +472,76 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 class _TopBar extends StatelessWidget {
   final AppProvider provider;
   final VoidCallback onNotificationsTap;
-
   const _TopBar({required this.provider, required this.onNotificationsTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-        left: 16,
-        right: 8,
-        bottom: 0,
-      ),
-      child: SizedBox(
-        height: 56,
-        child: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: AppColors.accentYellow,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              alignment: Alignment.center,
-              child: const Text('RZ',
-                  style: TextStyle(
-                      color: AppColors.primaryBlue,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 14)),
-            ),
+    final user = provider.currentUser;
+    return SafeArea(
+        bottom: false,
+        child: Container(
+          color: Colors.white,
+          height: 66,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(children: [
+            Image.asset('assets/images/retailzw_logo.png',
+                width: 155, height: 48, fit: BoxFit.contain),
+            const SizedBox(width: 24),
+            const Icon(Icons.storefront_outlined,
+                size: 20, color: AppColors.textDark),
             const SizedBox(width: 10),
-            Text(provider.currentUser?.isGasBranch == true ? 'RetailZW Gas POS' : 'RetailZW POS',
-                style: const TextStyle(
-                    color: AppColors.textDark,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 18)),
+            Expanded(
+                child: Text(
+                    user?.branchName.isNotEmpty == true
+                        ? user!.branchName
+                        : user?.isGasBranch == true
+                            ? 'Gas POS'
+                            : 'Point of sale',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark))),
+            Icon(Icons.circle,
+                size: 8,
+                color: provider.isOnline
+                    ? AppColors.successGreen
+                    : AppColors.warningOrange),
+            const SizedBox(width: 7),
+            Text(provider.isOnline ? 'Online' : 'Offline',
+                style:
+                    const TextStyle(fontSize: 12, color: AppColors.textMuted)),
             const SizedBox(width: 16),
-            if (provider.currentUser != null)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.person_rounded,
-                        size: 14, color: AppColors.textMuted),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${provider.currentUser!.firstName} ${provider.currentUser!.lastName}',
-                      style: const TextStyle(
-                          color: AppColors.textDark,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-            const Spacer(),
-            // Online status
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: provider.isOnline
-                        ? const Color(0xFF4CAF50)
-                        : const Color(0xFFEF5350),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  provider.isOnline ? 'Online' : 'Offline',
-                  style:
-                      const TextStyle(color: AppColors.textMuted, fontSize: 12),
-                ),
-              ],
-            ),
-            const SizedBox(width: 8),
-            // Notification bell
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.notifications_outlined,
-                      color: AppColors.textDark),
-                  onPressed: onNotificationsTap,
-                ),
-                if (provider.notificationCount > 0)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: AppColors.errorRed,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      constraints:
-                          const BoxConstraints(minWidth: 16, minHeight: 16),
-                      child: Text(
-                        '${provider.notificationCount}',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+            Badge(
+                isLabelVisible: provider.notificationCount > 0,
+                label: Text('${provider.notificationCount}'),
+                child: IconButton(
+                    tooltip: 'Notifications',
+                    onPressed: onNotificationsTap,
+                    icon: const Icon(Icons.notifications_outlined,
+                        color: AppColors.textDark))),
+            const SizedBox(width: 12),
+            const CircleAvatar(
+                radius: 17,
+                backgroundColor: Color(0xFFEAF2FA),
+                child: Icon(Icons.person_outline,
+                    size: 21, color: AppColors.textDark)),
+            const SizedBox(width: 9),
+            ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 180),
+                child: Text(
+                    user?.fullName.isNotEmpty == true
+                        ? user!.fullName
+                        : 'Cashier',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textDark,
+                        fontWeight: FontWeight.w600))),
+          ]),
+        ));
   }
 }
 
@@ -572,9 +563,9 @@ class _SideRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: extended ? 210 : 88,
+      width: extended ? 190 : 88,
       decoration: BoxDecoration(
-        color: const Color(0xFF071B3A),
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.12),
@@ -640,7 +631,7 @@ class _RailItem extends StatelessWidget {
             ? Row(
                 children: [
                   Icon(icon,
-                      color: selected ? Colors.white : Colors.white70,
+                      color: selected ? Colors.white : AppColors.textDark,
                       size: 22),
                   const SizedBox(width: 12),
                   Expanded(
@@ -649,7 +640,7 @@ class _RailItem extends StatelessWidget {
                           fontSize: 13,
                           fontWeight:
                               selected ? FontWeight.w800 : FontWeight.w600,
-                          color: selected ? Colors.white : Colors.white70,
+                          color: selected ? Colors.white : AppColors.textDark,
                         )),
                   ),
                   if (selected)
@@ -662,7 +653,7 @@ class _RailItem extends StatelessWidget {
                 children: [
                   Icon(
                     icon,
-                    color: selected ? Colors.white : Colors.white70,
+                    color: selected ? Colors.white : AppColors.textDark,
                     size: 24,
                   ),
                   const SizedBox(height: 4),
@@ -672,7 +663,7 @@ class _RailItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                      color: selected ? Colors.white : Colors.white70,
+                      color: selected ? Colors.white : AppColors.textDark,
                     ),
                   ),
                 ],
@@ -697,7 +688,7 @@ class _SessionBanner extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: 32,
-        color: AppColors.accentYellow,
+        color: const Color(0xFFE1F1FF),
         alignment: Alignment.center,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -4,14 +4,14 @@ import 'package:intl/intl.dart';
 // ─── App Colors ──────────────────────────────────────────────────────────────
 
 class AppColors {
-  static const Color primaryBlue = Color(0xFF1565C0);
+  static const Color primaryBlue = Color(0xFF087DDF);
   static const Color accentYellow = Color(0xFFFFD600);
   static const Color background = Color(0xFFF4F8FD);
   static const Color cardWhite = Colors.white;
   static const Color successGreen = Color(0xFF2E7D32);
   static const Color errorRed = Color(0xFFC62828);
   static const Color warningOrange = Color(0xFFE65100);
-  static const Color textDark = Color(0xFF1A1A2E);
+  static const Color textDark = Color(0xFF102447);
   static const Color textMuted = Color(0xFF6B7280);
 }
 
