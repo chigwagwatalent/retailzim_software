@@ -132,6 +132,19 @@
         <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Shop</button></div>
       </form>
     </div></div>
+    <section class="tenant-danger-zone">
+      <h2>Delete shop permanently</h2>
+      <p>Suspend this shop and stop its tills first. This removes its users, branches, sales, stock, gas operations, chat and billing records from this database. This cannot be undone here.</p>
+      <p>Backups, exported files, payment-provider records and offline device copies are not erased. Shared platform announcements and operational logs are retained.</p>
+      <form method="post" th:action="@{/admin/tenants/{id}/delete(id=${tenant.id})}">
+        <label>Type <strong th:text="${'DELETE ' + tenant.tenantCode}"></strong>
+          <input name="confirmation" required autocomplete="off" aria-label="Confirm permanent shop deletion">
+        </label>
+        <label><input type="checkbox" name="acknowledged" value="true" required> I have checked the shop, stopped its tills, and understand that all its database records will be deleted.</label>
+        <button class="btn" type="submit">Permanently delete shop</button>
+      </form>
+    </section>
+    <footer th:replace="~{common/layout :: platformFooter}"></footer>
   </main>
 </div>
 </body>

@@ -17,7 +17,7 @@
       </div>
       <div class="page-toolbar">
         <a class="btn btn-light" th:href="@{/admin/subscriptions}">
-          <i class="fa-solid fa-download"></i>Export Report
+          <i class="fa-solid fa-list"></i>View Plans
         </a>
         <a class="btn btn-primary" th:href="@{/auth/signup}">
           <i class="fa-solid fa-plus"></i>Register Shop
@@ -46,7 +46,7 @@
       </article>
       <article class="metric-card metric-orange">
         <header><i class="fa-regular fa-rectangle-list"></i><span>Active Plans</span></header>
-        <strong th:text="${#lists.size(plans)}">0</strong>
+        <strong th:text="${activePlanCount}">0</strong>
         <small>Subscription packages</small>
         <div><em style="width:66%"></em></div>
       </article>
@@ -64,8 +64,8 @@
         <div class="activity-analytics">
           <div class="shops-growth-chart">
             <div class="chart-heading">
-              <strong>Shops growth</strong>
-              <span>Registered accounts</span>
+              <strong>Shop registrations</strong>
+              <span>New accounts per month</span>
             </div>
             <svg viewBox="0 0 640 210" role="img" aria-label="Shop growth over six months">
               <defs>
@@ -80,29 +80,25 @@
                 <line x1="42" x2="620" y1="120" y2="120"/>
                 <line x1="42" x2="620" y1="166" y2="166"/>
               </g>
-              <path class="chart-area" d="M54 164 L160 164 L266 128 L372 128 L478 82 L600 82 L600 180 L54 180 Z"/>
-              <polyline class="chart-line" points="54,164 160,164 266,128 372,128 478,82 600,82"/>
+              <path class="chart-area" th:attr="d=${registrationChart.area}" d="M54 170 L594 170 L594 180 L54 180 Z"/>
+              <polyline class="chart-line" th:attr="points=${registrationChart.line}" points="54,170 594,170"/>
               <g class="chart-points">
-                <circle cx="54" cy="164" r="5"/><circle cx="160" cy="164" r="5"/>
-                <circle cx="266" cy="128" r="5"/><circle cx="372" cy="128" r="5"/>
-                <circle cx="478" cy="82" r="5"/><circle cx="600" cy="82" r="5"/>
+                <circle th:each="point : ${registrationChart.points}" th:attr="cx=${point.x},cy=${point.y}" r="5"><title th:text="${point.label + ': ' + point.count + ' registrations'}">Registrations</title></circle>
               </g>
               <g class="chart-labels">
-                <text x="54" y="204">Jan</text><text x="160" y="204">Feb</text>
-                <text x="266" y="204">Mar</text><text x="372" y="204">Apr</text>
-                <text x="478" y="204">May</text><text x="600" y="204">Jun</text>
+                <text th:each="point : ${registrationChart.points}" th:attr="x=${point.x}" y="204" th:text="${point.label}">Month</text>
+                <text x="12" y="28" th:text="${registrationChart.max}">1</text><text x="12" y="174">0</text>
               </g>
             </svg>
           </div>
           <div class="plan-distribution">
             <div class="chart-heading">
-              <strong>Subscription distribution</strong>
+              <strong>Plan pricing</strong>
               <span th:text="${#lists.size(plans) + ' available plans'}">0 available plans</span>
             </div>
             <div class="plan-distribution-list">
               <div th:each="plan, iter : ${plans}">
                 <span th:text="${plan.name}">Plan</span>
-                <div><em th:style="${'width:' + ((68 - iter.index * 9) > 12 ? (68 - iter.index * 9) : 12) + '%'}"></em></div>
                 <strong th:text="${'USD ' + plan.priceUsd}">USD 0.00</strong>
               </div>
               <p class="empty" th:if="${#lists.isEmpty(plans)}">No subscription plans configured.</p>
@@ -120,9 +116,9 @@
           <span class="health-shield"><i class="fa-solid fa-shield-halved"></i></span>
         </div>
         <div class="health-list">
-          <article><i class="fa-solid fa-code"></i><span><strong>API</strong><small>All services responding</small></span><em>Operational</em></article>
-          <article><i class="fa-solid fa-database"></i><span><strong>Database</strong><small>Connections normal</small></span><em>Healthy</em></article>
-          <article><i class="fa-regular fa-credit-card"></i><span><strong>Payment Gateway</strong><small>Smile &amp; Pay live</small></span><em>Connected</em></article>
+          <article><i class="fa-solid fa-code"></i><span><strong>API</strong><small>Live monitoring not configured</small></span><em>Unverified</em></article>
+          <article><i class="fa-solid fa-database"></i><span><strong>Database</strong><small>Dashboard data loaded</small></span><em>Read successful</em></article>
+          <article><i class="fa-regular fa-credit-card"></i><span><strong>Payment Gateway</strong><small>Provider health not checked</small></span><em>Unverified</em></article>
           <article><i class="fa-solid fa-headset"></i><span><strong>Support Queue</strong><small>Unread messages</small></span><b th:text="${supportUnreadCount ?: 0}">0</b></article>
         </div>
         <a class="panel-link" th:href="@{/admin/support}">View support status<i class="fa-solid fa-arrow-right"></i></a>
@@ -167,6 +163,7 @@
         </div>
       </aside>
     </section>
+    <footer th:replace="~{common/layout :: platformFooter}"></footer>
   </main>
 </div>
 </body>

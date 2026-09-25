@@ -13,6 +13,20 @@ import java.util.List;
 @Repository
 public interface SalePaymentRepository extends JpaRepository<SalePayment, Long> {
 
+    @Query("SELECT year(s.createdAt), month(s.createdAt), day(s.createdAt), SUM(sp.amount) " +
+           "FROM SalePayment sp JOIN sp.sale s WHERE s.tenantId = :tenantId AND s.branchId = :branchId " +
+           "AND s.status = 'COMPLETED' AND sp.currency = :currency " +
+           "AND s.createdAt >= :from AND s.createdAt < :to " +
+           "GROUP BY year(s.createdAt), month(s.createdAt), day(s.createdAt)")
+    List<Object[]> sumCompletedByDay(@Param("tenantId") Long tenantId, @Param("branchId") Long branchId,
+            @Param("currency") CurrencyCode currency, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+    @Query("SELECT s.branchId, sp.currency, SUM(sp.amount) FROM SalePayment sp JOIN sp.sale s " +
+           "WHERE s.tenantId = :tenantId AND s.status = 'COMPLETED' " +
+           "AND s.createdAt >= :from AND s.createdAt < :to GROUP BY s.branchId, sp.currency")
+    List<Object[]> sumCompletedByBranch(@Param("tenantId") Long tenantId,
+            @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
     List<SalePayment> findBySaleId(Long saleId);
 
     @Query("SELECT COALESCE(SUM(sp.amount), 0) FROM SalePayment sp " +

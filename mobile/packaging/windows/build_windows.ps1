@@ -1,6 +1,6 @@
 param(
     [string]$ApiBaseUrl = "https://admin.retailzw.co.zw",
-    [string]$Version = "1.2.4",
+    [string]$Version = "1.2.5",
     [string]$SigningCertificatePath = "",
     [Security.SecureString]$SigningCertificatePassword,
     [switch]$SkipInstaller,

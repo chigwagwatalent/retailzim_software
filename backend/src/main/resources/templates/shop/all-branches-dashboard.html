@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('All branches dashboard')}"></head>
+<body><div class="app-shell"><aside th:replace="~{common/layout :: shopSidebar('dashboard')}"></aside><main class="main">
+<nav th:replace="~{common/layout :: shopTopbar('Dashboard')}"></nav>
+<section class="page-hero"><div><p>YOUR SHOP AT A GLANCE</p><h1>Dashboard</h1><p>All branches · Select a branch above to view its individual dashboard.</p></div><a class="btn btn-primary" th:href="@{/shop/sales}">View sales</a></section>
+<section class="metric-grid">
+<div class="metric-card metric-blue"><span>Today's payments</span><div th:each="payment : ${allTodayPayments}"><strong th:text="${payment[0] + ' ' + #numbers.formatDecimal(payment[1],1,2)}"></strong></div><strong th:if="${#lists.isEmpty(allTodayPayments)}">No sales today</strong><small>Completed retail sales · currencies kept separate</small></div>
+<div class="metric-card metric-green"><span>Active branches</span><strong th:text="${allBranchCount}"></strong><small>Across your tenant</small></div>
+<div class="metric-card metric-blue"><span>Products</span><strong th:text="${allProductCount}"></strong><small>Active catalogue products</small></div>
+<div class="metric-card metric-orange"><span>Open cash sessions</span><strong th:text="${allOpenSessions}"></strong><small>Across all branches</small></div>
+</section><section th:replace="~{shop/branch-activity :: activityTable}"></section>
+<footer th:replace="~{common/layout :: shopFooter}"></footer></main></div></body></html>

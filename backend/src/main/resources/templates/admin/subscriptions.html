@@ -37,6 +37,7 @@
     <nav class="package-family-tabs" aria-label="Package families">
       <a class="active" href="#retail-packages"><i class="fa-solid fa-bag-shopping"></i><span>Retail POS</span><b th:text="${#lists.size(retailPlans)}">0</b></a>
       <a href="#gas-packages"><i class="fa-solid fa-fire-flame-simple"></i><span>LPG Gas</span><b th:text="${#lists.size(gasPlans)}">0</b></a>
+      <a href="#fuel-packages"><i class="fa-solid fa-gas-pump"></i><span>Fuel Station</span><b th:text="${#lists.size(fuelPlans)}">0</b></a>
       <a href="#restaurant-packages"><i class="fa-solid fa-utensils"></i><span>Restaurant</span><b th:text="${#lists.size(restaurantPlans)}">0</b></a>
     </nav>
 
@@ -65,6 +66,29 @@
             <td class="table-action-cell"><a class="btn btn-light package-table-action" th:href="${'#modal-package-' + p.id}"><i class="fa-solid fa-pen"></i>Edit</a></td>
           </tr>
           <tr th:if="${#lists.isEmpty(retailPlans)}"><td colspan="6"><div class="package-table-empty"><i class="fa-solid fa-bag-shopping"></i><span><strong>No Retail POS packages</strong><small>Create the first package dedicated to retail operations.</small></span><a href="#modal-package">Create package</a></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="fuel-packages" class="package-family-section fuel-family">
+      <header>
+        <div><span class="eyebrow">FORECOURT OPERATIONS</span><h2>Fuel Station packages</h2><p>Petrol and diesel tanks, pumps, nozzle sales, deliveries and shift reconciliation.</p></div>
+        <a class="btn btn-primary" href="#modal-package"><i class="fa-solid fa-plus"></i>Create fuel package</a>
+      </header>
+      <div class="package-table-wrap">
+        <table class="package-management-table">
+          <thead><tr><th>Package</th><th>Monthly price</th><th>Capacity</th><th>Fuel controls</th><th>Status</th><th class="table-action-cell">Actions</th></tr></thead>
+          <tbody>
+          <tr th:each="p : ${fuelPlans}">
+            <td><span class="package-table-name"><i class="fa-solid fa-gas-pump"></i><span><strong th:text="${p.name}">Fuel Package</strong><small th:text="${p.code}">FUEL</small></span></span><small class="package-table-description" th:text="${p.description != null && !p.description.isBlank() ? p.description : 'Fuel-station operations package.'}">Description</small></td>
+            <td><strong th:text="${'USD ' + p.priceUsd}">USD 0.00</strong><small th:text="${'ZWG ' + p.priceZwg + ' / month'}">ZWG 0.00</small></td>
+            <td><strong th:text="${p.maxBranches + ' stations'}">1 station</strong><small th:text="${p.maxUsers + ' users'}">5 users</small></td>
+            <td><strong>Pumps, tanks &amp; shifts</strong><small>Deliveries and wet-stock reconciliation</small></td>
+            <td><span class="badge" th:classappend="${p.isActive ? ' status-active' : ' status-suspended'}" th:text="${p.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+            <td class="table-action-cell"><a class="btn btn-light package-table-action" th:href="${'#modal-package-' + p.id}"><i class="fa-solid fa-pen"></i>Edit</a></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(fuelPlans)}"><td colspan="6"><div class="package-table-empty"><i class="fa-solid fa-gas-pump"></i><span><strong>No Fuel Station packages</strong><small>Create the first package dedicated to forecourt operations.</small></span><a href="#modal-package">Create package</a></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -148,7 +172,7 @@
         <label class="form-full">Business Module
           <select name="allowedModules" required>
             <option value="">Choose one module</option>
-            <option th:each="m : ${businessModules}" th:value="${m}" th:text="${m.name() == 'SHOP_MODULE' ? 'Retail POS' : (m.name() == 'GAS_MODULE' ? 'LPG Gas' : 'Restaurant')}">Retail POS</option>
+            <option th:each="m : ${businessModules}" th:value="${m}" th:text="${m.name() == 'SHOP_MODULE' ? 'Retail POS' : (m.name() == 'GAS_MODULE' ? 'LPG Gas' : (m.name() == 'FUEL_MODULE' ? 'Fuel Station' : 'Restaurant'))}">Retail POS</option>
           </select>
           <small>Packages cannot combine business modules.</small>
         </label>
@@ -173,7 +197,7 @@
         <label class="form-full">Business Module
           <select name="allowedModules" required>
             <option th:each="m : ${businessModules}" th:value="${m}"
-                    th:text="${m.name() == 'SHOP_MODULE' ? 'Retail POS' : (m.name() == 'GAS_MODULE' ? 'LPG Gas' : 'Restaurant')}"
+                    th:text="${m.name() == 'SHOP_MODULE' ? 'Retail POS' : (m.name() == 'GAS_MODULE' ? 'LPG Gas' : (m.name() == 'FUEL_MODULE' ? 'Fuel Station' : 'Restaurant'))}"
                     th:selected="${planPrimaryModules.get(p.id) == m}">Retail POS</option>
           </select>
           <small>Selecting a module moves this package into that independent family.</small>
@@ -191,6 +215,7 @@
         <div class="form-actions"><a class="btn btn-light" href="#">Cancel</a><button class="btn btn-primary" type="submit">Update Package</button></div>
       </form>
     </div></div>
+    <footer th:replace="~{common/layout :: platformFooter}"></footer>
   </main>
 </div>
 </body>

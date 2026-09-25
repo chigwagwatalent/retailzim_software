@@ -105,11 +105,11 @@
           <div class="finance-panel-head"><div><h2>Cash Position</h2><p>Cash recorded through shifts in this period.</p></div><a href="#modal-cash">View details</a></div>
           <div class="finance-currency-block">
             <strong>USD Balance</strong>
-            <dl><div><dt>Cash Accounted</dt><dd th:text="${'USD ' + #numbers.formatDecimal(cashAtHandUsd, 1, 2)}">USD 0.00</dd></div><div><dt>Cash Sales</dt><dd th:text="${'USD ' + #numbers.formatDecimal(cashCollectedUsd, 1, 2)}">USD 0.00</dd></div><div><dt>Cash Refunds</dt><dd th:text="${'USD ' + #numbers.formatDecimal(cashRefundsUsd, 1, 2)}">USD 0.00</dd></div><div><dt>Net Cash Movement</dt><dd th:text="${'USD ' + #numbers.formatDecimal(netCashMovementUsd, 1, 2)}">USD 0.00</dd></div></dl>
+            <dl><div><dt>Cash Accounted</dt><dd th:text="${'USD ' + #numbers.formatDecimal(cashAtHandUsd, 1, 2)}">USD 0.00</dd></div><div><dt>Cash Sales</dt><dd th:text="${'USD ' + #numbers.formatDecimal(cashCollectedUsd, 1, 2)}">USD 0.00</dd></div><div><dt>Cash Refunds</dt><dd th:text="${'USD ' + #numbers.formatDecimal(cashRefundsUsd, 1, 2)}">USD 0.00</dd></div><div><dt>Cash Expenses</dt><dd th:text="${'USD ' + #numbers.formatDecimal(cashExpensesUsd, 1, 2)}">USD 0.00</dd></div><div><dt>Net Cash Movement</dt><dd th:text="${'USD ' + #numbers.formatDecimal(netCashMovementUsd, 1, 2)}">USD 0.00</dd></div></dl>
           </div>
           <div class="finance-currency-block zwg">
             <strong>ZWG Balance</strong>
-            <dl><div><dt>Cash Accounted</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(cashAtHandZwg, 1, 2)}">ZWG 0.00</dd></div><div><dt>Cash Sales</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(cashCollectedZwg, 1, 2)}">ZWG 0.00</dd></div><div><dt>Cash Refunds</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(cashRefundsZwg, 1, 2)}">ZWG 0.00</dd></div><div><dt>Net Cash Movement</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(netCashMovementZwg, 1, 2)}">ZWG 0.00</dd></div></dl>
+            <dl><div><dt>Cash Accounted</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(cashAtHandZwg, 1, 2)}">ZWG 0.00</dd></div><div><dt>Cash Sales</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(cashCollectedZwg, 1, 2)}">ZWG 0.00</dd></div><div><dt>Cash Refunds</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(cashRefundsZwg, 1, 2)}">ZWG 0.00</dd></div><div><dt>Cash Expenses</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(cashExpensesZwg, 1, 2)}">ZWG 0.00</dd></div><div><dt>Net Cash Movement</dt><dd th:text="${'ZWG ' + #numbers.formatDecimal(netCashMovementZwg, 1, 2)}">ZWG 0.00</dd></div></dl>
           </div>
         </article>
 
@@ -121,7 +121,8 @@
             <div><dt>Approved Returns</dt><dd th:text="${'- USD ' + #numbers.formatDecimal(refundsUsd, 1, 2)}">USD 0.00</dd></div>
             <div class="subtotal"><dt>Net Sales</dt><dd th:text="${'USD ' + #numbers.formatDecimal(netSalesUsd, 1, 2)}">USD 0.00</dd></div>
             <div><dt>Net Cost of Goods</dt><dd th:text="${'- USD ' + #numbers.formatDecimal(cogsUsd, 1, 2)}">USD 0.00</dd></div>
-            <div class="total"><dt>Gross Profit</dt><dd th:text="${'USD ' + #numbers.formatDecimal(grossProfitUsd, 1, 2)}">USD 0.00</dd></div>
+            <div><dt>Operating Expenses</dt><dd th:text="${'- USD ' + #numbers.formatDecimal(operatingExpensesUsd, 1, 2)}">USD 0.00</dd></div>
+            <div class="total"><dt>Net Profit</dt><dd th:text="${'USD ' + #numbers.formatDecimal(netProfitUsd, 1, 2)}">USD 0.00</dd></div>
           </dl>
         </article>
 
@@ -179,11 +180,11 @@
             <tr class="credit"><td>Less: Returned Stock Cost</td><td th:text="${#numbers.formatDecimal(returnedCogsUsd, 1, 2)}">0.00</td><td th:text="${#numbers.formatDecimal(returnedCogsZwg, 1, 2)}">0.00</td></tr>
             <tr class="subtotal"><td>Net Cost of Goods Sold</td><td th:text="${#numbers.formatDecimal(cogsUsd, 1, 2)}">0.00</td><td th:text="${#numbers.formatDecimal(cogsZwg, 1, 2)}">0.00</td></tr>
             <tr class="total"><td>Gross Profit</td><td th:text="${#numbers.formatDecimal(grossProfitUsd, 1, 2)}">0.00</td><td th:text="${#numbers.formatDecimal(grossProfitZwg, 1, 2)}">0.00</td></tr>
-            <tr><td>Recorded Operating Expenses</td><td th:text="${#numbers.formatDecimal(operatingExpensesUsd, 1, 2)}">0.00</td><td th:text="${#numbers.formatDecimal(operatingExpensesZwg, 1, 2)}">0.00</td></tr>
+            <tr><td>Recorded Retail Operating Expenses</td><td th:text="${#numbers.formatDecimal(operatingExpensesUsd, 1, 2)}">0.00</td><td th:text="${#numbers.formatDecimal(operatingExpensesZwg, 1, 2)}">0.00</td></tr>
             <tr class="total final"><td>Reported Net Profit</td><td th:text="${#numbers.formatDecimal(netProfitUsd, 1, 2)}">0.00</td><td th:text="${#numbers.formatDecimal(netProfitZwg, 1, 2)}">0.00</td></tr>
             </tbody>
           </table>
-          <p class="finance-accounting-note"><i class="fa-solid fa-circle-info"></i>Tax collected is excluded from revenue. Net profit includes only expenses recorded by the current retail modules.</p>
+          <p class="finance-accounting-note"><i class="fa-solid fa-circle-info"></i>Tax collected is excluded from revenue. Net profit deducts posted retail expenses; voided expenses are excluded.</p>
         </div>
         <aside class="finance-margin-panel">
           <h3><i class="fa-solid fa-chart-simple"></i>Margin Analysis</h3>
@@ -205,7 +206,7 @@
     <div id="modal-cash" class="modal finance-modal"><div class="modal-content finance-modal-content">
       <div class="modal-head"><div><h2>Cash Position Details</h2><p>Shift cash accountability and tender activity for the selected period.</p></div><a class="close" href="#">&times;</a></div>
       <section class="finance-modal-kpis"><article><small>Cash Accounted USD</small><strong th:text="${'USD ' + #numbers.formatDecimal(cashAtHandUsd, 1, 2)}">USD 0.00</strong></article><article><small>Net Cash Movement</small><strong th:text="${'USD ' + #numbers.formatDecimal(netCashMovementUsd, 1, 2)}">USD 0.00</strong></article><article><small>Open Shifts</small><strong th:text="${openCashSessionCount}">0</strong></article><article><small>Closed Shifts</small><strong th:text="${closedCashSessionCount}">0</strong></article></section>
-      <div class="finance-modal-split"><section><h3>Payment Mix</h3><table><thead><tr><th>Tender &amp; Currency</th><th>Total</th></tr></thead><tbody><tr th:each="entry : ${paymentMethodTotals}"><td th:text="${entry.key}">CASH USD</td><td th:text="${#numbers.formatDecimal(entry.value, 1, 2)}">0.00</td></tr></tbody></table><div class="empty" th:if="${paymentMethodTotals.isEmpty()}">No payment records for this period.</div></section><section><h3>Cash Reconciliation</h3><dl class="finance-detail-list"><div><dt>Cash sales USD</dt><dd th:text="${#numbers.formatDecimal(cashCollectedUsd, 1, 2)}">0.00</dd></div><div><dt>Cash refunds USD</dt><dd th:text="${#numbers.formatDecimal(cashRefundsUsd, 1, 2)}">0.00</dd></div><div><dt>Recorded variance USD</dt><dd th:text="${#numbers.formatDecimal(varianceUsd, 1, 2)}">0.00</dd></div><div><dt>Cash sales ZWG</dt><dd th:text="${#numbers.formatDecimal(cashCollectedZwg, 1, 2)}">0.00</dd></div><div><dt>Cash refunds ZWG</dt><dd th:text="${#numbers.formatDecimal(cashRefundsZwg, 1, 2)}">0.00</dd></div><div><dt>Recorded variance ZWG</dt><dd th:text="${#numbers.formatDecimal(varianceZwg, 1, 2)}">0.00</dd></div></dl></section></div>
+      <div class="finance-modal-split"><section><h3>Payment Mix</h3><table><thead><tr><th>Tender &amp; Currency</th><th>Total</th></tr></thead><tbody><tr th:each="entry : ${paymentMethodTotals}"><td th:text="${entry.key}">CASH USD</td><td th:text="${#numbers.formatDecimal(entry.value, 1, 2)}">0.00</td></tr></tbody></table><div class="empty" th:if="${paymentMethodTotals.isEmpty()}">No payment records for this period.</div></section><section><h3>Cash Reconciliation</h3><dl class="finance-detail-list"><div><dt>Cash sales USD</dt><dd th:text="${#numbers.formatDecimal(cashCollectedUsd, 1, 2)}">0.00</dd></div><div><dt>Cash refunds USD</dt><dd th:text="${#numbers.formatDecimal(cashRefundsUsd, 1, 2)}">0.00</dd></div><div><dt>Cash expenses USD</dt><dd th:text="${#numbers.formatDecimal(cashExpensesUsd, 1, 2)}">0.00</dd></div><div><dt>Recorded variance USD</dt><dd th:text="${#numbers.formatDecimal(varianceUsd, 1, 2)}">0.00</dd></div><div><dt>Cash sales ZWG</dt><dd th:text="${#numbers.formatDecimal(cashCollectedZwg, 1, 2)}">0.00</dd></div><div><dt>Cash refunds ZWG</dt><dd th:text="${#numbers.formatDecimal(cashRefundsZwg, 1, 2)}">0.00</dd></div><div><dt>Cash expenses ZWG</dt><dd th:text="${#numbers.formatDecimal(cashExpensesZwg, 1, 2)}">0.00</dd></div><div><dt>Recorded variance ZWG</dt><dd th:text="${#numbers.formatDecimal(varianceZwg, 1, 2)}">0.00</dd></div></dl></section></div>
       <div class="modal-actions"><a class="btn btn-blue" href="#">Done</a></div>
     </div></div>
 

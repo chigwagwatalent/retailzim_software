@@ -7,6 +7,11 @@ import java.util.Optional;
 
 @Repository
 public interface SaasAdminRepository extends JpaRepository<SaasAdmin, Long> {
+    long countByIsActiveTrue();
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select a from SaasAdmin a order by a.id")
+    java.util.List<SaasAdmin> lockAccounts();
 
     Optional<SaasAdmin> findByUsername(String username);
 

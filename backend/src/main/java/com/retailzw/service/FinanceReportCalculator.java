@@ -16,11 +16,16 @@ import java.util.Map;
 public class FinanceReportCalculator {
 
     public ReportTotals calculate(List<Sale> sales, List<Return> returns, Map<Long, Sale> originalSalesById) {
+        return calculate(sales, returns, originalSalesById, BigDecimal.ZERO, BigDecimal.ZERO);
+    }
+
+    public ReportTotals calculate(List<Sale> sales, List<Return> returns, Map<Long, Sale> originalSalesById,
+                                  BigDecimal expensesUsd, BigDecimal expensesZwg) {
         List<Sale> recognizedSales = reportableSales(sales);
         List<Return> recognizedReturns = reportableReturns(returns);
         return new ReportTotals(
-                calculateCurrency(CurrencyCode.USD, recognizedSales, recognizedReturns, originalSalesById),
-                calculateCurrency(CurrencyCode.ZWG, recognizedSales, recognizedReturns, originalSalesById)
+                calculateCurrency(CurrencyCode.USD, recognizedSales, recognizedReturns, originalSalesById, expensesUsd),
+                calculateCurrency(CurrencyCode.ZWG, recognizedSales, recognizedReturns, originalSalesById, expensesZwg)
         );
     }
 
@@ -42,7 +47,7 @@ public class FinanceReportCalculator {
     }
 
     private CurrencyTotals calculateCurrency(CurrencyCode currency, List<Sale> sales, List<Return> returns,
-                                              Map<Long, Sale> originalSalesById) {
+                                              Map<Long, Sale> originalSalesById, BigDecimal recordedExpenses) {
         List<Sale> currencySales = sales.stream().filter(sale -> currency.equals(sale.getCurrency())).toList();
         List<Return> currencyReturns = returns.stream().filter(ret -> currency.equals(ret.getCurrency())).toList();
 
@@ -74,7 +79,7 @@ public class FinanceReportCalculator {
         BigDecimal netSales = salesAfterDiscounts.subtract(refunds);
         BigDecimal netCogs = grossCogs.subtract(returnedCogs);
         BigDecimal grossProfit = netSales.subtract(netCogs);
-        BigDecimal operatingExpenses = BigDecimal.ZERO;
+        BigDecimal operatingExpenses = nvl(recordedExpenses);
         BigDecimal netProfit = grossProfit.subtract(operatingExpenses);
 
         return new CurrencyTotals(

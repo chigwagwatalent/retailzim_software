@@ -32,7 +32,12 @@
             <h2>Shop Conversations</h2>
           </div>
         </div>
+        <form method="get" th:action="@{/admin/support}" class="support-search">
+          <input name="search" th:value="${search}" placeholder="Find shop by name or email" aria-label="Search shops" maxlength="120">
+          <button class="btn btn-primary" type="submit">Search</button>
+        </form>
         <a th:each="t : ${tenants}"
+           th:attr="data-support-tenant=${t.id}"
            th:href="@{/admin/support(tenantId=${t.id})}"
            th:class="${selectedTenantId != null and selectedTenantId == t.id ? 'support-thread active' : 'support-thread'}">
           <span class="thread-avatar" th:text="${#strings.substring(t.companyName,0,1)}">T</span>
@@ -43,6 +48,11 @@
           </span>
           <em th:if="${unreadByTenant.get(t.id) != null and unreadByTenant.get(t.id) > 0}" th:text="${unreadByTenant.get(t.id)}">0</em>
         </a>
+        <div class="support-pagination">
+          <a th:if="${inboxPage.hasPrevious()}" th:href="@{/admin/support(search=${search},page=${inboxPage.number - 1})}">Previous</a>
+          <span th:text="${inboxPage.number + 1}">1</span>
+          <a th:if="${inboxPage.hasNext()}" th:href="@{/admin/support(search=${search},page=${inboxPage.number + 1})}">Next</a>
+        </div>
       </aside>
 
       <section class="support-room chat-panel" th:if="${selectedTenant != null}" th:attr="data-feed-url=@{/admin/support/{id}/chat/feed(id=${selectedTenant.id})}">
@@ -77,6 +87,7 @@
         No shops are available for support yet.
       </section>
     </section>
+    <footer th:replace="~{common/layout :: platformFooter}"></footer>
   </main>
 </div>
 </body>

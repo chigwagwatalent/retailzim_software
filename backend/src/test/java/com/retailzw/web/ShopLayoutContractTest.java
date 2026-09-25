@@ -11,6 +11,29 @@ import org.junit.jupiter.api.Test;
 
 class ShopLayoutContractTest {
 
+    @Test
+    void tenantThemeAndDashboardPreserveRealActionsAndAccessibleTables() throws IOException {
+        String layout = Files.readString(Path.of("src/main/resources/templates/common/layout.html"));
+        String dashboard = Files.readString(SHOP_TEMPLATES.resolve("dashboard.html"));
+        String css = Files.readString(Path.of("src/main/resources/static/css/tenant-modern.css"));
+        String js = Files.readString(Path.of("src/main/resources/static/js/tenant-modern.js"));
+        assertTrue(layout.contains("tenant-modern.css"));
+        assertTrue(layout.contains("tenant-modern.js"));
+        assertTrue(layout.contains("/shop/branch/select"));
+        assertTrue(css.contains(".app-shell:has(> .tenant-shell-sidebar)"));
+        String footerCss = Files.readString(Path.of("src/main/resources/static/css/workspace-footer.css"));
+        assertTrue(footerCss.contains("position:fixed!important"));
+        assertTrue(footerCss.contains("--workspace-footer-height"));
+        assertTrue(css.contains("prefers-reduced-motion"));
+        assertTrue(css.contains("data-theme=\"dark\""));
+        assertTrue(js.contains("region.append(table)"));
+        assertTrue(js.contains("aria-label"));
+        assertTrue(!dashboard.contains("Stock Value"));
+        assertTrue(!dashboard.contains("on shift now"));
+        assertTrue(dashboard.contains("active cashier accounts"));
+        assertTrue(dashboard.contains("/shop/inventory-intelligence"));
+    }
+
     private static final Path SHOP_TEMPLATES = Path.of("src/main/resources/templates/shop");
 
     @Test
@@ -180,6 +203,31 @@ class ShopLayoutContractTest {
         assertTrue(expenses.contains("gasExpensePageLinks"));
         assertTrue(expenses.contains("Read-only audit details"));
         assertTrue(!expenses.contains("Delete expense"));
+    }
+
+    @Test
+    void retailExpensesProvideBranchAwareLedgerExportAndAccountingIntegration() throws IOException {
+        String expenses = Files.readString(SHOP_TEMPLATES.resolve("expenses.html"));
+        String expenseReport = Files.readString(SHOP_TEMPLATES.resolve("expense-report.html"));
+        String reports = Files.readString(SHOP_TEMPLATES.resolve("reports.html"));
+        String layout = Files.readString(Path.of("src/main/resources/templates/common/layout.html"));
+
+        assertTrue(layout.contains("/shop/expenses"));
+        assertTrue(expenses.contains("shopSidebar('expenses')"));
+        assertTrue(expenses.contains("EXPENSE REGISTER"));
+        assertTrue(expenses.contains("Category breakdown"));
+        assertTrue(expenses.contains("/shop/expenses/export"));
+        assertTrue(expenses.contains("/shop/expenses/report"));
+        assertTrue(expenses.contains("name=\"branchId\""));
+        assertTrue(expenses.contains("name=\"expenseCategory\""));
+        assertTrue(expenses.contains("/void"));
+        assertTrue(!expenses.contains("Delete expense"));
+        assertTrue(expenseReport.contains("Branch contribution"));
+        assertTrue(expenseReport.contains("Download CSV"));
+        assertTrue(expenseReport.contains("Voided excluded"));
+        assertTrue(reports.contains("Recorded Retail Operating Expenses"));
+        assertTrue(reports.contains("cashExpensesUsd"));
+        assertTrue(reports.contains("cashExpensesZwg"));
     }
 
     @Test

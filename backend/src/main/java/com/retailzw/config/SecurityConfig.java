@@ -82,8 +82,18 @@ public class SecurityConfig {
                         "/shop/gas/restocking/export",
                         "/shop/gas/tanks",
                         "/shop/gas/accounting",
+                        "/shop/fuel",
+                        "/shop/fuel/setup",
+                        "/shop/fuel/deliveries",
+                        "/shop/fuel/pricing",
+                        "/shop/fuel/shifts",
+                        "/shop/fuel/reports",
+                        "/shop/fuel/sales",
+                        "/shop/fuel/stock",
                         "/shop/notifications",
                         "/shop/support/chat/feed")
+                    .hasAnyRole("SUPER_ADMIN", "ACCOUNTANT", "SUPERVISOR")
+                .requestMatchers("/shop/live/events", "/shop/support/read", "/shop/support/messages")
                     .hasAnyRole("SUPER_ADMIN", "ACCOUNTANT", "SUPERVISOR")
                 .requestMatchers(HttpMethod.POST,
                         "/shop/cash/shifts/collect",

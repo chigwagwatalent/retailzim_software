@@ -9,11 +9,16 @@
 
     <div th:if="${message}" class="alert" th:text="${message}"></div>
 
+    <header class="shop-dashboard-heading">
+      <div><h1>Dashboard</h1><p>Your shop at a glance &middot; <strong th:text="${tenantActiveBranchName ?: 'Your shop'}">Your shop</strong></p></div>
+      <a class="btn primary" th:href="@{/shop/sales}"><i class="fa-solid fa-receipt"></i> View sales</a>
+    </header>
+
     <section class="dashboard-metric-row">
       <article class="workspace-kpi kpi-sales">
         <div class="kpi-icon"><i class="fa-solid fa-cart-shopping"></i></div>
         <div>
-          <span>Today Sales</span>
+          <span>Today's sales</span>
           <strong th:text="${todaySales.usd}">USD 0.00</strong>
           <small th:class="${#strings.startsWith(salesVsYesterday, '-') ? 'danger' : 'good'}">
             <i th:class="${#strings.startsWith(salesVsYesterday, '-') ? 'fa-solid fa-arrow-trend-down' : 'fa-solid fa-arrow-trend-up'}"></i>
@@ -24,8 +29,8 @@
       <article class="workspace-kpi kpi-stock">
         <div class="kpi-icon"><i class="fa-solid fa-tags"></i></div>
         <div>
-          <span>Stock Value</span>
-          <strong th:text="${productCount + ' products'}">0 products</strong>
+          <span>Products</span>
+          <strong th:text="${productCount}">0</strong>
           <small class="good"><i class="fa-solid fa-arrow-trend-up"></i><b th:text="${inventoryHealth + '%'}">100%</b> inventory health</small>
         </div>
       </article>
@@ -42,16 +47,17 @@
         <div>
           <span>Active Cashiers</span>
           <strong th:text="${activeCashierCount}">0</strong>
-          <small class="good">on shift now</small>
+          <small class="good">active cashier accounts</small>
         </div>
       </article>
     </section>
 
+    <div class="shop-dashboard-grid">
     <section class="dashboard-main-grid">
       <article class="workspace-panel sales-chart-panel">
         <div class="workspace-panel-head">
-          <h2>Sales Overview</h2>
-          <button class="tenant-select" type="button">This Week <i class="fa-solid fa-chevron-down"></i></button>
+          <h2><i class="fa-solid fa-chart-simple"></i> Sales overview</h2>
+          <span class="shop-period-label">Last 7 days &middot; USD</span>
         </div>
         <div class="workspace-chart">
           <div class="chart-scale"><span th:text="${salesChart.maxLabel}">USD 2,000</span><span>USD 0</span></div>
@@ -70,7 +76,7 @@
           <div class="chart-days"><span th:each="label : ${salesChart.labels}" th:text="${label}">Mon</span></div>
         </div>
         <div class="chart-summary">
-          <div><span>Total Sales</span><strong th:text="${todaySales.usd}">USD 0.00</strong></div>
+          <div><span>Today's sales</span><strong th:text="${todaySales.usd}">USD 0.00</strong></div>
           <div><span>Latest Day</span><strong th:text="${salesChart.latestValue}">USD 0.00</strong></div>
         </div>
       </article>
@@ -89,7 +95,11 @@
             </div>
             <em><b th:text="${'Stock: ' + item.currentStock}">Stock: 0</b><small th:text="${'Reorder level: ' + item.reorderLevel}">Reorder level: 0</small></em>
           </div>
-          <div class="empty soft-empty" th:if="${#lists.isEmpty(lowStock)}">No low-stock alerts for this branch.</div>
+          <div class="shop-stock-healthy" th:if="${#lists.isEmpty(lowStock)}">
+            <span><i class="fa-solid fa-check"></i></span>
+            <strong>You're all stocked up</strong>
+            <p>No low-stock alerts for this branch.</p>
+          </div>
         </div>
       </article>
     </section>
@@ -118,12 +128,10 @@
       <article class="workspace-panel quick-actions-panel">
         <h2>Quick Actions</h2>
         <div class="quick-action-grid">
-          <a th:href="@{/shop/sales}"><i class="fa-solid fa-cart-shopping"></i><span>New Sale</span></a>
           <a th:href="@{/shop/products}"><i class="fa-solid fa-square-plus"></i><span>Add Product</span></a>
-          <a th:href="@{/shop/inventory}"><i class="fa-solid fa-truck"></i><span>Receive Stock</span></a>
-          <a th:href="@{/shop/inventory}"><i class="fa-solid fa-pen-to-square"></i><span>Stock Adjustment</span></a>
+          <a th:href="@{/shop/purchasing}"><i class="fa-solid fa-truck"></i><span>Receive Stock</span></a>
+          <a th:href="@{/shop/inventory-intelligence}"><i class="fa-solid fa-pen-to-square"></i><span>Stock Counts</span></a>
           <a th:href="@{/shop/reports}"><i class="fa-solid fa-chart-simple"></i><span>Sales Report</span></a>
-          <a th:href="@{/shop/purchasing}"><i class="fa-regular fa-clipboard"></i><span>Expense Entry</span></a>
         </div>
       </article>
 
@@ -142,7 +150,7 @@
         </div>
       </article>
     </section>
-
+    </div>
     <footer th:replace="~{common/layout :: shopFooter}"></footer>
   </main>
 </div>

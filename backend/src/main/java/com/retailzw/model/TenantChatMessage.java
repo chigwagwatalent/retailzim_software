@@ -33,6 +33,9 @@ public class TenantChatMessage {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
+    @Column(name = "client_message_id", length = 36)
+    private String clientMessageId;
+
     @Column(name = "read_by_platform", nullable = false)
     private Boolean readByPlatform;
 

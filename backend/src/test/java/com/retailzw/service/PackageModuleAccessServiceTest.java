@@ -83,6 +83,32 @@ class PackageModuleAccessServiceTest {
     }
 
     @Test
+    void fuelPackageEnablesOnlyFuelStationModuleAndAlignsTheBranch() {
+        Long tenantId = 21L;
+        TenantEnabledModule shop = module(tenantId, BusinessModule.SHOP_MODULE, ModuleAccessStatus.ENABLED);
+        List<TenantEnabledModule> recorded = new ArrayList<>(List.of(shop));
+        stubSubscription(tenantId, BusinessModule.FUEL_MODULE.name());
+        Branch branch = Branch.builder().tenantId(tenantId).moduleType(BusinessModule.SHOP_MODULE).isActive(true).build();
+        when(tenantModules.findByTenantId(tenantId)).thenReturn(recorded);
+        when(tenants.findById(tenantId)).thenReturn(Optional.of(Tenant.builder()
+                .id(tenantId).businessMode(TenantBusinessMode.SINGLE_MODULE).build()));
+        when(branches.findByTenantIdAndIsActiveTrue(tenantId)).thenReturn(List.of(branch));
+        when(tenantModules.save(any(TenantEnabledModule.class))).thenAnswer(call -> {
+            TenantEnabledModule saved = call.getArgument(0);
+            if (!recorded.contains(saved)) recorded.add(saved);
+            return saved;
+        });
+
+        assertThat(service.syncAndGetEnabledModules(tenantId)).containsExactly(BusinessModule.FUEL_MODULE);
+        assertThat(branch.getModuleType()).isEqualTo(BusinessModule.FUEL_MODULE);
+        assertThat(shop.getStatus()).isEqualTo(ModuleAccessStatus.DISABLED);
+        assertThat(recorded).anySatisfy(module -> {
+            assertThat(module.getModule()).isEqualTo(BusinessModule.FUEL_MODULE);
+            assertThat(module.getStatus()).isEqualTo(ModuleAccessStatus.ENABLED);
+        });
+    }
+
+    @Test
     void gasOnlyTenantPlanOverridesStaleGrowthSubscriptionAndShopBranch() {
         Long tenantId = 25L;
         Long oldGrowthPlanId = 125L;

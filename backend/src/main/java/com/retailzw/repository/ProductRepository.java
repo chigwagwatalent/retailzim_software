@@ -14,6 +14,12 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    @Query("select p.category.id,count(p) from Product p where p.tenantId=:tenantId and p.isActive=true and p.category is not null " +
+            "and (:branchId is null or exists (select i.id from Inventory i where i.tenantId=:tenantId and i.branchId=:branchId and i.productId=p.id)) group by p.category.id")
+    List<Object[]> countProductsByCategory(@Param("tenantId") Long tenantId,@Param("branchId") Long branchId);
+
+    @EntityGraph(attributePaths = {"category"})
+    List<Product> findByTenantIdAndIdIn(Long tenantId, List<Long> ids);
 
     Optional<Product> findByTenantIdAndBarcode(Long tenantId, String barcode);
 

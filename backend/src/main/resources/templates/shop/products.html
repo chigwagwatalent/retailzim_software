@@ -144,11 +144,18 @@
       </section>
     </section>
 
-    <div id="modal-import-products" class="modal"><div class="modal-content">
+    <div id="modal-import-products" class="modal"><div class="modal-content product-import-dialog">
       <div class="modal-head"><h2 th:text="${'Import Products to ' + selectedBranchName}">Import Products</h2><a class="close" href="#">&times;</a></div>
+      <div class="import-template-card">
+        <span class="import-template-icon"><i class="fa-solid fa-file-excel" aria-hidden="true"></i></span>
+        <div><strong>First, download the sample Excel file</strong><p>Use this file to prepare your products. It includes the correct columns, example rows, and an Instructions sheet.</p></div>
+        <a class="btn btn-primary" th:href="@{/templates/RetailZim-Product-Import-Sample.xlsx}" download="RetailZim-Product-Import-Sample.xlsx"><i class="fa-solid fa-download" aria-hidden="true"></i>Download sample Excel</a>
+      </div>
+      <ol class="import-steps"><li>Download and open the sample in Excel.</li><li>Replace the example rows with your products. Keep the column headings.</li><li>Save as .xlsx, then upload the completed file below.</li></ol>
+      <p class="import-stock-warning"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Matching SKUs or barcodes update existing products. Opening Stock <strong>replaces</strong> this branch’s quantity; a blank value sets it to zero.</p>
       <form method="post" enctype="multipart/form-data" th:action="@{/shop/products/import}" class="form-grid">
         <input type="hidden" name="branchId" th:value="${selectedBranchId}">
-        <label style="grid-column:1/-1">Excel file<input name="file" type="file" accept=".xlsx" required></label>
+        <label class="import-upload-field" style="grid-column:1/-1">Upload your completed workbook<input name="file" type="file" accept=".xlsx" required><small>Keep the column headings unchanged. Remove the sample rows before importing.</small></label>
         <div class="modal-actions"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-file-import"></i>Import Products</button></div>
       </form>
     </div></div>

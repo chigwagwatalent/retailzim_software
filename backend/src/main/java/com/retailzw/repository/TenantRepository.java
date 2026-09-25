@@ -15,6 +15,15 @@ import jakarta.persistence.LockModeType;
 @Repository
 public interface TenantRepository extends JpaRepository<Tenant, Long> {
 
+    @Query("SELECT YEAR(t.createdAt), MONTH(t.createdAt), COUNT(t) FROM Tenant t " +
+           "WHERE t.createdAt >= :from AND t.createdAt < :to GROUP BY YEAR(t.createdAt), MONTH(t.createdAt)")
+    List<Object[]> registrationCounts(@Param("from") java.time.LocalDateTime from, @Param("to") java.time.LocalDateTime to);
+
+    @Query("SELECT t.planId, COUNT(t) FROM Tenant t WHERE t.status = 'ACTIVE' GROUP BY t.planId")
+    List<Object[]> activeCountsByPlan();
+
+    long countBySubscriptionEndGreaterThanEqualAndSubscriptionEndLessThan(java.time.LocalDateTime from, java.time.LocalDateTime to);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT tenant FROM Tenant tenant WHERE tenant.id = :id")
     Optional<Tenant> findLockedById(@Param("id") Long id);

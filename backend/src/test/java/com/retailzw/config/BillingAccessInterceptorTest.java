@@ -46,6 +46,14 @@ class BillingAccessInterceptorTest {
     }
 
     @Test
+    void supportRemainsAvailableWithoutBillingOrModuleChecks() throws Exception {
+        assertThat(preHandle("/shop/support/messages").allowed()).isTrue();
+        assertThat(preHandle("/shop/support/chat/feed").allowed()).isTrue();
+        assertThat(preHandle("/shop/live/events").allowed()).isTrue();
+        org.mockito.Mockito.verifyNoInteractions(modules);
+    }
+
+    @Test
     void gasOnlyTenantCanOpenGasAndCommonManagementPages() throws Exception {
         when(modules.hasGas(TENANT_ID)).thenReturn(true);
         when(modules.syncAndGetEnabledModules(TENANT_ID)).thenReturn(List.of(BusinessModule.GAS_MODULE));
@@ -76,6 +84,20 @@ class BillingAccessInterceptorTest {
         assertThat(result.allowed()).isFalse();
         assertThat(result.response().getStatus()).isEqualTo(403);
         assertThat(result.response().getContentAsString()).contains("Retail Shop is not included");
+    }
+
+    @Test
+    void fuelTenantCanUseFuelApiAndRedirectsToFuelWorkspace() throws Exception {
+        when(modules.hasFuel(TENANT_ID)).thenReturn(true);
+        when(modules.hasRetailShop(TENANT_ID)).thenReturn(false);
+        when(modules.retailWebModules()).thenReturn(java.util.Set.of("products"));
+
+        assertThat(preHandle("/api/fuel/pos/bootstrap").allowed()).isTrue();
+        assertThat(preHandle("/shop/fuel").allowed()).isTrue();
+
+        Result retailResult = preHandle("/shop/products");
+        assertThat(retailResult.allowed()).isFalse();
+        assertThat(retailResult.response().getRedirectedUrl()).isEqualTo("/shop/fuel");
     }
 
     private Result preHandle(String path) throws Exception {

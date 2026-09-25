@@ -151,6 +151,10 @@ public class PackageModuleAccessService {
         return hasModule(tenantId, BusinessModule.GAS_MODULE);
     }
 
+    public boolean hasFuel(Long tenantId) {
+        return hasModule(tenantId, BusinessModule.FUEL_MODULE);
+    }
+
     public void requireModule(Long tenantId, BusinessModule module) {
         if (!hasModule(tenantId, module)) {
             throw new IllegalStateException(module.getDisplayName() + " is not included in this subscription package.");

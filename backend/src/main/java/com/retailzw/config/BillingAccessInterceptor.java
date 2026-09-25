@@ -46,6 +46,8 @@ public class BillingAccessInterceptor implements HandlerInterceptor {
 
     private boolean isBillingAllowed(String path) {
         return path.equals("/shop/billing")
+                || path.startsWith("/shop/support/")
+                || path.equals("/shop/live/events")
                 || path.equals("/shop/billing/pay")
                 || path.startsWith("/shop/billing/renew")
                 || path.startsWith("/api/auth/");
@@ -57,6 +59,10 @@ public class BillingAccessInterceptor implements HandlerInterceptor {
         if (path.equals("/api/gas") || path.startsWith("/api/gas/")) {
             return packageModules.hasGas(shopUser.getTenantId())
                     || rejectApi(response, "Gas is not included in this subscription package.");
+        }
+        if (path.equals("/api/fuel") || path.startsWith("/api/fuel/")) {
+            return packageModules.hasFuel(shopUser.getTenantId())
+                    || rejectApi(response, "Fuel Station is not included in this subscription package.");
         }
         if (path.equals("/api/me") || path.equals("/api/branches") || path.startsWith("/api/notifications")) {
             packageModules.syncAndGetEnabledModules(shopUser.getTenantId());
@@ -91,6 +97,15 @@ public class BillingAccessInterceptor implements HandlerInterceptor {
             response.sendRedirect(request.getContextPath() + firstAvailableShopPath(shopUser.getTenantId()));
             return false;
         }
+        if ("fuel".equals(module)) {
+            if (packageModules.hasFuel(shopUser.getTenantId())) {
+                return true;
+            }
+            RequestContextUtils.getOutputFlashMap(request)
+                    .put("message", "Fuel Station is not included in this subscription package.");
+            response.sendRedirect(request.getContextPath() + firstAvailableShopPath(shopUser.getTenantId()));
+            return false;
+        }
         if (packageModules.retailWebModules().contains(module)
                 && !packageModules.hasRetailShop(shopUser.getTenantId())) {
             RequestContextUtils.getOutputFlashMap(request)
@@ -116,6 +131,9 @@ public class BillingAccessInterceptor implements HandlerInterceptor {
     }
 
     private String firstAvailableShopPath(Long tenantId) {
+        if (packageModules.hasFuel(tenantId)) {
+            return "/shop/fuel";
+        }
         if (packageModules.hasGas(tenantId)) {
             return "/shop/gas";
         }

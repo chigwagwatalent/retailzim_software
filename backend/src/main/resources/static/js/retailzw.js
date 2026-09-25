@@ -298,60 +298,6 @@ document.addEventListener('click', (event) => {
   widget.classList.toggle('open');
 });
 
-document.querySelectorAll('.chat-panel[data-feed-url]').forEach((panel) => {
-  const feed = panel.querySelector('.chat-feed');
-  const url = panel.dataset.feedUrl;
-  if (!feed || !url) return;
-
-  const render = (messages) => {
-    feed.innerHTML = messages.map((message) => {
-      const side = message.senderType === 'PLATFORM' ? 'platform' : 'shop';
-      const when = message.createdAt ? new Date(message.createdAt).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
-      return `<article class="chat-message ${side}">
-        <strong>${escapeHtml(message.senderName || 'User')}</strong>
-        <p>${escapeHtml(message.message || '')}</p>
-        <small>${escapeHtml(when)}</small>
-      </article>`;
-    }).join('');
-    feed.scrollTop = feed.scrollHeight;
-  };
-
-  const refresh = async () => {
-    try {
-      const response = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (response.ok) render(await response.json());
-    } catch (error) {
-      console.debug('Chat refresh failed', error);
-    }
-  };
-
-  panel.addEventListener('submit', async (event) => {
-    const form = event.target.closest('form[data-async-chat]');
-    if (!form) return;
-    event.preventDefault();
-    const button = form.querySelector('button[type="submit"]');
-    button?.setAttribute('disabled', 'disabled');
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      });
-      if (response.ok || response.redirected) {
-        form.reset();
-        await refresh();
-      }
-    } catch (error) {
-      console.debug('Chat send failed', error);
-    } finally {
-      button?.removeAttribute('disabled');
-    }
-  });
-
-  refresh();
-  window.setInterval(refresh, 3500);
-});
-
 function escapeHtml(value) {
   return String(value)
     .replaceAll('&', '&amp;')
@@ -432,6 +378,8 @@ function formatMoney(currency, value) {
 
 function enhanceForms() {
   document.querySelectorAll('form').forEach((form) => {
+    // Chat owns its validation and resets after delivery; do not attach blur errors.
+    if (form.hasAttribute('data-async-chat')) return;
     if (form.dataset.validationReady === 'true') return;
     form.dataset.validationReady = 'true';
     form.noValidate = true;

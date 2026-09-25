@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Branch activity')}"></head>
+<body><div class="app-shell"><aside th:replace="~{common/layout :: shopSidebar(${module})}"></aside><main class="main">
+<nav th:replace="~{common/layout :: shopTopbar('All branches')}"></nav>
+<section class="page-hero"><div><p>ALL BRANCHES · TENANT WORKSPACE</p><h1 th:text="${pageTitle}">Branch activity</h1><p>View activity across your shop. Select a branch in the navigation bar to open its full workspace and make changes.</p></div></section>
+<section class="panel filter-panel"><form method="get" class="filter-grid"><label>Search<input name="search" th:value="${activitySearch}" placeholder="Search records" maxlength="100"></label><button class="btn btn-primary" type="submit">Search</button></form></section>
+<section class="panel table-panel" th:fragment="activityTable">
+<div class="panel-header"><h2>Branch activity</h2><span th:text="${activityTotal + ' records'}"></span></div>
+<div class="table-responsive" style="overflow-x:auto"><table><thead><tr><th>Branch</th><th th:each="heading : ${activityHeadings}" th:text="${heading}"></th></tr></thead>
+<tbody><tr th:each="row : ${activityRows}"><td th:each="cell : ${row}" th:text="${cell ?: '—'}"></td></tr><tr th:if="${#lists.isEmpty(activityRows)}"><td th:colspan="${#lists.size(activityHeadings)+1}">No records found in your shop.</td></tr></tbody></table></div>
+<div class="page-toolbar"><a class="btn btn-light" th:if="${activityPage > 0}" th:href="@{''(page=${activityPage - 1},size=${activitySize},search=${activitySearch})}">Previous</a><span th:text="${'Page ' + (activityPage+1)}"></span><a class="btn btn-light" th:if="${activityHasNext}" th:href="@{''(page=${activityPage + 1},size=${activitySize},search=${activitySearch})}">Next</a></div>
+</section><footer th:replace="~{common/layout :: shopFooter}"></footer></main></div></body></html>

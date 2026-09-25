@@ -12,6 +12,11 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    @Query("SELECT COUNT(u) FROM User u WHERE u.tenantId=:tenantId AND u.branchId=:branchId AND u.isActive=true AND u.role.name=:role")
+    long countActiveByRoleAndBranch(@Param("tenantId") Long tenantId, @Param("branchId") Long branchId, @Param("role") com.retailzw.enums.UserRole role);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.tenantId = :tenantId AND u.isActive = true AND u.role.name = :role")
+    long countActiveByRole(@Param("tenantId") Long tenantId, @Param("role") com.retailzw.enums.UserRole role);
 
     Optional<User> findByUsernameAndTenantId(String username, Long tenantId);
 

@@ -3,16 +3,26 @@
 <head th:fragment="head(title)">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" th:content="${_csrf.token}">
+  <meta name="csrf-header" th:content="${_csrf.headerName}">
   <title th:text="${title + ' | RetailZW'}">RetailZW</title>
   <script>
     document.documentElement.dataset.theme = localStorage.getItem('retailzw-theme') || 'light';
   </script>
   <link rel="stylesheet" th:href="@{/css/retailzw.css(v=60)}">
   <link rel="stylesheet" th:href="@{/css/billing.css(v=3)}">
+  <link rel="stylesheet" th:href="@{/css/tenant-modern.css(v=4)}">
+  <link rel="stylesheet" th:href="@{/css/admin-modern.css(v=3)}">
+  <script defer th:src="@{/js/admin-modern.js(v=1)}"></script>
   <link rel="icon" type="image/png" th:href="@{/img/favicon.png}">
   <link rel="shortcut icon" th:href="@{/img/favicon.png}">
   <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}">
-  <script defer th:src="@{/js/retailzw.js(v=19)}"></script>
+  <script defer th:src="@{/js/retailzw.js(v=21)}"></script>
+  <script defer th:src="@{/js/live-support.js(v=3)}"></script>
+  <link rel="stylesheet" th:href="@{/css/live-support.css(v=3)}">
+  <script defer th:src="@{/js/tenant-modern.js(v=2)}"></script>
+  <link rel="stylesheet" th:href="@{/css/workspace-footer.css(v=1)}">
+  <script defer th:src="@{/js/workspace-footer.js(v=1)}"></script>
 </head>
 <body>
 <aside class="sidebar tenant-shell-sidebar" th:fragment="shopSidebar(active)">
@@ -62,6 +72,18 @@
       </a>
       <a th:class="${active == 'gas-change' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/gas/change}">
         <i class="fa-solid fa-coins"></i><span>Held Change</span>
+      </a>
+    </th:block>
+
+    <th:block th:if="${supervisorUser == true and fuelModuleEnabled == true}">
+      <a th:class="${active == 'fuel' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel}">
+        <i class="fa-solid fa-gas-pump"></i><span>Fuel Supervisor Desk</span>
+      </a>
+      <a th:class="${active == 'fuel-shifts' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel/shifts}">
+        <i class="fa-solid fa-clock-rotate-left"></i><span>Shift Oversight</span>
+      </a>
+      <a th:class="${active == 'fuel-deliveries' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel/deliveries}">
+        <i class="fa-solid fa-truck-droplet"></i><span>Fuel Receiving</span>
       </a>
     </th:block>
 
@@ -139,11 +161,24 @@
       </a>
     </details>
 
+    <details class="nav-group fuel-nav-group" th:if="${tenantBillingOnly != true and fuelModuleEnabled == true}" open>
+      <summary><i class="fa-solid fa-gas-pump"></i><span>Fuel Station</span><i class="fa-solid fa-chevron-down group-arrow"></i></summary>
+      <a th:class="${active == 'fuel' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel}"><i class="fa-solid fa-gauge-high"></i><span>Command Centre</span></a>
+      <a th:class="${active == 'fuel-setup' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel/setup}"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tanks &amp; Pumps</span></a>
+      <a th:class="${active == 'fuel-deliveries' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel/deliveries}"><i class="fa-solid fa-truck-droplet"></i><span>Deliveries</span></a>
+      <a th:class="${active == 'fuel-pricing' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel/pricing}"><i class="fa-solid fa-tags"></i><span>Fuel Pricing</span></a>
+      <a th:class="${active == 'fuel-shifts' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel/shifts}"><i class="fa-solid fa-people-arrows"></i><span>Shifts &amp; Reconciliation</span></a>
+      <a th:class="${active == 'fuel-reports' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/fuel/reports}"><i class="fa-solid fa-chart-line"></i><span>Fuel Reports</span></a>
+    </details>
+
+    <a th:if="${tenantBillingOnly != true and shopModuleEnabled == true}" th:class="${active == 'expenses' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/expenses}">
+      <i class="fa-solid fa-wallet"></i><span>Expenses</span>
+    </a>
     <a th:if="${tenantBillingOnly != true and shopModuleEnabled == true}" th:class="${active == 'reports' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/reports}">
       <i class="fa-solid fa-chart-pie"></i><span>Reports</span>
     </a>
 
-    <a th:if="${tenantBillingOnly != true and (shopModuleEnabled == true or gasModuleEnabled == true)}" th:class="${active == 'users' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/users}">
+    <a th:if="${tenantBillingOnly != true and (shopModuleEnabled == true or gasModuleEnabled == true or fuelModuleEnabled == true)}" th:class="${active == 'users' ? 'nav-link active' : 'nav-link'}" th:href="@{/shop/users}">
       <i class="fa-solid fa-users"></i><span>Users &amp; Roles</span>
     </a>
 
@@ -192,7 +227,7 @@
 <aside class="sidebar platform-sidebar" th:fragment="platformSidebar(active)">
   <div class="brand sidebar-brand platform-sidebar-brand">
     <span class="platform-brand-mark">
-      <img class="platform-sidebar-logo" th:src="@{/img/favicon.png}" alt="Retail Zim">
+      <img class="platform-sidebar-logo" th:src="@{/img/retail-zim-logo-transparent.png}" alt="Retail Zim">
     </span>
     <span><strong>Retail Zim</strong><small>System Admin</small></span>
   </div>
@@ -209,7 +244,7 @@
     <a th:class="${active == 'subscriptions' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/subscriptions}"><i class="fa-solid fa-receipt"></i><span>Subscriptions</span></a>
     <a th:class="${active == 'accounting' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/accounting}"><i class="fa-solid fa-chart-line"></i><span>Accounting</span></a>
     <a th:class="${active == 'reports' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/dashboard}"><i class="fa-solid fa-chart-column"></i><span>Reports</span></a>
-    <a th:class="${active == 'settings' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/dashboard}"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+    <a th:class="${active == 'settings' ? 'nav-link active' : 'nav-link'}" th:href="@{/admin/settings}"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
   </details>
   <div class="platform-sidebar-bottom">
     <details class="platform-sidebar-user">
@@ -233,7 +268,17 @@
 </aside>
 
 <nav class="app-topbar tenant-shell-topbar" th:fragment="shopTopbar(title)" th:attr="aria-label=${title + ' workspace navigation'}">
-  <a class="tenant-branch-pill" th:if="${tenantBillingOnly != true and supervisorUser != true}" th:href="@{/shop/branches}">
+  <form class="shop-branch-switcher" method="post" th:action="@{/shop/branch/select}"
+        th:if="${tenantBillingOnly != true and shopAdministrator == true and workspaceBranchOptions != null and !#lists.isEmpty(workspaceBranchOptions)}">
+    <label for="workspace-branch"><i class="fa-solid fa-store"></i><span class="shop-sr-only">Active branch</span></label>
+    <select id="workspace-branch" name="branchId" aria-label="Active branch">
+      <option value="0" th:selected="${workspaceBranchId == null}">All branches</option>
+      <option th:each="branch : ${workspaceBranchOptions}" th:value="${branch.id}" th:text="${branch.name}" th:selected="${branch.id == workspaceBranchId}">Branch</option>
+    </select>
+    <input type="hidden" name="returnTo" th:value="${workspaceReturnTo ?: '/shop/dashboard'}">
+    <button type="submit" title="Switch branch" aria-label="Switch branch"><i class="fa-solid fa-arrow-right"></i></button>
+  </form>
+  <a class="tenant-branch-pill" th:if="${tenantBillingOnly != true and supervisorUser != true and (shopAdministrator != true or workspaceBranchOptions == null or #lists.isEmpty(workspaceBranchOptions))}" th:href="@{/shop/branches}">
     <i class="fa-solid fa-building-columns"></i>
     <span th:text="${tenantActiveBranchName ?: 'Main Shop'}">Harare CBD</span>
     <i class="fa-solid fa-chevron-down"></i>
@@ -260,6 +305,7 @@
           <a th:if="${shopModuleEnabled == true}" th:href="@{/shop/reports}"><i class="fa-solid fa-chart-line"></i></a>
           <a th:if="${gasModuleEnabled == true}" th:href="@{/shop/gas}"><i class="fa-solid fa-gas-pump"></i></a>
           <a th:if="${gasModuleEnabled == true}" th:href="@{/shop/gas/tanks}"><i class="fa-solid fa-fire-flame-simple"></i></a>
+          <a th:if="${fuelModuleEnabled == true}" th:href="@{/shop/fuel}"><i class="fa-solid fa-gas-pump"></i></a>
           <a th:href="@{/shop/company}"><i class="fa-solid fa-building"></i></a>
         </div>
       </div>
@@ -330,7 +376,7 @@
     </button>
     <span class="billing-renewal-toast-progress" aria-hidden="true"></span>
   </aside>
-  <div id="support-chat" class="support-widget chat-panel" th:if="${tenantBillingOnly != true}" th:attr="data-feed-url=@{/shop/support/chat/feed}">
+  <div id="support-chat" class="support-widget chat-panel" th:attr="data-feed-url=@{/shop/support/chat/feed}">
     <button class="support-fab" type="button" data-chat-toggle title="Live support">
       <i class="fa-solid fa-headset"></i>
       <span th:if="${supportUnreadCount != null and supportUnreadCount > 0}" th:text="${supportUnreadCount}">0</span>
@@ -363,6 +409,11 @@
   <span>Powered By <a href="https://cntechnologies.co.zw/" target="_blank" rel="noopener">CN Technologies</a></span>
 </footer>
 
+<footer class="platform-footer" th:fragment="platformFooter">
+  <span>&copy; <b th:text="${#dates.year(#dates.createNow())}">2026</b> RetailZim. All rights reserved.</span>
+  <span>Powered by <a href="https://cntechnologies.co.zw/" target="_blank" rel="noopener">CN Technologies</a></span>
+  <a th:href="@{/admin/support}">Help &amp; support</a>
+</footer>
 <nav class="app-topbar platform-topbar" th:fragment="platformTopbar(title)">
   <div class="platform-topbar-copy">
     <strong th:text="${title}">System Overview</strong>
@@ -398,7 +449,7 @@
       <i class="fa-regular fa-envelope"></i><span th:if="${supportUnreadCount != null and supportUnreadCount > 0}" th:text="${supportUnreadCount}">0</span>
     </a>
     <a th:class="${unreadNotificationCount != null and unreadNotificationCount > 0 ? 'icon-button has-badge' : 'icon-button'}"
-       th:href="@{/admin/dashboard}" title="Notifications">
+       th:href="@{/admin/support}" title="Notifications">
       <i class="fa-solid fa-bell"></i><span th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
     </a>
     <details class="account-menu">
@@ -426,15 +477,6 @@
       </div>
     </details>
   </div>
-  <footer class="platform-footer">
-    <span>All rights reserved @<b th:text="${#dates.year(#dates.createNow())}">2026</b></span>
-    <nav aria-label="Footer links">
-      <a th:href="@{/admin/support}">Support</a>
-      <a th:href="@{/admin/dashboard}">Terms</a>
-      <a th:href="@{/admin/dashboard}">Privacy</a>
-      <span>Powered by <a href="https://cntechnologies.co.zw/" target="_blank" rel="noopener">CN Technologies</a></span>
-    </nav>
-  </footer>
 </nav>
 
 <nav class="accounting-tabs" th:fragment="accountingTabs(active)" aria-label="Accounting sections">

@@ -83,7 +83,7 @@
         <div class="signup-module-grid">
           <label class="signup-module-card" th:each="m : ${businessModules}" th:attr="data-business-module=${m.name()}">
             <input name="modules" type="checkbox" th:value="${m}" th:checked="${m.name() == 'SHOP_MODULE'}">
-            <span><i th:class="${m.name() == 'GAS_MODULE' ? 'fa-solid fa-gas-pump' : 'fa-solid fa-store'}"></i></span>
+            <span><i th:class="${m.name() == 'GAS_MODULE' ? 'fa-solid fa-fire-flame-simple' : (m.name() == 'FUEL_MODULE' ? 'fa-solid fa-gas-pump' : 'fa-solid fa-store')}"></i></span>
             <strong th:text="${m.displayName}">Retail Shop</strong>
             <small>Enable this workspace after payment.</small>
           </label>

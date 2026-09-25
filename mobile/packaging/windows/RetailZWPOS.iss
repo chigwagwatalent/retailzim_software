@@ -1,6 +1,6 @@
 #define MyAppName "RetailZW POS"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.2.4"
+  #define MyAppVersion "1.2.5"
 #endif
 #define MyAppPublisher "RetailZW"
 #define MyAppURL "https://retailzw.co.zw"

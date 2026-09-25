@@ -13,6 +13,20 @@ import java.util.Optional;
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
+    long countByTenantIdAndBranchId(Long tenantId, Long branchId);
+
+    @Query("SELECT COUNT(i) FROM Inventory i JOIN Product p ON p.id = i.productId " +
+           "WHERE i.tenantId = :tenantId AND i.branchId = :branchId AND p.tenantId = :tenantId " +
+           "AND p.isService = false AND p.isActive = true AND p.reorderLevel > 0 AND i.quantityOnHand <= p.reorderLevel")
+    long countLowStock(@Param("tenantId") Long tenantId, @Param("branchId") Long branchId);
+
+    @Query("SELECT i FROM Inventory i JOIN Product p ON p.id = i.productId " +
+           "WHERE i.tenantId = :tenantId AND i.branchId = :branchId AND p.tenantId = :tenantId " +
+           "AND p.isService = false AND p.isActive = true AND p.reorderLevel > 0 AND i.quantityOnHand <= p.reorderLevel " +
+           "ORDER BY i.quantityOnHand ASC, i.id ASC")
+    List<Inventory> findDashboardLowStock(@Param("tenantId") Long tenantId, @Param("branchId") Long branchId,
+            org.springframework.data.domain.Pageable pageable);
+
     Optional<Inventory> findByBranchIdAndProductId(Long branchId, Long productId);
 
     Optional<Inventory> findByTenantIdAndBranchIdAndProductId(Long tenantId, Long branchId, Long productId);
@@ -37,6 +51,15 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
                                            @Param("branchId") Long branchId,
                                            @Param("search") String search,
                                            @Param("categoryId") Long categoryId);
+
+    @Query("SELECT i FROM Inventory i JOIN Product p ON p.id = i.productId " +
+           "WHERE i.tenantId = :tenantId AND i.branchId = :branchId AND p.tenantId = :tenantId AND p.isActive = true " +
+           "AND (:categoryId IS NULL OR p.category.id = :categoryId) " +
+           "AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
+           "OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.barcode) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+           "ORDER BY p.name ASC, p.id ASC")
+    List<Inventory> findBranchProductStockPage(@Param("tenantId") Long tenantId, @Param("branchId") Long branchId,
+            @Param("search") String search, @Param("categoryId") Long categoryId, org.springframework.data.domain.Pageable pageable);
 
     List<Inventory> findByTenantId(Long tenantId);
 

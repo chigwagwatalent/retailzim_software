@@ -1,0 +1,52 @@
+.platform-shell .platform-sidebar-brand { flex-direction:column; align-items:flex-start; gap:8px; height:auto; min-height:88px; }
+.platform-shell .platform-sidebar-brand .platform-brand-mark { flex:none; width:160px; height:58px; background:white; border-radius:12px; padding:8px; }
+.platform-shell .platform-sidebar-logo { width:100%; height:100%; object-fit:contain; }
+.platform-shell .platform-sidebar-brand strong { display:none; }
+.chat-connection { font-size:12px; color:#63758e; margin:8px 16px; min-height:18px; }
+.chat-message p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.chat-message { max-width:88%; border-radius:16px; }
+.support-search { display:flex; gap:8px; padding:12px; }
+.support-search input { min-width:0; width:100%; }
+.support-pagination { display:flex; justify-content:space-between; padding:16px; }
+.support-thread > span { min-width:0; }
+.support-thread small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:220px; display:block; }
+.live-count { background:#e53955; color:#fff; border-radius:20px; padding:2px 6px; font-size:11px; min-width:18px; }
+.live-count[hidden] { display:none!important; }
+.support-room,.support-inbox { min-width:0; }
+.support-room-feed { height:clamp(280px,48vh,620px); overflow:auto; overscroll-behavior:contain; }
+.support-room-head { border-bottom:1px solid #dbe7f3; }
+.support-compose { border-top:1px solid #dbe7f3; padding:16px; }
+.tenant-danger-zone { border:1px solid #ef9aaa; padding:24px; border-radius:16px; margin:24px 0; }
+.tenant-danger-zone button { background:#be2442; color:white; }
+@media(max-width:800px) { .support-console { display:flex!important; flex-direction:column; } .support-inbox { max-height:320px; overflow:auto; } }
+@media(max-width:1100px) { .platform-shell .platform-sidebar-brand { flex-direction:row; align-items:center; min-height:62px; } .platform-shell .platform-sidebar-brand .platform-brand-mark { width:140px; height:42px; padding:4px 8px; } }
+
+/* Explicit badge styling keeps labels independent from legacy icon badge rules. */
+.platform-sidebar .nav-link > .live-count { position:static; margin-left:auto; flex:none; line-height:18px; text-align:center; }
+.support-fab > .live-count { position:absolute; top:-3px; right:-3px; border:2px solid white; line-height:18px; }
+.support-thread em[hidden] { display:none!important; }
+body > .support-widget { display:flex; flex-direction:column-reverse; gap:12px; align-items:flex-end; }
+body > .support-widget .support-window { width:min(410px,calc(100vw - 32px)); height:min(560px,calc(100dvh - var(--workspace-footer-height,64px) - 110px)); border-radius:20px; border:1px solid #d9e5f4; box-shadow:0 18px 60px #12376630; }
+body > .support-widget.open .support-window { display:grid; grid-template-rows:auto minmax(0,1fr) auto auto; }
+.support-head { background:linear-gradient(120deg,#eff6ff,#fff); padding:16px; }
+.support-head strong { color:#132e50; }
+.chat-panel .chat-feed { display:flex; flex-direction:column; gap:12px; padding:16px; background:#f4f7fc; min-height:0; overflow-y:auto; }
+.chat-panel .chat-message { width:fit-content; max-width:78%; margin:0; padding:12px 15px; border:1px solid #dce6f2; box-shadow:0 2px 5px #17385806; }
+.chat-panel .chat-message.incoming { align-self:flex-start; color:#18324e; background:#fff; border-radius:16px 16px 16px 4px; }
+.chat-panel .chat-message.outgoing { align-self:flex-end; color:white; background:linear-gradient(135deg,#1269f4,#0879ec); border-color:transparent; border-radius:16px 16px 4px 16px; }
+.chat-panel .chat-message strong { font-size:12px; color:inherit; }
+.chat-panel .chat-message p { margin:5px 0 8px; font-size:14px; line-height:1.5; }
+.chat-panel .chat-message small { color:inherit; opacity:.75; font-size:11px; }
+.chat-panel .chat-form { display:flex!important; flex-wrap:nowrap; align-items:center; gap:10px; padding:12px 16px; background:#fff; border-top:1px solid #e0e8f4; }
+.chat-panel .chat-form input { flex:1; width:0!important; min-width:0; height:44px; border-radius:12px; margin:0; }
+.chat-panel .chat-form button { flex:0 0 auto; width:auto!important; min-width:44px; height:44px; margin:0; border-radius:12px; }
+.chat-panel .chat-connection { margin:0; padding:7px 16px; font-size:11px; background:white; }
+.support-console { gap:18px; }
+.support-inbox { border-radius:18px; }
+.support-room { border-radius:18px; overflow:hidden; }
+.support-room-head { padding:18px; background:#fff; }
+.support-room-feed { height:clamp(280px,50vh,620px); }
+[data-theme="dark"] .chat-panel :is(.chat-feed,.chat-form,.chat-connection),[data-theme="dark"] .support-room-head,[data-theme="dark"] .support-head { background:#12243b; color:#cbdaf0; }
+[data-theme="dark"] .chat-panel .chat-message.incoming { background:#1d3552; color:#e4edfa; border-color:#35506d; }
+[data-theme="dark"] .support-head strong { color:#e4edfa; }
+@media(max-width:600px) { .support-room-head { flex-wrap:wrap; } .support-room-actions { display:flex; flex-wrap:wrap; gap:6px; } .chat-panel .chat-message { max-width:90%; } .chat-panel .chat-form { padding:10px; gap:8px; } }

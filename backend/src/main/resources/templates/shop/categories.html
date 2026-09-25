@@ -13,6 +13,7 @@
         <div>
           <p>Catalogue structure,</p>
           <h1>Product Categories</h1>
+          <p>Categories are shared across your shop. Product counts reflect <span th:text="${tenantActiveBranchName}">All branches</span>.</p>
         </div>
       </div>
       <div class="hero-metrics">
@@ -44,45 +45,25 @@
       </form>
     </section>
 
-    <section class="grid category-card-grid">
-      <div class="panel category-card" th:each="c : ${categoryList}">
-        <div class="branch-card-head">
-          <span class="branch-badge"><i class="fa-solid fa-layer-group"></i></span>
-          <div>
-            <h2 th:text="${c.name}">Category</h2>
-            <small th:text="${(c.code ?: 'NO-CODE') + (c.parentId != null ? ' - under ' + (parentCategoryById.get(c.parentId) ?: 'parent') : '')}">Code</small>
-          </div>
-          <span th:class="${c.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${c.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
-        </div>
-        <p th:text="${c.description ?: 'No description captured.'}">Description</p>
-        <div class="branch-mini-stats">
-          <div><strong th:text="${categoryProductCounts.get(c.id) ?: 0}">0</strong><span>Products</span></div>
-          <div><strong th:text="${c.sortOrder ?: 0}">0</strong><span>Sort</span></div>
-          <div><strong th:text="${c.parentId == null ? 'Root' : 'Child'}">Root</strong><span>Level</span></div>
-        </div>
-        <div class="branch-actions">
-          <a class="btn btn-light" th:href="${'#modal-edit-category-' + c.id}"><i class="fa-solid fa-pen"></i>Edit</a>
-          <form th:if="${!c.isActive}" method="post" th:action="@{'/shop/categories/' + ${c.id} + '/activate'}"><button class="btn btn-blue" type="submit"><i class="fa-solid fa-toggle-on"></i>Activate</button></form>
-          <form th:if="${c.isActive}" method="post" th:action="@{'/shop/categories/' + ${c.id} + '/deactivate'}"><button class="btn btn-light" type="submit"><i class="fa-solid fa-toggle-off"></i>Deactivate</button></form>
-        </div>
-      </div>
-    </section>
-
     <section class="panel table-panel">
       <div class="toolbar">
         <h2>Category Directory</h2>
         <span class="badge" th:text="${categoryPage.totalElements + ' categories'}">0 categories</span>
       </div>
       <table>
-        <thead><tr><th>Category</th><th>Parent</th><th>Products</th><th>Sort</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Category</th><th>Description</th><th>Parent</th><th>Products</th><th>Sort</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>
         <tr th:each="c : ${categoryList}">
           <td><strong th:text="${c.name}">Name</strong><small th:text="${c.code ?: 'No code'}">Code</small></td>
+          <td th:text="${c.description ?: '—'}">Description</td>
           <td th:text="${c.parentId == null ? 'Root category' : (parentCategoryById.get(c.parentId) ?: 'Parent #' + c.parentId)}">Parent</td>
           <td th:text="${categoryProductCounts.get(c.id) ?: 0}">0</td>
           <td th:text="${c.sortOrder ?: 0}">0</td>
           <td><span th:class="${c.isActive ? 'badge status-active' : 'badge status-suspended'}" th:text="${c.isActive ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
-          <td><a class="icon-button mini" th:href="${'#modal-edit-category-' + c.id}" title="Edit"><i class="fa-solid fa-pen"></i></a></td>
+          <td><div class="category-table-actions">
+            <a class="btn btn-light" th:href="${'#modal-edit-category-' + c.id}">Edit</a>
+            <form method="post" th:action="@{/shop/categories/{id}/{action}(id=${c.id},action=${c.isActive ? 'deactivate' : 'activate'})}"><button class="btn btn-light" type="submit" th:text="${c.isActive ? 'Deactivate' : 'Activate'}">Activate</button></form>
+          </div></td>
         </tr>
         </tbody>
       </table>

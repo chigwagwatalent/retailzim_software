@@ -94,6 +94,21 @@ class FinanceReportCalculatorTest {
         assertAmount(totals.zwg().grossProfit(), "100.00");
     }
 
+    @Test
+    void postedExpensesReduceNetProfitWithoutChangingGrossProfit() {
+        Sale usd = sale(1L, CurrencyCode.USD, "18.00", "2.70", "8.00", "2.00", "4.00");
+        Sale zwg = sale(2L, CurrencyCode.ZWG, "180.00", "27.00", "80.00", "20.00", "40.00");
+
+        FinanceReportCalculator.ReportTotals totals = calculator.calculate(
+                List.of(usd, zwg), List.of(), Map.of(), amount("3.25"), amount("15.00"));
+
+        assertAmount(totals.usd().grossProfit(), "10.00");
+        assertAmount(totals.usd().operatingExpenses(), "3.25");
+        assertAmount(totals.usd().netProfit(), "6.75");
+        assertAmount(totals.zwg().operatingExpenses(), "15.00");
+        assertAmount(totals.zwg().netProfit(), "85.00");
+    }
+
     private Sale sale(Long id, CurrencyCode currency, String subtotal, String tax, String cost,
                       String lineDiscount, String unitCost) {
         Sale sale = Sale.builder()

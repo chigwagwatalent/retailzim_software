@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/layout :: head('Settings')}"></head>
+<body><div class="app-shell platform-shell admin-settings">
+<aside th:replace="~{common/layout :: platformSidebar('settings')}"></aside>
+<main class="main">
+<nav th:replace="~{common/layout :: platformTopbar('Settings')}"></nav>
+<section class="settings-heading"><div><span class="settings-eyebrow">PLATFORM SETTINGS</span><h1>People &amp; access</h1><p>Manage your account and the people who run your platform.</p></div><button type="button" class="btn btn-primary" data-settings-open="create-admin"><i class="fa-solid fa-user-plus"></i> Add administrator</button></section>
+<div class="alert" th:if="${message}" th:text="${message}"></div>
+<section class="panel settings-profile"><div class="settings-avatar"><i class="fa-solid fa-user-shield"></i></div><div class="settings-profile-info"><span class="settings-eyebrow">MY ACCOUNT</span><h2 th:text="${profile.firstName + ' ' + profile.lastName}"></h2><p th:text="${profile.email}"></p><span class="settings-status">Platform administrator</span></div><div class="settings-actions"><button type="button" class="btn btn-light" data-settings-open="edit-profile"><i class="fa-regular fa-pen-to-square"></i> Edit profile</button><button type="button" class="btn btn-light" data-settings-open="change-password"><i class="fa-solid fa-key"></i> Change password</button></div></section>
+<dialog class="settings-dialog" id="edit-profile" aria-labelledby="profile-title"><div class="settings-dialog-head"><h2 id="profile-title">Edit my profile</h2><button type="button" data-settings-close aria-label="Close">&times;</button></div>
+<form method="post" th:action="@{/admin/settings/profile}" class="form-grid">
+<label>First name<input name="firstName" th:value="${profile.firstName}" maxlength="100" required></label>
+<label>Last name<input name="lastName" th:value="${profile.lastName}" maxlength="100" required></label>
+<label>Email<input type="email" name="email" th:value="${profile.email}" maxlength="150" required></label>
+<label>Username<input th:value="${profile.username}" readonly></label>
+<div class="form-actions"><button type="button" class="btn btn-light" data-settings-close>Cancel</button><button class="btn btn-primary" type="submit">Save profile</button></div></form></dialog>
+<dialog class="settings-dialog" id="change-password" aria-labelledby="password-title"><div class="settings-dialog-head"><h2 id="password-title">Change password</h2><button type="button" data-settings-close aria-label="Close">&times;</button></div><p>After changing your password, sign in again. Other browser sessions will also be signed out on their next request.</p>
+<form method="post" th:action="@{/admin/settings/password}" class="form-grid">
+<label>Current password<input type="password" name="currentPassword" autocomplete="current-password" required></label>
+<label>New password<input type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password" required></label>
+<label>Confirm new password<input type="password" name="confirmPassword" minlength="12" maxlength="72" autocomplete="new-password" required></label>
+<div class="form-actions"><button type="button" class="btn btn-light" data-settings-close>Cancel</button><button class="btn btn-primary" type="submit">Update password</button></div></form></dialog>
+<section class="panel table-panel settings-directory"><div class="settings-directory-head"><div><h2>Platform administrators <span class="badge" th:text="${adminPage.totalElements}"></span></h2><p>Platform-wide access. Shop staff are managed within their tenant.</p></div><span class="settings-status"><i class="fa-solid fa-shield-halved"></i> Protected access</span></div>
+<table><thead><tr><th>Administrator</th><th>Username</th><th>Email address</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+<tr th:each="a : ${adminPage.content}"><td><div class="settings-person"><span class="settings-avatar small" th:text="${#strings.toUpperCase(#strings.substring(a.username,0,1))}"></span><strong th:text="${a.firstName + ' ' + a.lastName}"></strong></div></td><td th:text="${a.username}"></td><td th:text="${a.email}"></td><td><span th:class="${a.isActive ? 'settings-status' : 'settings-status inactive'}" th:text="${a.isActive ? 'Active' : 'Inactive'}"></span></td><td><div class="settings-actions">
+<button type="button" class="btn btn-light" th:attr="data-settings-open=${'view-admin-' + a.id}"><i class="fa-regular fa-eye"></i> View</button>
+<span th:if="${a.id == profile.id}">Your account</span>
+<button type="button" class="btn btn-light" th:unless="${a.id == profile.id}" th:attr="data-settings-open=${'edit-admin-' + a.id}"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+<button th:unless="${a.id == profile.id}" class="btn btn-light" type="button" th:attr="data-settings-open=${'status-admin-' + a.id}" th:text="${a.isActive ? 'Deactivate' : 'Activate'}"></button>
+</div></td></tr></tbody></table>
+<div class="toolbar"><a th:if="${adminPage.hasPrevious()}" th:href="@{/admin/settings(page=${adminPage.number - 1})}">Previous</a><span th:text="${'Page ' + (adminPage.number + 1)}"></span><a th:if="${adminPage.hasNext()}" th:href="@{/admin/settings(page=${adminPage.number + 1})}">Next</a></div></section>
+<dialog class="settings-dialog" th:each="a : ${adminPage.content}" th:if="${a.id != profile.id}" th:id="${'edit-admin-' + a.id}" th:attr="aria-label=${'Edit ' + a.username}">
+<div class="settings-dialog-head"><h2 th:text="${'Edit ' + a.username}"></h2><button type="button" data-settings-close aria-label="Close">&times;</button></div>
+<form method="post" th:action="@{/admin/settings/users/{id}(id=${a.id})}" class="form-grid">
+<label>First name<input name="firstName" th:value="${a.firstName}" maxlength="100" required></label><label>Last name<input name="lastName" th:value="${a.lastName}" maxlength="100" required></label>
+<label>Email<input name="email" type="email" th:value="${a.email}" maxlength="150" required></label>
+<label>Reset password (optional)<input name="password" type="password" autocomplete="new-password" minlength="12" maxlength="72"><small>Leave blank to keep the current password. Resetting signs out existing sessions.</small></label>
+<div class="form-actions"><button type="button" class="btn btn-light" data-settings-close>Cancel</button><button class="btn btn-primary" type="submit">Save administrator</button></div></form></dialog>
+<dialog class="settings-dialog" id="create-admin" aria-labelledby="create-title"><div class="settings-dialog-head"><h2 id="create-title">Add administrator</h2><button type="button" data-settings-close aria-label="Close">&times;</button></div><p>This account will have platform-wide administrator access.</p>
+<form method="post" th:action="@{/admin/settings/users}" class="form-grid">
+<label>Username<input name="username" minlength="3" maxlength="50" autocomplete="off" required></label><label>Email<input name="email" type="email" maxlength="150" required></label>
+<label>First name<input name="firstName" maxlength="100" required></label><label>Last name<input name="lastName" maxlength="100" required></label>
+<label>Initial password<input name="password" type="password" minlength="12" maxlength="72" autocomplete="new-password" required></label>
+<div class="form-actions"><button type="button" class="btn btn-light" data-settings-close>Cancel</button><button class="btn btn-primary" type="submit">Create administrator</button></div></form></dialog>
+<th:block th:each="a : ${adminPage.content}">
+<dialog class="settings-dialog" th:id="${'view-admin-' + a.id}" aria-label="Administrator details"><div class="settings-dialog-head"><h2>Administrator details</h2><button type="button" data-settings-close aria-label="Close">&times;</button></div><dl class="settings-details"><dt>Name</dt><dd th:text="${a.firstName + ' ' + a.lastName}"></dd><dt>Username</dt><dd th:text="${a.username}"></dd><dt>Email</dt><dd th:text="${a.email}"></dd><dt>Access</dt><dd>Platform administrator</dd><dt>Status</dt><dd th:text="${a.isActive ? 'Active' : 'Inactive'}"></dd></dl><div class="form-actions"><button type="button" class="btn btn-primary" data-settings-close>Done</button></div></dialog>
+<dialog class="settings-dialog" th:if="${a.id != profile.id}" th:id="${'status-admin-' + a.id}" aria-label="Confirm access change"><div class="settings-dialog-head"><h2 th:text="${a.isActive ? 'Deactivate administrator?' : 'Activate administrator?'}"></h2><button type="button" data-settings-close aria-label="Close">&times;</button></div><p><strong th:text="${a.firstName + ' ' + a.lastName}"></strong> <span th:text="${a.isActive ? 'will lose platform access. Their account history will be retained.' : 'will regain platform-wide administrator access.'}"></span></p><form method="post" th:action="@{/admin/settings/users/{id}/status(id=${a.id})}"><input type="hidden" name="active" th:value="${!a.isActive}"><div class="form-actions"><button type="button" class="btn btn-light" data-settings-close>Cancel</button><button class="btn btn-primary" type="submit" th:text="${a.isActive ? 'Confirm deactivation' : 'Confirm activation'}"></button></div></form></dialog>
+</th:block>
+<p class="settings-footnote"><i class="fa-solid fa-lock"></i> Deactivation removes access without deleting account history. Your own account is protected from deactivation.</p>
+<footer th:replace="~{common/layout :: platformFooter}"></footer>
+</main></div><script defer th:src="@{/js/admin-settings.js(v=1)}"></script></body></html>

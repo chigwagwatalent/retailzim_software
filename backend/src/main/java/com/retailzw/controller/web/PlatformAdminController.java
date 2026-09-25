@@ -62,6 +62,17 @@ public class PlatformAdminController {
     private final EmailService emailService;
     private final SmilePayCheckoutService smilePayCheckoutService;
     private final BillingAutomationService billingAutomationService;
+    private final com.retailzw.service.TenantDeletionService tenantDeletion;
+    private final com.retailzw.service.SupportMessageService chatSending;
+
+    @PostMapping("/admin/tenants/{id}/delete")
+    public String deleteTenant(@PathVariable Long id, @RequestParam String confirmation,
+                               @RequestParam(defaultValue = "false") boolean acknowledged,
+                               java.security.Principal principal, RedirectAttributes redirect) {
+        tenantDeletion.delete(id, confirmation, acknowledged, principal.getName());
+        redirect.addFlashAttribute("message", "Shop and its database records permanently deleted. External backups and device copies are not erased.");
+        return "redirect:/admin/tenants";
+    }
 
     @GetMapping("/")
     public String home() {
@@ -112,8 +123,12 @@ public class PlatformAdminController {
         model.addAttribute("totalTenants", tenants.count());
         model.addAttribute("activeTenants", tenants.countByStatus(Tenant.TenantStatus.ACTIVE));
         model.addAttribute("pendingTenants", tenants.countByStatus(Tenant.TenantStatus.PENDING));
-        model.addAttribute("plans", plans.findAll());
-        model.addAttribute("tenants", tenants.findAll(PageRequest.of(0, 8)).getContent());
+        List<SaasPlan> dashboardPlans = plans.findAll();
+        model.addAttribute("plans", dashboardPlans);
+        model.addAttribute("activePlanCount", dashboardPlans.stream().filter(p -> Boolean.TRUE.equals(p.getIsActive())).count());
+        model.addAttribute("registrationChart", registrationChart(LocalDate.now()));
+        model.addAttribute("tenants", tenants.findAll(PageRequest.of(0, 5,
+                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt", "id"))).getContent());
         return "admin/dashboard";
     }
 
@@ -210,32 +225,32 @@ public class PlatformAdminController {
     }
 
     @GetMapping("/admin/support")
-    public String supportCenter(@RequestParam(required = false) Long tenantId, Model model) {
+    public String supportCenter(@RequestParam(required = false) Long tenantId,
+                                @RequestParam(defaultValue = "") String search,
+                                @RequestParam(defaultValue = "0") int page, Model model) {
         addNavigationModel(model);
-        List<Tenant> tenantList = tenants.findAll().stream()
-                .sorted(Comparator.comparing(Tenant::getCompanyName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
-                .toList();
+        Page<Tenant> inboxPage = tenants.searchTenants(search.strip(), PageRequest.of(Math.max(0, page), 30,
+                org.springframework.data.domain.Sort.by("companyName", "id")));
+        List<Tenant> tenantList = inboxPage.getContent();
+        model.addAttribute("inboxPage", inboxPage);
+        model.addAttribute("search", search);
         Long selectedTenantId = tenantId != null
                 ? tenantId
                 : tenantList.stream().findFirst().map(Tenant::getId).orElse(null);
         Tenant selectedTenant = selectedTenantId == null ? null : tenants.findById(selectedTenantId).orElse(null);
 
-        Map<Long, TenantChatMessage> lastMessageByTenant = chatMessages.findAll().stream()
-                .sorted(Comparator.comparing(TenantChatMessage::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())))
-                .collect(Collectors.toMap(TenantChatMessage::getTenantId, Function.identity(), (oldValue, newValue) -> newValue));
+        List<Long> inboxIds = tenantList.stream().map(Tenant::getId).toList();
+        Map<Long, TenantChatMessage> lastMessageByTenant = inboxIds.isEmpty() ? Map.of() : chatMessages.latestForTenants(inboxIds).stream()
+                .collect(Collectors.toMap(TenantChatMessage::getTenantId, Function.identity()));
         Map<Long, Long> unreadByTenant = new HashMap<>();
-        tenantList.forEach(t -> unreadByTenant.put(t.getId(), chatMessages
-                .findByTenantIdAndReadByPlatformFalseAndSenderTypeOrderByCreatedAtAsc(t.getId(), TenantChatMessage.SenderType.SHOP)
-                .stream().count()));
+        if (!inboxIds.isEmpty()) chatMessages.unreadForTenants(inboxIds)
+                .forEach(row -> unreadByTenant.put(((Number) row[0]).longValue(), ((Number) row[1]).longValue()));
 
         List<TenantChatMessage> activeChat = selectedTenantId == null
                 ? List.of()
                 : chatMessages.findByTenantIdOrderByCreatedAtDesc(selectedTenantId, PageRequest.of(0, 60)).stream()
                 .sorted(Comparator.comparing(TenantChatMessage::getCreatedAt))
                 .toList();
-        if (selectedTenantId != null) {
-            markPlatformChatRead(selectedTenantId);
-        }
 
         model.addAttribute("tenants", tenantList);
         model.addAttribute("selectedTenant", selectedTenant);
@@ -336,12 +351,8 @@ public class PlatformAdminController {
     public String sendTenantChat(@PathVariable Long id,
                                  @RequestParam String message,
                                  RedirectAttributes redirect) {
-        chatMessages.save(TenantChatMessage.builder()
-                .tenantId(id)
-                .senderType(TenantChatMessage.SenderType.PLATFORM)
-                .senderName("Platform Admin")
-                .message(message)
-                .build());
+        validateChat(id, message);
+        chatSending.send(id, TenantChatMessage.SenderType.PLATFORM, "Platform Admin", message, java.util.UUID.randomUUID().toString());
         redirect.addFlashAttribute("message", "Chat message sent.");
         return "redirect:/admin/tenants/" + id + "#live-chat";
     }
@@ -350,14 +361,8 @@ public class PlatformAdminController {
     public String sendSupportChat(@PathVariable Long id,
                                   @RequestParam String message,
                                   RedirectAttributes redirect) {
-        chatMessages.save(TenantChatMessage.builder()
-                .tenantId(id)
-                .senderType(TenantChatMessage.SenderType.PLATFORM)
-                .senderName("Platform Support")
-                .message(message)
-                .readByPlatform(true)
-                .readByShop(false)
-                .build());
+        validateChat(id, message);
+        chatSending.send(id, TenantChatMessage.SenderType.PLATFORM, "Platform Support", message, java.util.UUID.randomUUID().toString());
         redirect.addFlashAttribute("message", "Support reply sent.");
         return "redirect:/admin/support?tenantId=" + id;
     }
@@ -365,7 +370,6 @@ public class PlatformAdminController {
     @GetMapping("/admin/tenants/{id}/chat/feed")
     @ResponseBody
     public List<Map<String, Object>> tenantChatFeed(@PathVariable Long id) {
-        markPlatformChatRead(id);
         return chatMessages.findByTenantIdOrderByCreatedAtDesc(id, PageRequest.of(0, 30)).stream()
                 .sorted(Comparator.comparing(TenantChatMessage::getCreatedAt))
                 .map(this::chatPayload)
@@ -375,7 +379,6 @@ public class PlatformAdminController {
     @GetMapping("/admin/support/{id}/chat/feed")
     @ResponseBody
     public List<Map<String, Object>> supportChatFeed(@PathVariable Long id) {
-        markPlatformChatRead(id);
         return chatMessages.findByTenantIdOrderByCreatedAtDesc(id, PageRequest.of(0, 60)).stream()
                 .sorted(Comparator.comparing(TenantChatMessage::getCreatedAt))
                 .map(this::chatPayload)
@@ -386,7 +389,7 @@ public class PlatformAdminController {
     public String signup(Model model) {
         addNavigationModel(model);
         model.addAttribute("plans", plans.findByIsActiveTrue());
-        model.addAttribute("businessModules", List.of(BusinessModule.SHOP_MODULE, BusinessModule.GAS_MODULE));
+        model.addAttribute("businessModules", List.of(BusinessModule.SHOP_MODULE, BusinessModule.GAS_MODULE, BusinessModule.FUEL_MODULE));
         model.addAttribute("signup", new TenantSignUpRequest());
         return "auth/signup";
     }
@@ -450,24 +453,20 @@ public class PlatformAdminController {
                                 Model model) {
         addNavigationModel(model);
         List<SaasPlan> allPlans = plans.findAll();
-        List<Tenant> allTenants = tenants.findAll();
         Map<Long, SaasPlan> planById = allPlans.stream()
                 .collect(Collectors.toMap(SaasPlan::getId, Function.identity()));
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime renewalWindow = now.plusDays(30);
-        long expiringSoonCount = allTenants.stream()
-                .filter(t -> t.getSubscriptionEnd() != null)
-                .filter(t -> !t.getSubscriptionEnd().isBefore(now) && t.getSubscriptionEnd().isBefore(renewalWindow))
-                .count();
-
-        BigDecimal monthlyRevenueUsd = allTenants.stream()
-                .filter(t -> Tenant.TenantStatus.ACTIVE.equals(t.getStatus()))
-                .map(t -> planPrice(planById, t, SaasPlan::getPriceUsd))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal monthlyRevenueZwg = allTenants.stream()
-                .filter(t -> Tenant.TenantStatus.ACTIVE.equals(t.getStatus()))
-                .map(t -> planPrice(planById, t, SaasPlan::getPriceZwg))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        long expiringSoonCount = tenants.countBySubscriptionEndGreaterThanEqualAndSubscriptionEndLessThan(now, renewalWindow);
+        BigDecimal monthlyRevenueUsd = BigDecimal.ZERO;
+        BigDecimal monthlyRevenueZwg = BigDecimal.ZERO;
+        for (Object[] row : tenants.activeCountsByPlan()) {
+            SaasPlan plan = row[0] == null ? null : planById.get(((Number) row[0]).longValue());
+            if (plan == null) continue;
+            BigDecimal count = BigDecimal.valueOf(((Number) row[1]).longValue());
+            monthlyRevenueUsd = monthlyRevenueUsd.add(safeMoney(plan.getPriceUsd()).multiply(count));
+            monthlyRevenueZwg = monthlyRevenueZwg.add(safeMoney(plan.getPriceZwg()).multiply(count));
+        }
         String normalizedSearch = search == null ? "" : search.trim().toLowerCase(Locale.ROOT);
         List<SaasPlan> planList = normalizedSearch.isBlank()
                 ? allPlans
@@ -481,6 +480,9 @@ public class PlatformAdminController {
                 .toList();
         List<SaasPlan> gasPlans = planList.stream()
                 .filter(plan -> isExclusiveModulePlan(plan, BusinessModule.GAS_MODULE))
+                .toList();
+        List<SaasPlan> fuelPlans = planList.stream()
+                .filter(plan -> isExclusiveModulePlan(plan, BusinessModule.FUEL_MODULE))
                 .toList();
         List<SaasPlan> restaurantPlans = planList.stream()
                 .filter(plan -> isExclusiveModulePlan(plan, BusinessModule.RESTAURANT_MODULE))
@@ -500,6 +502,7 @@ public class PlatformAdminController {
         model.addAttribute("search", search == null ? "" : search.trim());
         model.addAttribute("retailPlans", retailPlans);
         model.addAttribute("gasPlans", gasPlans);
+        model.addAttribute("fuelPlans", fuelPlans);
         model.addAttribute("restaurantPlans", restaurantPlans);
         model.addAttribute("legacyMixedPlans", legacyMixedPlans);
         model.addAttribute("planPrimaryModules", planPrimaryModules);
@@ -509,6 +512,7 @@ public class PlatformAdminController {
         model.addAttribute("businessModules", List.of(
                 BusinessModule.SHOP_MODULE,
                 BusinessModule.GAS_MODULE,
+                BusinessModule.FUEL_MODULE,
                 BusinessModule.RESTAURANT_MODULE));
         model.addAttribute("expiringSoonCount", expiringSoonCount);
         model.addAttribute("monthlyRevenueUsd", monthlyRevenueUsd);
@@ -719,14 +723,10 @@ public class PlatformAdminController {
         );
     }
 
-    private void markPlatformChatRead(Long tenantId) {
-        List<TenantChatMessage> unread = chatMessages
-                .findByTenantIdAndReadByPlatformFalseAndSenderTypeOrderByCreatedAtAsc(tenantId, TenantChatMessage.SenderType.SHOP);
-        if (unread.isEmpty()) {
-            return;
-        }
-        unread.forEach(message -> message.setReadByPlatform(true));
-        chatMessages.saveAll(unread);
+    private void validateChat(Long tenantId, String message) {
+        if (!tenants.existsById(tenantId)) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND);
+        if (message == null || message.isBlank() || message.length() > 4000)
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Message must contain 1–4000 characters");
     }
 
     private void applySubscriptionToTenant(Tenant tenant,
@@ -777,6 +777,27 @@ public class PlatformAdminController {
 
     private BigDecimal planPriceForCurrency(SaasPlan plan, CurrencyCode currency) {
         return CurrencyCode.ZWG.equals(currency) ? safeMoney(plan.getPriceZwg()) : safeMoney(plan.getPriceUsd());
+    }
+
+    private Map<String, Object> registrationChart(LocalDate today) {
+        LocalDate first = today.withDayOfMonth(1).minusMonths(5);
+        Map<Integer, Long> counts = new HashMap<>();
+        for (Object[] row : tenants.registrationCounts(first.atStartOfDay(), today.plusDays(1).atStartOfDay())) {
+            counts.put(((Number) row[0]).intValue() * 12 + ((Number) row[1]).intValue(), ((Number) row[2]).longValue());
+        }
+        long max = Math.max(1L, counts.values().stream().mapToLong(Long::longValue).max().orElse(0));
+        List<Map<String, Object>> points = new ArrayList<>();
+        List<String> coordinates = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            LocalDate month = first.plusMonths(i);
+            long count = counts.getOrDefault(month.getYear() * 12 + month.getMonthValue(), 0L);
+            int x = 54 + i * 108;
+            int y = 170 - (int) (count * 140.0 / max);
+            points.add(Map.of("x", x, "y", y, "count", count, "label", month.format(java.time.format.DateTimeFormatter.ofPattern("MMM"))));
+            coordinates.add(x + "," + y);
+        }
+        String line = String.join(" ", coordinates);
+        return Map.of("points", points, "line", line, "area", "M " + String.join(" L ", coordinates) + " L 594,180 L 54,180 Z", "max", max);
     }
 
     private String blankToNull(String value) {

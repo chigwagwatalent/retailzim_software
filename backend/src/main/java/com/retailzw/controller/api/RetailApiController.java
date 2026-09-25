@@ -76,17 +76,21 @@ public class RetailApiController {
                                                                     @RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "100") int size) {
         Long targetBranch = selectedBranch(branchId);
-        List<Map<String, Object>> allRows = inventory.findBranchProductStock(current.tenantId(), targetBranch, blank(search), categoryId)
-                .stream()
-                .map(stock -> products.findById(stock.getProductId())
-                        .filter(product -> product.getTenantId().equals(current.tenantId()))
-                        .map(product -> branchProductRow(product, targetBranch))
-                        .orElse(null))
+        Long tenantId = current.tenantId();
+        List<Inventory> stockPage = inventory.findBranchProductStockPage(tenantId, targetBranch, blank(search), categoryId,
+                boundedPage(page, size));
+        List<Long> productIds = stockPage.stream().map(Inventory::getProductId).distinct().toList();
+        if (productIds.isEmpty()) return ApiResponse.success(List.of());
+        Map<Long, Product> productMap = products.findByTenantIdAndIdIn(tenantId, productIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Product::getId, java.util.function.Function.identity()));
+        Map<Long, ProductWholesalePricing> wholesaleMap = wholesalePricingService.configurations(tenantId, productIds);
+        List<Map<String, Object>> rows = stockPage.stream()
+                .map(stock -> {
+                    Product product = productMap.get(stock.getProductId());
+                    return product == null ? null : branchProductRow(product, targetBranch, stock, wholesaleMap.get(product.getId()));
+                })
                 .filter(java.util.Objects::nonNull)
                 .toList();
-        int from = Math.min(page * size, allRows.size());
-        int to = Math.min(from + size, allRows.size());
-        List<Map<String, Object>> rows = allRows.subList(from, to);
         return ApiResponse.success(rows);
     }
 
@@ -280,11 +284,16 @@ public class RetailApiController {
                 .filter(branch -> branch.getId().equals(requestedBranchId))
                 .findFirst()
                 .map(Branch::getId)
-                .orElseGet(this::activeBranch);
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Branch is not active or does not belong to your shop."));
     }
 
     private Map<String, Object> branchProductRow(Product product, Long branchId) {
         Inventory stock = inventory.findByTenantIdAndBranchIdAndProductId(current.tenantId(), branchId, product.getId()).orElse(null);
+        return branchProductRow(product, branchId, stock,
+                wholesalePricingService.configuration(current.tenantId(), product.getId()).orElse(null));
+    }
+
+    private Map<String, Object> branchProductRow(Product product, Long branchId, Inventory stock, ProductWholesalePricing wholesale) {
         BigDecimal onHand = stock == null || stock.getQuantityOnHand() == null ? BigDecimal.ZERO : stock.getQuantityOnHand();
         BigDecimal reserved = stock == null || stock.getQuantityReserved() == null ? BigDecimal.ZERO : stock.getQuantityReserved();
         Map<String, Object> row = new HashMap<>();
@@ -307,9 +316,6 @@ public class RetailApiController {
         row.put("quantityReserved", reserved);
         row.put("quantityAvailable", onHand.subtract(reserved));
         row.put("lowStock", product.getReorderLevel() != null && product.getReorderLevel().compareTo(BigDecimal.ZERO) > 0 && onHand.compareTo(product.getReorderLevel()) <= 0);
-        ProductWholesalePricing wholesale = wholesalePricingService
-                .configuration(current.tenantId(), product.getId())
-                .orElse(null);
         boolean wholesaleEnabled = wholesale != null && Boolean.TRUE.equals(wholesale.getIsEnabled());
         row.put("wholesaleEnabled", wholesaleEnabled);
         row.put("wholesaleMinimumQuantity", wholesaleEnabled ? wholesale.getMinimumQuantity() : null);
@@ -322,6 +328,14 @@ public class RetailApiController {
 
     private String blank(String value) {
         return value == null || value.isBlank() ? null : value;
+    }
+
+    private PageRequest boundedPage(int page, int size) {
+        if (page < 0 || size < 1 || size > 500) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Page must be non-negative and size must be between 1 and 500.");
+        }
+        return PageRequest.of(page, size);
     }
 
     private boolean contains(String value, String search) {

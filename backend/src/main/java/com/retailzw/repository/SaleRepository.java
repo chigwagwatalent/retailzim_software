@@ -17,6 +17,11 @@ import java.util.Optional;
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
 
+    @Query("SELECT s.branchId, COUNT(s) FROM Sale s WHERE s.tenantId = :tenantId " +
+           "AND s.status = 'COMPLETED' AND s.createdAt >= :from AND s.createdAt < :to GROUP BY s.branchId")
+    List<Object[]> countCompletedByBranch(@Param("tenantId") Long tenantId,
+            @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
     @EntityGraph(attributePaths = {"items"})
     Optional<Sale> findByReceiptNumberAndTenantId(String receiptNumber, Long tenantId);
 

@@ -26,6 +26,9 @@ import com.retailzw.service.WholesalePricingService;
 import com.retailzw.service.ReturnService;
 import com.retailzw.service.SmilePayCheckoutService;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -70,7 +73,7 @@ public class ShopWebController {
     private static final List<String> SALES_MODULES = List.of("sales", "cash", "change", "returns");
     private static final List<String> STOCK_MODULES = List.of("products", "categories", "inventory", "inventory-intelligence", "gas");
     private static final List<String> PEOPLE_MODULES = List.of("customers", "borrowers", "users");
-    private static final List<String> FINANCE_MODULES = List.of("suppliers", "purchasing", "reports");
+    private static final List<String> FINANCE_MODULES = List.of("suppliers", "purchasing", "expenses", "reports");
     private static final List<String> SYSTEM_MODULES = List.of("branches", "company", "audit");
     private static final List<String> GAS_MODULES = List.of("gas", "gas-sales", "gas-change", "gas-restocking", "gas-expenses", "gas-tanks", "gas-accounting");
     private static final List<UserRole> USER_MANAGEMENT_ROLES = List.of(
@@ -111,6 +114,7 @@ public class ShopWebController {
             Map.entry("users", "Users & HR"),
             Map.entry("suppliers", "Suppliers"),
             Map.entry("purchasing", "Purchasing"),
+            Map.entry("expenses", "Expenses"),
             Map.entry("reports", "Reports"),
             Map.entry("branches", "Branches"),
             Map.entry("company", "Company"),
@@ -139,6 +143,7 @@ public class ShopWebController {
             Map.entry("users", "fa-solid fa-user-gear"),
             Map.entry("suppliers", "fa-solid fa-truck-field"),
             Map.entry("purchasing", "fa-solid fa-file-invoice-dollar"),
+            Map.entry("expenses", "fa-solid fa-wallet"),
             Map.entry("reports", "fa-solid fa-chart-pie"),
             Map.entry("branches", "fa-solid fa-store"),
             Map.entry("company", "fa-solid fa-building"),
@@ -157,6 +162,7 @@ public class ShopWebController {
     );
 
     private final CurrentUserService current;
+    private final com.retailzw.service.BranchActivityService branchActivity;
     private final RetailOperationsService operations;
     private final FinanceReportCalculator financeReportCalculator;
     private final ReturnService returnService;
@@ -185,6 +191,7 @@ public class ShopWebController {
     private final ReturnRepository returns;
     private final NotificationRepository notifications;
     private final TenantChatMessageRepository chatMessages;
+    private final com.retailzw.service.SupportMessageService chatSending;
     private final NotificationService notificationService;
     private final PasswordResetService passwordResetService;
     private final TenantSubscriptionRepository tenantSubscriptions;
@@ -202,6 +209,8 @@ public class ShopWebController {
     private final GasOperationsService gasOperations;
     private final CurrencyConversionService currencyConversionService;
     private final WholesalePricingService wholesalePricingService;
+    private final RetailExpenseRepository retailExpenses;
+    private final com.retailzw.service.RetailExpenseService retailExpenseService;
 
     @GetMapping("/auth/shop/login")
     public String login() {
@@ -247,24 +256,33 @@ public class ShopWebController {
             return "redirect:/shop/supervisor";
         }
         Long tenantId = current.tenantId();
-        Long branchId = activeBranch();
+        Long branchId = reportingBranch(null);
+        if (branchId == null) {
+            model.addAttribute("module", "dashboard");
+            addNavigationModel(model);
+            branchActivity.dashboard(current.tenantId(), model);
+            return "shop/all-branches-dashboard";
+        }
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = start.plusDays(1);
         LocalDateTime yesterdayStart = start.minusDays(1);
         LocalDateTime weekStart = start.minusDays(6);
-        List<Branch> activeBranches = branches.findByTenantIdAndIsActiveTrue(tenantId);
-        List<Inventory> branchStock = inventory.findByTenantIdAndBranchId(tenantId, branchId);
-        List<Inventory> lowStockRows = inventory.findLowStockItems(tenantId, branchId);
-        List<User> tenantUsers = users.findByTenantId(tenantId);
-        Map<Long, Product> productById = products.findByTenantIdAndIsActiveTrue(tenantId).stream()
+        List<Branch> activeBranches = branches.findByTenantIdAndIsActiveTrue(tenantId).stream()
+                .filter(b -> b.getId().equals(branchId)).toList();
+        long stockLineCount = inventory.countByTenantIdAndBranchId(tenantId, branchId);
+        long dashboardLowStockCount = inventory.countLowStock(tenantId, branchId);
+        List<Inventory> lowStockRows = inventory.findDashboardLowStock(tenantId, branchId, PageRequest.of(0, 5));
+        List<Long> lowStockProductIds = lowStockRows.stream().map(Inventory::getProductId).distinct().toList();
+        Map<Long, Product> productById = (lowStockProductIds.isEmpty() ? List.<Product>of()
+                : products.findByTenantIdAndIdIn(tenantId, lowStockProductIds)).stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
         DashboardMoney todayTotals = moneyTotals(tenantId, branchId, start, end);
         DashboardMoney yesterdayTotals = moneyTotals(tenantId, branchId, yesterdayStart, start);
         long todayTransactions = sales.countByTenantIdAndBranchIdAndStatusAndCreatedAtBetween(
                 tenantId, branchId, Sale.SaleStatus.COMPLETED, start, end);
-        long openCashSessions = cashSessions.findAllByTenantIdAndBranchIdAndStatus(
-                tenantId, branchId, CashSession.SessionStatus.OPEN).size();
+        long openCashSessions = cashSessions.countByTenantIdAndBranchIdAndStatus(
+                tenantId, branchId, CashSession.SessionStatus.OPEN);
         BigDecimal openCashUsd = salePayments.sumCashCollected(tenantId, branchId, CurrencyCode.USD, start, end);
         BigDecimal openCashZwg = salePayments.sumCashCollected(tenantId, branchId, CurrencyCode.ZWG, start, end);
         TenantSubscription subscription = tenantSubscriptions
@@ -277,20 +295,16 @@ public class ShopWebController {
 
         model.addAttribute("module", "dashboard");
         addNavigationModel(model);
-        model.addAttribute("productCount", products.countByTenantIdAndIsActiveTrue(tenantId));
+        model.addAttribute("productCount", stockLineCount);
         model.addAttribute("customerCount", customers.countByTenantId(tenantId));
         model.addAttribute("branchCount", activeBranches.size());
-        model.addAttribute("activeCashierCount", tenantUsers.stream()
-                .filter(user -> Boolean.TRUE.equals(user.getIsActive()))
-                .filter(user -> hasRole(user, UserRole.CASHIER))
-                .count());
+        model.addAttribute("activeCashierCount", users.countActiveByRoleAndBranch(tenantId, branchId, UserRole.CASHIER));
         model.addAttribute("todaySales", todayTotals);
         model.addAttribute("yesterdaySales", yesterdayTotals);
         model.addAttribute("salesVsYesterday", percentChange(todayTotals.usdRaw(), yesterdayTotals.usdRaw()));
         model.addAttribute("todayTransactions", todayTransactions);
-        model.addAttribute("inventoryHealth", inventoryHealth(branchStock.size(), lowStockRows.size()));
-        model.addAttribute("lowStockCount", lowStockRows.size());
-        model.addAttribute("lowStockCategoryCount", lowStockCategoryCount(lowStockRows, productById));
+        model.addAttribute("inventoryHealth", inventoryHealth(stockLineCount, dashboardLowStockCount));
+        model.addAttribute("lowStockCount", dashboardLowStockCount);
         model.addAttribute("cashSessionCount", cashSessions.findByTenantIdAndBranchId(tenantId, branchId, PageRequest.of(0, 100)).getTotalElements());
         model.addAttribute("openCashSessions", openCashSessions);
         model.addAttribute("openCashUsd", money(openCashUsd));
@@ -663,6 +677,8 @@ public class ShopWebController {
                          @RequestParam(required = false) String from,
                          @RequestParam(required = false) String to,
                          @RequestParam(required = false) String status,
+                         @RequestParam(required = false) String currency,
+                         @RequestParam(required = false) String expenseCategory,
                          @RequestParam(required = false) Long cashierId,
                          @RequestParam(required = false) Long collectShiftId,
                          @RequestParam(required = false) Long closeShiftId,
@@ -670,7 +686,7 @@ public class ShopWebController {
                          @RequestParam(defaultValue = "25") int size,
                          Model model) {
         Long tenantId = current.tenantId();
-        Long activeBranchId = selectedBranch(branchId);
+        Long activeBranchId = reportingBranch(branchId);
         int currentPage = safePage(page);
         int pageSize = safeSize(size);
         String activeModule = safeModule(module);
@@ -684,6 +700,18 @@ public class ShopWebController {
         }
         model.addAttribute("module", activeModule);
         addNavigationModel(model);
+        if ("expenses".equals(activeModule)) {
+            addExpenseManagementModel(model, tenantId, activeBranchId, search, from, to, status, currency, expenseCategory, currentPage, pageSize);
+            return "shop/expenses";
+        }
+        if (activeBranchId == null && branchActivity.supports(activeModule)) {
+            branchActivity.page(tenantId, activeModule, search, currentPage, pageSize, model);
+            return "shop/branch-activity";
+        }
+        if ("categories".equals(activeModule)) {
+            addCategoryManagementModel(model, tenantId, activeBranchId, search, currentPage, pageSize);
+            return "shop/categories";
+        }
         model.addAttribute("workspaceModules", WORKSPACE_MODULES);
         model.addAttribute("modalPlaceholderModules", MODAL_PLACEHOLDER_MODULES);
         model.addAttribute("selectedBranchId", activeBranchId);
@@ -718,16 +746,13 @@ public class ShopWebController {
             addProductManagementModel(model, tenantId, activeBranchId, search, categoryId, currentPage, pageSize);
             return "shop/products";
         }
-        if ("categories".equals(activeModule)) {
-            addCategoryManagementModel(model, tenantId, search, currentPage, pageSize);
-            return "shop/categories";
-        }
         if ("inventory".equals(activeModule)) {
             addInventoryManagementModel(model, tenantId, activeBranchId, search, status, currentPage, pageSize);
             return "shop/inventory";
         }
         if ("inventory-intelligence".equals(activeModule)) {
-            var transferRows = inventoryIntelligenceService.transfers(tenantId);
+            var transferRows = inventoryIntelligenceService.transfers(tenantId).stream()
+                    .filter(t -> activeBranchId.equals(t.getFromBranchId()) || activeBranchId.equals(t.getToBranchId())).toList();
             var stocktakeRows = inventoryIntelligenceService.stocktakes(tenantId, activeBranchId);
             model.addAttribute("transfers", transferRows);
             model.addAttribute("stocktakes", stocktakeRows);
@@ -883,7 +908,7 @@ public class ShopWebController {
         if (!packageModuleAccessService.hasGas(tenantId)) {
             return "redirect:/shop/billing";
         }
-        Long activeBranchId = selectedBranch(branchId);
+        Long activeBranchId = reportingBranch(branchId);
         String activeModule = switch (section) {
             case "sales" -> "gas-sales";
             case "change" -> "gas-change";
@@ -894,6 +919,11 @@ public class ShopWebController {
             default -> "gas";
         };
         model.addAttribute("module", activeModule);
+        if (activeBranchId == null) {
+            addNavigationModel(model);
+            branchActivity.page(tenantId, activeModule, salesQuery, page, size, model);
+            return "shop/branch-activity";
+        }
         model.addAttribute("pageTitle", title(activeModule));
         model.addAttribute("selectedBranchId", activeBranchId);
         model.addAttribute("selectedBranchName", branchById(tenantId).get(activeBranchId));
@@ -2084,15 +2114,11 @@ public class ShopWebController {
 
     @PostMapping("/shop/support/chat")
     public String sendSupportChat(@RequestParam String message, RedirectAttributes redirect) {
+        if (message.isBlank() || message.length() > 4000)
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Message must contain 1–4000 characters");
         User user = users.findById(current.userId()).orElseThrow();
-        chatMessages.save(TenantChatMessage.builder()
-                .tenantId(current.tenantId())
-                .senderType(TenantChatMessage.SenderType.SHOP)
-                .senderName(user.getFirstName() + " " + user.getLastName())
-                .message(message)
-                .readByPlatform(false)
-                .readByShop(true)
-                .build());
+        chatSending.send(current.tenantId(), TenantChatMessage.SenderType.SHOP,
+                user.getFirstName() + " " + user.getLastName(), message, java.util.UUID.randomUUID().toString());
         redirect.addFlashAttribute("message", "Support message sent.");
         return "redirect:/shop/notifications#live-chat";
     }
@@ -2100,7 +2126,6 @@ public class ShopWebController {
     @GetMapping("/shop/support/chat/feed")
     @ResponseBody
     public List<Map<String, Object>> supportChatFeed() {
-        markShopChatRead(current.tenantId());
         return chatMessages.findByTenantIdOrderByCreatedAtDesc(current.tenantId(), PageRequest.of(0, 30)).stream()
                 .sorted(java.util.Comparator.comparing(TenantChatMessage::getCreatedAt))
                 .map(message -> Map.<String, Object>of(
@@ -2115,29 +2140,183 @@ public class ShopWebController {
                 .toList();
     }
 
-    private Long activeBranch() {
-        if (isSupervisor()) {
-            return assignedSupervisorBranch();
+    @PostMapping("/shop/branch/select")
+    public String selectWorkspaceBranch(@RequestParam Long branchId, HttpSession session,
+            @RequestParam(defaultValue="/shop/dashboard") String returnTo) {
+        requireShopAdministrator();
+        if (!canSelectWorkspaceBranch()) {
+            throw new AccessDeniedException("Branch-assigned users cannot switch their workspace.");
         }
-        if (current.branchId() != null) return current.branchId();
-        return branches.findByTenantIdAndIsActiveTrue(current.tenantId()).stream().findFirst().orElseThrow().getId();
+        Long selected = branchId == 0L ? null : selectedBranch(branchId);
+        session.setAttribute(workspaceBranchKey(), selected == null ? 0L : selected);
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attrs)
+            attrs.getRequest().setAttribute(workspaceBranchKey(), selected == null ? 0L : selected);
+        String path = returnTo.split("\\?", 2)[0];
+        boolean safe = path.equals("/shop/dashboard") || path.matches("/shop/gas/(sales|change|restocking|expenses|tanks|accounting)")
+                || (path.startsWith("/shop/") && !"dashboard".equals(safeModule(path.substring(6))));
+        return "redirect:" + (safe ? path : "/shop/dashboard");
+    }
+
+    @GetMapping("/shop/expenses/report")
+    public String retailExpenseReport(@RequestParam(required=false) Long branchId,
+            @RequestParam(required=false) String search,@RequestParam(required=false) String from,
+            @RequestParam(required=false) String to,@RequestParam(required=false) String status,
+            @RequestParam(required=false) String currency,@RequestParam(required=false) String expenseCategory,
+            Model model) {
+        requireShopAdministrator();
+        Long tenantId=current.tenantId();
+        Long activeBranchId=reportingBranch(branchId);
+        addNavigationModel(model);
+        addExpenseManagementModel(model,tenantId,activeBranchId,search,from,to,status,currency,expenseCategory,0,100);
+        model.addAttribute("module","expenses");
+        return "shop/expense-report";
+    }
+
+    @PostMapping("/shop/expenses")
+    public String createRetailExpense(@RequestParam Long branchId,@RequestParam String description,
+            @RequestParam(required=false) String vendor,@RequestParam RetailExpense.Category category,
+            @RequestParam BigDecimal amount,@RequestParam CurrencyCode currency,@RequestParam String paymentMethod,
+            @RequestParam(required=false) String paymentReference,@RequestParam LocalDate incurredOn,
+            @RequestParam(required=false) String notes,RedirectAttributes redirect) {
+        requireShopAdministrator();
+        Long target=selectedBranch(branchId);
+        return expenseAction(redirect,target,() -> retailExpenseService.create(current.tenantId(),current.userId(),
+                new com.retailzw.service.RetailExpenseService.Command(target,description,vendor,category,amount,currency,paymentMethod,paymentReference,incurredOn,notes)),"Expense recorded.");
+    }
+
+    @PostMapping("/shop/expenses/{id}")
+    public String updateRetailExpense(@PathVariable Long id,@RequestParam long version,@RequestParam Long branchId,
+            @RequestParam String description,@RequestParam(required=false) String vendor,@RequestParam RetailExpense.Category category,
+            @RequestParam BigDecimal amount,@RequestParam CurrencyCode currency,@RequestParam String paymentMethod,
+            @RequestParam(required=false) String paymentReference,@RequestParam LocalDate incurredOn,
+            @RequestParam(required=false) String notes,RedirectAttributes redirect) {
+        requireShopAdministrator();
+        Long target=selectedBranch(branchId);
+        return expenseAction(redirect,target,() -> retailExpenseService.update(current.tenantId(),current.userId(),id,version,
+                new com.retailzw.service.RetailExpenseService.Command(target,description,vendor,category,amount,currency,paymentMethod,paymentReference,incurredOn,notes)),"Expense updated.");
+    }
+
+    @PostMapping("/shop/expenses/{id}/void")
+    public String voidRetailExpense(@PathVariable Long id,@RequestParam long version,@RequestParam String reason,
+            @RequestParam(required=false) Long branchId,RedirectAttributes redirect) {
+        requireShopAdministrator();
+        return expenseAction(redirect,branchId,() -> retailExpenseService.voidExpense(current.tenantId(),current.userId(),id,version,reason),"Expense voided and removed from financial totals.");
+    }
+
+    @GetMapping(value = "/shop/expenses/export", produces = "text/csv")
+    public ResponseEntity<StreamingResponseBody> exportRetailExpenses(
+            @RequestParam(required=false) Long branchId,
+            @RequestParam(required=false) String search,
+            @RequestParam(required=false) String from,
+            @RequestParam(required=false) String to,
+            @RequestParam(required=false) String status,
+            @RequestParam(required=false) String currency,
+            @RequestParam(required=false) String expenseCategory) {
+        requireShopAdministrator();
+        Long tenantId=current.tenantId();
+        Long activeBranchId=reportingBranch(branchId);
+        LocalDateTime parsedFrom=parseDate(from,false);
+        LocalDateTime parsedTo=parseDate(to,true);
+        LocalDate fromDate=parsedFrom==null?LocalDate.now().withDayOfMonth(1):parsedFrom.toLocalDate();
+        LocalDate toDate=parsedTo==null?LocalDate.now().plusDays(1):parsedTo.toLocalDate();
+        RetailExpense.Status expenseStatus=parseEnum(status,RetailExpense.Status.class);
+        CurrencyCode expenseCurrency=parseEnum(currency,CurrencyCode.class);
+        RetailExpense.Category category=parseEnum(expenseCategory,RetailExpense.Category.class);
+        Map<Long,String> branchNames=branchById(tenantId);
+        String filename="retail-expenses-"+(activeBranchId==null?"all-branches":"branch-"+activeBranchId)+"-"+LocalDate.now()+".csv";
+        StreamingResponseBody stream=output->{
+            BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(output,StandardCharsets.UTF_8));
+            writer.write('\ufeff');
+            writer.write("Expense Number,Date,Branch,Description,Vendor,Category,Amount,Currency,Payment Method,Payment Reference,Status,Void Reason,Created At");
+            writer.newLine();
+            int pageNumber=0;
+            Page<RetailExpense> exportPage;
+            do {
+                exportPage=retailExpenses.search(tenantId,activeBranchId,fromDate,toDate,expenseCurrency,category,expenseStatus,blank(search),PageRequest.of(pageNumber,1000));
+                for(RetailExpense expense:exportPage.getContent()) {
+                    writer.write(String.join(",",
+                            csvCell(expense.getExpenseNumber()),csvCell(expense.getIncurredOn().toString()),
+                            csvCell(branchNames.getOrDefault(expense.getBranchId(),"Branch "+expense.getBranchId())),
+                            csvCell(expense.getDescription()),csvCell(expense.getVendor()),csvCell(expense.getCategory().getLabel()),
+                            csvCell(expense.getAmount().toPlainString()),csvCell(expense.getCurrency().name()),
+                            csvCell(expense.getPaymentMethod()),csvCell(expense.getPaymentReference()),csvCell(expense.getStatus().name()),
+                            csvCell(expense.getVoidReason()),csvCell(expense.getCreatedAt()==null?"":expense.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))));
+                    writer.newLine();
+                }
+                writer.flush();
+                pageNumber++;
+            } while(exportPage.hasNext());
+        };
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+filename+"\"")
+                .contentType(MediaType.parseMediaType("text/csv")).body(stream);
+    }
+
+    private String expenseAction(RedirectAttributes redirect,Long branchId,Runnable action,String success) {
+        try { action.run();redirect.addFlashAttribute("message",success); }
+        catch(IllegalArgumentException|org.springframework.dao.OptimisticLockingFailureException ex){redirect.addFlashAttribute("message",ex.getMessage());}
+        return "redirect:/shop/expenses"+(branchId==null?"":"?branchId="+branchId);
+    }
+
+    // Null means an explicitly read-only, tenant-wide reporting scope; never a write target.
+    private Long reportingBranch(Long requested) {
+        if (isSupervisor()) return assignedSupervisorBranch();
+        if (!canSelectWorkspaceBranch() && current.branchId() != null) return current.branchId();
+        if (requested != null) {
+            Long selected = requested == 0L ? null : selectedBranch(requested);
+            if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attrs) {
+                attrs.getRequest().setAttribute(workspaceBranchKey(), selected == null ? 0L : selected);
+                attrs.getRequest().getSession().setAttribute(workspaceBranchKey(), selected == null ? 0L : selected);
+            }
+            return selected;
+        }
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attrs) {
+            Object request = attrs.getRequest().getAttribute(workspaceBranchKey());
+            if (Long.valueOf(0L).equals(request)) return null;
+            if (request instanceof Long id && branches.findByTenantIdAndIsActiveTrue(current.tenantId()).stream().anyMatch(b -> b.getId().equals(id))) return id;
+            HttpSession session = attrs.getRequest().getSession(false);
+            Object value = session == null ? null : session.getAttribute(workspaceBranchKey());
+            if (value instanceof Long id && id != 0L) {
+                if (branches.findByTenantIdAndIsActiveTrue(current.tenantId()).stream().anyMatch(b -> b.getId().equals(id))) return id;
+                session.removeAttribute(workspaceBranchKey());
+            }
+        }
+        return null;
+    }
+
+    private String workspaceBranchKey() {
+        return "retailzw.workspace.branch." + current.tenantId() + "." + current.userId();
+    }
+
+    private Long activeBranch() {
+        Long scope = reportingBranch(null);
+        if (scope == null) throw new AccessDeniedException("Select a branch in the navigation bar before making branch-specific changes.");
+        return scope;
     }
 
     private Long selectedBranch(Long requestedBranchId) {
         if (isSupervisor()) {
             return assignedSupervisorBranch();
         }
-        if (current.branchId() != null) return current.branchId();
+        if (!canSelectWorkspaceBranch() && current.branchId() != null) return current.branchId();
         if (requestedBranchId == null) return activeBranch();
-        return branches.findByTenantIdAndIsActiveTrue(current.tenantId()).stream()
+        Long selected = branches.findByTenantIdAndIsActiveTrue(current.tenantId()).stream()
                 .filter(branch -> branch.getId().equals(requestedBranchId))
                 .findFirst()
                 .map(Branch::getId)
-                .orElseGet(this::activeBranch);
+                .orElseThrow(() -> new AccessDeniedException("The selected branch is not active or does not belong to your shop."));
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes) {
+            attributes.getRequest().setAttribute(workspaceBranchKey(), selected);
+        }
+        return selected;
     }
 
     private boolean isSupervisor() {
         return UserRole.SUPERVISOR.name().equals(current.roleName());
+    }
+
+    private boolean canSelectWorkspaceBranch() {
+        return UserRole.SUPER_ADMIN.name().equals(current.roleName())
+                || UserRole.ACCOUNTANT.name().equals(current.roleName());
     }
 
     private void requireSupervisor() {
@@ -2188,7 +2367,7 @@ public class ShopWebController {
 
     private String safeModule(String module) {
         return switch (module) {
-            case "products", "categories", "customers", "borrowers", "change", "suppliers", "branches", "users", "inventory", "gas",
+            case "products", "categories", "customers", "borrowers", "change", "suppliers", "branches", "users", "inventory", "gas", "fuel", "expenses",
                  "inventory-intelligence", "purchasing", "sales", "cash", "returns", "reports", "company", "notifications", "audit" -> module;
             default -> "dashboard";
         };
@@ -2196,11 +2375,15 @@ public class ShopWebController {
 
     private void addNavigationModel(Model model) {
         Long tenantId = current.tenantId();
-        Long activeBranchId = activeBranch();
+        Long activeBranchId = reportingBranch(null);
         Map<Long, String> branchNames = branchById(tenantId);
+        model.addAttribute("workspaceBranchId", activeBranchId);
+        model.addAttribute("workspaceBranchOptions", canSelectWorkspaceBranch()
+                ? branches.findByTenantIdAndIsActiveTrue(tenantId) : List.of());
         List<BusinessModule> enabledBusinessModules = packageModuleAccessService.syncAndGetEnabledModules(tenantId);
         boolean shopEnabled = enabledBusinessModules.contains(BusinessModule.SHOP_MODULE);
         boolean gasEnabled = enabledBusinessModules.contains(BusinessModule.GAS_MODULE);
+        boolean fuelEnabled = enabledBusinessModules.contains(BusinessModule.FUEL_MODULE);
         BillingAccessService.BillingAccess billingAccess = billingAccessService.evaluate(tenantId);
         boolean tenantBillingOnly = billingAccess.locked();
 
@@ -2216,8 +2399,10 @@ public class ShopWebController {
             model.addAttribute("tenantSubscriptionEnd", tenant.getSubscriptionEnd());
             model.addAttribute("tenantStatus", tenant.getStatus());
         });
-        model.addAttribute("tenantActiveBranchName", branchNames.getOrDefault(activeBranchId, "Main Shop"));
-        model.addAttribute("topbarBranchName", branchNames.getOrDefault(activeBranchId, "Head Office Branch"));
+        model.addAttribute("tenantActiveBranchName", activeBranchId == null ? "All branches" : branchNames.getOrDefault(activeBranchId, "Branch"));
+        model.addAttribute("topbarBranchName", activeBranchId == null ? "All branches" : branchNames.getOrDefault(activeBranchId, "Branch"));
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attrs)
+            model.addAttribute("workspaceReturnTo", attrs.getRequest().getRequestURI());
         model.addAttribute("topbarDateLabel", LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy")));
         model.addAttribute("moduleLabels", MODULE_LABELS);
         model.addAttribute("moduleIcons", MODULE_ICONS);
@@ -2234,6 +2419,7 @@ public class ShopWebController {
             model.addAttribute("systemModules", List.of());
             model.addAttribute("enabledBusinessModules", enabledBusinessModules);
             model.addAttribute("gasModuleEnabled", gasEnabled);
+            model.addAttribute("fuelModuleEnabled", fuelEnabled);
             model.addAttribute("shopModuleEnabled", shopEnabled);
             model.addAttribute("billingAccessLocked", false);
             model.addAttribute("supportChatMessages", chatMessages
@@ -2255,6 +2441,7 @@ public class ShopWebController {
             model.addAttribute("systemModules", List.of());
             model.addAttribute("enabledBusinessModules", List.of());
             model.addAttribute("gasModuleEnabled", false);
+            model.addAttribute("fuelModuleEnabled", false);
             model.addAttribute("shopModuleEnabled", false);
             model.addAttribute("billingAccessLocked", true);
             model.addAttribute("billingLockMessage", billingAccess.message());
@@ -2272,11 +2459,12 @@ public class ShopWebController {
         }
         model.addAttribute("stockModules", stockModules);
         model.addAttribute("gasModules", gasEnabled ? GAS_MODULES : List.of());
-        model.addAttribute("peopleModules", shopEnabled ? PEOPLE_MODULES : (gasEnabled ? List.of("users") : List.of()));
+        model.addAttribute("peopleModules", shopEnabled ? PEOPLE_MODULES : ((gasEnabled || fuelEnabled) ? List.of("users") : List.of()));
         model.addAttribute("financeModules", shopEnabled ? FINANCE_MODULES : List.of());
         model.addAttribute("systemModules", shopEnabled ? SYSTEM_MODULES : List.of());
         model.addAttribute("enabledBusinessModules", enabledBusinessModules);
         model.addAttribute("gasModuleEnabled", gasEnabled);
+        model.addAttribute("fuelModuleEnabled", fuelEnabled);
         model.addAttribute("shopModuleEnabled", shopEnabled);
         model.addAttribute("supportChatMessages", chatMessages.findByTenantIdOrderByCreatedAtDesc(tenantId, PageRequest.of(0, 30)).stream()
                 .sorted(java.util.Comparator.comparing(TenantChatMessage::getCreatedAt))
@@ -2284,18 +2472,9 @@ public class ShopWebController {
         model.addAttribute("supportUnreadCount", chatMessages.countByTenantIdAndReadByShopFalseAndSenderType(tenantId, TenantChatMessage.SenderType.PLATFORM));
     }
 
-    private void markShopChatRead(Long tenantId) {
-        List<TenantChatMessage> unread = chatMessages
-                .findByTenantIdAndReadByShopFalseAndSenderTypeOrderByCreatedAtAsc(tenantId, TenantChatMessage.SenderType.PLATFORM);
-        if (unread.isEmpty()) {
-            return;
-        }
-        unread.forEach(message -> message.setReadByShop(true));
-        chatMessages.saveAll(unread);
-    }
-
     private void addUserManagementModel(Model model, Long tenantId, Long selectedBranchId, int page, int size) {
-        List<User> allUsers = users.findByTenantId(tenantId);
+        List<User> allUsers = users.findByTenantId(tenantId).stream()
+                .filter(u -> selectedBranchId == null || selectedBranchId.equals(u.getBranchId())).toList();
         Page<User> userPage = pageList(allUsers, page, size);
         List<User> tenantUsers = userPage.getContent();
         Set<Long> activeBranchIds = branches.findByTenantIdAndIsActiveTrue(tenantId).stream()
@@ -2306,7 +2485,7 @@ public class ShopWebController {
         addPaginationModel(model, "user", userPage, "/shop/users", params("branchId", selectedBranchId));
         model.addAttribute("branchById", branchById(tenantId));
         model.addAttribute("activeBranchIds", activeBranchIds);
-        model.addAttribute("selectedBranchUserCount", allUsers.stream().filter(u -> selectedBranchId.equals(u.getBranchId())).count());
+        model.addAttribute("selectedBranchUserCount", allUsers.size());
         model.addAttribute("userRoleOptions", roles.findAll().stream()
                 .filter(role -> USER_MANAGEMENT_ROLES.contains(role.getName()))
                 .toList());
@@ -2441,7 +2620,7 @@ public class ShopWebController {
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
-    private void addCategoryManagementModel(Model model, Long tenantId, String search, int page, int size) {
+    private void addCategoryManagementModel(Model model, Long tenantId, Long branchId, String search, int page, int size) {
         String cleanSearch = search == null || search.isBlank() ? null : search.toLowerCase();
         List<ProductCategory> allCategories = categories.findByTenantIdOrderBySortOrderAsc(tenantId);
         List<ProductCategory> categoryList = allCategories.stream()
@@ -2450,11 +2629,8 @@ public class ShopWebController {
                         || contains(category.getCode(), cleanSearch)
                         || contains(category.getDescription(), cleanSearch))
                 .toList();
-        List<Product> activeProducts = products.findByTenantIdAndIsActiveTrue(tenantId);
         Map<Long, Long> productCounts = new HashMap<>();
-        activeProducts.stream()
-                .filter(product -> product.getCategory() != null)
-                .forEach(product -> productCounts.merge(product.getCategory().getId(), 1L, Long::sum));
+        products.countProductsByCategory(tenantId,branchId).forEach(row -> productCounts.put((Long)row[0],(Long)row[1]));
         Page<ProductCategory> categoryPage = pageList(categoryList, page, size);
         model.addAttribute("categoryList", categoryPage.getContent());
         model.addAttribute("categoryPage", categoryPage);
@@ -2790,6 +2966,34 @@ public class ShopWebController {
         model.addAttribute("purchaseValueZwg", orderList.stream().map(PurchaseOrder::getTotalZwg).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
+    private void addExpenseManagementModel(Model model,Long tenantId,Long branchId,String search,String from,String to,
+                                            String status,String currency,String category,int page,int size) {
+        LocalDate fromDate=parseDate(from,false)==null?LocalDate.now().withDayOfMonth(1):parseDate(from,false).toLocalDate();
+        LocalDate toDate=parseDate(to,true)==null?LocalDate.now().plusDays(1):parseDate(to,true).toLocalDate();
+        RetailExpense.Status expenseStatus=parseEnum(status,RetailExpense.Status.class);
+        CurrencyCode expenseCurrency=parseEnum(currency,CurrencyCode.class);
+        RetailExpense.Category expenseCategory=parseEnum(category,RetailExpense.Category.class);
+        Page<RetailExpense> expensePage=retailExpenses.search(tenantId,branchId,fromDate,toDate,expenseCurrency,expenseCategory,expenseStatus,blank(search),pageRequest(page,size));
+        Map<CurrencyCode,BigDecimal> totals=new java.util.EnumMap<>(CurrencyCode.class);
+        Map<CurrencyCode,Long> counts=new java.util.EnumMap<>(CurrencyCode.class);
+        retailExpenses.summary(tenantId,branchId,fromDate,toDate,expenseCurrency,expenseCategory,blank(search)).forEach(row->{totals.put((CurrencyCode)row[0],(BigDecimal)row[1]);counts.put((CurrencyCode)row[0],(Long)row[2]);});
+        model.addAttribute("expensePage",expensePage);model.addAttribute("expenseList",expensePage.getContent());
+        model.addAttribute("expenseTotals",totals);model.addAttribute("expenseCounts",counts);
+        model.addAttribute("expenseTotalUsd",totals.getOrDefault(CurrencyCode.USD,BigDecimal.ZERO));
+        model.addAttribute("expenseTotalZwg",totals.getOrDefault(CurrencyCode.ZWG,BigDecimal.ZERO));
+        model.addAttribute("expensePostedCount",counts.values().stream().mapToLong(Long::longValue).sum());
+        model.addAttribute("expenseToday",LocalDate.now().toString());
+        model.addAttribute("expenseCategories",RetailExpense.Category.values());model.addAttribute("expenseStatuses",RetailExpense.Status.values());
+        model.addAttribute("expenseCurrencies",CurrencyCode.values());model.addAttribute("expensePaymentMethods",List.of("CASH","ECOCASH","ONEMONEY","INNBUCKS","CARD","SWIPE","ZIPIT","BANK_TRANSFER"));
+        model.addAttribute("expenseBranches",branches.findByTenantIdAndIsActiveTrue(tenantId));model.addAttribute("branchById",branchById(tenantId));
+        model.addAttribute("expenseSearch",search);model.addAttribute("expenseStatusFilter",status);model.addAttribute("expenseCurrencyFilter",currency);model.addAttribute("expenseCategoryFilter",category);
+        model.addAttribute("expenseDateFrom",fromDate.toString());model.addAttribute("expenseDateTo",toDate.minusDays(1).toString());
+        model.addAttribute("selectedBranchId",branchId);model.addAttribute("selectedBranchName",branchId==null?"All branches":branchById(tenantId).get(branchId));
+        model.addAttribute("expenseCategoryTotals",retailExpenses.categoryTotals(tenantId,branchId,fromDate,toDate,expenseCurrency,expenseCategory,blank(search)));
+        model.addAttribute("expenseBranchTotals",retailExpenses.branchTotals(tenantId,branchId,fromDate,toDate,expenseCurrency,expenseCategory,blank(search)));
+        addPaginationModel(model,"expense",expensePage,"/shop/expenses",params("branchId",branchId,"search",search,"from",from,"to",to,"status",status,"currency",currency,"expenseCategory",category));
+    }
+
     private void addReportsModel(Model model, Long tenantId, Long selectedBranchId, String from, String to) {
         Tenant tenant = tenants.findById(tenantId).orElseThrow();
         model.addAttribute("tenant", tenant);
@@ -2814,8 +3018,12 @@ public class ShopWebController {
         Map<Long, Sale> originalSalesById = returnOriginSales(periodReturns, previousReturns);
         List<Sale> completedSales = financeReportCalculator.reportableSales(periodSales);
         List<Return> recognizedReturns = financeReportCalculator.reportableReturns(periodReturns);
-        var financeTotals = financeReportCalculator.calculate(periodSales, periodReturns, originalSalesById);
-        var previousFinanceTotals = financeReportCalculator.calculate(previousSales, previousReturns, originalSalesById);
+        BigDecimal operatingExpensesUsd=retailExpenses.totalPosted(tenantId,selectedBranchId,CurrencyCode.USD,reportFrom.toLocalDate(),reportTo.toLocalDate());
+        BigDecimal operatingExpensesZwg=retailExpenses.totalPosted(tenantId,selectedBranchId,CurrencyCode.ZWG,reportFrom.toLocalDate(),reportTo.toLocalDate());
+        BigDecimal previousExpensesUsd=retailExpenses.totalPosted(tenantId,selectedBranchId,CurrencyCode.USD,previousFrom.toLocalDate(),reportFrom.toLocalDate());
+        BigDecimal previousExpensesZwg=retailExpenses.totalPosted(tenantId,selectedBranchId,CurrencyCode.ZWG,previousFrom.toLocalDate(),reportFrom.toLocalDate());
+        var financeTotals = financeReportCalculator.calculate(periodSales, periodReturns, originalSalesById,operatingExpensesUsd,operatingExpensesZwg);
+        var previousFinanceTotals = financeReportCalculator.calculate(previousSales, previousReturns, originalSalesById,previousExpensesUsd,previousExpensesZwg);
         var usdTotals = financeTotals.usd();
         var zwgTotals = financeTotals.zwg();
         List<Inventory> branchInventory = inventory.findByTenantIdAndBranchId(tenantId, selectedBranchId);
@@ -2864,8 +3072,10 @@ public class ShopWebController {
                 .filter(ret -> Return.RefundMethod.CASH.equals(ret.getRefundMethod()))
                 .filter(ret -> CurrencyCode.ZWG.equals(ret.getCurrency()))
                 .map(Return::getTotalRefund).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal netCashMovementUsd = cashCollectedUsd.subtract(cashRefundsUsd);
-        BigDecimal netCashMovementZwg = cashCollectedZwg.subtract(cashRefundsZwg);
+        BigDecimal cashExpensesUsd=retailExpenses.totalPostedByPayment(tenantId,selectedBranchId,CurrencyCode.USD,"CASH",reportFrom.toLocalDate(),reportTo.toLocalDate());
+        BigDecimal cashExpensesZwg=retailExpenses.totalPostedByPayment(tenantId,selectedBranchId,CurrencyCode.ZWG,"CASH",reportFrom.toLocalDate(),reportTo.toLocalDate());
+        BigDecimal netCashMovementUsd = cashCollectedUsd.subtract(cashRefundsUsd).subtract(cashExpensesUsd);
+        BigDecimal netCashMovementZwg = cashCollectedZwg.subtract(cashRefundsZwg).subtract(cashExpensesZwg);
         BigDecimal openExpectedCashUsd = periodSessions.stream()
                 .filter(session -> CashSession.SessionStatus.OPEN.equals(session.getStatus()))
                 .map(CashSession::getExpectedCashUsd).filter(java.util.Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -3042,8 +3252,10 @@ public class ShopWebController {
         model.addAttribute("netSalesZwg", netSalesZwg);
         model.addAttribute("netProfitUsd", netProfitUsd);
         model.addAttribute("netProfitZwg", netProfitZwg);
-        model.addAttribute("operatingExpensesUsd", usdTotals.operatingExpenses());
-        model.addAttribute("operatingExpensesZwg", zwgTotals.operatingExpenses());
+        model.addAttribute("operatingExpensesUsd", operatingExpensesUsd);
+        model.addAttribute("operatingExpensesZwg", operatingExpensesZwg);
+        model.addAttribute("expenseCategoryTotals",retailExpenses.categoryTotals(tenantId,selectedBranchId,
+                reportFrom.toLocalDate(),reportTo.toLocalDate(),null,null,null));
         model.addAttribute("averageBasketUsd", averageBasketUsd);
         model.addAttribute("profitMarginUsd", profitMarginUsd);
         model.addAttribute("netMarginUsd", netMarginUsd);
@@ -3053,6 +3265,8 @@ public class ShopWebController {
         model.addAttribute("cashCollectedZwg", cashCollectedZwg);
         model.addAttribute("cashRefundsUsd", cashRefundsUsd);
         model.addAttribute("cashRefundsZwg", cashRefundsZwg);
+        model.addAttribute("cashExpensesUsd",cashExpensesUsd);
+        model.addAttribute("cashExpensesZwg",cashExpensesZwg);
         model.addAttribute("netCashMovementUsd", netCashMovementUsd);
         model.addAttribute("netCashMovementZwg", netCashMovementZwg);
         model.addAttribute("cashAtHandUsd", cashAtHandUsd);
@@ -3407,11 +3621,11 @@ public class ShopWebController {
         return (change.compareTo(BigDecimal.ZERO) >= 0 ? "+" : "") + change.toPlainString() + "%";
     }
 
-    private int inventoryHealth(int stockLines, int lowStockLines) {
+    private int inventoryHealth(long stockLines, long lowStockLines) {
         if (stockLines <= 0) {
             return 100;
         }
-        int healthy = Math.max(0, stockLines - lowStockLines);
+        long healthy = Math.max(0, stockLines - lowStockLines);
         return BigDecimal.valueOf(healthy)
                 .multiply(BigDecimal.valueOf(100))
                 .divide(BigDecimal.valueOf(stockLines), 0, RoundingMode.HALF_UP)
@@ -3482,12 +3696,21 @@ public class ShopWebController {
     }
 
     private List<DashboardBranchPerformance> dashboardBranchPerformance(Long tenantId, List<Branch> activeBranches, LocalDateTime from, LocalDateTime to) {
+        Map<Long, Map<CurrencyCode, BigDecimal>> totalsByBranch = new HashMap<>();
+        for (Object[] row : salePayments.sumCompletedByBranch(tenantId, from, to)) {
+            totalsByBranch.computeIfAbsent(((Number) row[0]).longValue(), ignored -> new HashMap<>())
+                    .put((CurrencyCode) row[1], (BigDecimal) row[2]);
+        }
+        Map<Long, Long> countsByBranch = new HashMap<>();
+        for (Object[] row : sales.countCompletedByBranch(tenantId, from, to)) {
+            countsByBranch.put(((Number) row[0]).longValue(), ((Number) row[1]).longValue());
+        }
         return activeBranches.stream()
                 .map(branch -> {
-                    DashboardMoney totals = moneyTotals(tenantId, branch.getId(), from, to);
-                    long transactions = sales.countByTenantIdAndBranchIdAndStatusAndCreatedAtBetween(
-                            tenantId, branch.getId(), Sale.SaleStatus.COMPLETED, from, to);
-                    return new DashboardBranchPerformance(branch.getName(), totals.usd(), totals.zwg(), transactions, "Active");
+                    Map<CurrencyCode, BigDecimal> totals = totalsByBranch.getOrDefault(branch.getId(), Map.of());
+                    long transactions = countsByBranch.getOrDefault(branch.getId(), 0L);
+                    return new DashboardBranchPerformance(branch.getName(), "USD " + money(totals.get(CurrencyCode.USD)),
+                            "ZWG " + money(totals.get(CurrencyCode.ZWG)), transactions, "Active");
                 })
                 .sorted(Comparator.comparing(DashboardBranchPerformance::transactions).reversed())
                 .limit(5)
@@ -3498,10 +3721,15 @@ public class ShopWebController {
         List<BigDecimal> values = new ArrayList<>();
         List<String> labels = new ArrayList<>();
         BigDecimal max = BigDecimal.ZERO;
+        Map<LocalDate, BigDecimal> totalsByDay = new HashMap<>();
+        for (Object[] row : salePayments.sumCompletedByDay(tenantId, branchId, CurrencyCode.USD,
+                weekStart, today.plusDays(1).atStartOfDay())) {
+            totalsByDay.put(LocalDate.of(((Number) row[0]).intValue(), ((Number) row[1]).intValue(),
+                    ((Number) row[2]).intValue()), (BigDecimal) row[3]);
+        }
         for (int i = 0; i < 7; i++) {
             LocalDate date = weekStart.toLocalDate().plusDays(i);
-            BigDecimal amount = nvl(salePayments.sumCompletedPaymentsByCurrency(
-                    tenantId, branchId, CurrencyCode.USD, date.atStartOfDay(), date.plusDays(1).atStartOfDay()));
+            BigDecimal amount = totalsByDay.getOrDefault(date, BigDecimal.ZERO);
             values.add(amount);
             labels.add(date.format(DateTimeFormatter.ofPattern("MMM d")));
             if (amount.compareTo(max) > 0) {
@@ -3608,12 +3836,7 @@ public class ShopWebController {
                 .filter(branch -> BusinessModule.GAS_MODULE.equals(branch.getModuleType()))
                 .filter(branch -> !isSupervisor() || branch.getId().equals(assignedSupervisorBranch()))
                 .toList();
-        Long gasBranchId = gasBranches.stream()
-                .filter(branch -> branch.getId().equals(selectedBranchId))
-                .findFirst()
-                .or(() -> gasBranches.stream().findFirst())
-                .map(Branch::getId)
-                .orElse(selectedBranchId);
+        Long gasBranchId = selectedBranchId;
 
         List<GasTank> gasTanks = List.of();
         List<GasPrice> gasPrices = List.of();
@@ -3628,7 +3851,7 @@ public class ShopWebController {
                 Page.empty(PageRequest.of(shiftPageNumber, shiftPageSize));
         GasOperationsService.GasDashboard gasDashboard = null;
         GasShift currentGasShift = null;
-        if (!gasBranches.isEmpty()) {
+        if (gasBranches.stream().anyMatch(b -> b.getId().equals(gasBranchId))) {
             gasTanks = gasOperations.tanks(tenantId, gasBranchId);
             gasPrices = gasOperations.prices(tenantId, gasBranchId);
             currentGasShift = gasOperations.currentShift(tenantId, gasBranchId, current.userId());

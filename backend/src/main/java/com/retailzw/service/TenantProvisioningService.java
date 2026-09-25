@@ -105,6 +105,9 @@ public class TenantProvisioningService {
             categories.save(ProductCategory.builder().tenantId(tenant.getId()).name("Groceries").code("GROC").description("Daily retail goods").isActive(true).sortOrder(1).build());
             drawers.save(CashDrawer.builder().tenantId(tenant.getId()).branchId(branch.getId()).name("Till 1").description("Default till").isActive(true).build());
         }
+        if (selectedModules.contains(BusinessModule.FUEL_MODULE)) {
+            uoms.save(UnitOfMeasure.builder().tenantId(tenant.getId()).name("Litre").abbreviation("L").isDecimal(true).build());
+        }
         uoms.save(UnitOfMeasure.builder().tenantId(tenant.getId()).name("Kilogram").abbreviation("KG").isDecimal(true).build());
         for (BusinessModule module : selectedModules) {
             tenantModules.save(TenantEnabledModule.builder()

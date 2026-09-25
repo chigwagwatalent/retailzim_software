@@ -30,7 +30,17 @@ class AdminUiContractTest {
                     .contains("platform-shell")
                     .contains("platformSidebar(")
                     .contains("platformTopbar(");
+            assertThat(Files.readString(page)).contains("common/layout :: platformFooter");
         }
+    }
+
+    @Test
+    void newThemeIsScopedAndDashboardAvoidsFabricatedTelemetry() throws IOException {
+        String css = Files.readString(Path.of("src/main/resources/static/css/admin-modern.css"));
+        String dashboard = Files.readString(ADMIN_ROOT.resolve("dashboard.html"));
+        assertThat(css).contains(".platform-shell", "prefers-reduced-motion", "data-theme=\"dark\"", ".platform-footer");
+        assertThat(dashboard).contains("registrationChart.points", "activePlanCount", "Unverified")
+                .doesNotContain("All services responding", "Smile &amp; Pay live", "68 - iter.index");
     }
 
     @Test

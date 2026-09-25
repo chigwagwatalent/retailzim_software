@@ -13,6 +13,8 @@ import java.util.Optional;
 @Repository
 public interface CashSessionRepository extends JpaRepository<CashSession, Long> {
 
+    long countByTenantIdAndBranchIdAndStatus(Long tenantId, Long branchId, CashSession.SessionStatus status);
+
     @Query("SELECT cs FROM CashSession cs WHERE cs.drawerId = :drawerId AND cs.cashierId = :cashierId AND cs.status = 'OPEN'")
     Optional<CashSession> findOpenSessionByDrawerAndCashier(@Param("drawerId") Long drawerId, @Param("cashierId") Long cashierId);
 
