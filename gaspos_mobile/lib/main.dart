@@ -1054,7 +1054,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
               style: const TextStyle(color: Colors.blueGrey)),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-              initialValue: first,
+              value: first,
               decoration: const InputDecoration(labelText: 'Payment method'),
               items: methods
                   .map((method) => DropdownMenuItem(
@@ -1078,7 +1078,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
                     const InputDecoration(labelText: 'First payment amount')),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
-                initialValue: second,
+                value: second,
                 decoration: InputDecoration(
                     labelText:
                         'Second method - ${widget.currency} ${amount2.toStringAsFixed(2)}'),

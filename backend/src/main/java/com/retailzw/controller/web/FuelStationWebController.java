@@ -51,7 +51,10 @@ public class FuelStationWebController {
         model.addAttribute("module", "dashboard".equals(page) ? "fuel" : "fuel-" + page);
         model.addAttribute("fuelPage", page);
         model.addAttribute("financialSummary", "reports".equals(page)?fuel.financialSummary(current.tenantId(),current.branchId(),selected):List.of());
-        model.addAttribute("canManageFuel", !"SUPERVISOR".equals(current.roleName()));
+        boolean fuelSupervisor = "SUPERVISOR".equals(current.roleName());
+        model.addAttribute("fuelSupervisor", fuelSupervisor);
+        model.addAttribute("canManageFuel", !fuelSupervisor);
+        model.addAttribute("canOperateFuel", true);
         var records = fuel.records(current.tenantId(),current.branchId(),selected,page,recordPage);
         model.addAttribute("fuelRecords",records.stream().limit(50).toList());
         model.addAttribute("recordColumns",records.isEmpty()?List.of():List.copyOf(records.get(0).keySet()));

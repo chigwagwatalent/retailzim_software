@@ -53,7 +53,82 @@ public class FuelStationService {
         List<Map<String,Object>> nozzles = db.query("select n.id,n.branch_id,n.tank_id,n.grade_id,p.code pump,n.code nozzle,g.name grade,g.colour,n.meter_l,n.status from fuel_nozzles n join fuel_pumps p on p.id=n.pump_id join fuel_grades g on g.id=n.grade_id where n.tenant_id=:tenant and n.active=b'1'" + branchFilter.replace("branch_id","n.branch_id") + " order by n.branch_id,p.code,n.code", params,
                 (rs,n)->Map.ofEntries(Map.entry("id",rs.getLong("id")),Map.entry("branchId",rs.getLong("branch_id")),Map.entry("tankId",rs.getLong("tank_id")),Map.entry("gradeId",rs.getLong("grade_id")),Map.entry("pump",rs.getString("pump")),Map.entry("nozzle",rs.getString("nozzle")),Map.entry("grade",rs.getString("grade")),Map.entry("colour",rs.getString("colour")),Map.entry("meter",rs.getBigDecimal("meter_l")),Map.entry("status",rs.getString("status"))));
         Long openShifts = db.queryForObject("select count(*) from fuel_shifts where tenant_id=:tenant and status='OPEN'" + branchFilter, params, Long.class);
-        return Map.of("selectedBranchId",branchId == null ? 0L : branchId,"stations",stations,"totals",totals,"tanks",tanks,"nozzles",nozzles,"openShifts",nvl(openShifts));
+        BigDecimal usdRevenue = totalAmount(totals, "USD");
+        BigDecimal zwgRevenue = totalAmount(totals, "ZWG");
+        BigDecimal litresSold = totals.stream().map(row -> (BigDecimal) row.get("litres")).reduce(BigDecimal.ZERO, BigDecimal::add);
+        long saleCount = totals.stream().mapToLong(row -> ((Number) row.get("sales")).longValue()).sum();
+        long lowTankCount = tanks.stream().filter(tank -> ((BigDecimal) tank.get("stock")).compareTo((BigDecimal) tank.get("reorder")) <= 0).count();
+        long offlineNozzleCount = nozzles.stream().filter(nozzle -> "OFFLINE".equals(nozzle.get("status"))).count();
+
+        List<Map<String,Object>> hourlySales = db.query("select hour(occurred_at) sale_hour,coalesce(sum(case when currency='USD' then amount else 0 end),0) usd,coalesce(sum(litres),0) litres,count(*) sales from fuel_sales where tenant_id=:tenant and voided=b'0' and occurred_at>=CURRENT_DATE" + branchFilter + " group by hour(occurred_at) order by sale_hour", params,
+                (rs,n)->Map.of("hour",rs.getInt("sale_hour"),"usd",rs.getBigDecimal("usd"),"litres",rs.getBigDecimal("litres"),"sales",rs.getLong("sales")));
+        BigDecimal peakLitres = hourlySales.stream().map(row -> (BigDecimal) row.get("litres")).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        hourlySales = hourlySales.stream().map(row -> {
+            Map<String,Object> item = new LinkedHashMap<>(row);
+            BigDecimal litres = (BigDecimal) row.get("litres");
+            int percent = peakLitres.signum() == 0 ? 4 : litres.multiply(BigDecimal.valueOf(100)).divide(peakLitres,0,RoundingMode.HALF_UP).intValue();
+            item.put("percent", Math.max(4, Math.min(100, percent)));
+            item.put("label", String.format(Locale.ROOT, "%02d:00", ((Number) row.get("hour")).intValue()));
+            return item;
+        }).toList();
+
+        String stationBranchFilter = branchId == null ? "" : " and b.id=:branch";
+        List<Map<String,Object>> stationPerformance = db.query("""
+                select b.id,b.name,
+                       coalesce(sum(case when s.currency='USD' then s.amount else 0 end),0) usd,
+                       coalesce(sum(case when s.currency='ZWG' then s.amount else 0 end),0) zwg,
+                       coalesce(sum(s.litres),0) litres,count(s.id) sales,
+                       (select count(*) from fuel_tanks t where t.tenant_id=b.tenant_id and t.branch_id=b.id and t.active=b'1' and t.book_stock_l<=t.reorder_level_l) low_tanks,
+                       (select count(*) from fuel_nozzles n where n.tenant_id=b.tenant_id and n.branch_id=b.id and n.active=b'1' and n.status='OFFLINE') offline_nozzles,
+                       (select count(*) from fuel_shifts fsh where fsh.tenant_id=b.tenant_id and fsh.branch_id=b.id and fsh.status='OPEN') open_shifts
+                from branches b
+                left join fuel_sales s on s.tenant_id=b.tenant_id and s.branch_id=b.id and s.voided=b'0' and s.occurred_at>=CURRENT_DATE
+                where b.tenant_id=:tenant and b.is_active=b'1' and b.module_type='FUEL_MODULE'
+                """ + stationBranchFilter + " group by b.id,b.name order by usd desc,b.name", params,
+                (rs,n)->Map.ofEntries(Map.entry("id",rs.getLong("id")),Map.entry("name",rs.getString("name")),Map.entry("usd",rs.getBigDecimal("usd")),Map.entry("zwg",rs.getBigDecimal("zwg")),Map.entry("litres",rs.getBigDecimal("litres")),Map.entry("sales",rs.getLong("sales")),Map.entry("lowTanks",rs.getLong("low_tanks")),Map.entry("offlineNozzles",rs.getLong("offline_nozzles")),Map.entry("openShifts",rs.getLong("open_shifts"))));
+
+        Map<String,Object> shiftSummary = db.query("select coalesce(sum(opening_usd),0) opening_usd,coalesce(sum(opening_zwg),0) opening_zwg,count(*) cashiers from fuel_shifts where tenant_id=:tenant and status='OPEN'" + branchFilter, params, rs -> {
+            rs.next();
+            Map<String,Object> summary = new LinkedHashMap<>();
+            summary.put("openingUsd", rs.getBigDecimal("opening_usd"));
+            summary.put("openingZwg", rs.getBigDecimal("opening_zwg"));
+            summary.put("cashiers", rs.getLong("cashiers"));
+            return summary;
+        });
+        BigDecimal openShiftCashUsd = db.queryForObject("select coalesce(sum(p.amount),0) from fuel_sale_payments p join fuel_sales s on s.id=p.sale_id join fuel_shifts f on f.id=s.shift_id where f.tenant_id=:tenant and f.status='OPEN' and p.currency='USD' and p.method='CASH' and s.voided=b'0'" + (branchId == null ? "" : " and f.branch_id=:branch"), params, BigDecimal.class);
+        BigDecimal todayVarianceUsd = db.queryForObject("select coalesce(sum(cash_variance_usd),0) from fuel_shifts where tenant_id=:tenant and status='CLOSED' and closed_at>=CURRENT_DATE" + branchFilter, params, BigDecimal.class);
+        shiftSummary.put("expectedUsd", ((BigDecimal) shiftSummary.get("openingUsd")).add(nvl(openShiftCashUsd)));
+        shiftSummary.put("varianceUsd", nvl(todayVarianceUsd));
+
+        Map<String,Object> summary = new LinkedHashMap<>();
+        summary.put("usdRevenue", usdRevenue);
+        summary.put("zwgRevenue", zwgRevenue);
+        summary.put("litresSold", litresSold);
+        summary.put("saleCount", saleCount);
+        summary.put("lowTanks", lowTankCount);
+        summary.put("offlineNozzles", offlineNozzleCount);
+        summary.put("exceptions", lowTankCount + offlineNozzleCount);
+
+        Map<String,Object> payload = new LinkedHashMap<>();
+        payload.put("selectedBranchId", branchId == null ? 0L : branchId);
+        payload.put("stations", stations);
+        payload.put("totals", totals);
+        payload.put("tanks", tanks);
+        payload.put("nozzles", nozzles);
+        payload.put("openShifts", nvl(openShifts));
+        payload.put("summary", summary);
+        payload.put("hourlySales", hourlySales);
+        payload.put("stationPerformance", stationPerformance);
+        payload.put("shiftSummary", shiftSummary);
+        return payload;
+    }
+
+    private BigDecimal totalAmount(List<Map<String,Object>> totals, String currency) {
+        return totals.stream()
+                .filter(row -> currency.equals(row.get("currency")))
+                .map(row -> (BigDecimal) row.get("amount"))
+                .findFirst()
+                .orElse(BigDecimal.ZERO);
     }
 
     @Transactional(readOnly = true)

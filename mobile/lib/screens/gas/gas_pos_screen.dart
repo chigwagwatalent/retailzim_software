@@ -207,7 +207,7 @@ class _GasPosScreenState extends State<GasPosScreen> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    initialValue: currency,
+                    value: currency,
                     items: _prices
                         .map((p) => DropdownMenuItem(
                             value: p.currency,
@@ -219,7 +219,7 @@ class _GasPosScreenState extends State<GasPosScreen> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    initialValue: paymentMethod,
+                    value: paymentMethod,
                     items: const [
                       'CASH',
                       'ECOCASH',
@@ -323,7 +323,7 @@ class _GasPosScreenState extends State<GasPosScreen> {
                         const InputDecoration(labelText: 'Quantity kg')),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  initialValue: currency,
+                  value: currency,
                   items: const ['USD', 'ZWG']
                       .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                       .toList(),
@@ -416,7 +416,7 @@ class _GasPosScreenState extends State<GasPosScreen> {
                     decoration: const InputDecoration(labelText: 'Amount')),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  initialValue: currency,
+                  value: currency,
                   items: const ['USD', 'ZWG']
                       .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                       .toList(),
@@ -425,7 +425,7 @@ class _GasPosScreenState extends State<GasPosScreen> {
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  initialValue: paymentMethod,
+                  value: paymentMethod,
                   items: const [
                     'CASH',
                     'ECOCASH',

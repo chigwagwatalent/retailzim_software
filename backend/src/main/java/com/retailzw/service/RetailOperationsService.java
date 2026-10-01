@@ -18,11 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -59,11 +61,15 @@ public class RetailOperationsService {
             throw new IllegalArgumentException("Select the branch this product belongs to.");
         }
         validateActiveBranch(tenantId, targetBranchId);
+        String name = requiredProductName(request.getName());
+        String sku = prepareProductSku(tenantId, null, request.getSku(), name);
+        String barcode = blankToNull(request.getBarcode());
+        validateProductIdentityAvailable(tenantId, null, sku, barcode);
         Product product = Product.builder()
                 .tenantId(tenantId)
-                .name(request.getName())
-                .sku(request.getSku())
-                .barcode(request.getBarcode())
+                .name(name)
+                .sku(sku)
+                .barcode(barcode)
                 .description(request.getDescription())
                 .category(request.getCategoryId() == null ? null : categories.findById(request.getCategoryId()).orElse(null))
                 .unitOfMeasure(request.getUomId() == null ? null : uoms.findById(request.getUomId()).orElse(null))
@@ -108,9 +114,13 @@ public class RetailOperationsService {
         Product product = products.findById(productId)
                 .filter(p -> p.getTenantId().equals(tenantId))
                 .orElseThrow(() -> new IllegalArgumentException("Product not found."));
-        product.setName(request.getName());
-        product.setSku(request.getSku());
-        product.setBarcode(request.getBarcode());
+        String name = requiredProductName(request.getName());
+        String sku = prepareProductSku(tenantId, productId, request.getSku(), name);
+        String barcode = blankToNull(request.getBarcode());
+        validateProductIdentityAvailable(tenantId, productId, sku, barcode);
+        product.setName(name);
+        product.setSku(sku);
+        product.setBarcode(barcode);
         product.setDescription(request.getDescription());
         product.setCategory(request.getCategoryId() == null ? null : categories.findById(request.getCategoryId()).orElse(null));
         product.setUnitOfMeasure(request.getUomId() == null ? null : uoms.findById(request.getUomId()).orElse(null));
@@ -891,6 +901,63 @@ public class RetailOperationsService {
                 .filter(branch -> branch.getTenantId().equals(tenantId))
                 .filter(branch -> Boolean.TRUE.equals(branch.getIsActive()))
                 .orElseThrow(() -> new IllegalArgumentException("Selected branch is inactive or does not belong to this shop."));
+    }
+
+    private String requiredProductName(String value) {
+        String name = blankToNull(value);
+        if (name == null) {
+            throw new IllegalArgumentException("Product name is required.");
+        }
+        return name;
+    }
+
+    private String prepareProductSku(Long tenantId, Long currentProductId, String requestedSku, String productName) {
+        String supplied = blankToNull(requestedSku);
+        if (supplied != null) {
+            return supplied;
+        }
+
+        String base = Normalizer.normalize(productName, Normalizer.Form.NFKD)
+                .replaceAll("\\p{M}+", "")
+                .toUpperCase(Locale.ROOT)
+                .replaceAll("[^A-Z0-9]+", "-")
+                .replaceAll("^-+|-+$", "");
+        if (base.isBlank()) {
+            base = "PRODUCT";
+        }
+        base = base.substring(0, Math.min(base.length(), 90));
+
+        String candidate = base;
+        for (int suffix = 2; productSkuBelongsToAnotherProduct(tenantId, currentProductId, candidate); suffix++) {
+            if (suffix > 9999) {
+                throw new IllegalStateException("Could not generate a unique SKU. Enter a SKU and try again.");
+            }
+            candidate = base + "-" + suffix;
+        }
+        return candidate;
+    }
+
+    private void validateProductIdentityAvailable(Long tenantId, Long currentProductId, String sku, String barcode) {
+        if (productSkuBelongsToAnotherProduct(tenantId, currentProductId, sku)) {
+            throw new IllegalArgumentException("SKU '" + sku
+                    + "' is already used by another product in this shop. Use a different SKU or assign the existing product to this branch.");
+        }
+        if (barcode != null && products.findByTenantIdAndBarcode(tenantId, barcode)
+                .filter(existing -> currentProductId == null || !existing.getId().equals(currentProductId))
+                .isPresent()) {
+            throw new IllegalArgumentException("Barcode '" + barcode
+                    + "' is already used by another product in this shop. Use a different barcode or assign the existing product to this branch.");
+        }
+    }
+
+    private boolean productSkuBelongsToAnotherProduct(Long tenantId, Long currentProductId, String sku) {
+        return products.findByTenantIdAndSku(tenantId, sku)
+                .filter(existing -> currentProductId == null || !existing.getId().equals(currentProductId))
+                .isPresent();
+    }
+
+    private String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     private void validateTenantModule(Long tenantId, BusinessModule module) {

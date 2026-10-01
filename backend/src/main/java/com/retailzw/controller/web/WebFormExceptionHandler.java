@@ -42,7 +42,7 @@ public class WebFormExceptionHandler {
         return new ModelAndView("redirect:" + safeReturnPath(request));
     }
 
-    private String cleanMessage(Exception exception) {
+    String cleanMessage(Exception exception) {
         if (exception instanceof MissingServletRequestParameterException missing) {
             return label(missing.getParameterName()) + " is required.";
         }
@@ -59,6 +59,12 @@ public class WebFormExceptionHandler {
                 return "Please complete all required fields before saving.";
             }
             if (message.contains("duplicate") || message.contains("unique")) {
+                if (message.contains("uk_sku_tenant")) {
+                    return "That SKU is already used by another product in this shop. Use a different SKU or assign the existing product to this branch.";
+                }
+                if (message.contains("uk_barcode_tenant")) {
+                    return "That barcode is already used by another product in this shop. Use a different barcode or assign the existing product to this branch.";
+                }
                 return "A record with those details already exists. Check the unique fields and try again.";
             }
             return "We could not save this form. Please check the values and try again.";

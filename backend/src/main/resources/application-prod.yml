@@ -68,8 +68,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 300MB
-      max-request-size: 310MB
+      max-file-size: ${RETAILZW_MULTIPART_MAX_FILE_SIZE:300MB}
+      max-request-size: ${RETAILZW_MULTIPART_MAX_REQUEST_SIZE:310MB}
 
 management:
   health:

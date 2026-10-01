@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{common/layout :: head(${title})}"></head>
-<body class="fuel-shell" th:attr="data-fuel-page=${fuelPage},data-fuel-manage=${canManageFuel}">
+<body class="fuel-shell" th:attr="data-fuel-page=${fuelPage},data-fuel-manage=${canManageFuel},data-fuel-role=${fuelSupervisor ? 'supervisor' : 'admin'}">
 <div class="app-shell">
   <aside th:replace="~{common/layout :: shopSidebar(${module})}"></aside>
   <main class="main">
@@ -13,37 +13,90 @@
     <div th:if="${message}" class="alert success" th:text="${message}"></div>
     <div th:if="${error}" class="alert danger" th:text="${error}"></div>
 
-    <header class="fuel-heading">
-      <div><span class="eyebrow">RETAILZIM FUEL OPERATIONS</span><h1 th:text="${title}">Fuel Station</h1><p>Live forecourt, wet-stock and cashier control &middot; <strong th:text="${tenantActiveBranchName}">All stations</strong></p></div>
-      <div class="fuel-heading-actions"><a class="btn btn-light" th:href="@{/shop/fuel/reports(branchId=${workspaceBranchId})}"><i class="fa-solid fa-file-lines"></i> Reports</a><a class="btn btn-primary" th:href="@{/shop/fuel/setup(branchId=${workspaceBranchId})}"><i class="fa-solid fa-screwdriver-wrench"></i> Configure station</a></div>
+    <header class="fuel-heading fuel-command-heading" th:if="${fuelPage == 'dashboard' and !fuelSupervisor}">
+      <div><span class="eyebrow">RETAILZW FUEL OPERATIONS</span><h1>Fuel Command Centre</h1><p>Live network performance &middot; <strong th:text="${tenantActiveBranchName}">All fuel stations</strong></p></div>
+      <div class="fuel-heading-actions"><a class="btn btn-light" th:href="@{/shop/fuel/reports(branchId=${workspaceBranchId})}"><i class="fa-solid fa-chart-line"></i> Reports</a><a class="btn btn-primary" th:href="@{/shop/fuel/setup(branchId=${workspaceBranchId})}"><i class="fa-solid fa-screwdriver-wrench"></i> Configure station</a></div>
+    </header>
+    <header class="fuel-heading fuel-command-heading" th:if="${fuelPage == 'dashboard' and fuelSupervisor}">
+      <div class="fuel-station-title"><span class="fuel-operating-dot"></span><div><span class="eyebrow">SITE SUPERVISOR DESK</span><h1 th:text="${tenantActiveBranchName}">Fuel station</h1><p>Branch-locked forecourt, wet-stock and shift control</p></div></div>
+      <div class="fuel-heading-actions"><a class="btn btn-light" th:href="@{/shop/fuel/deliveries(branchId=${workspaceBranchId})}"><i class="fa-solid fa-truck-droplet"></i> Receive delivery</a><a class="btn btn-primary" href="#fuel-action-toolbar"><i class="fa-solid fa-ruler-vertical"></i> Record tank dip</a></div>
+    </header>
+    <header class="fuel-heading" th:if="${fuelPage != 'dashboard'}">
+      <div><span class="eyebrow">RETAILZW FUEL OPERATIONS</span><h1 th:text="${title}">Fuel Station</h1><p>Operational records &middot; <strong th:text="${tenantActiveBranchName}">Fuel station</strong></p></div>
+      <div class="fuel-heading-actions"><a class="btn btn-light" th:href="@{/shop/fuel(branchId=${workspaceBranchId})}"><i class="fa-solid fa-arrow-left"></i> Command centre</a></div>
     </header>
 
-    <nav class="fuel-module-tabs" aria-label="Fuel station modules"><a th:href="@{/shop/fuel(branchId=${workspaceBranchId})}">Station control</a><a th:href="@{/shop/fuel/setup(branchId=${workspaceBranchId})}">Tanks &amp; pumps</a><a th:href="@{/shop/fuel/sales(branchId=${workspaceBranchId})}">Sales</a><a th:href="@{/shop/fuel/deliveries(branchId=${workspaceBranchId})}">Deliveries</a><a th:href="@{/shop/fuel/stock(branchId=${workspaceBranchId})}">Stock ledger</a><a th:href="@{/shop/fuel/pricing(branchId=${workspaceBranchId})}">Pricing</a><a th:href="@{/shop/fuel/shifts(branchId=${workspaceBranchId})}">Shifts</a><a th:href="@{/shop/fuel/reports(branchId=${workspaceBranchId})}">Reports</a></nav>
-    <div id="fuel-action-toolbar" class="fuel-module-tabs"></div>
-    <div class="fuel-module-tabs"><a th:href="@{/shop/fuel/expenses(branchId=${workspaceBranchId})}">Station expenses</a></div>
+    <nav class="fuel-module-tabs" th:if="${fuelPage != 'dashboard'}" aria-label="Fuel station modules"><a th:href="@{/shop/fuel/setup(branchId=${workspaceBranchId})}">Tanks &amp; pumps</a><a th:href="@{/shop/fuel/sales(branchId=${workspaceBranchId})}">Sales</a><a th:href="@{/shop/fuel/deliveries(branchId=${workspaceBranchId})}">Deliveries</a><a th:href="@{/shop/fuel/stock(branchId=${workspaceBranchId})}">Stock ledger</a><a th:href="@{/shop/fuel/pricing(branchId=${workspaceBranchId})}">Pricing</a><a th:href="@{/shop/fuel/shifts(branchId=${workspaceBranchId})}">Shifts</a><a th:href="@{/shop/fuel/reports(branchId=${workspaceBranchId})}">Reports</a><a th:href="@{/shop/fuel/expenses(branchId=${workspaceBranchId})}">Expenses</a></nav>
+    <div id="fuel-action-toolbar" class="fuel-action-toolbar"></div>
     <section class="fuel-section-grid" th:if="${fuelPage == 'reports'}"><article class="workspace-panel fuel-full"><h2>Month-to-date financial summary</h2><p>Revenue, fuel purchases and operating expenses are shown separately by currency. Purchases are not cost of fuel sold.</p><div class="fuel-table-wrap"><table><thead><tr><th>Currency</th><th>Sales revenue</th><th>Fuel purchases</th><th>Operating expenses</th></tr></thead><tbody><tr th:each="f:${financialSummary}"><td th:text="${f.currency}"></td><td th:text="${f.Revenue}"></td><td th:text="${f.Fuel_purchases}"></td><td th:text="${f.Expenses}"></td></tr></tbody></table></div></article></section>
-    <section class="fuel-kpis">
+    <section class="fuel-kpis" th:if="${fuelPage != 'dashboard'}">
       <article><span class="fuel-kpi-icon blue"><i class="fa-solid fa-gas-pump"></i></span><div><small>Fuel sales today</small><strong th:text="${#lists.isEmpty(fuelDashboard.totals) ? 'USD 0.00' : fuelDashboard.totals[0].currency + ' ' + fuelDashboard.totals[0].amount}">USD 0.00</strong><em th:text="${#lists.isEmpty(fuelDashboard.totals) ? 'No sales yet' : fuelDashboard.totals[0].litres + ' litres dispensed'}">0 litres</em></div></article>
       <article><span class="fuel-kpi-icon green"><i class="fa-solid fa-droplet"></i></span><div><small>Configured tanks</small><strong th:text="${#lists.size(fuelDashboard.tanks)}">0</strong><em>Live book-stock control</em></div></article>
       <article><span class="fuel-kpi-icon amber"><i class="fa-solid fa-triangle-exclamation"></i></span><div><small>Low tanks</small><strong th:text="${#lists.size(fuelDashboard.tanks.?[stock.compareTo(reorder) <= 0])}">0</strong><em>At or below reorder level</em></div></article>
       <article><span class="fuel-kpi-icon violet"><i class="fa-solid fa-people-arrows"></i></span><div><small>Open shifts</small><strong th:text="${fuelDashboard.openShifts}">0</strong><em>Across selected stations</em></div></article>
     </section>
 
-    <section th:if="${fuelPage == 'dashboard'}" class="fuel-dashboard-grid">
-      <article class="workspace-panel fuel-wide">
-        <div class="workspace-panel-head"><div><span class="eyebrow">LIVE FORECOURT</span><h2>Tanks &amp; inventory</h2></div><a th:href="@{/shop/fuel/setup(branchId=${workspaceBranchId})}">Manage <i class="fa-solid fa-arrow-right"></i></a></div>
-        <div class="fuel-tank-grid">
-          <div class="fuel-tank" th:each="tank : ${fuelDashboard.tanks}" th:attr="data-tank-id=${tank.id},data-percent=${tank.fillPercent}" th:style="${'--tank-color:' + tank.colour + ';--tank-level:' + tank.fillPercent + '%'}">
-            <div class="fuel-tank-head"><i th:style="${'background:' + tank.colour}"></i><div><strong th:text="${tank.code + ' · ' + tank.grade}">T1 Petrol</strong><small th:text="${branchNames[tank.branchId]}">Station</small></div><span th:classappend="${tank.stock.compareTo(tank.reorder) <= 0 ? ' low' : ''}" th:text="${tank.stock.compareTo(tank.reorder) <= 0 ? 'LOW' : 'HEALTHY'}">HEALTHY</span></div>
-            <div class="fuel-vessel" role="img" th:aria-label="${tank.grade + ' tank ' + tank.fillPercent + ' percent full'}"><div class="fuel-liquid"></div><strong th:text="${tank.fillPercent + '%'}">0%</strong></div>
-            <div class="fuel-level"><i th:style="${'width:' + tank.fillPercent + '%;background:' + tank.colour}"></i></div>
-            <dl><div><dt>Book stock</dt><dd th:text="${tank.stock + ' L'}">0 L</dd></div><div><dt>Dip</dt><dd th:text="${tank.dip + ' L'}">0 L</dd></div><div><dt>Ullage</dt><dd th:text="${tank.capacity.subtract(tank.stock) + ' L'}">0 L</dd></div><div><dt>Water</dt><dd th:text="${tank.water + ' mm'}">0 mm</dd></div></dl>
+    <section class="fuel-dashboard fuel-admin-dashboard" th:if="${fuelPage == 'dashboard' and !fuelSupervisor}">
+      <div class="fuel-dashboard-kpis">
+        <article><i class="fa-solid fa-chart-column green"></i><span>Revenue today</span><strong th:text="${'USD ' + #numbers.formatDecimal(fuelDashboard.summary.usdRevenue,1,2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(fuelDashboard.summary.zwgRevenue,1,2)}">ZWG 0.00</small></article>
+        <article><i class="fa-solid fa-gas-pump blue"></i><span>Litres sold</span><strong th:text="${#numbers.formatDecimal(fuelDashboard.summary.litresSold,1,2) + ' L'}">0 L</strong><small th:text="${fuelDashboard.summary.saleCount + ' completed sales'}">0 completed sales</small></article>
+        <article><i class="fa-solid fa-people-arrows violet"></i><span>Open shifts</span><strong th:text="${fuelDashboard.openShifts}">0</strong><small th:text="${#lists.size(fuelDashboard.stations) + ' fuel stations'}">0 fuel stations</small></article>
+        <article th:classappend="${fuelDashboard.summary.exceptions > 0 ? ' has-exception' : ''}"><i class="fa-solid fa-triangle-exclamation red"></i><span>Exceptions</span><strong th:text="${fuelDashboard.summary.exceptions}">0</strong><small>Low tanks and offline nozzles</small></article>
+      </div>
+      <div class="fuel-admin-primary">
+        <article class="fuel-panel fuel-sales-chart">
+          <div class="fuel-panel-head"><div><span class="eyebrow">TODAY</span><h2>Sales &amp; litres by hour</h2></div><span class="fuel-chart-key"><i></i> Litres dispensed</span></div>
+          <div class="fuel-hour-chart" th:if="${!#lists.isEmpty(fuelDashboard.hourlySales)}">
+            <div class="fuel-hour-column" th:each="hour:${fuelDashboard.hourlySales}"><div class="fuel-hour-value" th:text="${#numbers.formatDecimal(hour.litres,1,0) + ' L'}">0 L</div><div class="fuel-hour-track"><i th:style="${'height:' + hour.percent + '%'}"></i></div><span th:text="${hour.label}">08:00</span></div>
           </div>
-          <div class="fuel-empty" th:if="${#lists.isEmpty(fuelDashboard.tanks)}"><i class="fa-solid fa-database"></i><strong>No fuel tanks configured</strong><span>Select a station and configure its first tank.</span></div>
-        </div>
-      </article>
-      <aside class="workspace-panel fuel-alerts"><div class="workspace-panel-head"><h2>Control room</h2></div><div class="fuel-alert good"><i class="fa-solid fa-shield-halved"></i><span><strong>Tenant isolation active</strong><small>All records are package and branch scoped.</small></span></div><div class="fuel-alert good"><i class="fa-solid fa-rotate"></i><span><strong>Offline-safe cashier API</strong><small>Idempotency prevents duplicate synced sales.</small></span></div><div class="fuel-alert"><i class="fa-solid fa-receipt"></i><span><strong>Fiscal queue</strong><small>Receipts remain queued until a certified ZIMRA adapter confirms them.</small></span></div></aside>
-      <article class="workspace-panel fuel-wide"><div class="workspace-panel-head"><h2>Pumps &amp; nozzles</h2></div><div class="fuel-nozzle-grid"><div class="fuel-nozzle" th:each="nozzle : ${fuelDashboard.nozzles}"><span><i th:style="${'background:' + nozzle.colour}"></i><b th:text="${nozzle.pump + ' / ' + nozzle.nozzle}">P01 / 1A</b></span><strong th:text="${nozzle.grade}">Petrol</strong><small th:text="${'Meter ' + nozzle.meter + ' L'}">Meter</small><em th:text="${nozzle.status}">IDLE</em></div><div class="fuel-empty compact" th:if="${#lists.isEmpty(fuelDashboard.nozzles)}">Select one station to view its nozzle topology.</div></div></article>
+          <div class="fuel-empty compact" th:if="${#lists.isEmpty(fuelDashboard.hourlySales)}"><i class="fa-solid fa-chart-column"></i><strong>No sales recorded today</strong><span>Hourly performance will appear after the first fuel sale.</span></div>
+        </article>
+        <aside class="fuel-panel fuel-attention">
+          <div class="fuel-panel-head"><h2>Attention required</h2><span th:text="${fuelDashboard.summary.exceptions + ' open'}">0 open</span></div>
+          <a th:each="tank:${fuelDashboard.tanks.?[stock.compareTo(reorder) <= 0]}" th:href="@{/shop/fuel/stock(branchId=${tank.branchId})}"><i class="fa-solid fa-droplet"></i><span><strong th:text="${branchNames[tank.branchId] + ' · ' + tank.code + ' below reorder'}">Tank below reorder</strong><small th:text="${'Current ' + tank.stock + ' L · Reorder ' + tank.reorder + ' L'}">Current level</small></span><b>Review</b></a>
+          <a th:each="nozzle:${fuelDashboard.nozzles.?[status == 'OFFLINE']}" th:href="@{/shop/fuel/setup(branchId=${nozzle.branchId})}"><i class="fa-solid fa-gas-pump"></i><span><strong th:text="${branchNames[nozzle.branchId] + ' · ' + nozzle.pump + '/' + nozzle.nozzle + ' offline'}">Nozzle offline</strong><small th:text="${nozzle.grade + ' unavailable for sales'}">Unavailable</small></span><b>Inspect</b></a>
+          <div class="fuel-all-clear" th:if="${fuelDashboard.summary.exceptions == 0}"><i class="fa-solid fa-circle-check"></i><div><strong>Network operating normally</strong><small>No low tanks or offline nozzles.</small></div></div>
+        </aside>
+      </div>
+      <div class="fuel-admin-secondary">
+        <article class="fuel-panel fuel-station-performance">
+          <div class="fuel-panel-head"><h2>Station performance</h2><a th:href="@{/shop/fuel/reports(branchId=${workspaceBranchId})}">Open reports <i class="fa-solid fa-arrow-right"></i></a></div>
+          <div class="fuel-table-wrap"><table><thead><tr><th>Station</th><th>Revenue</th><th>Litres</th><th>Sales</th><th>Tank health</th><th>Shift status</th></tr></thead><tbody><tr th:each="station:${fuelDashboard.stationPerformance}"><td><strong th:text="${station.name}">Station</strong></td><td><strong th:text="${'USD ' + #numbers.formatDecimal(station.usd,1,2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(station.zwg,1,2)}">ZWG 0.00</small></td><td th:text="${#numbers.formatDecimal(station.litres,1,2) + ' L'}">0 L</td><td th:text="${station.sales}">0</td><td><span class="fuel-status" th:classappend="${station.lowTanks > 0 ? ' warning' : ' healthy'}" th:text="${station.lowTanks > 0 ? station.lowTanks + ' low' : 'Healthy'}">Healthy</span></td><td><span class="fuel-status" th:classappend="${station.openShifts > 0 ? ' healthy' : ''}" th:text="${station.openShifts + ' open'}">0 open</span></td></tr><tr th:if="${#lists.isEmpty(fuelDashboard.stationPerformance)}"><td colspan="6">No fuel stations are configured.</td></tr></tbody></table></div>
+        </article>
+        <article class="fuel-panel fuel-tank-network">
+          <div class="fuel-panel-head"><h2>Tank network</h2><a th:href="@{/shop/fuel/setup(branchId=${workspaceBranchId})}">View tanks <i class="fa-solid fa-arrow-right"></i></a></div>
+          <div class="fuel-network-row" th:each="tank:${fuelDashboard.tanks}"><div><strong th:text="${tank.code + ' · ' + tank.grade}">T1 Petrol</strong><small th:text="${branchNames[tank.branchId]}">Station</small></div><div class="fuel-network-level"><i th:style="${'width:' + tank.fillPercent + '%;background:' + tank.colour}"></i></div><b th:text="${tank.fillPercent + '%'}">0%</b></div>
+          <div class="fuel-empty compact" th:if="${#lists.isEmpty(fuelDashboard.tanks)}">No tanks configured.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="fuel-dashboard fuel-supervisor-dashboard" th:if="${fuelPage == 'dashboard' and fuelSupervisor}">
+      <div class="fuel-dashboard-kpis supervisor-kpis">
+        <article><i class="fa-solid fa-chart-column blue"></i><span>Sales today</span><strong th:text="${'USD ' + #numbers.formatDecimal(fuelDashboard.summary.usdRevenue,1,2)}">USD 0.00</strong><small th:text="${'ZWG ' + #numbers.formatDecimal(fuelDashboard.summary.zwgRevenue,1,2)}">ZWG 0.00</small></article>
+        <article><i class="fa-solid fa-droplet blue"></i><span>Litres dispensed</span><strong th:text="${#numbers.formatDecimal(fuelDashboard.summary.litresSold,1,2) + ' L'}">0 L</strong><small th:text="${fuelDashboard.summary.saleCount + ' sales today'}">0 sales today</small></article>
+        <article><i class="fa-solid fa-money-bill-wave green"></i><span>Expected cash</span><strong th:text="${'USD ' + #numbers.formatDecimal(fuelDashboard.shiftSummary.expectedUsd,1,2)}">USD 0.00</strong><small>Open shifts</small></article>
+        <article><i class="fa-solid fa-scale-balanced violet"></i><span>Closed shift variance</span><strong th:text="${'USD ' + #numbers.formatDecimal(fuelDashboard.shiftSummary.varianceUsd,1,2)}">USD 0.00</strong><small>Today</small></article>
+        <article><i class="fa-solid fa-users blue"></i><span>Cashiers on shift</span><strong th:text="${fuelDashboard.shiftSummary.cashiers}">0</strong><small>Currently open</small></article>
+      </div>
+      <div class="fuel-supervisor-primary">
+        <article class="fuel-panel fuel-forecourt">
+          <div class="fuel-panel-head"><div><span class="fuel-live-dot"></span><h2>Forecourt status</h2></div><small>Live POS availability</small></div>
+          <div class="fuel-nozzle-grid"><div class="fuel-nozzle" th:each="nozzle:${fuelDashboard.nozzles}" th:attr="data-nozzle-status=${nozzle.status}"><div class="fuel-nozzle-head"><strong th:text="${nozzle.pump}">P01</strong><span th:classappend="${nozzle.status == 'OFFLINE' ? ' offline' : ' online'}" th:text="${nozzle.status == 'OFFLINE' ? 'OFFLINE' : 'ONLINE'}">ONLINE</span></div><div class="fuel-nozzle-body"><i class="fa-solid fa-gas-pump" th:style="${'color:' + nozzle.colour}"></i><div><small th:text="${'Nozzle ' + nozzle.nozzle}">Nozzle 1</small><strong th:text="${nozzle.grade}">Petrol</strong><b th:text="${#numbers.formatDecimal(nozzle.meter,1,2) + ' L'}">0 L</b></div></div><a th:if="${nozzle.status == 'OFFLINE'}" href="#fuel-action-toolbar"><i class="fa-solid fa-triangle-exclamation"></i> Manage issue</a></div><div class="fuel-empty compact" th:if="${#lists.isEmpty(fuelDashboard.nozzles)}"><strong>No nozzles configured</strong><span>Ask an administrator to complete station setup.</span></div></div>
+        </article>
+        <aside class="fuel-panel fuel-shift-control">
+          <div class="fuel-panel-head"><h2>Shift controls</h2><span th:text="${fuelDashboard.openShifts + ' open'}">0 open</span></div>
+          <div class="fuel-control-row"><i class="fa-solid fa-circle-check"></i><span><strong>Forecourt assets</strong><small th:text="${#lists.size(fuelDashboard.nozzles) + ' nozzles available'}">0 nozzles</small></span></div>
+          <div class="fuel-control-row" th:classappend="${fuelDashboard.summary.lowTanks > 0 ? ' warning' : ''}"><i class="fa-solid fa-ruler-vertical"></i><span><strong>Wet-stock position</strong><small th:text="${fuelDashboard.summary.lowTanks > 0 ? fuelDashboard.summary.lowTanks + ' tanks need attention' : 'All tanks above reorder level'}">All tanks healthy</small></span><a href="#fuel-action-toolbar">Record dip</a></div>
+          <div class="fuel-control-row" th:classappend="${fuelDashboard.summary.offlineNozzles > 0 ? ' warning' : ''}"><i class="fa-solid fa-screwdriver-wrench"></i><span><strong>Pump availability</strong><small th:text="${fuelDashboard.summary.offlineNozzles > 0 ? fuelDashboard.summary.offlineNozzles + ' nozzles offline' : 'All configured nozzles online'}">All online</small></span><a href="#fuel-action-toolbar">Update</a></div>
+          <div class="fuel-control-row"><i class="fa-solid fa-truck-droplet"></i><span><strong>Fuel receiving</strong><small>Capture supplier delivery and dip variance</small></span><a th:href="@{/shop/fuel/deliveries(branchId=${workspaceBranchId})}">Receive</a></div>
+          <a class="btn btn-primary fuel-shift-link" th:href="@{/shop/fuel/shifts(branchId=${workspaceBranchId})}">Open shift oversight <i class="fa-solid fa-arrow-right"></i></a>
+        </aside>
+      </div>
+      <div class="fuel-supervisor-secondary">
+        <article class="fuel-panel fuel-supervisor-tanks"><div class="fuel-panel-head"><h2>Tank levels</h2><small>Book stock vs latest dip</small></div><div class="fuel-supervisor-tank" th:each="tank:${fuelDashboard.tanks}"><div><strong th:text="${tank.code}">T1</strong><span th:text="${tank.grade}">Petrol</span></div><div class="fuel-network-level"><i th:style="${'width:' + tank.fillPercent + '%;background:' + tank.colour}"></i></div><b th:text="${tank.fillPercent + '%'}">0%</b><strong th:text="${#numbers.formatDecimal(tank.stock,1,2) + ' L'}">0 L</strong><span class="fuel-status" th:classappend="${tank.stock.compareTo(tank.reorder) <= 0 ? ' warning' : ' healthy'}" th:text="${tank.stock.compareTo(tank.reorder) <= 0 ? 'LOW' : 'OK'}">OK</span><small th:text="${'Dip ' + #numbers.formatDecimal(tank.dip,1,2) + ' L'}">Dip</small></div><div class="fuel-empty compact" th:if="${#lists.isEmpty(fuelDashboard.tanks)}">No tanks configured.</div></article>
+        <article class="fuel-panel fuel-recent-activity"><div class="fuel-panel-head"><h2>Recent fuel sales</h2><a th:href="@{/shop/fuel/sales(branchId=${workspaceBranchId})}">View all</a></div><div class="fuel-activity-row" th:each="sale,stat:${fuelSales}" th:if="${stat.index < 5}"><i></i><time th:text="${#temporals.format(sale.at,'HH:mm')}">11:52</time><span><strong th:text="${sale.receipt}">Receipt</strong><small th:text="${sale.pump + '/' + sale.nozzle + ' · ' + sale.litres + ' L · ' + sale.currency + ' ' + sale.amount}">Sale details</small></span></div><div class="fuel-empty compact" th:if="${#lists.isEmpty(fuelSales)}">No fuel sales recorded yet.</div></article>
+      </div>
     </section>
 
     <section th:if="${fuelPage == 'setup'}" class="fuel-section-grid">
