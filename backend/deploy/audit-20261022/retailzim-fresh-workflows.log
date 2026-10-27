@@ -1,0 +1,173 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.retailzw:retail-saas-backend >------------------
+[INFO] Building RetailZW SaaS Platform 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ retail-saas-backend ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 142 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ retail-saas-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ retail-saas-backend ---
+[INFO] skip non existing resourceDirectory /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ retail-saas-backend ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 36 source files with javac [debug release 21] to target/test-classes
+[INFO] /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/src/test/java/com/retailzw/service/PurchaseOrderServiceTest.java: Some input files use unchecked or unsafe operations.
+[INFO] /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/src/test/java/com/retailzw/service/PurchaseOrderServiceTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ retail-saas-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.retailzw.web.DatabaseWorkflowIntegrationTest
+16:47:53.276 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.retailzw.web.DatabaseWorkflowIntegrationTest]: DatabaseWorkflowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+16:47:53.353 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.retailzw.RetailSaasApplication for test class com.retailzw.web.DatabaseWorkflowIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-10-22 16:47:53.574 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 42642 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:47:53.575 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:47:54.178 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:47:54.285 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 102 ms. Found 71 JPA repository interfaces.
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-10-22 16:47:55.204 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:47:55.239 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:47:55.258 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:47:55.329 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:47:55.343 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:47:55.438 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@33197c2f
+2026-10-22 16:47:55.439 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:47:55.469 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:47:56.497 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:47:56.498 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:47:56.692 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:47:59.267 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:47:59.736 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.318 seconds (process running for 6.834)
+2026-10-22 16:48:00.119 INFO  [main] c.r.service.RetailOperationsService - Product assigned to branch tenant=1 branch=6 product=471 onHand=10
+2026-10-22 16:48:00.119 INFO  [main] c.r.service.RetailOperationsService - Product created tenant=1 branch=6 product=471 sku=AUDd06ce161-d3d1-4db5-a987-ff3c8aacf279 openingStock=10
+2026-10-22 16:48:00.138 INFO  [main] c.r.service.RetailOperationsService - Cash session opened tenant=1 branch=6 cashier=1 drawer=3 session=1 floatUsd=0 floatZwg=0
+2026-10-22 16:48:00.160 WARN  [main] o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1054, SQLState: 42S22
+2026-10-22 16:48:00.161 ERROR [main] o.h.e.jdbc.spi.SqlExceptionHelper - Unknown column 's1_0.coupon_discount' in 'field list'
+[ERROR] Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 7.066 s <<< FAILURE! -- in com.retailzw.web.DatabaseWorkflowIntegrationTest
+[ERROR] com.retailzw.web.DatabaseWorkflowIntegrationTest.retailSaleReducesStockAndCashShiftReconciles -- Time elapsed: 0.083 s <<< ERROR!
+org.springframework.dao.InvalidDataAccessResourceUsageException: JDBC exception executing SQL [select s1_0.id,s1_0.borrower_id,s1_0.branch_id,s1_0.cash_session_id,s1_0.cashier_id,s1_0.coupon_code,s1_0.coupon_discount,s1_0.created_at,s1_0.currency,s1_0.customer_id,s1_0.discount_amount,s1_0.grand_total,s1_0.gross_profit,s1_0.is_offline_sale,i1_0.sale_id,i1_0.id,i1_0.cost_price,i1_0.discount_amount,i1_0.line_total,i1_0.pricing_exchange_rate_id,i1_0.pricing_source,i1_0.pricing_tier,i1_0.pricing_version,i1_0.product_barcode,i1_0.product_id,i1_0.product_name,i1_0.product_sku,i1_0.promotion_id,i1_0.promotion_name,i1_0.quantity,i1_0.retail_unit_price,i1_0.tax_amount,i1_0.tax_rate,i1_0.unit_price,i1_0.wholesale_minimum_quantity,s1_0.loyalty_points_earned,s1_0.loyalty_points_redeemed,s1_0.offline_created_at,s1_0.offline_receipt_number,s1_0.receipt_number,s1_0.sale_type,s1_0.status,s1_0.subtotal,s1_0.tax_amount,s1_0.tenant_id,s1_0.total_cost,s1_0.updated_at,s1_0.void_reason,s1_0.voided_at,s1_0.voided_by from sales s1_0 left join sale_items i1_0 on s1_0.id=i1_0.sale_id where s1_0.tenant_id=? and s1_0.offline_receipt_number=?] [Unknown column 's1_0.coupon_discount' in 'field list'] [n/a]; SQL [n/a]
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:277)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:241)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:335)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:152)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:135)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223)
+	at jdk.proxy2/jdk.proxy2.$Proxy233.findByTenantIdAndOfflineReceiptNumber(Unknown Source)
+	at com.retailzw.service.RetailOperationsService.completeSale(RetailOperationsService.java:554)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:354)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.retailzw.service.RetailOperationsService$$SpringCGLIB$$0.completeSale(<generated>)
+	at com.retailzw.web.DatabaseWorkflowIntegrationTest.retailSaleReducesStockAndCashShiftReconciles(DatabaseWorkflowIntegrationTest.java:69)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: org.hibernate.exception.SQLGrammarException: JDBC exception executing SQL [select s1_0.id,s1_0.borrower_id,s1_0.branch_id,s1_0.cash_session_id,s1_0.cashier_id,s1_0.coupon_code,s1_0.coupon_discount,s1_0.created_at,s1_0.currency,s1_0.customer_id,s1_0.discount_amount,s1_0.grand_total,s1_0.gross_profit,s1_0.is_offline_sale,i1_0.sale_id,i1_0.id,i1_0.cost_price,i1_0.discount_amount,i1_0.line_total,i1_0.pricing_exchange_rate_id,i1_0.pricing_source,i1_0.pricing_tier,i1_0.pricing_version,i1_0.product_barcode,i1_0.product_id,i1_0.product_name,i1_0.product_sku,i1_0.promotion_id,i1_0.promotion_name,i1_0.quantity,i1_0.retail_unit_price,i1_0.tax_amount,i1_0.tax_rate,i1_0.unit_price,i1_0.wholesale_minimum_quantity,s1_0.loyalty_points_earned,s1_0.loyalty_points_redeemed,s1_0.offline_created_at,s1_0.offline_receipt_number,s1_0.receipt_number,s1_0.sale_type,s1_0.status,s1_0.subtotal,s1_0.tax_amount,s1_0.tenant_id,s1_0.total_cost,s1_0.updated_at,s1_0.void_reason,s1_0.voided_at,s1_0.voided_by from sales s1_0 left join sale_items i1_0 on s1_0.id=i1_0.sale_id where s1_0.tenant_id=? and s1_0.offline_receipt_number=?] [Unknown column 's1_0.coupon_discount' in 'field list'] [n/a]
+	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:66)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:58)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:94)
+	at org.hibernate.sql.results.jdbc.internal.DeferredResultSetAccess.executeQuery(DeferredResultSetAccess.java:265)
+	at org.hibernate.sql.results.jdbc.internal.DeferredResultSetAccess.getResultSet(DeferredResultSetAccess.java:167)
+	at org.hibernate.sql.results.jdbc.internal.JdbcValuesResultSetImpl.advanceNext(JdbcValuesResultSetImpl.java:218)
+	at org.hibernate.sql.results.jdbc.internal.JdbcValuesResultSetImpl.processNext(JdbcValuesResultSetImpl.java:98)
+	at org.hibernate.sql.results.jdbc.internal.AbstractJdbcValues.next(AbstractJdbcValues.java:19)
+	at org.hibernate.sql.results.internal.RowProcessingStateStandardImpl.next(RowProcessingStateStandardImpl.java:66)
+	at org.hibernate.sql.results.spi.ListResultsConsumer.consume(ListResultsConsumer.java:180)
+	at org.hibernate.sql.results.spi.ListResultsConsumer.consume(ListResultsConsumer.java:33)
+	at org.hibernate.sql.exec.internal.JdbcSelectExecutorStandardImpl.doExecuteQuery(JdbcSelectExecutorStandardImpl.java:209)
+	at org.hibernate.sql.exec.internal.JdbcSelectExecutorStandardImpl.executeQuery(JdbcSelectExecutorStandardImpl.java:83)
+	at org.hibernate.sql.exec.spi.JdbcSelectExecutor.list(JdbcSelectExecutor.java:76)
+	at org.hibernate.sql.exec.spi.JdbcSelectExecutor.list(JdbcSelectExecutor.java:65)
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.lambda$new$2(ConcreteSqmSelectQueryPlan.java:137)
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.withCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:362)
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.performList(ConcreteSqmSelectQueryPlan.java:303)
+	at org.hibernate.query.sqm.internal.QuerySqmImpl.doList(QuerySqmImpl.java:509)
+	at org.hibernate.query.spi.AbstractSelectionQuery.list(AbstractSelectionQuery.java:427)
+	at org.hibernate.query.spi.AbstractSelectionQuery.getSingleResult(AbstractSelectionQuery.java:564)
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution$SingleEntityExecution.doExecute(JpaQueryExecution.java:223)
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution.execute(JpaQueryExecution.java:92)
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.doExecute(AbstractJpaQuery.java:149)
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.execute(AbstractJpaQuery.java:137)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:164)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:143)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:70)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:137)
+	... 25 more
+Caused by: java.sql.SQLSyntaxErrorException: Unknown column 's1_0.coupon_discount' in 'field list'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeQuery(ClientPreparedStatement.java:968)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeQuery(HikariProxyPreparedStatement.java)
+	at org.hibernate.sql.results.jdbc.internal.DeferredResultSetAccess.executeQuery(DeferredResultSetAccess.java:246)
+	... 58 more
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   DatabaseWorkflowIntegrationTest.retailSaleReducesStockAndCashShiftReconciles:69 » InvalidDataAccessResourceUsage JDBC exception executing SQL [select s1_0.id,s1_0.borrower_id,s1_0.branch_id,s1_0.cash_session_id,s1_0.cashier_id,s1_0.coupon_code,s1_0.coupon_discount,s1_0.created_at,s1_0.currency,s1_0.customer_id,s1_0.discount_amount,s1_0.grand_total,s1_0.gross_profit,s1_0.is_offline_sale,i1_0.sale_id,i1_0.id,i1_0.cost_price,i1_0.discount_amount,i1_0.line_total,i1_0.pricing_exchange_rate_id,i1_0.pricing_source,i1_0.pricing_tier,i1_0.pricing_version,i1_0.product_barcode,i1_0.product_id,i1_0.product_name,i1_0.product_sku,i1_0.promotion_id,i1_0.promotion_name,i1_0.quantity,i1_0.retail_unit_price,i1_0.tax_amount,i1_0.tax_rate,i1_0.unit_price,i1_0.wholesale_minimum_quantity,s1_0.loyalty_points_earned,s1_0.loyalty_points_redeemed,s1_0.offline_created_at,s1_0.offline_receipt_number,s1_0.receipt_number,s1_0.sale_type,s1_0.status,s1_0.subtotal,s1_0.tax_amount,s1_0.tenant_id,s1_0.total_cost,s1_0.updated_at,s1_0.void_reason,s1_0.voided_at,s1_0.voided_by from sales s1_0 left join sale_items i1_0 on s1_0.id=i1_0.sale_id where s1_0.tenant_id=? and s1_0.offline_receipt_number=?] [Unknown column 's1_0.coupon_discount' in 'field list'] [n/a]; SQL [n/a]
+[INFO] 
+[ERROR] Tests run: 3, Failures: 0, Errors: 1, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.839 s
+[INFO] Finished at: 2026-10-22T16:48:00+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.1.2:test (default-test) on project retail-saas-backend: 
+[ERROR] 
+[ERROR] Please refer to /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

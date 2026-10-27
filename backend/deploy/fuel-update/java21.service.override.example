@@ -1,0 +1,5 @@
+# Example only: adapt paths to the EXISTING service and preserve WorkingDirectory.
+[Service]
+EnvironmentFile=/etc/retailzw/fuel-update.env
+ExecStart=
+ExecStart=/bin/sh /opt/retailzw/fuel-update/start.sh

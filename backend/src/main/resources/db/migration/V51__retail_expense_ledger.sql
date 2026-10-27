@@ -1,4 +1,4 @@
-CREATE TABLE retail_expenses (
+CREATE TABLE IF NOT EXISTS retail_expenses (
  id BIGINT NOT NULL AUTO_INCREMENT, tenant_id BIGINT NOT NULL, branch_id BIGINT NOT NULL,
  expense_number VARCHAR(50) NOT NULL, description VARCHAR(180) NOT NULL, vendor VARCHAR(150), category VARCHAR(40) NOT NULL,
  amount DECIMAL(15,2) NOT NULL, currency VARCHAR(5) NOT NULL, payment_method VARCHAR(30) NOT NULL,

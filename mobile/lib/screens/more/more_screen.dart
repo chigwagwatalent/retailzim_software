@@ -131,10 +131,10 @@ class MoreScreen extends StatelessWidget {
                         color: AppColors.primaryBlue),
                     title: Text(Platform.isWindows
                         ? 'Windows Printer'
-                        : 'Bluetooth Printer'),
+                        : 'Receipt Printer'),
                     subtitle: Text(Platform.isWindows
                         ? 'Use any printer installed in Windows'
-                        : 'Connect a thermal receipt printer'),
+                        : 'Built-in SUNMI or external Bluetooth printer'),
                     trailing: const Icon(Icons.chevron_right_rounded,
                         color: AppColors.textMuted),
                     onTap: Platform.isWindows

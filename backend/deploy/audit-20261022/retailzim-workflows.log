@@ -1,0 +1,78 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.retailzw:retail-saas-backend >------------------
+[INFO] Building RetailZW SaaS Platform 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ retail-saas-backend ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 142 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ retail-saas-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ retail-saas-backend ---
+[INFO] skip non existing resourceDirectory /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ retail-saas-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ retail-saas-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.retailzw.web.DatabaseWorkflowIntegrationTest
+16:50:09.935 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.retailzw.web.DatabaseWorkflowIntegrationTest]: DatabaseWorkflowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+16:50:10.016 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.retailzw.RetailSaasApplication for test class com.retailzw.web.DatabaseWorkflowIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-10-22 16:50:10.258 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 42822 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:50:10.259 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:50:10.912 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:50:11.019 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 102 ms. Found 71 JPA repository interfaces.
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-10-22 16:50:11.993 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:50:12.029 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:50:12.049 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:50:12.125 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:50:12.142 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:50:12.262 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@1d45c4b7
+2026-10-22 16:50:12.263 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:50:12.295 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:50:13.443 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:50:13.445 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:50:13.650 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:50:16.254 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:50:16.780 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.692 seconds (process running for 7.336)
+2026-10-22 16:50:17.178 INFO  [main] c.r.service.RetailOperationsService - Product assigned to branch tenant=1 branch=13 product=477 onHand=10
+2026-10-22 16:50:17.178 INFO  [main] c.r.service.RetailOperationsService - Product created tenant=1 branch=13 product=477 sku=AUD9ba7de9f-15cc-42f8-955f-c4905321831a openingStock=10
+2026-10-22 16:50:17.188 INFO  [main] c.r.service.RetailOperationsService - Cash session opened tenant=1 branch=13 cashier=1 drawer=7 session=4 floatUsd=0 floatZwg=0
+2026-10-22 16:50:17.226 INFO  [main] c.r.service.RetailOperationsService - Sale completed tenant=1 branch=13 cashier=1 session=4 sale=4 receipt=BR13-20261022-1792680617200 currency=USD total=4.00 items=1 offlineReceipt=AUDcd3faa24-306b-436c-9c2a-e8992139a6cc syncedBy=1
+2026-10-22 16:50:17.234 INFO  [main] c.r.service.RetailOperationsService - Cash session closed tenant=1 branch=13 cashier=1 session=4 transactions=1 expectedUsd=4.00 actualUsd=4 varianceUsd=0.00 expectedZwg=0.00 actualZwg=0 varianceZwg=0.00
+2026-10-22 16:50:17.263 INFO  [main] com.retailzw.service.ReturnService - Return processed tenant=1 branch=13 cashier=1 return=RET-AUD4a3b9dbe-20261022-5293 originalReceipt=BR13-20261022-1792680617200 total=2.00 currency=USD items=1 requiresApproval=false
+2026-10-22 16:50:17.276 INFO  [main] c.r.service.PurchaseOrderService - Purchase order created tenant=1 branch=13 user=1 po=PO-AUD4a3b9dbe-20261022-8293 supplier=4 items=1 totalUsd=3.00 totalZwg=0.00
+2026-10-22 16:50:17.289 INFO  [main] c.r.service.PurchaseOrderService - Purchase order submitted tenant=1 branch=13 po=PO-AUD4a3b9dbe-20261022-8293 id=2
+2026-10-22 16:50:17.300 INFO  [main] c.r.service.PurchaseOrderService - Purchase order approved tenant=1 branch=13 po=PO-AUD4a3b9dbe-20261022-8293 id=2 manager=1
+2026-10-22 16:50:17.310 INFO  [main] c.r.service.PurchaseOrderService - Goods received tenant=1 branch=13 po=PO-AUD4a3b9dbe-20261022-8293 id=2 status=RECEIVED grn=GRN-13-20261022-2165 user=1
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.673 s -- in com.retailzw.web.DatabaseWorkflowIntegrationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  9.432 s
+[INFO] Finished at: 2026-10-22T16:50:17+02:00
+[INFO] ------------------------------------------------------------------------

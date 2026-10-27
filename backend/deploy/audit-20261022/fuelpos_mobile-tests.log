@@ -1,0 +1,6 @@
+00:00 +0: loading /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/fuelpos_mobile/test/models_test.dart
+00:00 +0: /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/fuelpos_mobile/test/models_test.dart: fuel cashier uses the shared RetailZW mobile login response
+00:00 +1: /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/fuelpos_mobile/test/models_test.dart: cashier assigned to a non-fuel branch is rejected
+00:00 +2: /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/fuelpos_mobile/test/models_test.dart: bootstrap maps tanks nozzles and per-grade prices
+00:00 +3: /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/fuelpos_mobile/test/login_screen_test.dart: login uses RetailZW branding and fuel cashier wording
+00:00 +4: All tests passed!

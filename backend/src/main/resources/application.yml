@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: jdbc:mysql://localhost:3306/retail_zw?useSSL=false&serverTimezone=Africa/Harare&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
-    username: root
-    password: cHigwagwa1t
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 50
@@ -51,7 +51,7 @@ spring:
     host: mail.retailzw.co.zw
     port: 587
     username: support@retailzw.co.zw
-    password: ${MAIL_PASSWORD:cHigwagwa1t}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -90,7 +90,7 @@ server:
       enabled: false
 
 jwt:
-  secret: RetailZW-SaaS-Super-Secret-Key-2024-Zimbabwe-Retail-Platform-Key-Must-Be-Long-Enough
+  secret: ${JWT_SECRET:local-development-only-key-change-before-deployment-0123456789}
   access-token-expiry: 604800000
   refresh-token-expiry: 604800000
 
@@ -117,17 +117,17 @@ app:
   mail:
     from-name: RetailZW
     support-from: support@retailzw.co.zw
-    support-password: ${MAIL_SUPPORT_PASSWORD:${MAIL_PASSWORD:cHigwagwa1t}}
+    support-password: ${MAIL_SUPPORT_PASSWORD:${MAIL_PASSWORD:}}
     billing-from: sales@retailzw.co.zw
-    billing-password: ${MAIL_BILLING_PASSWORD:${MAIL_PASSWORD:cHigwagwa1t}}
+    billing-password: ${MAIL_BILLING_PASSWORD:${MAIL_PASSWORD:}}
     notifications-from: info@retailzw.co.zw
-    notifications-password: ${MAIL_NOTIFICATIONS_PASSWORD:${MAIL_PASSWORD:cHigwagwa1t}}
+    notifications-password: ${MAIL_NOTIFICATIONS_PASSWORD:${MAIL_PASSWORD:}}
     reply-to: support@retailzw.co.zw
 
 smilepay:
   base-url: https://zbnet.zb.co.zw/wallet_gateway/payments-gateway
-  api-key: 66ab728f-563b-4a4e-9fc7-1743e549aa66
-  api-secret: c4b74356-55e8-45d2-b0ea-a132e3895784
+  api-key: ${SMILEPAY_API_KEY:}
+  api-secret: ${SMILEPAY_API_SECRET:}
 
 billing:
   reminder-days: 14,7,3,1,0,-1,-3

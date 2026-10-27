@@ -17,6 +17,7 @@ class ApiService {
   final OfflineService _offline = OfflineService();
   String? _token;
   bool lastLoginUsedOfflineCache = false;
+  static Future<SyncResult>? _syncInFlight;
 
   // Build a full URL by looking up the configured server at runtime.
   Future<Uri> _uri(String path, {Map<String, String>? queryParameters}) async {
@@ -505,14 +506,14 @@ class ApiService {
           )
           .timeout(_timeout);
       if (response.statusCode == 404) {
-        return keepLocalWhenServerHasNoSession ? _cachedSession() : null;
+        return keepLocalWhenServerHasNoSession ? await _cachedSession() : null;
       }
       final raw = jsonDecode(response.body);
       if (raw is Map<String, dynamic> &&
           raw.containsKey('data') &&
           raw['data'] == null) {
         if (keepLocalWhenServerHasNoSession) {
-          return _cachedSession();
+          return await _cachedSession();
         }
         await _offline.setStateValue('session', null);
         return null;
@@ -526,10 +527,10 @@ class ApiService {
       await _offline.setStateValue('session', jsonEncode(session.toJson()));
       return session;
     } on SocketException {
-      if (keepLocalWhenServerHasNoSession) return _cachedSession();
+      if (keepLocalWhenServerHasNoSession) return await _cachedSession();
       rethrow;
     } on TimeoutException {
-      if (keepLocalWhenServerHasNoSession) return _cachedSession();
+      if (keepLocalWhenServerHasNoSession) return await _cachedSession();
       rethrow;
     }
   }
@@ -571,7 +572,16 @@ class ApiService {
   }
 
   Future<CashSession> closeSession(
-      int sessionId, double actualUsd, double actualZwg) async {
+    int sessionId,
+    double actualUsd,
+    double actualZwg,
+  ) async {
+    if (await _offline.getPendingCount() > 0) {
+      throw ApiException(
+        'Sync all pending sales and change collections before closing the shift.',
+        statusCode: 409,
+      );
+    }
     await _ensureToken();
     final response = await http
         .post(
@@ -766,16 +776,34 @@ class ApiService {
   }
 
   Future<SyncResult> syncOfflineSales() async {
+    final running = _syncInFlight;
+    if (running != null) return running;
+    final operation = _syncOfflineSales();
+    _syncInFlight = operation;
+    try {
+      return await operation;
+    } finally {
+      _syncInFlight = null;
+    }
+  }
+
+  Future<SyncResult> _syncOfflineSales() async {
     await _ensureToken();
     final pending = await _offline.getPendingSales();
     final pendingGas = await _offline.getPendingGasSales();
+    final pendingActions = await _offline.getPendingActions();
+    final totalPending =
+        pending.length + pendingGas.length + pendingActions.length;
+    if (totalPending == 0) {
+      return const SyncResult(synced: 0, failed: 0, pending: 0);
+    }
     var synced = 0;
     var failed = 0;
     if (_token == null || _token!.isEmpty) {
       return SyncResult(
         synced: 0,
-        failed: pending.length + pendingGas.length,
-        pending: pending.length + pendingGas.length,
+        failed: totalPending,
+        pending: totalPending,
         message:
             'Sign in online once before syncing offline sales. The device has no server session token.',
       );
@@ -787,8 +815,8 @@ class ApiService {
       if (e.statusCode == 401 || e.statusCode == 403) {
         return SyncResult(
           synced: 0,
-          failed: pending.length + pendingGas.length,
-          pending: pending.length + pendingGas.length,
+          failed: totalPending,
+          pending: totalPending,
           message: _syncErrorMessage(e),
         );
       }
@@ -803,20 +831,15 @@ class ApiService {
         final queuedBranchId = (saleData['branchId'] as num?)?.toInt();
         final sessionId = queuedSessionId ?? session?.id;
         saleData = await _withCachedSaleContext(
-            _saleRequestWithOfflineIdentity(saleData, uuid));
-        final fallbackBranchId = session?.branchId ??
-            queuedBranchId ??
+          _saleRequestWithOfflineIdentity(saleData, uuid),
+        );
+        final branchId = queuedBranchId ??
+            session?.branchId ??
             (await getSavedUser())?.branchId;
         saleData = {
           ...saleData,
           if (sessionId != null && sessionId > 0) 'cashSessionId': sessionId,
-          if (session?.branchId != null) 'branchId': session!.branchId,
-          if (session?.branchId == null && queuedBranchId != null)
-            'branchId': queuedBranchId,
-          if (session?.branchId == null &&
-              queuedBranchId == null &&
-              fallbackBranchId != null)
-            'branchId': fallbackBranchId,
+          if (branchId != null) 'branchId': branchId,
         };
         saleData = await _withResolvedItemPrices(saleData);
         final response = await http
@@ -832,10 +855,13 @@ class ApiService {
       } catch (e) {
         failed++;
         lastError = _syncErrorMessage(e);
-        if (e is SocketException ||
-            e is TimeoutException ||
-            e is ApiException) {
-          break;
+        if (_shouldStopSync(e)) {
+          return SyncResult(
+            synced: synced,
+            failed: failed,
+            pending: await _offline.getPendingCount(),
+            message: lastError,
+          );
         }
       }
     }
@@ -851,19 +877,23 @@ class ApiService {
             .timeout(_timeout);
         final payload = _decode(response);
         await _offline.markGasSaleSynced(
-            entry['offline_uuid'] as String, payload);
+          entry['offline_uuid'] as String,
+          payload,
+        );
         synced++;
       } catch (e) {
         failed++;
         lastError = _syncErrorMessage(e);
-        if (e is SocketException ||
-            e is TimeoutException ||
-            e is ApiException) {
-          break;
+        if (_shouldStopSync(e)) {
+          return SyncResult(
+            synced: synced,
+            failed: failed,
+            pending: await _offline.getPendingCount(),
+            message: lastError,
+          );
         }
       }
     }
-    final pendingActions = await _offline.getPendingActions();
     for (final entry in pendingActions) {
       try {
         final payload = entry['payload'] as Map<String, dynamic>;
@@ -872,19 +902,24 @@ class ApiService {
           final path =
               id == null ? '/api/change/collect' : '/api/change/$id/collect';
           final response = await http
-              .post(await _uri(path),
-                  headers: _headers(), body: jsonEncode(payload))
+              .post(
+                await _uri(path),
+                headers: _headers(),
+                body: jsonEncode(payload),
+              )
               .timeout(_timeout);
           _decode(response);
-          await _offline.markActionSynced(entry['offline_uuid'] as String,
-              changeKey:
-                  payload['offlineReference']?.toString() ?? id?.toString());
+          await _offline.markActionSynced(
+            entry['offline_uuid'] as String,
+            changeKey:
+                payload['offlineReference']?.toString() ?? id?.toString(),
+          );
           synced++;
         }
       } catch (e) {
         failed++;
         lastError = _syncErrorMessage(e);
-        break;
+        if (_shouldStopSync(e)) break;
       }
     }
     final remaining = await _offline.getPendingCount();
@@ -1087,7 +1122,17 @@ class ApiService {
   }
 
   Map<String, dynamic> _decode(http.Response response) {
-    final payload = jsonDecode(response.body) as Map<String, dynamic>;
+    Map<String, dynamic> payload;
+    try {
+      final decoded = jsonDecode(response.body);
+      if (decoded is! Map<String, dynamic>) throw const FormatException();
+      payload = decoded;
+    } on FormatException {
+      throw ApiException(
+        'The server returned an invalid response. Please retry.',
+        statusCode: response.statusCode >= 400 ? response.statusCode : 502,
+      );
+    }
     if (response.statusCode >= 400 || payload['success'] == false) {
       throw ApiException(
         payload['message'] as String? ?? 'Request failed',
@@ -1275,6 +1320,18 @@ class ApiService {
         msg.contains('connection') ||
         msg.contains('server unavailable');
   }
+
+  bool _shouldStopSync(Object error) =>
+      error is SocketException ||
+      error is TimeoutException ||
+      error is HandshakeException ||
+      error is http.ClientException ||
+      (error is ApiException &&
+          (error.statusCode == 0 ||
+              error.statusCode == 401 ||
+              error.statusCode == 403 ||
+              error.statusCode == 429 ||
+              error.statusCode >= 500));
 
   String _syncErrorMessage(Object error) {
     if (error is ApiException) {

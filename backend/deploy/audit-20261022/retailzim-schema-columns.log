@@ -1,0 +1,237 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.retailzw:retail-saas-backend >------------------
+[INFO] Building RetailZW SaaS Platform 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ retail-saas-backend ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 142 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ retail-saas-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ retail-saas-backend ---
+[INFO] skip non existing resourceDirectory /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ retail-saas-backend ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 36 source files with javac [debug release 21] to target/test-classes
+[INFO] /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/src/test/java/com/retailzw/service/PurchaseOrderServiceTest.java: Some input files use unchecked or unsafe operations.
+[INFO] /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/src/test/java/com/retailzw/service/PurchaseOrderServiceTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ retail-saas-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.retailzw.web.DatabaseWorkflowIntegrationTest
+16:49:19.936 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.retailzw.web.DatabaseWorkflowIntegrationTest]: DatabaseWorkflowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+16:49:20.011 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.retailzw.RetailSaasApplication for test class com.retailzw.web.DatabaseWorkflowIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-10-22 16:49:20.253 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 42755 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:49:20.254 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:49:20.887 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:49:20.988 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 96 ms. Found 71 JPA repository interfaces.
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-10-22 16:49:21.899 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:49:21.932 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:49:21.948 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:49:22.004 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:49:22.018 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:49:22.122 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@7e84af34
+2026-10-22 16:49:22.123 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:49:22.153 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:49:23.236 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:49:23.241 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:49:23.447 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:49:26.027 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:49:26.523 INFO  [main] c.r.w.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.444 seconds (process running for 6.955)
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 6.945 s <<< FAILURE! -- in com.retailzw.web.DatabaseWorkflowIntegrationTest
+[ERROR] com.retailzw.web.DatabaseWorkflowIntegrationTest.migrationsProvideEveryMappedColumn -- Time elapsed: 0.204 s <<< FAILURE!
+java.lang.AssertionError: 
+[Mapped columns missing from Flyway schema] 
+Expecting empty but was: ["goods_received_notes.created_at",
+    "goods_received_notes.supplier_id",
+    "inventory_adjustments.adjustment_number",
+    "inventory_adjustments.quantity_after",
+    "inventory_adjustments.quantity_before",
+    "leave_requests.days_requested",
+    "leave_requests.leave_type",
+    "leave_requests.reviewer_notes",
+    "leave_requests.updated_at",
+    "loyalty_transactions.description",
+    "offline_sale_queue.cashier_id",
+    "offline_sale_queue.offline_created_at",
+    "offline_sale_queue.offline_receipt_number",
+    "offline_sale_queue.processed_sale_id",
+    "offline_sale_queue.sync_status",
+    "product_branch_pricing.cost_price_usd",
+    "product_branch_pricing.cost_price_zwg",
+    "product_branch_pricing.is_active",
+    "product_branch_pricing.updated_by",
+    "product_variants.created_at",
+    "product_variants.name",
+    "product_variants.sku",
+    "promotions.applies_to_category_id",
+    "promotions.applies_to_product_id",
+    "promotions.ends_at",
+    "promotions.is_combinable",
+    "promotions.max_discount_usd",
+    "promotions.min_purchase_usd",
+    "promotions.min_purchase_zwg",
+    "promotions.priority",
+    "promotions.starts_at",
+    "promotions.updated_at",
+    "returns.approved_by",
+    "returns.currency",
+    "returns.is_approved",
+    "returns.notes",
+    "returns.original_receipt_number",
+    "returns.requires_approval",
+    "returns.total_refund",
+    "returns.updated_at",
+    "sale_items.product_barcode",
+    "sale_items.product_sku",
+    "sale_items.promotion_name",
+    "sale_payments.amount_usd_equivalent",
+    "sale_payments.created_at",
+    "sale_payments.payment_method",
+    "sales.coupon_discount",
+    "sales.discount_amount",
+    "sales.gross_profit",
+    "sales.offline_receipt_number",
+    "sales.tax_amount",
+    "sales.total_cost",
+    "sales.updated_at",
+    "staff_profiles.annual_leave_days",
+    "staff_profiles.date_of_birth",
+    "staff_profiles.end_date",
+    "staff_profiles.gender",
+    "staff_profiles.job_title",
+    "staff_profiles.leave_days_used",
+    "staff_profiles.notes",
+    "staff_profiles.salary_usd",
+    "staff_profiles.salary_zwg",
+    "staff_profiles.updated_at",
+    "suppliers.bank_account",
+    "suppliers.bank_name",
+    "suppliers.contact_person",
+    "suppliers.country",
+    "suppliers.mobile",
+    "suppliers.payment_terms",
+    "suppliers.tax_number",
+    "suppliers.updated_at",
+    "system_settings.setting_group"]
+	at com.retailzw.web.DatabaseWorkflowIntegrationTest.migrationsProvideEveryMappedColumn(DatabaseWorkflowIntegrationTest.java:72)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   DatabaseWorkflowIntegrationTest.migrationsProvideEveryMappedColumn:72 [Mapped columns missing from Flyway schema] 
+Expecting empty but was: ["goods_received_notes.created_at",
+    "goods_received_notes.supplier_id",
+    "inventory_adjustments.adjustment_number",
+    "inventory_adjustments.quantity_after",
+    "inventory_adjustments.quantity_before",
+    "leave_requests.days_requested",
+    "leave_requests.leave_type",
+    "leave_requests.reviewer_notes",
+    "leave_requests.updated_at",
+    "loyalty_transactions.description",
+    "offline_sale_queue.cashier_id",
+    "offline_sale_queue.offline_created_at",
+    "offline_sale_queue.offline_receipt_number",
+    "offline_sale_queue.processed_sale_id",
+    "offline_sale_queue.sync_status",
+    "product_branch_pricing.cost_price_usd",
+    "product_branch_pricing.cost_price_zwg",
+    "product_branch_pricing.is_active",
+    "product_branch_pricing.updated_by",
+    "product_variants.created_at",
+    "product_variants.name",
+    "product_variants.sku",
+    "promotions.applies_to_category_id",
+    "promotions.applies_to_product_id",
+    "promotions.ends_at",
+    "promotions.is_combinable",
+    "promotions.max_discount_usd",
+    "promotions.min_purchase_usd",
+    "promotions.min_purchase_zwg",
+    "promotions.priority",
+    "promotions.starts_at",
+    "promotions.updated_at",
+    "returns.approved_by",
+    "returns.currency",
+    "returns.is_approved",
+    "returns.notes",
+    "returns.original_receipt_number",
+    "returns.requires_approval",
+    "returns.total_refund",
+    "returns.updated_at",
+    "sale_items.product_barcode",
+    "sale_items.product_sku",
+    "sale_items.promotion_name",
+    "sale_payments.amount_usd_equivalent",
+    "sale_payments.created_at",
+    "sale_payments.payment_method",
+    "sales.coupon_discount",
+    "sales.discount_amount",
+    "sales.gross_profit",
+    "sales.offline_receipt_number",
+    "sales.tax_amount",
+    "sales.total_cost",
+    "sales.updated_at",
+    "staff_profiles.annual_leave_days",
+    "staff_profiles.date_of_birth",
+    "staff_profiles.end_date",
+    "staff_profiles.gender",
+    "staff_profiles.job_title",
+    "staff_profiles.leave_days_used",
+    "staff_profiles.notes",
+    "staff_profiles.salary_usd",
+    "staff_profiles.salary_zwg",
+    "staff_profiles.updated_at",
+    "suppliers.bank_account",
+    "suppliers.bank_name",
+    "suppliers.contact_person",
+    "suppliers.country",
+    "suppliers.mobile",
+    "suppliers.payment_terms",
+    "suppliers.tax_number",
+    "suppliers.updated_at",
+    "system_settings.setting_group"]
+[INFO] 
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.840 s
+[INFO] Finished at: 2026-10-22T16:49:27+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.1.2:test (default-test) on project retail-saas-backend: There are test failures.
+[ERROR] 
+[ERROR] Please refer to /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

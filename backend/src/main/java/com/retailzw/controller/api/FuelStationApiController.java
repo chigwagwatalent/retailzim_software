@@ -55,6 +55,12 @@ public class FuelStationApiController {
                 java.util.Map.of("id", fuel.delivery(current.tenantId(), current.userId(), current.branchId(), request)));
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(org.springframework.http.HttpStatus.FORBIDDEN)
+    public ApiResponse<?> forbidden(AccessDeniedException ex) {
+        return ApiResponse.error(ex.getMessage());
+    }
+
     private void requireRole(String... allowed) {
         if (!Set.of(allowed).contains(current.roleName())) {
             throw new AccessDeniedException("This fuel operation is not available to your role.");

@@ -12,14 +12,15 @@ import '../../widgets/common_widgets.dart';
 /// The user scans for paired Bluetooth devices, taps one to connect,
 /// and the chosen address is persisted via [PrinterService].
 class PrinterSettingsScreen extends StatefulWidget {
-  const PrinterSettingsScreen({super.key});
+  const PrinterSettingsScreen({super.key, this.printer});
+  final PrinterService? printer;
 
   @override
   State<PrinterSettingsScreen> createState() => _PrinterSettingsScreenState();
 }
 
 class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
-  final _printer = PrinterService();
+  late final PrinterService _printer;
 
   List<BluetoothInfo> _devices = [];
   List<Printer> _systemPrinters = [];
@@ -31,6 +32,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
   @override
   void initState() {
     super.initState();
+    _printer = widget.printer ?? PrinterService();
     _init();
   }
 
@@ -40,9 +42,6 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
       await _loadSystemPrinters();
       return;
     }
-    await _ensureBluetoothPermissions();
-    final connected = await _printer.isConnected;
-    if (mounted) setState(() => _connected = connected);
     await _loadDevices();
   }
 
@@ -117,6 +116,18 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
       _error = null;
     });
     try {
+      await _printer.refreshBuiltInPrinter();
+      if (!mounted) return;
+      if (_printer.usesBuiltInPrinter) {
+        setState(() {
+          _devices = [];
+          _loadingDevices = false;
+          _connected =
+              _printer.builtInInfo.available && _printer.builtInInfo.ready;
+          _error = _connected ? null : _printer.builtInInfo.message;
+        });
+        return;
+      }
       final permissionsGranted = await _ensureBluetoothPermissions();
       if (!permissionsGranted) {
         if (mounted) {
@@ -138,10 +149,12 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
         }
         return;
       }
+      final connected = await _printer.isConnected;
       final devices = await _printer.getPairedDevices();
       if (mounted) {
         setState(() {
           _devices = devices;
+          _connected = connected;
           _loadingDevices = false;
         });
       }
@@ -201,6 +214,18 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
     }
   }
 
+  Future<void> _selectBuiltInPrinter() async {
+    await _printer.selectBuiltInPrinter();
+    if (!mounted) return;
+    await _loadDevices();
+  }
+
+  Future<void> _useBluetoothPrinter() async {
+    await _printer.selectBluetoothPrinter();
+    if (!mounted) return;
+    await _loadDevices();
+  }
+
   Future<void> _disconnect() async {
     if (_printer.usesSystemPrinter) {
       await _printer.forgetSystemPrinter();
@@ -229,10 +254,14 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
     );
     if (!mounted) return;
     if (result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        backgroundColor: Color(0xFF2E7D32),
-        content: Text('Test receipt printed!',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: const Color(0xFF2E7D32),
+        content: Text(
+            _printer.usesBuiltInPrinter
+                ? 'Test receipt sent. Check the printer.'
+                : 'Test receipt printed!',
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w600)),
       ));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -261,7 +290,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
         backgroundColor: AppColors.primaryBlue,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text('Bluetooth Printer',
+        title: const Text('Receipt Printer',
             style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
@@ -284,6 +313,33 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
             // ── Status card ────────────────────────────────────────────────
             _statusCard(),
             const SizedBox(height: 20),
+            if (_printer.builtInInfo.available ||
+                _printer.usesBuiltInPrinter) ...[
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.receipt_long,
+                      color: AppColors.primaryBlue),
+                  title: const Text('SUNMI built-in printer',
+                      style: TextStyle(fontWeight: FontWeight.w800)),
+                  subtitle: Text(
+                      '${_printer.builtInInfo.model} · ${_printer.builtInInfo.message}\nNo Bluetooth pairing required.'),
+                  isThreeLine: true,
+                  trailing: _printer.usesBuiltInPrinter
+                      ? const Icon(Icons.check_circle,
+                          color: AppColors.successGreen)
+                      : TextButton(
+                          onPressed: _selectBuiltInPrinter,
+                          child: const Text('Use printer')),
+                ),
+              ),
+              if (_printer.usesBuiltInPrinter)
+                TextButton.icon(
+                  onPressed: _useBluetoothPrinter,
+                  icon: const Icon(Icons.bluetooth),
+                  label: const Text('Use an external Bluetooth printer'),
+                ),
+              const SizedBox(height: 16),
+            ],
 
             // ── Error banner ───────────────────────────────────────────────
             if (_error != null) ...[
@@ -309,34 +365,36 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
               const SizedBox(height: 16),
             ],
 
-            // ── Paired devices ─────────────────────────────────────────────
-            const Text('Paired Bluetooth Devices',
-                style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 15,
-                    color: AppColors.textDark)),
-            const SizedBox(height: 4),
-            const Text(
-              'Go to your phone\'s Bluetooth settings to pair a new printer first.',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-            ),
-            const SizedBox(height: 12),
+            if (!_printer.usesBuiltInPrinter) ...[
+              // ── Paired devices ─────────────────────────────────────────────
+              const Text('Paired Bluetooth Devices',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: AppColors.textDark)),
+              const SizedBox(height: 4),
+              const Text(
+                'Go to your phone\'s Bluetooth settings to pair a new printer first.',
+                style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+              ),
+              const SizedBox(height: 12),
 
-            if (_loadingDevices)
-              const Center(
-                  child: Padding(
-                padding: EdgeInsets.all(32),
-                child: CircularProgressIndicator(),
-              ))
-            else if (_devices.isEmpty)
-              _emptyState()
-            else
-              ...(_devices.map((d) => _deviceTile(d))),
+              if (_loadingDevices)
+                const Center(
+                    child: Padding(
+                  padding: EdgeInsets.all(32),
+                  child: CircularProgressIndicator(),
+                ))
+              else if (_devices.isEmpty)
+                _emptyState()
+              else
+                ...(_devices.map((d) => _deviceTile(d))),
 
-            const SizedBox(height: 28),
+              const SizedBox(height: 28),
 
-            // ── Tips ───────────────────────────────────────────────────────
-            _tipsCard(),
+              // ── Tips ───────────────────────────────────────────────────────
+              _tipsCard(),
+            ],
           ],
         ),
       ),
@@ -525,9 +583,11 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
   // ─── Widgets ──────────────────────────────────────────────────────────────
 
   Widget _statusCard() {
-    final saved = _printer.usesSystemPrinter
-        ? _printer.savedSystemPrinterName
-        : _printer.savedAddress;
+    final saved = _printer.usesBuiltInPrinter
+        ? 'SUNMI built-in · 58 mm'
+        : _printer.usesSystemPrinter
+            ? _printer.savedSystemPrinterName
+            : _printer.savedAddress;
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -552,7 +612,9 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
               child: Icon(
                 _connected
                     ? Icons.print_rounded
-                    : Icons.bluetooth_disabled_rounded,
+                    : _printer.usesBuiltInPrinter
+                        ? Icons.print_disabled_rounded
+                        : Icons.bluetooth_disabled_rounded,
                 color: Colors.white,
                 size: 22,
               ),
@@ -563,7 +625,11 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _connected ? 'Printer Ready' : 'No Printer Selected',
+                    _connected
+                        ? 'Printer Ready'
+                        : _printer.usesBuiltInPrinter
+                            ? 'Built-in printer not ready'
+                            : 'No Printer Selected',
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 15,
@@ -597,8 +663,9 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                     onPressed: _forget,
                     style: TextButton.styleFrom(
                         foregroundColor: AppColors.errorRed),
-                    child: const Text('Forget',
-                        style: TextStyle(fontWeight: FontWeight.w700)),
+                    child: Text(
+                        _printer.usesBuiltInPrinter ? 'Bluetooth' : 'Forget',
+                        style: const TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),

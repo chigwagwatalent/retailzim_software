@@ -1,7 +1,7 @@
 name: retailzw_mobile
 description: RetailZW Flutter POS app for Zimbabwean retail shops.
 publish_to: "none"
-version: 1.2.5+5
+version: 1.2.7+7
 
 environment:
   sdk: ">=3.3.0 <4.0.0"

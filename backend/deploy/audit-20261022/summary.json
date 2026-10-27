@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-22",
+  "decision": "HOLD",
+  "backend_default_suite": {
+    "tests": 153,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 7
+  },
+  "authenticated_clone_tests": {
+    "passed": 2
+  },
+  "clone_workflow_and_column_tests": {
+    "passed": 4
+  },
+  "fresh_transaction_tests": {
+    "passed": 2,
+    "errors": 1
+  },
+  "fresh_missing_mapped_columns": 72,
+  "fresh_schema_validation": "FAILED",
+  "flutter": {
+    "mobile": {
+      "tests": {
+        "exit": 0,
+        "log": "/tmp/retailzim-mobile-tests.log"
+      },
+      "analysis": {
+        "exit": 0,
+        "log": "/tmp/retailzim-mobile-analysis.log"
+      }
+    },
+    "gaspos_mobile": {
+      "dependencies": {
+        "exit": 0,
+        "log": "/tmp/retailzim-gaspos_mobile-dependencies.log"
+      },
+      "tests": {
+        "exit": 0,
+        "log": "/tmp/retailzim-gaspos_mobile-tests.log"
+      },
+      "analysis": {
+        "exit": 0,
+        "log": "/tmp/retailzim-gaspos_mobile-analysis.log"
+      }
+    },
+    "fuelpos_mobile": {
+      "dependencies": {
+        "exit": 0,
+        "log": "/tmp/retailzim-fuelpos_mobile-dependencies.log"
+      },
+      "tests": {
+        "exit": 0,
+        "log": "/tmp/retailzim-fuelpos_mobile-tests.log"
+      },
+      "analysis": {
+        "exit": 0,
+        "log": "/tmp/retailzim-fuelpos_mobile-analysis.log"
+      }
+    }
+  }
+}

@@ -365,7 +365,7 @@ class _SellPageState extends State<SellPage> {
       CardPanel(
           child: Column(children: [
         DropdownButtonFormField<FuelNozzle>(
-            value: nozzle,
+            initialValue: nozzle,
             decoration: const InputDecoration(labelText: 'Pump / nozzle'),
             items: data.nozzles
                 .where((n) => n.available)
@@ -387,7 +387,7 @@ class _SellPageState extends State<SellPage> {
           const SizedBox(width: 12),
           Expanded(
               child: DropdownButtonFormField(
-                  value: currency,
+                  initialValue: currency,
                   decoration: const InputDecoration(labelText: 'Currency'),
                   items: const [
                     DropdownMenuItem(value: 'USD', child: Text('USD')),
@@ -397,7 +397,7 @@ class _SellPageState extends State<SellPage> {
         ]),
         const SizedBox(height: 12),
         DropdownButtonFormField(
-            value: method,
+            initialValue: method,
             decoration: const InputDecoration(labelText: 'Payment method'),
             items: data.paymentMethods
                 .map((m) => DropdownMenuItem(

@@ -1,14 +1,18 @@
 import java.util.Properties
 import java.io.FileInputStream
 
-val keyProps = Properties()
-val keyPropsFile = rootProject.file("key.properties")
-if (keyPropsFile.exists()) keyProps.load(FileInputStream(keyPropsFile))
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+val buildUnsigned = System.getenv("RETAILZW_UNSIGNED_RELEASE") == "true"
+val freshInstall = System.getenv("RETAILZW_FRESH_INSTALL") == "true"
+val keyProps = Properties()
+val keyPropsFile = rootProject.file("key.properties")
+if (!buildUnsigned && keyPropsFile.exists()) {
+    FileInputStream(keyPropsFile).use { keyProps.load(it) }
 }
 
 android {
@@ -26,7 +30,7 @@ android {
     }
 
     signingConfigs {
-        create("release") {
+        if (!buildUnsigned) create("release") {
             keyAlias      = keyProps["keyAlias"]     as String
             keyPassword   = keyProps["keyPassword"]  as String
             storeFile     = file(keyProps["storeFile"] as String)
@@ -36,6 +40,8 @@ android {
 
     defaultConfig {
         applicationId = "zw.co.retailzw.pos"
+        if (freshInstall) applicationIdSuffix = ".sunmi"
+        manifestPlaceholders["appLabel"] = if (freshInstall) "RetailZW Shop" else "RetailZW POS"
         minSdk        = flutter.minSdkVersion
         targetSdk     = flutter.targetSdkVersion
         versionCode   = flutter.versionCode
@@ -44,7 +50,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig     = signingConfigs.getByName("release")
+            if (!buildUnsigned) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled   = false
             isShrinkResources = false
         }
@@ -53,4 +61,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("com.sunmi:printerlibrary:1.0.18")
 }

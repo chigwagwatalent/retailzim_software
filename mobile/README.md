@@ -2,6 +2,20 @@
 
 RetailZW POS supports Android and Windows from the same Flutter codebase. The Windows version uses SQLite for offline operation and the native Windows print dialog for receipts.
 
+## Build the Android release
+
+Use Flutter 3.47.6, Java 17 or newer, and Android SDK platform 36 with NDK 27.0.12077973.
+
+For an unsigned release APK on macOS or Linux:
+
+```sh
+flutter pub get
+flutter test
+RETAILZW_UNSIGNED_RELEASE=true flutter build apk --release --dart-define=RETAILZW_API_BASE_URL=https://admin.retailzw.co.zw
+```
+
+The unsigned release uses package ID `zw.co.retailzw.pos` and version 1.2.6 (build 6). Android requires APK signing before installation. To update an existing installation and preserve its data, use the original release signing key. For a signed build, configure `android/key.properties` with the original keystore and omit `RETAILZW_UNSIGNED_RELEASE`.
+
 ## Build the Windows application
 
 From PowerShell:

@@ -35,6 +35,31 @@ void main() {
       }
     });
 
+    test('gas queue retries preserve stock and synced status', () async {
+      await offline.cacheGasBootstrap(
+        branchId: 7,
+        tanks: [
+          {'id': 1, 'name': 'Tank', 'currentKg': 10},
+        ],
+        prices: [],
+        sales: [],
+      );
+      final request = <String, dynamic>{
+        'branchId': 7,
+        'tankId': 1,
+        'quantityKg': 2,
+        'estimatedTotal': 4,
+      };
+      await offline.queueGasSale(request, 'gas-1');
+      await offline.queueGasSale(request, 'gas-1');
+      final bootstrap = await offline.getCachedGasBootstrap(7);
+      expect((bootstrap['tanks'] as List).single['currentKg'], 8);
+      expect(await offline.getPendingCount(), 1);
+      await offline.markGasSaleSynced('gas-1', {'receiptNumber': 'GAS-1'});
+      await offline.queueGasSale(request, 'gas-1');
+      expect(await offline.getPendingCount(), 0);
+    });
+
     test('caches products, queues sale, updates stock, and marks synced',
         () async {
       await offline.cacheProducts([
@@ -106,6 +131,8 @@ void main() {
         ],
       };
 
+      await offline.queueSale(saleData, 'offline-001');
+      // Retrying a local enqueue must not deduct stock twice.
       await offline.queueSale(saleData, 'offline-001');
       await offline.saveShiftSale(
         offlineUuid: 'offline-001',

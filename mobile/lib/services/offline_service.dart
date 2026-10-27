@@ -601,22 +601,32 @@ class OfflineService {
   }
 
   Future<void> queueSale(
-      Map<String, dynamic> saleData, String offlineUuid) async {
+    Map<String, dynamic> saleData,
+    String offlineUuid,
+  ) async {
     final db = await database;
-    await db.transaction((txn) async {
-      await txn.insert(
+    final inserted = await db.transaction((txn) async {
+      final existing = await txn.query(
         'offline_sales',
-        {
-          'offline_uuid': offlineUuid,
-          'sale_data': jsonEncode(saleData),
-          'status': 'PENDING',
-          'created_at': DateTime.now().toIso8601String(),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
+        columns: ['offline_uuid'],
+        where: 'offline_uuid = ?',
+        whereArgs: [offlineUuid],
+        limit: 1,
       );
+      if (existing.isNotEmpty) return false;
+      await txn.insert(
+          'offline_sales',
+          {
+            'offline_uuid': offlineUuid,
+            'sale_data': jsonEncode(saleData),
+            'status': 'PENDING',
+            'created_at': DateTime.now().toIso8601String(),
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace);
       await _applyCachedStockChanges(txn, saleData);
+      return true;
     });
-    await addLocalHeldChange(saleData);
+    if (inserted) await addLocalHeldChange(saleData);
   }
 
   Future<void> saveShiftSale({
@@ -680,35 +690,44 @@ class OfflineService {
   }
 
   Future<void> queueGasSale(
-      Map<String, dynamic> saleData, String offlineUuid) async {
+    Map<String, dynamic> saleData,
+    String offlineUuid,
+  ) async {
     final db = await database;
     await db.transaction((txn) async {
-      await txn.insert(
+      final existing = await txn.query(
         'offline_gas_sales',
-        {
-          'offline_uuid': offlineUuid,
-          'sale_data': jsonEncode(saleData),
-          'status': 'PENDING',
-          'created_at': DateTime.now().toIso8601String(),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
+        columns: ['offline_uuid'],
+        where: 'offline_uuid = ?',
+        whereArgs: [offlineUuid],
+        limit: 1,
       );
+      if (existing.isNotEmpty) return;
+      await txn.insert(
+          'offline_gas_sales',
+          {
+            'offline_uuid': offlineUuid,
+            'sale_data': jsonEncode(saleData),
+            'status': 'PENDING',
+            'created_at': DateTime.now().toIso8601String(),
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace);
       await _applyCachedGasSale(txn, saleData);
       await txn.insert(
-        'gas_shift_sales',
-        {
-          'offline_uuid': offlineUuid,
-          'receipt_number':
-              saleData['offlineReceiptNumber']?.toString() ?? offlineUuid,
-          'payload': jsonEncode(_offlineGasSalePayload(saleData, offlineUuid)),
-          'currency': saleData['currency']?.toString() ?? 'USD',
-          'total': _toDouble(saleData['estimatedTotal']),
-          'status': 'PENDING',
-          'synced': 0,
-          'created_at': DateTime.now().toIso8601String(),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+          'gas_shift_sales',
+          {
+            'offline_uuid': offlineUuid,
+            'receipt_number':
+                saleData['offlineReceiptNumber']?.toString() ?? offlineUuid,
+            'payload':
+                jsonEncode(_offlineGasSalePayload(saleData, offlineUuid)),
+            'currency': saleData['currency']?.toString() ?? 'USD',
+            'total': _toDouble(saleData['estimatedTotal']),
+            'status': 'PENDING',
+            'synced': 0,
+            'created_at': DateTime.now().toIso8601String(),
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace);
     });
   }
 

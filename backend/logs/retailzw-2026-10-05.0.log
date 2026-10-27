@@ -1,0 +1,896 @@
+2026-10-05 14:17:32.385 INFO  [main] com.retailzw.RetailSaasApplication - Starting RetailSaasApplication using Java 21.0.12.1 with PID 11168 (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-05 14:17:32.392 INFO  [main] com.retailzw.RetailSaasApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-05 14:17:33.132 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-05 14:17:33.255 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 117 ms. Found 71 JPA repository interfaces.
+2026-10-05 14:17:33.853 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-05 14:17:33.865 INFO  [main] org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-05 14:17:33.865 INFO  [main] org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-10-05 14:17:33.905 INFO  [main] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-10-05 14:17:33.906 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1488 ms
+2026-10-05 14:17:34.130 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-05 14:17:34.353 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@538e74fc
+2026-10-05 14:17:34.354 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-05 14:17:34.417 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.22.3 by Redgate
+2026-10-05 14:17:34.418 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2026-10-05 14:17:34.418 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - 
+2026-10-05 14:17:34.469 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/retail_zw (MySQL 8.0)
+2026-10-05 14:17:34.524 INFO  [main] o.f.c.i.schemahistory.JdbcTableSchemaHistory - Schema history table `retail_zw`.`flyway_schema_history` does not exist yet
+2026-10-05 14:17:34.528 INFO  [main] org.flywaydb.core.internal.command.DbValidate - Successfully validated 55 migrations (execution time 00:00.040s)
+2026-10-05 14:17:34.546 INFO  [main] o.f.c.i.schemahistory.JdbcTableSchemaHistory - Creating Schema History table `retail_zw`.`flyway_schema_history` ...
+2026-10-05 14:17:34.589 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Current version of schema `retail_zw`: << Empty Schema >>
+2026-10-05 14:17:34.612 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "1 - init schema"
+2026-10-05 14:17:35.062 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "2 - mobile login indexes"
+2026-10-05 14:17:35.104 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "3 - cashier branch integrity"
+2026-10-05 14:17:35.180 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "4 - test data"
+2026-10-05 14:17:35.217 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "5 - repair test user password hashes"
+2026-10-05 14:17:35.226 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "6 - relax legacy sale item sku"
+2026-10-05 14:17:35.243 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "7 - align tenant subscriptions schema"
+2026-10-05 14:17:35.299 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "8 - align purchase order schema"
+2026-10-05 14:17:35.471 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "9 - relax purchase order created by"
+2026-10-05 14:17:35.492 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "10 - update saas plan prices"
+2026-10-05 14:17:35.500 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "11 - ensure platform admin"
+2026-10-05 14:17:35.502 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: 'VALUES function' is deprecated and will be removed in a future release. Please use an alias (INSERT INTO ... VALUES (...) AS alias) and replace VALUES(col) in the ON DUPLICATE KEY UPDATE clause with alias.col instead (SQL State: HY000 - Error Code: 1287)
+2026-10-05 14:17:35.502 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: 'VALUES function' is deprecated and will be removed in a future release. Please use an alias (INSERT INTO ... VALUES (...) AS alias) and replace VALUES(col) in the ON DUPLICATE KEY UPDATE clause with alias.col instead (SQL State: HY000 - Error Code: 1287)
+2026-10-05 14:17:35.502 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: 'VALUES function' is deprecated and will be removed in a future release. Please use an alias (INSERT INTO ... VALUES (...) AS alias) and replace VALUES(col) in the ON DUPLICATE KEY UPDATE clause with alias.col instead (SQL State: HY000 - Error Code: 1287)
+2026-10-05 14:17:35.502 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: 'VALUES function' is deprecated and will be removed in a future release. Please use an alias (INSERT INTO ... VALUES (...) AS alias) and replace VALUES(col) in the ON DUPLICATE KEY UPDATE clause with alias.col instead (SQL State: HY000 - Error Code: 1287)
+2026-10-05 14:17:35.502 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: 'VALUES function' is deprecated and will be removed in a future release. Please use an alias (INSERT INTO ... VALUES (...) AS alias) and replace VALUES(col) in the ON DUPLICATE KEY UPDATE clause with alias.col instead (SQL State: HY000 - Error Code: 1287)
+2026-10-05 14:17:35.509 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "12 - password reset tokens"
+2026-10-05 14:17:35.521 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "13 - tenant announcements and chat"
+2026-10-05 14:17:35.536 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "14 - tenant chat read tracking"
+2026-10-05 14:17:35.550 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "15 - align attendance records schema"
+2026-10-05 14:17:35.577 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "16 - align attendance status enum"
+2026-10-05 14:17:35.602 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "17 - align cash drawers schema"
+2026-10-05 14:17:35.614 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "18 - align cash movements schema"
+2026-10-05 14:17:35.637 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "19 - align cash sessions schema"
+2026-10-05 14:17:35.674 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "20 - align coupon codes schema"
+2026-10-05 14:17:35.690 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "21 - align customers schema"
+2026-10-05 14:17:35.717 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "22 - smile pay checkouts"
+2026-10-05 14:17:35.733 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "23 - relax tenant subscription legacy amount"
+2026-10-05 14:17:35.762 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "24 - express checkout and billing reminders"
+2026-10-05 14:17:35.791 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "25 - checkout reconciliation and invoice tracking"
+2026-10-05 14:17:35.812 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "26 - expand smile pay checkout status"
+2026-10-05 14:17:35.834 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "27 - relax legacy subscription period columns"
+2026-10-05 14:17:35.858 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "28 - borrower credit change and inventory intelligence"
+2026-10-05 14:17:35.977 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "29 - align inventory intelligence schema"
+2026-10-05 14:17:36.210 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "30 - align inventory adjustment reason"
+2026-10-05 14:17:36.247 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "31 - business modules and gas core"
+2026-10-05 14:17:36.248 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: PROCEDURE retail_zw.add_column_if_missing does not exist (SQL State: 42000 - Error Code: 1305)
+2026-10-05 14:17:36.397 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "32 - gas accounting and lpg operations"
+2026-10-05 14:17:36.398 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: PROCEDURE retail_zw.retailzw_add_column_if_missing does not exist (SQL State: 42000 - Error Code: 1305)
+2026-10-05 14:17:36.459 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "33 - cash session collection"
+2026-10-05 14:17:36.516 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "34 - align return items schema"
+2026-10-05 14:17:36.517 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: PROCEDURE retail_zw.retailzw_add_column_if_missing does not exist (SQL State: 42000 - Error Code: 1305)
+2026-10-05 14:17:36.568 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "35 - relax legacy return item quantity"
+2026-10-05 14:17:36.569 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: PROCEDURE retail_zw.retailzw_modify_column_if_exists does not exist (SQL State: 42000 - Error Code: 1305)
+2026-10-05 14:17:36.578 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "36 - preserve single business module selection"
+2026-10-05 14:17:36.589 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "37 - reconcile single module plan assignments"
+2026-10-05 14:17:36.601 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "38 - gas stock reconciliation audit"
+2026-10-05 14:17:36.613 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "39 - separate signup and renewal checkouts"
+2026-10-05 14:17:36.694 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "40 - add system accounting expenses"
+2026-10-05 14:17:36.708 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "41 - index system accounting and admin directory"
+2026-10-05 14:17:36.774 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "42 - production gas pos and tank reconciliation"
+2026-10-05 14:17:36.845 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "43 - enforce gas tank weight invariants"
+2026-10-05 14:17:36.863 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "44 - tenant exchange rates and product pricing"
+2026-10-05 14:17:36.913 ERROR [main] org.flywaydb.core.internal.command.DbMigrate - Migration of schema `retail_zw` to version "44 - tenant exchange rates and product pricing" failed! Please restore backups and roll back database and code!
+2026-10-05 14:17:36.919 ERROR [main] o.s.boot.web.embedded.tomcat.TomcatStarter - Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'jwtAuthFilter' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/jwt/JwtAuthFilter.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'userDetailsServiceImpl' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/UserDetailsServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'userRepository' defined in com.retailzw.repository.UserRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+2026-10-05 14:17:36.934 INFO  [main] org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-10-05 14:17:36.936 WARN  [main] org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [RetailZW-HikariPool housekeeper] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:269)
+ java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1797)
+ java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1182)
+ java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+ java.base/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1070)
+ java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+ java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+ java.base/java.lang.Thread.run(Thread.java:1583)
+2026-10-05 14:17:36.936 WARN  [main] org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [RetailZW-HikariPool connection adder] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:269)
+ java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1797)
+ java.base/java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:460)
+ java.base/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1069)
+ java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+ java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+ java.base/java.lang.Thread.run(Thread.java:1583)
+2026-10-05 14:17:36.938 WARN  [main] o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
+2026-10-05 14:17:36.938 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-05 14:17:36.940 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-05 14:17:36.951 INFO  [main] o.s.b.a.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-10-05 14:17:36.963 ERROR [main] org.springframework.boot.SpringApplication - Application run failed
+org.springframework.context.ApplicationContextException: Unable to start web server
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:165)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:618)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
+	at com.retailzw.RetailSaasApplication.main(RetailSaasApplication.java:15)
+Caused by: org.springframework.boot.web.server.WebServerException: Unable to start embedded Tomcat
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:145)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:105)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:499)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:218)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:188)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:162)
+	... 8 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'jwtAuthFilter' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/jwt/JwtAuthFilter.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'userDetailsServiceImpl' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/UserDetailsServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'userRepository' defined in com.retailzw.repository.UserRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:795)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:237)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1355)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1192)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:210)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:173)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:168)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:153)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:86)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.getServletContextInitializerBeans(ServletWebServerApplicationContext.java:266)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.selfInitialize(ServletWebServerApplicationContext.java:240)
+	at org.springframework.boot.web.embedded.tomcat.TomcatStarter.onStartup(TomcatStarter.java:52)
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4880)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1332)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1322)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:866)
+	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:845)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1332)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1322)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:866)
+	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:240)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:433)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:921)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:437)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:126)
+	... 13 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'userDetailsServiceImpl' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/UserDetailsServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'userRepository' defined in com.retailzw.repository.UserRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:795)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:237)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1355)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1192)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1443)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1353)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:904)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:782)
+	... 54 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'userRepository' defined in com.retailzw.repository.UserRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1685)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1434)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:599)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1443)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1353)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:904)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:782)
+	... 68 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jpaSharedEM_entityManagerFactory': Cannot resolve reference to bean 'entityManagerFactory' while setting constructor argument
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:682)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:509)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1335)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1165)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
+	... 82 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Migration V44__tenant_exchange_rates_and_product_pricing.sql failed
+-------------------------------------------------------------------
+SQL State  : 42S22
+Error Code : 1054
+Message    : Unknown column 'exchange_rate' in 'sale_payments'
+Location   : db/migration/V44__tenant_exchange_rates_and_product_pricing.sql (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/db/migration/V44__tenant_exchange_rates_and_product_pricing.sql)
+Line       : 34
+Statement  : ALTER TABLE sale_payments
+    MODIFY exchange_rate DECIMAL(19,6) NOT NULL DEFAULT 1.000000,
+    ADD COLUMN exchange_rate_config_id BIGINT NULL,
+    ADD INDEX idx_sale_payments_exchange_rate (exchange_rate_config_id),
+    ADD CONSTRAINT fk_sale_payments_exchange_rate
+        FOREIGN KEY (exchange_rate_config_id) REFERENCES tenant_exchange_rates(id) ON DELETE SET NULL
+
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1786)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:313)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
+	... 94 common frames omitted
+Caused by: org.flywaydb.core.internal.command.DbMigrate$FlywayMigrateException: Migration V44__tenant_exchange_rates_and_product_pricing.sql failed
+-------------------------------------------------------------------
+SQL State  : 42S22
+Error Code : 1054
+Message    : Unknown column 'exchange_rate' in 'sale_payments'
+Location   : db/migration/V44__tenant_exchange_rates_and_product_pricing.sql (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/db/migration/V44__tenant_exchange_rates_and_product_pricing.sql)
+Line       : 34
+Statement  : ALTER TABLE sale_payments
+    MODIFY exchange_rate DECIMAL(19,6) NOT NULL DEFAULT 1.000000,
+    ADD COLUMN exchange_rate_config_id BIGINT NULL,
+    ADD INDEX idx_sale_payments_exchange_rate (exchange_rate_config_id),
+    ADD CONSTRAINT fk_sale_payments_exchange_rate
+        FOREIGN KEY (exchange_rate_config_id) REFERENCES tenant_exchange_rates(id) ON DELETE SET NULL
+
+	at org.flywaydb.core.internal.command.DbMigrate.doMigrateGroup(DbMigrate.java:382)
+	at org.flywaydb.core.internal.command.DbMigrate.lambda$applyMigrations$1(DbMigrate.java:272)
+	at org.flywaydb.core.internal.jdbc.TransactionalExecutionTemplate.execute(TransactionalExecutionTemplate.java:55)
+	at org.flywaydb.core.internal.command.DbMigrate.applyMigrations(DbMigrate.java:271)
+	at org.flywaydb.core.internal.command.DbMigrate.migrateGroup(DbMigrate.java:244)
+	at org.flywaydb.core.internal.command.DbMigrate.lambda$migrateAll$0(DbMigrate.java:139)
+	at org.flywaydb.database.mysql.MySQLNamedLockTemplate.execute(MySQLNamedLockTemplate.java:58)
+	at org.flywaydb.database.mysql.MySQLConnection.lock(MySQLConnection.java:152)
+	at org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory.lock(JdbcTableSchemaHistory.java:144)
+	at org.flywaydb.core.internal.command.DbMigrate.migrateAll(DbMigrate.java:139)
+	at org.flywaydb.core.internal.command.DbMigrate.migrate(DbMigrate.java:97)
+	at org.flywaydb.core.Flyway.lambda$migrate$0(Flyway.java:188)
+	at org.flywaydb.core.FlywayExecutor.execute(FlywayExecutor.java:213)
+	at org.flywaydb.core.Flyway.migrate(Flyway.java:140)
+	at org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer.afterPropertiesSet(FlywayMigrationInitializer.java:66)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1833)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1782)
+	... 103 common frames omitted
+Caused by: org.flywaydb.core.internal.sqlscript.FlywaySqlScriptException: Migration V44__tenant_exchange_rates_and_product_pricing.sql failed
+-------------------------------------------------------------------
+SQL State  : 42S22
+Error Code : 1054
+Message    : Unknown column 'exchange_rate' in 'sale_payments'
+Location   : db/migration/V44__tenant_exchange_rates_and_product_pricing.sql (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/db/migration/V44__tenant_exchange_rates_and_product_pricing.sql)
+Line       : 34
+Statement  : ALTER TABLE sale_payments
+    MODIFY exchange_rate DECIMAL(19,6) NOT NULL DEFAULT 1.000000,
+    ADD COLUMN exchange_rate_config_id BIGINT NULL,
+    ADD INDEX idx_sale_payments_exchange_rate (exchange_rate_config_id),
+    ADD CONSTRAINT fk_sale_payments_exchange_rate
+        FOREIGN KEY (exchange_rate_config_id) REFERENCES tenant_exchange_rates(id) ON DELETE SET NULL
+
+	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.handleException(DefaultSqlScriptExecutor.java:267)
+	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.executeStatement(DefaultSqlScriptExecutor.java:222)
+	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.execute(DefaultSqlScriptExecutor.java:126)
+	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.executeOnce(SqlMigrationExecutor.java:68)
+	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.lambda$execute$0(SqlMigrationExecutor.java:57)
+	at org.flywaydb.core.internal.database.DefaultExecutionStrategy.execute(DefaultExecutionStrategy.java:27)
+	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.execute(SqlMigrationExecutor.java:56)
+	at org.flywaydb.core.internal.command.DbMigrate.doMigrateGroup(DbMigrate.java:374)
+	... 119 common frames omitted
+Caused by: java.sql.SQLSyntaxErrorException: Unknown column 'exchange_rate' in 'sale_payments'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:770)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:653)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.flywaydb.core.internal.jdbc.JdbcTemplate.executeStatement(JdbcTemplate.java:201)
+	at org.flywaydb.core.internal.sqlscript.ParsedSqlStatement.execute(ParsedSqlStatement.java:95)
+	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.executeStatement(DefaultSqlScriptExecutor.java:210)
+	... 125 common frames omitted
+2026-10-05 14:18:04.937 INFO  [main] com.retailzw.RetailSaasApplication - Starting RetailSaasApplication using Java 21.0.12.1 with PID 11354 (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-05 14:18:04.938 INFO  [main] com.retailzw.RetailSaasApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-05 14:18:05.641 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-05 14:18:05.767 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 121 ms. Found 71 JPA repository interfaces.
+2026-10-05 14:18:06.345 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-05 14:18:06.355 INFO  [main] org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-05 14:18:06.355 INFO  [main] org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-10-05 14:18:06.389 INFO  [main] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-10-05 14:18:06.390 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1428 ms
+2026-10-05 14:18:06.637 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-05 14:18:06.672 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-05 14:18:06.701 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-05 14:18:06.837 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-05 14:18:06.852 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-05 14:18:06.959 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@3a8ead9
+2026-10-05 14:18:06.960 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-05 14:18:07.000 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-05 14:18:08.420 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-05 14:18:11.012 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-05 14:18:11.236 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-05 14:18:12.057 INFO  [main] com.retailzw.service.EmailService - SMTP configured host=mail.retailzw.co.zw port=587 support=support@retailzw.co.zw billing=sales@retailzw.co.zw notifications=info@retailzw.co.zw
+2026-10-05 14:18:15.015 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-05 14:18:15.698 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-10-05 14:18:15.712 INFO  [main] com.retailzw.RetailSaasApplication - Started RetailSaasApplication in 11.018 seconds (process running for 11.216)
+2026-10-05 14:18:15.860 WARN  [main] org.hibernate.engine.jdbc.spi.SqlExceptionHelper - SQL Error: 1265, SQLState: 01000
+2026-10-05 14:18:15.860 ERROR [main] org.hibernate.engine.jdbc.spi.SqlExceptionHelper - Data truncated for column 'name' at row 1
+2026-10-05 14:18:15.867 INFO  [main] o.s.b.a.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-10-05 14:18:15.877 ERROR [main] org.springframework.boot.SpringApplication - Application run failed
+org.springframework.orm.jpa.JpaSystemException: could not execute statement [Data truncated for column 'name' at row 1] [insert into roles (description,is_system_role,name) values (?,?,?)]
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:341)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:241)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:335)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:152)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:164)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223)
+	at jdk.proxy2/jdk.proxy2.$Proxy193.save(Unknown Source)
+	at com.retailzw.config.DataInitializer.lambda$seedData$0(DataInitializer.java:40)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at com.retailzw.config.DataInitializer.lambda$seedData$9(DataInitializer.java:40)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:341)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
+	at com.retailzw.RetailSaasApplication.main(RetailSaasApplication.java:15)
+Caused by: org.hibernate.exception.GenericJDBCException: could not execute statement [Data truncated for column 'name' at row 1] [insert into roles (description,is_system_role,name) values (?,?,?)]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:63)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:197)
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performInsert(GetGeneratedKeysDelegate.java:107)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorPostInsertSingleTable.execute(MutationExecutorPostInsertSingleTable.java:100)
+	at org.hibernate.persister.entity.mutation.InsertCoordinator.doStaticInserts(InsertCoordinator.java:175)
+	at org.hibernate.persister.entity.mutation.InsertCoordinator.coordinateInsert(InsertCoordinator.java:113)
+	at org.hibernate.persister.entity.AbstractEntityPersister.insert(AbstractEntityPersister.java:2868)
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:81)
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:670)
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291)
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:272)
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322)
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:386)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:300)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:219)
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:134)
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:175)
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:93)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:77)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:54)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:127)
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:754)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:738)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:319)
+	at jdk.proxy2/jdk.proxy2.$Proxy152.persist(Unknown Source)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:618)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:354)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:277)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:516)
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:285)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:628)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:168)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:143)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:70)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:137)
+	... 30 common frames omitted
+Caused by: java.sql.SQLException: Data truncated for column 'name' at row 1
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:130)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:194)
+	... 76 common frames omitted
+2026-10-05 14:18:15.896 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-05 14:18:15.897 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-05 14:18:15.901 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-05 14:25:42.351 INFO  [main] com.retailzw.RetailSaasApplication - Starting RetailSaasApplication using Java 21.0.12.1 with PID 11978 (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-05 14:25:42.352 INFO  [main] com.retailzw.RetailSaasApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-05 14:25:43.004 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-05 14:25:43.109 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 99 ms. Found 71 JPA repository interfaces.
+2026-10-05 14:25:43.684 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-05 14:25:43.691 INFO  [main] org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-05 14:25:43.692 INFO  [main] org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-10-05 14:25:43.726 INFO  [main] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-10-05 14:25:43.726 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1351 ms
+2026-10-05 14:25:43.942 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-05 14:25:44.038 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@738a39cc
+2026-10-05 14:25:44.038 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-05 14:25:44.094 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.22.3 by Redgate
+2026-10-05 14:25:44.094 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2026-10-05 14:25:44.094 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - 
+2026-10-05 14:25:44.111 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/retail_zw (MySQL 8.0)
+2026-10-05 14:25:44.164 INFO  [main] org.flywaydb.core.internal.command.DbValidate - Successfully validated 55 migrations (execution time 00:00.040s)
+2026-10-05 14:25:44.182 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Current version of schema `retail_zw`: 43
+2026-10-05 14:25:44.198 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "44 - tenant exchange rates and product pricing"
+2026-10-05 14:25:44.209 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: Table 'tenant_exchange_rates' already exists (SQL State: 42S01 - Error Code: 1050)
+2026-10-05 14:25:44.214 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.217 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.219 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.222 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.225 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.248 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.281 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "45 - product wholesale pricing"
+2026-10-05 14:25:44.282 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: Table 'product_wholesale_pricing' already exists (SQL State: 42S01 - Error Code: 1050)
+2026-10-05 14:25:44.283 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.284 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.285 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.286 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.287 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.288 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:25:44.327 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "46 - add branch supervisor role"
+2026-10-05 14:25:44.350 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "47 - software release management"
+2026-10-05 14:25:44.355 ERROR [main] org.flywaydb.core.internal.command.DbMigrate - Migration of schema `retail_zw` to version "47 - software release management" failed! Please restore backups and roll back database and code!
+2026-10-05 14:25:44.362 ERROR [main] o.s.boot.web.embedded.tomcat.TomcatStarter - Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'jwtAuthFilter' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/jwt/JwtAuthFilter.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'userDetailsServiceImpl' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/UserDetailsServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'userRepository' defined in com.retailzw.repository.UserRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+2026-10-05 14:25:44.376 INFO  [main] org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-10-05 14:25:44.377 WARN  [main] org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [RetailZW-HikariPool housekeeper] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:269)
+ java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1797)
+ java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1182)
+ java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+ java.base/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1070)
+ java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+ java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+ java.base/java.lang.Thread.run(Thread.java:1583)
+2026-10-05 14:25:44.377 WARN  [main] org.apache.catalina.loader.WebappClassLoaderBase - The web application [ROOT] appears to have started a thread named [RetailZW-HikariPool connection adder] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:269)
+ java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1797)
+ java.base/java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:460)
+ java.base/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1069)
+ java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+ java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+ java.base/java.lang.Thread.run(Thread.java:1583)
+2026-10-05 14:25:44.379 WARN  [main] o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
+2026-10-05 14:25:44.379 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-05 14:25:44.383 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-05 14:25:44.393 INFO  [main] o.s.b.a.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-10-05 14:25:44.402 ERROR [main] org.springframework.boot.SpringApplication - Application run failed
+org.springframework.context.ApplicationContextException: Unable to start web server
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:165)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:618)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
+	at com.retailzw.RetailSaasApplication.main(RetailSaasApplication.java:15)
+Caused by: org.springframework.boot.web.server.WebServerException: Unable to start embedded Tomcat
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:145)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.<init>(TomcatWebServer.java:105)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getTomcatWebServer(TomcatServletWebServerFactory.java:499)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:218)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:188)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:162)
+	... 8 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'jwtAuthFilter' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/jwt/JwtAuthFilter.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'userDetailsServiceImpl' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/UserDetailsServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'userRepository' defined in com.retailzw.repository.UserRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:795)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:237)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1355)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1192)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.getOrderedBeansOfType(ServletContextInitializerBeans.java:210)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:173)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAsRegistrationBean(ServletContextInitializerBeans.java:168)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.addAdaptableBeans(ServletContextInitializerBeans.java:153)
+	at org.springframework.boot.web.servlet.ServletContextInitializerBeans.<init>(ServletContextInitializerBeans.java:86)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.getServletContextInitializerBeans(ServletWebServerApplicationContext.java:266)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.selfInitialize(ServletWebServerApplicationContext.java:240)
+	at org.springframework.boot.web.embedded.tomcat.TomcatStarter.onStartup(TomcatStarter.java:52)
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4880)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1332)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1322)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:866)
+	at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:845)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1332)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1322)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:866)
+	at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:240)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.core.StandardService.startInternal(StandardService.java:433)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:921)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:171)
+	at org.apache.catalina.startup.Tomcat.start(Tomcat.java:437)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize(TomcatWebServer.java:126)
+	... 13 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'userDetailsServiceImpl' defined in file [/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/com/retailzw/security/UserDetailsServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'userRepository' defined in com.retailzw.repository.UserRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:795)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:237)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1355)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1192)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1443)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1353)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:904)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:782)
+	... 54 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'userRepository' defined in com.retailzw.repository.UserRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1685)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1434)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:599)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1443)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1353)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:904)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:782)
+	... 68 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jpaSharedEM_entityManagerFactory': Cannot resolve reference to bean 'entityManagerFactory' while setting constructor argument
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:682)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:509)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1335)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1165)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
+	... 82 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Migration V47__software_release_management.sql failed
+-----------------------------------------------------
+SQL State  : 42S01
+Error Code : 1050
+Message    : Table 'software_releases' already exists
+Location   : db/migration/V47__software_release_management.sql (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/db/migration/V47__software_release_management.sql)
+Line       : 1
+Statement  : CREATE TABLE software_releases (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    platform VARCHAR(20) NOT NULL,
+    package_type VARCHAR(30) NOT NULL,
+    version VARCHAR(50) NOT NULL,
+    title VARCHAR(160) NOT NULL,
+    description TEXT NOT NULL,
+    release_notes TEXT NULL,
+    minimum_requirements VARCHAR(500) NULL,
+    original_file_name VARCHAR(255) NOT NULL,
+    stored_file_name VARCHAR(255) NOT NULL,
+    content_type VARCHAR(120) NULL,
+    file_size BIGINT NOT NULL,
+    sha256_checksum CHAR(64) NOT NULL,
+    published BIT(1) NOT NULL DEFAULT b'0',
+    latest_release BIT(1) NOT NULL DEFAULT b'0',
+    download_count BIGINT NOT NULL DEFAULT 0,
+    uploaded_by VARCHAR(120) NULL,
+    created_at DATETIME(6) NOT NULL,
+    updated_at DATETIME(6) NOT NULL,
+    published_at DATETIME(6) NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_software_release_stored_file (stored_file_name),
+    KEY idx_software_release_public (published, platform, latest_release, created_at),
+    KEY idx_software_release_version (platform, package_type, version)
+)
+
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1786)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:313)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
+	... 94 common frames omitted
+Caused by: org.flywaydb.core.internal.command.DbMigrate$FlywayMigrateException: Migration V47__software_release_management.sql failed
+-----------------------------------------------------
+SQL State  : 42S01
+Error Code : 1050
+Message    : Table 'software_releases' already exists
+Location   : db/migration/V47__software_release_management.sql (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/db/migration/V47__software_release_management.sql)
+Line       : 1
+Statement  : CREATE TABLE software_releases (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    platform VARCHAR(20) NOT NULL,
+    package_type VARCHAR(30) NOT NULL,
+    version VARCHAR(50) NOT NULL,
+    title VARCHAR(160) NOT NULL,
+    description TEXT NOT NULL,
+    release_notes TEXT NULL,
+    minimum_requirements VARCHAR(500) NULL,
+    original_file_name VARCHAR(255) NOT NULL,
+    stored_file_name VARCHAR(255) NOT NULL,
+    content_type VARCHAR(120) NULL,
+    file_size BIGINT NOT NULL,
+    sha256_checksum CHAR(64) NOT NULL,
+    published BIT(1) NOT NULL DEFAULT b'0',
+    latest_release BIT(1) NOT NULL DEFAULT b'0',
+    download_count BIGINT NOT NULL DEFAULT 0,
+    uploaded_by VARCHAR(120) NULL,
+    created_at DATETIME(6) NOT NULL,
+    updated_at DATETIME(6) NOT NULL,
+    published_at DATETIME(6) NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_software_release_stored_file (stored_file_name),
+    KEY idx_software_release_public (published, platform, latest_release, created_at),
+    KEY idx_software_release_version (platform, package_type, version)
+)
+
+	at org.flywaydb.core.internal.command.DbMigrate.doMigrateGroup(DbMigrate.java:382)
+	at org.flywaydb.core.internal.command.DbMigrate.lambda$applyMigrations$1(DbMigrate.java:272)
+	at org.flywaydb.core.internal.jdbc.TransactionalExecutionTemplate.execute(TransactionalExecutionTemplate.java:55)
+	at org.flywaydb.core.internal.command.DbMigrate.applyMigrations(DbMigrate.java:271)
+	at org.flywaydb.core.internal.command.DbMigrate.migrateGroup(DbMigrate.java:244)
+	at org.flywaydb.core.internal.command.DbMigrate.lambda$migrateAll$0(DbMigrate.java:139)
+	at org.flywaydb.database.mysql.MySQLNamedLockTemplate.execute(MySQLNamedLockTemplate.java:58)
+	at org.flywaydb.database.mysql.MySQLConnection.lock(MySQLConnection.java:152)
+	at org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory.lock(JdbcTableSchemaHistory.java:144)
+	at org.flywaydb.core.internal.command.DbMigrate.migrateAll(DbMigrate.java:139)
+	at org.flywaydb.core.internal.command.DbMigrate.migrate(DbMigrate.java:97)
+	at org.flywaydb.core.Flyway.lambda$migrate$0(Flyway.java:188)
+	at org.flywaydb.core.FlywayExecutor.execute(FlywayExecutor.java:213)
+	at org.flywaydb.core.Flyway.migrate(Flyway.java:140)
+	at org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer.afterPropertiesSet(FlywayMigrationInitializer.java:66)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1833)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1782)
+	... 103 common frames omitted
+Caused by: org.flywaydb.core.internal.sqlscript.FlywaySqlScriptException: Migration V47__software_release_management.sql failed
+-----------------------------------------------------
+SQL State  : 42S01
+Error Code : 1050
+Message    : Table 'software_releases' already exists
+Location   : db/migration/V47__software_release_management.sql (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes/db/migration/V47__software_release_management.sql)
+Line       : 1
+Statement  : CREATE TABLE software_releases (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    platform VARCHAR(20) NOT NULL,
+    package_type VARCHAR(30) NOT NULL,
+    version VARCHAR(50) NOT NULL,
+    title VARCHAR(160) NOT NULL,
+    description TEXT NOT NULL,
+    release_notes TEXT NULL,
+    minimum_requirements VARCHAR(500) NULL,
+    original_file_name VARCHAR(255) NOT NULL,
+    stored_file_name VARCHAR(255) NOT NULL,
+    content_type VARCHAR(120) NULL,
+    file_size BIGINT NOT NULL,
+    sha256_checksum CHAR(64) NOT NULL,
+    published BIT(1) NOT NULL DEFAULT b'0',
+    latest_release BIT(1) NOT NULL DEFAULT b'0',
+    download_count BIGINT NOT NULL DEFAULT 0,
+    uploaded_by VARCHAR(120) NULL,
+    created_at DATETIME(6) NOT NULL,
+    updated_at DATETIME(6) NOT NULL,
+    published_at DATETIME(6) NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_software_release_stored_file (stored_file_name),
+    KEY idx_software_release_public (published, platform, latest_release, created_at),
+    KEY idx_software_release_version (platform, package_type, version)
+)
+
+	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.handleException(DefaultSqlScriptExecutor.java:267)
+	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.executeStatement(DefaultSqlScriptExecutor.java:222)
+	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.execute(DefaultSqlScriptExecutor.java:126)
+	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.executeOnce(SqlMigrationExecutor.java:68)
+	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.lambda$execute$0(SqlMigrationExecutor.java:57)
+	at org.flywaydb.core.internal.database.DefaultExecutionStrategy.execute(DefaultExecutionStrategy.java:27)
+	at org.flywaydb.core.internal.resolver.sql.SqlMigrationExecutor.execute(SqlMigrationExecutor.java:56)
+	at org.flywaydb.core.internal.command.DbMigrate.doMigrateGroup(DbMigrate.java:374)
+	... 119 common frames omitted
+Caused by: java.sql.SQLSyntaxErrorException: Table 'software_releases' already exists
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:770)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:653)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.flywaydb.core.internal.jdbc.JdbcTemplate.executeStatement(JdbcTemplate.java:201)
+	at org.flywaydb.core.internal.sqlscript.ParsedSqlStatement.execute(ParsedSqlStatement.java:95)
+	at org.flywaydb.core.internal.sqlscript.DefaultSqlScriptExecutor.executeStatement(DefaultSqlScriptExecutor.java:210)
+	... 125 common frames omitted
+2026-10-05 14:26:41.090 INFO  [main] com.retailzw.RetailSaasApplication - Starting RetailSaasApplication using Java 21.0.12.1 with PID 12314 (/Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/target/classes started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-05 14:26:41.091 INFO  [main] com.retailzw.RetailSaasApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-05 14:26:41.722 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-05 14:26:41.829 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 102 ms. Found 71 JPA repository interfaces.
+2026-10-05 14:26:42.408 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-05 14:26:42.415 INFO  [main] org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-05 14:26:42.415 INFO  [main] org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-10-05 14:26:42.448 INFO  [main] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-10-05 14:26:42.448 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1334 ms
+2026-10-05 14:26:42.658 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-05 14:26:42.755 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@62158991
+2026-10-05 14:26:42.756 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-05 14:26:42.814 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.22.3 by Redgate
+2026-10-05 14:26:42.814 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2026-10-05 14:26:42.814 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - 
+2026-10-05 14:26:42.831 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/retail_zw (MySQL 8.0)
+2026-10-05 14:26:42.889 INFO  [main] org.flywaydb.core.internal.command.DbValidate - Successfully validated 55 migrations (execution time 00:00.044s)
+2026-10-05 14:26:42.902 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Current version of schema `retail_zw`: 46
+2026-10-05 14:26:42.912 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "47 - software release management"
+2026-10-05 14:26:42.925 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: Table 'software_releases' already exists (SQL State: 42S01 - Error Code: 1050)
+2026-10-05 14:26:42.951 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "48 - tenant branch dashboard indexes"
+2026-10-05 14:26:43.011 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "49 - platform registration and renewal indexes"
+2026-10-05 14:26:43.129 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "50 - live support indexes"
+2026-10-05 14:26:43.146 INFO  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - +---+
+| 1 |
++---+
+| 1 |
++---+
+
+2026-10-05 14:26:43.162 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "51 - retail expense ledger"
+2026-10-05 14:26:43.164 WARN  [main] o.f.c.internal.sqlscript.DefaultSqlScriptExecutor - DB: Table 'retail_expenses' already exists (SQL State: 42S01 - Error Code: 1050)
+2026-10-05 14:26:43.176 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "52 - fuel station module"
+2026-10-05 14:26:43.258 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "53 - seed fuel station package"
+2026-10-05 14:26:43.267 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "54 - enable fuel module enums"
+2026-10-05 14:26:43.319 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Migrating schema `retail_zw` to version "55 - fuel expenses and cash controls"
+2026-10-05 14:26:43.332 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Successfully applied 9 migrations to schema `retail_zw`, now at version v55 (execution time 00:00.325s)
+2026-10-05 14:26:43.411 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-05 14:26:43.446 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-05 14:26:43.465 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-05 14:26:43.583 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-05 14:26:43.618 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-05 14:26:44.979 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-05 14:26:45.106 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-05 14:26:45.308 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-05 14:26:46.110 INFO  [main] com.retailzw.service.EmailService - SMTP configured host=mail.retailzw.co.zw port=587 support=support@retailzw.co.zw billing=sales@retailzw.co.zw notifications=info@retailzw.co.zw
+2026-10-05 14:26:48.967 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-05 14:26:49.648 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-10-05 14:26:49.662 INFO  [main] com.retailzw.RetailSaasApplication - Started RetailSaasApplication in 8.809 seconds (process running for 8.987)
+2026-10-05 14:26:55.490 INFO  [http-nio-0.0.0.0-8080-exec-1] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-05 14:26:55.491 INFO  [http-nio-0.0.0.0-8080-exec-1] org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-10-05 14:26:55.493 INFO  [http-nio-0.0.0.0-8080-exec-1] org.springframework.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-10-05 14:26:55.723 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (194 ms) client=0:0:0:0:0:0:0:1 requestId=9a597953
+2026-10-05 14:27:04.547 INFO  [http-nio-0.0.0.0-8080-exec-4] org.apache.tomcat.util.http.parser.Cookie - A cookie header was received [g_state={"i_l":0,"i_ll":1790717549430,"i_b":"piDhN8JIF779dx+yr12H9dbPDKd/J4p6Khv6uxOoB6U","i_e":{"enable_itp_optimization":24},"i_et":1790717549430}] that contained an invalid cookie. That cookie will be ignored.
+ Note: further occurrences of this error will be logged at DEBUG level.
+2026-10-05 14:27:04.565 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=8f906064
+2026-10-05 15:09:03.255 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=2m19s916ms).
+2026-10-05 15:43:02.731 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=33m29s454ms).
+2026-10-05 15:53:52.915 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=2m50s112ms).
+2026-10-05 16:25:24.808 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=15m31s718ms).
+2026-10-05 16:40:56.366 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=15m31s558ms).
+2026-10-05 18:11:14.082 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=1h30m17s716ms).
+2026-10-05 18:41:46.339 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=30m32s257ms).
+2026-10-05 18:45:09.774 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=3m23s434ms).
+2026-10-05 19:05:06.913 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=5m57s2ms).
+2026-10-05 19:08:59.526 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=3m22s606ms).
+2026-10-05 20:09:28.335 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=15m28s344ms).
+2026-10-05 20:12:20.459 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=2m52s125ms).
+2026-10-05 20:24:54.222 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=12m3s756ms).
+2026-10-05 22:22:25.315 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=15m30s472ms).
+2026-10-05 22:39:45.001 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=15m49s659ms).
+2026-10-05 22:54:28.945 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=14m13s927ms).
+2026-10-05 23:48:30.093 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=17m550ms).

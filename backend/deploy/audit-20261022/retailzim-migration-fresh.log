@@ -1,0 +1,9 @@
+16:47:47.888 [main] INFO org.flywaydb.core.internal.license.VersionPrinter -- Flyway Community Edition 9.22.3 by Redgate
+16:47:47.889 [main] INFO org.flywaydb.core.internal.license.VersionPrinter -- See release notes here: https://rd.gt/416ObMi
+16:47:47.889 [main] INFO org.flywaydb.core.internal.license.VersionPrinter -- 
+16:47:48.022 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:mysql://127.0.0.1:3306/retailzim_audit_1792680033_fresh (MySQL 8.0)
+16:47:48.074 [main] INFO org.flywaydb.core.internal.command.DbValidate -- Successfully validated 57 migrations (execution time 00:00.034s)
+16:47:48.088 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Current version of schema `retailzim_audit_1792680033_fresh`: 56
+16:47:48.096 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Migrating schema `retailzim_audit_1792680033_fresh` to version "57 - allow optional product max stock"
+16:47:48.181 [main] INFO org.flywaydb.core.internal.command.DbMigrate -- Successfully applied 1 migration to schema `retailzim_audit_1792680033_fresh`, now at version v57 (execution time 00:00.074s)
+MIGRATION_PROBE_SUCCESS version=57 count=1

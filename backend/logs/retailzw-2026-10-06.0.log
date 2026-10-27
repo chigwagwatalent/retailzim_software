@@ -1,0 +1,4 @@
+2026-10-06 00:04:46.266 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=15m46s156ms).
+2026-10-06 00:20:59.446 WARN  [RetailZW-HikariPool housekeeper] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Thread starvation or clock leap detected (housekeeper delta=15m43s112ms).
+2026-10-06 00:53:02.570 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET / -> 302 (25 ms) client=0:0:0:0:0:0:0:1 requestId=4fe6fc6a
+2026-10-06 00:53:02.579 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /auth/shop/login -> 200 (4 ms) client=0:0:0:0:0:0:0:1 requestId=53fdefb3

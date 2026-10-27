@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "build": 1,
+  "package": "zw.co.retailzw.pos.sunmi",
+  "label": "RetailZW Shop",
+  "date": "2026-10-26",
+  "fresh_install": true,
+  "built_in_sunmi_support": true,
+  "signature_verified": true,
+  "sha256": "afe192a522db07a4c783366e9872fdb776cda054c8764a232b48744769f7aa7b",
+  "server": "https://admin.retailzw.co.zw",
+  "physical_printer_test": "Run Test on the SUNMI terminal"
+}

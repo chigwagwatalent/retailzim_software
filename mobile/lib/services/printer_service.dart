@@ -11,11 +11,12 @@ import 'package:printing/printing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/models.dart';
+import 'sunmi_printer.dart';
 
 /// Bluetooth ESC/POS thermal receipt printer service.
 ///
 /// Windows/Linux/macOS use system printer/PDF printing.
-/// Android/iOS use Bluetooth ESC/POS printing.
+/// Android supports SUNMI built-in services and Bluetooth ESC/POS; iOS uses Bluetooth.
 class PrinterService {
   static const double _thermalPaperWidthMm = 80;
   static const double _thermalLeftMarginMm = 0;
@@ -26,6 +27,37 @@ class PrinterService {
   static final PrinterService _instance = PrinterService._internal();
   factory PrinterService() => _instance;
   PrinterService._internal();
+
+  @visibleForTesting
+  PrinterService.forTesting({required bool isAndroid})
+      : _androidOverride = isAndroid;
+
+  bool? _androidOverride;
+  bool get _isAndroid => _androidOverride ?? Platform.isAndroid;
+  final _sunmi = SunmiPrinter();
+  BuiltInPrinterInfo _builtInInfo = const BuiltInPrinterInfo();
+  bool _builtInSelected = false;
+  static const _transportKey = 'receipt_printer_transport';
+  BuiltInPrinterInfo get builtInInfo => _builtInInfo;
+  bool get usesBuiltInPrinter => _isAndroid && _builtInSelected;
+
+  Future<void> refreshBuiltInPrinter() async {
+    if (_isAndroid) _builtInInfo = await _sunmi.getInfo();
+  }
+
+  Future<void> selectBuiltInPrinter() async {
+    await refreshBuiltInPrinter();
+    if (!_builtInInfo.detected) return;
+    _builtInSelected = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_transportKey, 'sunmi');
+  }
+
+  Future<void> selectBluetoothPrinter() async {
+    _builtInSelected = false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_transportKey, 'bluetooth');
+  }
 
   // ─── State ────────────────────────────────────────────────────────────────
   static const _prefKey = 'printer_mac_address';
@@ -52,16 +84,22 @@ class PrinterService {
   bool _useRawWindowsPrinting = false;
   String _cutterCommand = 'feed_partial';
 
-  bool _initialized = false;
+  Future<void>? _initialization;
 
   // ─── Init ─────────────────────────────────────────────────────────────────
 
-  Future<void> init() async {
-    if (_initialized) return;
-    _initialized = true;
+  Future<void> init() => _initialization ??= _initialize();
 
+  Future<void> _initialize() async {
     final prefs = await SharedPreferences.getInstance();
     _savedAddress = prefs.getString(_prefKey);
+    await refreshBuiltInPrinter();
+    final transport = prefs.getString(_transportKey);
+    _builtInSelected = transport == 'sunmi' ||
+        (transport == null && _savedAddress == null && _builtInInfo.detected);
+    if (_builtInSelected && transport == null) {
+      await prefs.setString(_transportKey, 'sunmi');
+    }
     _savedSystemPrinterUrl = prefs.getString(_systemPrinterUrlKey);
     _savedSystemPrinterName = prefs.getString(_systemPrinterNameKey);
 
@@ -88,21 +126,31 @@ class PrinterService {
   };
 
   bool get usesSystemPrinter =>
-      Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+      !_isAndroid &&
+      (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
 
-  bool get hasSavedPrinter => usesSystemPrinter
-      ? _savedSystemPrinterUrl != null || _savedSystemPrinterName != null
-      : _savedAddress != null;
+  bool get hasSavedPrinter =>
+      usesBuiltInPrinter ||
+      (usesSystemPrinter
+          ? _savedSystemPrinterUrl != null || _savedSystemPrinterName != null
+          : _savedAddress != null);
 
-  Future<bool> get isBluetoothEnabled => usesSystemPrinter
-      ? Future<bool>.value(true)
-      : PrintBluetoothThermal.bluetoothEnabled;
+  Future<bool> get isBluetoothEnabled =>
+      (usesSystemPrinter || usesBuiltInPrinter)
+          ? Future<bool>.value(true)
+          : PrintBluetoothThermal.bluetoothEnabled;
 
-  Future<bool> get isConnected => usesSystemPrinter
-      ? Future<bool>.value(
-          _savedSystemPrinterUrl != null || _savedSystemPrinterName != null,
-        )
-      : PrintBluetoothThermal.connectionStatus;
+  Future<bool> get isConnected async {
+    if (usesBuiltInPrinter) {
+      await refreshBuiltInPrinter();
+      return _builtInInfo.available && _builtInInfo.ready;
+    }
+    return usesSystemPrinter
+        ? Future<bool>.value(
+            _savedSystemPrinterUrl != null || _savedSystemPrinterName != null,
+          )
+        : PrintBluetoothThermal.connectionStatus;
+  }
 
   Future<List<Printer>> getSystemPrinters() async {
     if (!usesSystemPrinter) return const [];
@@ -235,6 +283,7 @@ class PrinterService {
       );
 
       if (ok) {
+        await selectBluetoothPrinter();
         _savedAddress = normalizedAddress;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(_prefKey, normalizedAddress);
@@ -248,7 +297,7 @@ class PrinterService {
 
   /// Disconnects from the current printer.
   Future<void> disconnect() async {
-    if (usesSystemPrinter) return;
+    if (usesSystemPrinter || usesBuiltInPrinter) return;
 
     try {
       await PrintBluetoothThermal.disconnect;
@@ -262,6 +311,7 @@ class PrinterService {
       return;
     }
 
+    await selectBluetoothPrinter();
     _savedAddress = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_prefKey);
@@ -277,6 +327,7 @@ class PrinterService {
       return _savedSystemPrinterUrl != null || _savedSystemPrinterName != null;
     }
 
+    if (usesBuiltInPrinter) return await isConnected;
     if (_savedAddress == null) return false;
 
     final connected = await isConnected;
@@ -301,7 +352,7 @@ class PrinterService {
       await init();
 
       if (usesSystemPrinter) {
-        return _printWithSystemPrinter(
+        return await _printWithSystemPrinter(
           sale: sale,
           cartItems: cartItems,
           companyName: companyName,
@@ -311,6 +362,33 @@ class PrinterService {
           currency: currency,
           paperSize: paperSize,
         );
+      }
+
+      if (usesBuiltInPrinter) {
+        final bytes = await _buildReceipt(
+          sale: sale,
+          cartItems: cartItems,
+          companyName: companyName,
+          companyLines: companyLines,
+          footerText: footerText,
+          change: change,
+          currency: currency,
+          paperSize: PaperSize.mm58,
+        );
+        try {
+          final accepted = await _sunmi.printRaw(bytes);
+          return accepted
+              ? PrintResult.success()
+              : PrintResult.failure(
+                  'Built-in printer did not accept the receipt. Check the paper and cover.',
+                );
+        } on PlatformException catch (error) {
+          return PrintResult.failure(
+              error.message ?? 'Built-in printer error: ${error.code}');
+        } on TimeoutException {
+          return PrintResult.failure(
+              'Printer response timed out. Check whether the receipt printed before retrying.');
+        }
       }
 
       final btEnabled = await isBluetoothEnabled;
@@ -324,7 +402,7 @@ class PrinterService {
       if (!connected) {
         if (_savedAddress == null) {
           return PrintResult.failure(
-            'No printer selected. Go to Settings → Bluetooth Printer to pair one.',
+            'No printer selected. Go to Settings → Receipt Printer to pair one.',
           );
         }
 
@@ -429,7 +507,7 @@ class PrinterService {
         // Do not fail here. Fall back to PDF/system printing.
       }
 
-      return _printPdfReceipt(
+      return await _printPdfReceipt(
         selected: selected,
         sale: sale,
         cartItems: cartItems,

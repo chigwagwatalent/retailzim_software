@@ -1,305 +1,527 @@
-2026-08-12 00:00:09.636 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=072eefc7
-2026-08-12 00:01:09.639 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=47ecb22f
-2026-08-12 00:02:09.642 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=2ae11107
-2026-08-12 00:03:09.638 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=3667374d
-2026-08-12 00:04:09.644 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=597c4e50
-2026-08-12 00:05:09.640 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=1d42266b
-2026-08-12 00:06:09.644 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (28 ms) client=0:0:0:0:0:0:0:1 requestId=e5ff0d85
-2026-08-12 00:07:09.641 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=d4d05c86
-2026-08-12 00:08:09.641 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=8a3c680e
-2026-08-12 00:09:09.643 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=151670a7
-2026-08-12 00:10:09.626 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=cd0573fb
-2026-08-12 00:11:09.627 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=52260248
-2026-08-12 00:12:09.633 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=b383bad1
-2026-08-12 00:13:09.622 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=39bd9b9b
-2026-08-12 00:14:09.637 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=0d130edd
-2026-08-12 00:15:09.643 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=76d4ee21
-2026-08-12 00:16:09.635 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=88a297e8
-2026-08-12 00:17:09.636 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=990c2c92
-2026-08-12 00:18:09.624 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=b90a0c21
-2026-08-12 00:19:09.626 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (21 ms) client=0:0:0:0:0:0:0:1 requestId=d25c63dd
-2026-08-12 00:20:09.637 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=55762201
-2026-08-12 00:21:09.680 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (25 ms) client=0:0:0:0:0:0:0:1 requestId=d2442203
-2026-08-12 00:22:09.631 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=9c826237
-2026-08-12 00:23:09.633 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=dacdc527
-2026-08-12 00:24:09.619 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=f0978700
-2026-08-12 00:25:09.618 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=a9b81bda
-2026-08-12 00:26:09.625 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=a20865de
-2026-08-12 00:27:09.620 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=6cab5525
-2026-08-12 00:28:09.621 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=29a1105e
-2026-08-12 00:29:09.629 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=cc617f79
-2026-08-12 00:30:09.618 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=7aa68883
-2026-08-12 00:31:09.622 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=606d8cd2
-2026-08-12 00:32:09.624 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=e1026a6f
-2026-08-12 00:33:09.620 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=3797ed53
-2026-08-12 00:34:09.612 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=fe38344b
-2026-08-12 00:35:09.625 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=1c08ac9f
-2026-08-12 00:36:09.609 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=5d6f10e2
-2026-08-12 00:37:09.621 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=e5b22b5c
-2026-08-12 00:38:09.622 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=5f9c739b
-2026-08-12 00:39:09.613 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=0f6d3f7a
-2026-08-12 00:40:09.611 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=0fcfe0ac
-2026-08-12 00:41:09.621 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=1c1f50f0
-2026-08-12 00:42:09.615 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (22 ms) client=0:0:0:0:0:0:0:1 requestId=04ca05c6
-2026-08-12 00:43:09.616 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=bf3ddf67
-2026-08-12 00:44:09.610 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=687cb232
-2026-08-12 00:45:09.623 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=8c8f9752
-2026-08-12 00:46:09.618 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=4b99318f
-2026-08-12 00:47:09.607 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=c43bbdd4
-2026-08-12 00:48:09.609 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=ad29fc40
-2026-08-12 00:49:09.611 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=bd76ee53
-2026-08-12 00:50:09.607 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=7df8a351
-2026-08-12 00:51:09.606 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=27512e1d
-2026-08-12 00:52:09.613 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=3a1ea4ff
-2026-08-12 00:53:09.605 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=4bb96fab
-2026-08-12 00:54:09.610 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=89b126b0
-2026-08-12 00:55:09.607 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=4f694b90
-2026-08-12 00:56:09.598 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=e8511240
-2026-08-12 00:57:09.604 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=93fb9c84
-2026-08-12 00:58:09.606 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=5a77960f
-2026-08-12 00:59:09.600 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (19 ms) client=0:0:0:0:0:0:0:1 requestId=d8c743e3
-2026-08-12 01:00:09.594 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=b7de5c9f
-2026-08-12 01:01:09.604 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=44702435
-2026-08-12 01:02:09.599 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=e5e98840
-2026-08-12 01:03:09.602 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=a1ea36f3
-2026-08-12 01:04:09.599 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=8532ed20
-2026-08-12 01:05:09.599 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=e99c0806
-2026-08-12 01:06:09.596 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=8b87436c
-2026-08-12 01:07:09.603 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=6bf158c2
-2026-08-12 01:08:09.591 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=c9af91a8
-2026-08-12 01:09:09.597 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=86c52b9e
-2026-08-12 01:10:09.594 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=03ee3479
-2026-08-12 01:11:09.593 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=b166078e
-2026-08-12 01:12:09.589 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=c6468d99
-2026-08-12 01:13:09.598 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=a621f64e
-2026-08-12 01:14:09.585 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=00faecfa
-2026-08-12 01:15:09.592 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=112c254c
-2026-08-12 01:16:09.593 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=81c8d76a
-2026-08-12 01:17:09.589 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=ada205b8
-2026-08-12 01:18:09.582 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=2fe76d23
-2026-08-12 01:19:09.593 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=facd13d4
-2026-08-12 01:20:09.592 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=44c3225b
-2026-08-12 01:21:09.587 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=da0ac178
-2026-08-12 01:22:09.581 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=df9a5964
-2026-08-12 01:23:09.592 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=afec0ed4
-2026-08-12 01:24:09.586 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=a387e407
-2026-08-12 01:25:09.578 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=eca510a0
-2026-08-12 01:26:09.585 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=ecfe4faa
-2026-08-12 01:27:09.582 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=18f1b730
-2026-08-12 01:28:09.582 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=788dc63c
-2026-08-12 01:29:09.580 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=3a067e64
-2026-08-12 01:30:09.584 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=8e1e4c89
-2026-08-12 01:31:09.585 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=6b23d293
-2026-08-12 01:32:09.576 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=e399fc58
-2026-08-12 01:33:09.577 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=26c34e78
-2026-08-12 01:34:09.584 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=9bef30c8
-2026-08-12 01:35:09.579 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=983028ce
-2026-08-12 01:36:09.575 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=83e4288b
-2026-08-12 01:37:09.570 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=6ec3f218
-2026-08-12 01:38:09.582 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=d9cfe6f6
-2026-08-12 01:39:09.580 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=23dfcf85
-2026-08-12 01:40:09.574 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=a4031e0a
-2026-08-12 01:41:09.569 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=8fedad1c
-2026-08-12 01:42:09.579 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=11ea396b
-2026-08-12 01:43:09.563 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=34c9011e
-2026-08-12 01:44:09.577 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=1733203f
-2026-08-12 01:45:09.565 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=d9d6cfeb
-2026-08-12 01:46:09.572 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=cddee048
-2026-08-12 01:47:09.579 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=bf3936ab
-2026-08-12 01:48:09.568 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=33797936
-2026-08-12 01:49:09.577 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=52ac521d
-2026-08-12 01:50:09.562 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=95637cf6
-2026-08-12 01:51:09.569 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=98c59dc4
-2026-08-12 01:52:09.566 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=160a42e6
-2026-08-12 01:53:09.567 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=2ed65f96
-2026-08-12 01:54:09.572 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=a0fab196
-2026-08-12 01:55:09.563 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=254b298b
-2026-08-12 01:56:09.563 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=adee2b75
-2026-08-12 01:57:09.563 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=3eb78add
-2026-08-12 01:58:09.554 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=b288dd66
-2026-08-12 01:59:09.564 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=2de7efab
-2026-08-12 02:00:09.560 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=072cd7f2
-2026-08-12 02:01:09.565 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=b8b54516
-2026-08-12 02:02:09.563 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=c70ad3c9
-2026-08-12 02:03:09.565 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=c70672cd
-2026-08-12 02:04:09.561 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=8a739290
-2026-08-12 02:05:09.556 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=efce5775
-2026-08-12 02:06:09.555 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=92b46377
-2026-08-12 02:07:09.555 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=1cdf8ad3
-2026-08-12 02:08:09.554 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=144edd8c
-2026-08-12 02:09:09.550 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=5fa9506a
-2026-08-12 02:10:09.560 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=53058afa
-2026-08-12 02:11:09.559 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=18f355c0
-2026-08-12 02:12:09.562 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=f8ad889a
-2026-08-12 02:13:09.556 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=9461e6fd
-2026-08-12 02:14:09.559 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=4061542c
-2026-08-12 02:15:09.544 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=094a72e3
-2026-08-12 02:16:09.546 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=482c7674
-2026-08-12 02:17:09.541 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=60a8db10
-2026-08-12 02:18:09.546 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=dd590506
-2026-08-12 02:19:09.550 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=7cadf310
-2026-08-12 02:20:09.548 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=3d866b02
-2026-08-12 02:21:09.540 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=fd7277e2
-2026-08-12 02:22:09.543 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=79302cf0
-2026-08-12 02:23:09.539 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=9a4dc42b
-2026-08-12 02:24:09.554 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=51a9c2f1
-2026-08-12 02:25:09.544 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=3a014e8a
-2026-08-12 02:26:09.545 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=f5eccb26
-2026-08-12 02:27:09.541 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=89570c92
-2026-08-12 02:28:09.538 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=8b0e3b62
-2026-08-12 02:29:09.543 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=673e10e7
-2026-08-12 02:30:09.540 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=ea3a98cb
-2026-08-12 02:31:09.541 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=2de985c5
-2026-08-12 02:32:09.539 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=849355a1
-2026-08-12 02:33:09.539 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=c98e2b41
-2026-08-12 02:34:09.534 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=eec94880
-2026-08-12 02:35:09.539 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=5be868e6
-2026-08-12 02:36:09.530 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=d7f78c16
-2026-08-12 02:37:09.535 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=691ea740
-2026-08-12 02:38:09.535 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=723aaa8d
-2026-08-12 02:39:09.540 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=25b0c546
-2026-08-12 02:40:09.532 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=d89d7558
-2026-08-12 02:41:09.542 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=00d703b2
-2026-08-12 02:42:09.538 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=c1da68a4
-2026-08-12 02:43:09.537 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=7e0b2c34
-2026-08-12 02:44:09.537 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=12c3debd
-2026-08-12 02:45:09.536 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=6d5bcd58
-2026-08-12 02:46:09.537 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=7432d77f
-2026-08-12 02:47:09.524 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=30c7dff4
-2026-08-12 02:48:09.533 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=ec5dc5ae
-2026-08-12 02:49:09.532 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=5a1cfa0d
-2026-08-12 02:50:09.519 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=37638e44
-2026-08-12 02:51:09.523 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=d2eb2a67
-2026-08-12 02:52:09.525 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=98b40359
-2026-08-12 02:53:09.525 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=41a4a7f5
-2026-08-12 02:54:09.531 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=4efc4955
-2026-08-12 02:55:09.524 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=fa850c93
-2026-08-12 02:56:09.517 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=cf974e42
-2026-08-12 02:57:09.524 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=91a9c681
-2026-08-12 02:58:09.516 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=6180e684
-2026-08-12 02:59:09.522 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=a9a71a6a
-2026-08-12 03:00:09.524 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=be4786e0
-2026-08-12 03:01:09.522 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=fb43cd84
-2026-08-12 03:02:09.528 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=2d10e8c0
-2026-08-12 03:03:09.523 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=61045fd6
-2026-08-12 03:04:09.523 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=c7adfd3f
-2026-08-12 03:05:09.521 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=69097dae
-2026-08-12 03:06:09.523 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=696c86d7
-2026-08-12 03:07:09.512 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=81a30fa9
-2026-08-12 03:08:09.511 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=e331ca49
-2026-08-12 03:09:09.516 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=8509b8f0
-2026-08-12 03:10:09.510 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=2d36859f
-2026-08-12 03:11:09.515 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=1d56c186
-2026-08-12 03:12:09.511 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=97b78d0b
-2026-08-12 03:13:09.509 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=439696fe
-2026-08-12 03:14:09.520 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=39e96a1d
-2026-08-12 03:15:09.517 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=939cc0ba
-2026-08-12 03:16:09.516 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=2484e4c7
-2026-08-12 03:17:09.519 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (18 ms) client=0:0:0:0:0:0:0:1 requestId=27a50d14
-2026-08-12 03:18:09.499 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=87b2527a
-2026-08-12 03:19:09.512 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=e2348cb3
-2026-08-12 03:20:09.504 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=f762af57
-2026-08-12 03:21:09.512 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=193177bf
-2026-08-12 03:22:09.506 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=b6debedc
-2026-08-12 03:23:09.510 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=a2f65db7
-2026-08-12 03:24:09.504 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=f3872904
-2026-08-12 03:25:09.500 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=54bdd4c9
-2026-08-12 03:25:17.731 WARN  [scheduling-1] com.retailzw.service.EmailService - Email failed from=sales@retailzw.co.zw to=test@retailzw.co.zw subject=RetailZW payment confirmed - INV-RZW117849363492110EC9D551D2D2 cause=Failed messages: jakarta.mail.SendFailedException: Invalid Addresses;
-  nested exception is:
-	org.eclipse.angus.mail.smtp.SMTPAddressFailedException: 550 No such recipient here
+2026-10-22 16:41:24.738 INFO  [main] com.retailzw.web.WorkspaceLocalSmokeTest - Starting WorkspaceLocalSmokeTest using Java 21.0.12.1 with PID 41647 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:41:24.743 INFO  [main] com.retailzw.web.WorkspaceLocalSmokeTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:41:25.492 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:41:25.597 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 100 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:41:26.513 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:41:26.549 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:41:26.569 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:41:26.633 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:41:26.647 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:41:26.745 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@76c85485
+2026-10-22 16:41:26.746 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:41:26.781 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:41:27.848 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:41:27.850 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:41:28.066 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:41:28.880 WARN  [main] com.retailzw.service.EmailService - SMTP host is configured, but mailbox passwords are missing. Set MAIL_SUPPORT_PASSWORD, MAIL_BILLING_PASSWORD and MAIL_NOTIFICATIONS_PASSWORD.
+2026-10-22 16:41:30.986 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:41:31.450 INFO  [main] o.s.b.test.mock.web.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-10-22 16:41:31.450 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+2026-10-22 16:41:31.451 INFO  [main] o.s.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
+2026-10-22 16:41:31.504 INFO  [main] com.retailzw.web.WorkspaceLocalSmokeTest - Started WorkspaceLocalSmokeTest in 6.933 seconds (process running for 7.568)
+2026-10-22 16:41:31.676 WARN  [main] o.s.web.servlet.handler.HandlerMappingIntrospector - Cache miss for REQUEST dispatch to '/admin/settings' (previous null). Performing MatchableHandlerMapping lookup. This is logged once only at WARN level, and every time at TRACE.
+2026-10-22 16:41:31.963 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /admin/settings -> 200 (273 ms) client=127.0.0.1 requestId=066dfd26
+2026-10-22 16:41:32.153 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/categories -> 200 (141 ms) client=127.0.0.1 requestId=8a0405a5
+2026-10-22 16:41:32.218 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/dashboard -> 200 (60 ms) client=127.0.0.1 requestId=2dda770d
+2026-10-22 16:41:32.309 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/categories -> 200 (58 ms) client=127.0.0.1 requestId=55b2ee5c
+2026-10-22 16:41:32.369 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/products -> 200 (56 ms) client=127.0.0.1 requestId=3c7ae990
+2026-10-22 16:41:32.409 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/inventory -> 200 (37 ms) client=127.0.0.1 requestId=e8872cba
+2026-10-22 16:41:32.448 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/inventory-intelligence -> 200 (37 ms) client=127.0.0.1 requestId=e0c7c068
+2026-10-22 16:41:32.499 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/sales -> 200 (49 ms) client=127.0.0.1 requestId=b5051b92
+2026-10-22 16:41:32.541 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/cash -> 200 (39 ms) client=127.0.0.1 requestId=b4ea89dc
+2026-10-22 16:41:32.584 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/returns -> 200 (41 ms) client=127.0.0.1 requestId=f01a649f
+2026-10-22 16:41:32.612 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/purchasing -> 200 (26 ms) client=127.0.0.1 requestId=61a5f6cc
+2026-10-22 16:41:32.640 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/reports -> 200 (25 ms) client=127.0.0.1 requestId=33bf667b
+2026-10-22 16:41:32.669 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/change -> 200 (26 ms) client=127.0.0.1 requestId=b3303f24
+2026-10-22 16:41:32.790 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:32.851 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/users -> 200 (180 ms) client=127.0.0.1 requestId=772d25bb
+2026-10-22 16:41:32.950 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:32.985 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/customers -> 200 (121 ms) client=127.0.0.1 requestId=9740d7fe
+2026-10-22 16:41:33.052 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.087 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/suppliers -> 200 (98 ms) client=127.0.0.1 requestId=05061fa8
+2026-10-22 16:41:33.183 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.223 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/cash -> 200 (128 ms) client=127.0.0.1 requestId=bacb00eb
+2026-10-22 16:41:33.306 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.318 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.344 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/sales -> 200 (114 ms) client=127.0.0.1 requestId=19ddd9a2
+2026-10-22 16:41:33.389 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/reports -> 200 (42 ms) client=127.0.0.1 requestId=23b4d4f0
+2026-10-22 16:41:33.451 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/categories -> 200 (60 ms) client=127.0.0.1 requestId=eff45153
+2026-10-22 16:41:33.522 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.622 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/products -> 200 (169 ms) client=127.0.0.1 requestId=b257184b
+2026-10-22 16:41:33.708 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.792 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/inventory -> 200 (160 ms) client=127.0.0.1 requestId=a0a4fb87
+2026-10-22 16:41:33.874 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.884 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.898 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/sales -> 200 (100 ms) client=127.0.0.1 requestId=f50ce246
+2026-10-22 16:41:33.962 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.983 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/cash -> 200 (82 ms) client=127.0.0.1 requestId=2d220177
+2026-10-22 16:41:34.065 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.075 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.078 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.094 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/returns -> 200 (107 ms) client=127.0.0.1 requestId=ed904f81
+2026-10-22 16:41:34.155 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.208 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/purchasing -> 200 (111 ms) client=127.0.0.1 requestId=5c38834a
+2026-10-22 16:41:34.277 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.369 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/reports -> 200 (154 ms) client=127.0.0.1 requestId=32ebffb0
+2026-10-22 16:41:34.423 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.455 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/change -> 200 (81 ms) client=127.0.0.1 requestId=7fec4b4c
+2026-10-22 16:41:34.509 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.528 INFO  [main] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/users -> 200 (70 ms) client=127.0.0.1 requestId=bb955b99
+2026-10-22 16:41:34.635 INFO  [SpringApplicationShutdownHook] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:41:34.639 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:41:34.644 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-22 16:43:06.758 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 41768 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:43:06.760 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:43:07.585 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:43:07.706 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 114 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:43:08.800 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:43:08.837 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:43:08.865 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:43:08.943 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:43:08.960 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:43:09.076 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@6ac4f31d
+2026-10-22 16:43:09.077 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:43:09.112 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:43:10.350 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:43:10.351 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:43:10.572 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:43:11.306 WARN  [main] com.retailzw.service.EmailService - SMTP host is configured, but mailbox passwords are missing. Set MAIL_SUPPORT_PASSWORD, MAIL_BILLING_PASSWORD and MAIL_NOTIFICATIONS_PASSWORD.
+2026-10-22 16:43:13.420 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:43:13.960 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 7.393 seconds (process running for 8.053)
+2026-10-22 16:43:14.374 INFO  [main] com.retailzw.service.RetailOperationsService - Product assigned to branch tenant=1 branch=4 product=474 onHand=10
+2026-10-22 16:43:14.375 INFO  [main] com.retailzw.service.RetailOperationsService - Product created tenant=1 branch=4 product=474 sku=AUD20e1e1d3-4f31-44d4-9b94-a1346d283261 openingStock=10
+2026-10-22 16:43:14.386 INFO  [main] com.retailzw.service.RetailOperationsService - Cash session opened tenant=1 branch=4 cashier=1 drawer=4 session=1 floatUsd=0 floatZwg=0
+2026-10-22 16:43:14.436 INFO  [main] com.retailzw.service.RetailOperationsService - Sale completed tenant=1 branch=4 cashier=1 session=1 sale=1 receipt=BR4-20261022-1792680194399 currency=USD total=4.00 items=1 offlineReceipt=AUDb5a200ec-7cd6-4ea3-a895-46d2d946661a syncedBy=1
+2026-10-22 16:43:14.631 INFO  [SpringApplicationShutdownHook] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:43:14.633 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:43:14.637 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-22 16:44:35.084 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 41933 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:44:35.085 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:44:35.716 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:44:35.836 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 115 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:44:36.812 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:44:36.845 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:44:36.865 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:44:36.940 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:44:36.958 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:44:37.081 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@3113595e
+2026-10-22 16:44:37.082 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:44:37.113 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:44:38.301 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:44:38.303 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:44:38.511 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:44:39.073 WARN  [main] com.retailzw.service.EmailService - SMTP host is configured, but mailbox passwords are missing. Set MAIL_SUPPORT_PASSWORD, MAIL_BILLING_PASSWORD and MAIL_NOTIFICATIONS_PASSWORD.
+2026-10-22 16:44:40.921 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:44:41.341 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.434 seconds (process running for 7.024)
+2026-10-22 16:44:41.666 INFO  [main] com.retailzw.service.RetailOperationsService - Product assigned to branch tenant=1 branch=7 product=475 onHand=10
+2026-10-22 16:44:41.666 INFO  [main] com.retailzw.service.RetailOperationsService - Product created tenant=1 branch=7 product=475 sku=AUD11f44efa-152f-4c61-bb30-d4cb9044b3e2 openingStock=10
+2026-10-22 16:44:41.674 INFO  [main] com.retailzw.service.RetailOperationsService - Cash session opened tenant=1 branch=7 cashier=1 drawer=5 session=2 floatUsd=0 floatZwg=0
+2026-10-22 16:44:41.709 INFO  [main] com.retailzw.service.RetailOperationsService - Sale completed tenant=1 branch=7 cashier=1 session=2 sale=2 receipt=BR7-20261022-1792680281685 currency=USD total=4.00 items=1 offlineReceipt=AUD676956c1-ce52-425b-8c64-49393bf9d67b syncedBy=1
+2026-10-22 16:44:41.716 INFO  [main] com.retailzw.service.RetailOperationsService - Cash session closed tenant=1 branch=7 cashier=1 session=2 transactions=1 expectedUsd=4.00 actualUsd=4 varianceUsd=0.00 expectedZwg=0.00 actualZwg=0 varianceZwg=0.00
+2026-10-22 16:44:41.823 INFO  [SpringApplicationShutdownHook] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:44:41.825 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:44:41.829 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-22 16:44:50.756 INFO  [main] com.retailzw.web.ProductionSchemaIntegrationTest - Starting ProductionSchemaIntegrationTest using Java 21.0.12.1 with PID 42087 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:44:50.757 INFO  [main] com.retailzw.web.ProductionSchemaIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:44:51.514 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:44:52.046 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 519 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:44:53.125 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:44:53.226 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@490fbeaa
+2026-10-22 16:44:53.227 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:44:53.290 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.22.3 by Redgate
+2026-10-22 16:44:53.291 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2026-10-22 16:44:53.291 INFO  [main] org.flywaydb.core.internal.license.VersionPrinter - 
+2026-10-22 16:44:53.319 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://127.0.0.1:3306/retailzim_audit_1792680033_fresh (MySQL 8.0)
+2026-10-22 16:44:53.380 INFO  [main] org.flywaydb.core.internal.command.DbValidate - Successfully validated 56 migrations (execution time 00:00.047s)
+2026-10-22 16:44:53.396 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Current version of schema `retailzim_audit_1792680033_fresh`: 56
+2026-10-22 16:44:53.399 INFO  [main] org.flywaydb.core.internal.command.DbMigrate - Schema `retailzim_audit_1792680033_fresh` is up to date. No migration necessary.
+2026-10-22 16:44:53.477 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:44:53.515 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:44:53.535 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:44:53.591 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:44:53.628 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:44:54.731 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:44:54.800 ERROR [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [currency] in table [borrower_transactions]; found [varchar (Types#VARCHAR)], but expecting [enum ('usd','zwg') (Types#ENUM)]
+2026-10-22 16:44:54.801 WARN  [main] o.s.w.context.support.GenericWebApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [currency] in table [borrower_transactions]; found [varchar (Types#VARCHAR)], but expecting [enum ('usd','zwg') (Types#ENUM)]
+2026-10-22 16:44:54.801 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:44:54.805 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-22 16:44:54.818 INFO  [main] o.s.b.a.logging.ConditionEvaluationReportLogger - 
 
-2026-08-12 03:25:17.735 WARN  [scheduling-1] com.retailzw.service.PaymentNotificationWorker - Payment confirmation deferred checkoutId=4 attempt=41 reason=Email provider did not accept the confirmation.
-2026-08-12 03:26:09.507 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=25a6a394
-2026-08-12 03:27:09.503 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=63ab1c3c
-2026-08-12 03:28:09.503 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=91d217d5
-2026-08-12 03:29:09.506 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=f5285eb8
-2026-08-12 03:30:09.500 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=cf605786
-2026-08-12 03:31:09.503 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=37e271ef
-2026-08-12 03:32:09.493 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=c5d13011
-2026-08-12 03:33:09.490 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=e4cb3316
-2026-08-12 03:34:09.499 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=6a7bead6
-2026-08-12 03:35:09.501 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=2b12b750
-2026-08-12 03:36:09.505 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=d76c6f2c
-2026-08-12 03:37:09.496 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=4f580204
-2026-08-12 03:38:09.492 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=be6c9f8c
-2026-08-12 03:39:09.504 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=fbf7e6b8
-2026-08-12 03:40:09.488 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=31643c2e
-2026-08-12 03:41:09.502 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=057e4bb1
-2026-08-12 03:42:09.500 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=7fb90b67
-2026-08-12 03:43:09.484 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=9f0018d5
-2026-08-12 03:44:09.499 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=9eda66d2
-2026-08-12 03:45:09.487 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=13d8bac5
-2026-08-12 03:46:09.496 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=0bba2e44
-2026-08-12 03:47:09.496 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=7ced58d6
-2026-08-12 03:48:09.486 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=498accc0
-2026-08-12 03:49:09.486 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=687ca1f8
-2026-08-12 03:50:09.482 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=1a62058a
-2026-08-12 03:51:09.488 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=4985c9d3
-2026-08-12 03:52:09.491 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=cb018516
-2026-08-12 03:53:09.486 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=dbf81456
-2026-08-12 03:54:09.489 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=32c3e169
-2026-08-12 03:55:09.476 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=a1554609
-2026-08-12 03:56:09.483 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=5e303f00
-2026-08-12 03:57:09.482 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=00abb928
-2026-08-12 03:58:09.478 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=ea856ea2
-2026-08-12 03:59:09.490 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=868a874d
-2026-08-12 04:00:09.486 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=fc08206f
-2026-08-12 04:01:09.480 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=b50feaa4
-2026-08-12 04:02:09.482 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=4fe23dfe
-2026-08-12 04:03:09.471 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=f7bafe74
-2026-08-12 04:04:09.482 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=bad1cbcc
-2026-08-12 04:05:09.483 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=9d029156
-2026-08-12 04:06:09.481 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (17 ms) client=0:0:0:0:0:0:0:1 requestId=60864104
-2026-08-12 04:07:09.482 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=3d3de2eb
-2026-08-12 04:08:09.474 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=675eceb8
-2026-08-12 04:09:09.475 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=2a663763
-2026-08-12 04:10:09.475 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=91aa3e76
-2026-08-12 04:11:09.478 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=80baa676
-2026-08-12 04:12:09.467 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=f426281e
-2026-08-12 04:13:09.480 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=eb925efd
-2026-08-12 04:14:09.469 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=bfe84ca2
-2026-08-12 04:15:09.476 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=b54fb415
-2026-08-12 04:16:09.473 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=8f7a40d3
-2026-08-12 04:17:09.464 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=690c0649
-2026-08-12 04:18:09.473 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=74ae754e
-2026-08-12 04:19:09.470 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=d65e9ea3
-2026-08-12 04:20:09.473 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=83b77808
-2026-08-12 04:21:09.529 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (20 ms) client=0:0:0:0:0:0:0:1 requestId=62b1b1e1
-2026-08-12 04:22:09.468 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=54f74556
-2026-08-12 04:23:09.477 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=58933636
-2026-08-12 04:24:09.466 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=9b441770
-2026-08-12 04:25:09.460 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (9 ms) client=0:0:0:0:0:0:0:1 requestId=80c5046d
-2026-08-12 04:26:09.464 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (10 ms) client=0:0:0:0:0:0:0:1 requestId=5eeca5dc
-2026-08-12 04:27:09.458 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=9d4a84ca
-2026-08-12 04:28:09.461 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=fab1a722
-2026-08-12 04:29:09.460 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (9 ms) client=0:0:0:0:0:0:0:1 requestId=73e563fa
-2026-08-12 04:30:09.455 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=d6efe2e0
-2026-08-12 04:31:09.456 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=e6d1ef91
-2026-08-12 04:32:09.459 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=0ea24a3d
-2026-08-12 04:33:09.468 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=85398175
-2026-08-12 04:34:09.463 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=2454aff4
-2026-08-12 04:35:09.463 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=d54b973d
-2026-08-12 04:36:09.461 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=df8d871e
-2026-08-12 04:37:09.463 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=d42337ae
-2026-08-12 04:38:09.461 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=dd59efdf
-2026-08-12 04:39:09.454 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=532c15d7
-2026-08-12 04:40:09.458 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=15ddadc8
-2026-08-12 04:41:09.458 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=17d40a55
-2026-08-12 04:42:09.454 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=5fb7e33d
-2026-08-12 04:43:09.458 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=3bab861a
-2026-08-12 04:44:09.451 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=c0cfd5b0
-2026-08-12 04:45:09.448 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (11 ms) client=0:0:0:0:0:0:0:1 requestId=78f2aee0
-2026-08-12 04:46:09.452 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=13d90483
-2026-08-12 04:47:09.456 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=2a732d50
-2026-08-12 04:48:09.456 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=f52b9bd6
-2026-08-12 04:49:09.448 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=8aee5147
-2026-08-12 04:50:09.454 INFO  [http-nio-0.0.0.0-8080-exec-10] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=6af86b72
-2026-08-12 04:51:09.447 INFO  [http-nio-0.0.0.0-8080-exec-7] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=f64df5d3
-2026-08-12 04:52:09.449 INFO  [http-nio-0.0.0.0-8080-exec-9] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=3c72c4ab
-2026-08-12 04:53:09.442 INFO  [http-nio-0.0.0.0-8080-exec-6] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (16 ms) client=0:0:0:0:0:0:0:1 requestId=7b78041e
-2026-08-12 04:54:09.440 INFO  [http-nio-0.0.0.0-8080-exec-4] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=1d795ab0
-2026-08-12 04:55:09.445 INFO  [http-nio-0.0.0.0-8080-exec-5] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=30f68d42
-2026-08-12 04:56:09.444 INFO  [http-nio-0.0.0.0-8080-exec-8] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (14 ms) client=0:0:0:0:0:0:0:1 requestId=dbc1f861
-2026-08-12 04:57:09.441 INFO  [http-nio-0.0.0.0-8080-exec-1] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (12 ms) client=0:0:0:0:0:0:0:1 requestId=58fa4ca9
-2026-08-12 04:58:09.445 INFO  [http-nio-0.0.0.0-8080-exec-2] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (15 ms) client=0:0:0:0:0:0:0:1 requestId=b28b8732
-2026-08-12 04:59:09.447 INFO  [http-nio-0.0.0.0-8080-exec-3] com.retailzw.config.RequestLoggingFilter - HTTP GET /shop/support/chat/feed -> 200 (13 ms) client=0:0:0:0:0:0:0:1 requestId=450ead1d
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-10-22 16:44:54.828 ERROR [main] org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [currency] in table [borrower_transactions]; found [varchar (Types#VARCHAR)], but expecting [enum ('usd','zwg') (Types#ENUM)]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1786)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1234)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:952)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:624)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1454)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191)
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:130)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:163)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$10(ClassBasedTestDescriptor.java:378)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(StreamSpliterators.java:310)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:735)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:734)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:762)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$6(ClassBasedTestDescriptor.java:290)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$4(ClassBasedTestDescriptor.java:279)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:278)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$0(TestMethodTestDescriptor.java:106)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:105)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:90)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+Caused by: jakarta.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [currency] in table [borrower_transactions]; found [varchar (Types#VARCHAR)], but expecting [enum ('usd','zwg') (Types#ENUM)]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:421)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1833)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1782)
+	... 94 common frames omitted
+Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [currency] in table [borrower_transactions]; found [varchar (Types#VARCHAR)], but expecting [enum ('usd','zwg') (Types#ENUM)]
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateColumnType(AbstractSchemaValidator.java:165)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateTable(AbstractSchemaValidator.java:152)
+	at org.hibernate.tool.schema.internal.GroupedSchemaValidatorImpl.validateTables(GroupedSchemaValidatorImpl.java:46)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.performValidation(AbstractSchemaValidator.java:97)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.doValidation(AbstractSchemaValidator.java:75)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:295)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:145)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1429)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:142)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:315)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:450)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1507)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	... 98 common frames omitted
+2026-10-22 16:44:54.835 WARN  [main] o.springframework.test.context.TestContextManager - Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener] to prepare test instance [com.retailzw.web.ProductionSchemaIntegrationTest@4da86d09]
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@53e7ef2d testClass = com.retailzw.web.ProductionSchemaIntegrationTest, locations = [], classes = [com.retailzw.RetailSaasApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["spring.flyway.enabled=true", "spring.flyway.baseline-on-migrate=false", "spring.jpa.hibernate.ddl-auto=validate", "org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@536dbea0, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@18ece7f4, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@ca2ffd41, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@6531a794, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1df8b5b8, org.springframework.boot.test.context.SpringBootTestAnnotation@79002b2b], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191)
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:130)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:163)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$10(ClassBasedTestDescriptor.java:378)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(StreamSpliterators.java:310)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:735)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:734)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:762)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$6(ClassBasedTestDescriptor.java:290)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$4(ClassBasedTestDescriptor.java:279)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:278)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$0(TestMethodTestDescriptor.java:106)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:105)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:90)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [currency] in table [borrower_transactions]; found [varchar (Types#VARCHAR)], but expecting [enum ('usd','zwg') (Types#ENUM)]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1786)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1234)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:952)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:624)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1454)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	... 73 common frames omitted
+Caused by: jakarta.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [currency] in table [borrower_transactions]; found [varchar (Types#VARCHAR)], but expecting [enum ('usd','zwg') (Types#ENUM)]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:421)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1833)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1782)
+	... 94 common frames omitted
+Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: wrong column type encountered in column [currency] in table [borrower_transactions]; found [varchar (Types#VARCHAR)], but expecting [enum ('usd','zwg') (Types#ENUM)]
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateColumnType(AbstractSchemaValidator.java:165)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateTable(AbstractSchemaValidator.java:152)
+	at org.hibernate.tool.schema.internal.GroupedSchemaValidatorImpl.validateTables(GroupedSchemaValidatorImpl.java:46)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.performValidation(AbstractSchemaValidator.java:97)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.doValidation(AbstractSchemaValidator.java:75)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:295)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:145)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1429)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:142)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:315)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:450)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1507)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	... 98 common frames omitted
+2026-10-22 16:46:25.782 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 42475 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:46:25.783 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:46:26.386 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:46:26.499 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 108 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:46:27.370 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:46:27.402 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:46:27.419 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:46:27.480 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:46:27.494 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:46:27.592 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@14580edc
+2026-10-22 16:46:27.593 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:46:27.622 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:46:28.705 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:46:28.707 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:46:28.899 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:46:29.572 WARN  [main] com.retailzw.service.EmailService - SMTP host is configured, but mailbox passwords are missing. Set MAIL_SUPPORT_PASSWORD, MAIL_BILLING_PASSWORD and MAIL_NOTIFICATIONS_PASSWORD.
+2026-10-22 16:46:31.500 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:46:31.966 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.344 seconds (process running for 6.864)
+2026-10-22 16:46:32.348 WARN  [main] org.hibernate.engine.jdbc.spi.SqlExceptionHelper - SQL Error: 1048, SQLState: 23000
+2026-10-22 16:46:32.349 ERROR [main] org.hibernate.engine.jdbc.spi.SqlExceptionHelper - Column 'max_stock_level' cannot be null
+2026-10-22 16:46:32.494 INFO  [SpringApplicationShutdownHook] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:46:32.496 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:46:32.500 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-22 16:47:53.574 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 42642 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:47:53.575 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:47:54.178 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:47:54.285 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 102 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:47:55.204 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:47:55.239 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:47:55.258 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:47:55.329 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:47:55.343 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:47:55.438 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@33197c2f
+2026-10-22 16:47:55.439 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:47:55.469 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:47:56.497 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:47:56.498 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:47:56.692 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:47:59.267 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:47:59.736 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.318 seconds (process running for 6.834)
+2026-10-22 16:48:00.119 INFO  [main] com.retailzw.service.RetailOperationsService - Product assigned to branch tenant=1 branch=6 product=471 onHand=10
+2026-10-22 16:48:00.119 INFO  [main] com.retailzw.service.RetailOperationsService - Product created tenant=1 branch=6 product=471 sku=AUDd06ce161-d3d1-4db5-a987-ff3c8aacf279 openingStock=10
+2026-10-22 16:48:00.138 INFO  [main] com.retailzw.service.RetailOperationsService - Cash session opened tenant=1 branch=6 cashier=1 drawer=3 session=1 floatUsd=0 floatZwg=0
+2026-10-22 16:48:00.160 WARN  [main] org.hibernate.engine.jdbc.spi.SqlExceptionHelper - SQL Error: 1054, SQLState: 42S22
+2026-10-22 16:48:00.161 ERROR [main] org.hibernate.engine.jdbc.spi.SqlExceptionHelper - Unknown column 's1_0.coupon_discount' in 'field list'
+2026-10-22 16:48:00.282 INFO  [SpringApplicationShutdownHook] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:48:00.284 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:48:00.288 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-22 16:48:41.014 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 42687 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:48:41.015 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:48:41.632 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:48:41.732 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 96 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:48:42.594 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:48:42.619 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:48:42.635 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:48:42.695 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:48:42.707 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:48:42.803 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@7ba623d1
+2026-10-22 16:48:42.804 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:48:42.830 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:48:43.833 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:48:43.834 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:48:44.020 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:48:46.581 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:48:47.021 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.162 seconds (process running for 6.683)
+2026-10-22 16:48:47.383 INFO  [main] com.retailzw.service.RetailOperationsService - Product assigned to branch tenant=1 branch=10 product=476 onHand=10
+2026-10-22 16:48:47.383 INFO  [main] com.retailzw.service.RetailOperationsService - Product created tenant=1 branch=10 product=476 sku=AUDd20a6f2a-6e90-4826-b0d2-ab76ee393b41 openingStock=10
+2026-10-22 16:48:47.392 INFO  [main] com.retailzw.service.RetailOperationsService - Cash session opened tenant=1 branch=10 cashier=1 drawer=6 session=3 floatUsd=0 floatZwg=0
+2026-10-22 16:48:47.435 INFO  [main] com.retailzw.service.RetailOperationsService - Sale completed tenant=1 branch=10 cashier=1 session=3 sale=3 receipt=BR10-20261022-1792680527406 currency=USD total=4.00 items=1 offlineReceipt=AUD632e2344-3dfa-4bdf-9528-0a1af73758cc syncedBy=1
+2026-10-22 16:48:47.442 INFO  [main] com.retailzw.service.RetailOperationsService - Cash session closed tenant=1 branch=10 cashier=1 session=3 transactions=1 expectedUsd=4.00 actualUsd=4 varianceUsd=0.00 expectedZwg=0.00 actualZwg=0 varianceZwg=0.00
+2026-10-22 16:48:47.473 INFO  [main] com.retailzw.service.ReturnService - Return processed tenant=1 branch=10 cashier=1 return=RET-AUD17a83223-20261022-2426 originalReceipt=BR10-20261022-1792680527406 total=2.00 currency=USD items=1 requiresApproval=false
+2026-10-22 16:48:47.490 INFO  [main] com.retailzw.service.PurchaseOrderService - Purchase order created tenant=1 branch=10 user=1 po=PO-AUD17a83223-20261022-2962 supplier=3 items=1 totalUsd=3.00 totalZwg=0.00
+2026-10-22 16:48:47.503 INFO  [main] com.retailzw.service.PurchaseOrderService - Purchase order submitted tenant=1 branch=10 po=PO-AUD17a83223-20261022-2962 id=1
+2026-10-22 16:48:47.512 INFO  [main] com.retailzw.service.PurchaseOrderService - Purchase order approved tenant=1 branch=10 po=PO-AUD17a83223-20261022-2962 id=1 manager=1
+2026-10-22 16:48:47.525 INFO  [main] com.retailzw.service.PurchaseOrderService - Goods received tenant=1 branch=10 po=PO-AUD17a83223-20261022-2962 id=1 status=RECEIVED grn=GRN-10-20261022-8805 user=1
+2026-10-22 16:48:47.635 INFO  [SpringApplicationShutdownHook] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:48:47.637 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:48:47.641 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-22 16:49:20.253 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 42755 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:49:20.254 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:49:20.887 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:49:20.988 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 96 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:49:21.899 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:49:21.932 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:49:21.948 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:49:22.004 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:49:22.018 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:49:22.122 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@7e84af34
+2026-10-22 16:49:22.123 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:49:22.153 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:49:23.236 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:49:23.241 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:49:23.447 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:49:26.027 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:49:26.523 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.444 seconds (process running for 6.955)
+2026-10-22 16:49:26.828 INFO  [SpringApplicationShutdownHook] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:49:26.830 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:49:26.835 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.
+2026-10-22 16:50:10.258 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Starting DatabaseWorkflowIntegrationTest using Java 21.0.12.1 with PID 42822 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:50:10.259 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:50:10.912 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:50:11.019 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 102 ms. Found 71 JPA repository interfaces.
+2026-10-22 16:50:11.993 INFO  [main] org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:50:12.029 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:50:12.049 INFO  [main] o.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:50:12.125 INFO  [main] o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:50:12.142 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:50:12.262 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@1d45c4b7
+2026-10-22 16:50:12.263 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:50:12.295 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:50:13.443 INFO  [main] o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:50:13.445 INFO  [main] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:50:13.650 INFO  [main] o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:50:16.254 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:50:16.780 INFO  [main] com.retailzw.web.DatabaseWorkflowIntegrationTest - Started DatabaseWorkflowIntegrationTest in 6.692 seconds (process running for 7.336)
+2026-10-22 16:50:17.178 INFO  [main] com.retailzw.service.RetailOperationsService - Product assigned to branch tenant=1 branch=13 product=477 onHand=10
+2026-10-22 16:50:17.178 INFO  [main] com.retailzw.service.RetailOperationsService - Product created tenant=1 branch=13 product=477 sku=AUD9ba7de9f-15cc-42f8-955f-c4905321831a openingStock=10
+2026-10-22 16:50:17.188 INFO  [main] com.retailzw.service.RetailOperationsService - Cash session opened tenant=1 branch=13 cashier=1 drawer=7 session=4 floatUsd=0 floatZwg=0
+2026-10-22 16:50:17.226 INFO  [main] com.retailzw.service.RetailOperationsService - Sale completed tenant=1 branch=13 cashier=1 session=4 sale=4 receipt=BR13-20261022-1792680617200 currency=USD total=4.00 items=1 offlineReceipt=AUDcd3faa24-306b-436c-9c2a-e8992139a6cc syncedBy=1
+2026-10-22 16:50:17.234 INFO  [main] com.retailzw.service.RetailOperationsService - Cash session closed tenant=1 branch=13 cashier=1 session=4 transactions=1 expectedUsd=4.00 actualUsd=4 varianceUsd=0.00 expectedZwg=0.00 actualZwg=0 varianceZwg=0.00
+2026-10-22 16:50:17.263 INFO  [main] com.retailzw.service.ReturnService - Return processed tenant=1 branch=13 cashier=1 return=RET-AUD4a3b9dbe-20261022-5293 originalReceipt=BR13-20261022-1792680617200 total=2.00 currency=USD items=1 requiresApproval=false
+2026-10-22 16:50:17.276 INFO  [main] com.retailzw.service.PurchaseOrderService - Purchase order created tenant=1 branch=13 user=1 po=PO-AUD4a3b9dbe-20261022-8293 supplier=4 items=1 totalUsd=3.00 totalZwg=0.00
+2026-10-22 16:50:17.289 INFO  [main] com.retailzw.service.PurchaseOrderService - Purchase order submitted tenant=1 branch=13 po=PO-AUD4a3b9dbe-20261022-8293 id=2
+2026-10-22 16:50:17.300 INFO  [main] com.retailzw.service.PurchaseOrderService - Purchase order approved tenant=1 branch=13 po=PO-AUD4a3b9dbe-20261022-8293 id=2 manager=1
+2026-10-22 16:50:17.310 INFO  [main] com.retailzw.service.PurchaseOrderService - Goods received tenant=1 branch=13 po=PO-AUD4a3b9dbe-20261022-8293 id=2 status=RECEIVED grn=GRN-13-20261022-2165 user=1
+2026-10-22 16:50:17.534 INFO  [SpringApplicationShutdownHook] o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:50:17.536 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown initiated...
+2026-10-22 16:50:17.540 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Shutdown completed.

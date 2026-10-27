@@ -1,0 +1,13 @@
+{
+  "version": "1.2.7",
+  "build": 7,
+  "package": "zw.co.retailzw.pos",
+  "date": "2026-10-26",
+  "sha256": "9963c34e6bd4722059cbb61dbdf03c8c7dd6665750de7be4d0b09dabdcc1693a",
+  "signer_matches_previous_apk": true,
+  "apk_v2_signature_verified": true,
+  "tests_passed": 39,
+  "analysis": "No issues found",
+  "sunmi_native_bridge_and_sdk_present": true,
+  "physical_device_test": "Pending test on the user SUNMI V2 Pro"
+}

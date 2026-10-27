@@ -1,0 +1,40 @@
+{
+  "mobile": {
+    "tests": {
+      "exit": 0,
+      "log": "/tmp/retailzim-mobile-tests.log"
+    },
+    "analysis": {
+      "exit": 0,
+      "log": "/tmp/retailzim-mobile-analysis.log"
+    }
+  },
+  "gaspos_mobile": {
+    "dependencies": {
+      "exit": 0,
+      "log": "/tmp/retailzim-gaspos_mobile-dependencies.log"
+    },
+    "tests": {
+      "exit": 0,
+      "log": "/tmp/retailzim-gaspos_mobile-tests.log"
+    },
+    "analysis": {
+      "exit": 0,
+      "log": "/tmp/retailzim-gaspos_mobile-analysis.log"
+    }
+  },
+  "fuelpos_mobile": {
+    "dependencies": {
+      "exit": 0,
+      "log": "/tmp/retailzim-fuelpos_mobile-dependencies.log"
+    },
+    "tests": {
+      "exit": 0,
+      "log": "/tmp/retailzim-fuelpos_mobile-tests.log"
+    },
+    "analysis": {
+      "exit": 0,
+      "log": "/tmp/retailzim-fuelpos_mobile-analysis.log"
+    }
+  }
+}

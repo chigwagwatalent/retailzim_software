@@ -3692,7 +3692,7 @@ public class ShopWebController {
         if (saleDate.equals(today.minusDays(1))) {
             return "Yesterday";
         }
-        return createdAt.format(DateTimeFormatter.ofPattern("MMM d"));
+        return createdAt.format(DateTimeFormatter.ofPattern("MMM d", java.util.Locale.US));
     }
 
     private List<DashboardBranchPerformance> dashboardBranchPerformance(Long tenantId, List<Branch> activeBranches, LocalDateTime from, LocalDateTime to) {
@@ -3731,7 +3731,7 @@ public class ShopWebController {
             LocalDate date = weekStart.toLocalDate().plusDays(i);
             BigDecimal amount = totalsByDay.getOrDefault(date, BigDecimal.ZERO);
             values.add(amount);
-            labels.add(date.format(DateTimeFormatter.ofPattern("MMM d")));
+            labels.add(date.format(DateTimeFormatter.ofPattern("MMM d", java.util.Locale.US)));
             if (amount.compareTo(max) > 0) {
                 max = amount;
             }

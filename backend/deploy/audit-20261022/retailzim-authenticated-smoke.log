@@ -1,0 +1,120 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.retailzw:retail-saas-backend >------------------
+[INFO] Building RetailZW SaaS Platform 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ retail-saas-backend ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 141 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ retail-saas-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ retail-saas-backend ---
+[INFO] skip non existing resourceDirectory /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ retail-saas-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ retail-saas-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.retailzw.web.WorkspaceLocalSmokeTest
+16:41:24.417 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.retailzw.web.WorkspaceLocalSmokeTest]: WorkspaceLocalSmokeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+16:41:24.501 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.retailzw.RetailSaasApplication for test class com.retailzw.web.WorkspaceLocalSmokeTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-10-22 16:41:24.738 INFO  [main] c.r.web.WorkspaceLocalSmokeTest - Starting WorkspaceLocalSmokeTest using Java 21.0.12.1 with PID 41647 (started by talentchigwagwa in /Users/talentchigwagwa/Desktop/JAVA SYSTEMS/retailzim_software/backend)
+2026-10-22 16:41:24.743 INFO  [main] c.r.web.WorkspaceLocalSmokeTest - No active profile set, falling back to 1 default profile: "default"
+2026-10-22 16:41:25.492 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22 16:41:25.597 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 100 ms. Found 71 JPA repository interfaces.
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-10-22 16:41:26.513 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22 16:41:26.549 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-22 16:41:26.569 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-10-22 16:41:26.633 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22 16:41:26.647 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Starting...
+2026-10-22 16:41:26.745 INFO  [main] com.zaxxer.hikari.pool.HikariPool - RetailZW-HikariPool - Added connection com.mysql.cj.jdbc.ConnectionImpl@76c85485
+2026-10-22 16:41:26.746 INFO  [main] com.zaxxer.hikari.HikariDataSource - RetailZW-HikariPool - Start completed.
+2026-10-22 16:41:26.781 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22 16:41:27.848 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-22 16:41:27.850 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22 16:41:28.066 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22 16:41:28.880 WARN  [main] com.retailzw.service.EmailService - SMTP host is configured, but mailbox passwords are missing. Set MAIL_SUPPORT_PASSWORD, MAIL_BILLING_PASSWORD and MAIL_NOTIFICATIONS_PASSWORD.
+2026-10-22 16:41:30.986 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-10-22 16:41:31.450 INFO  [main] o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-10-22 16:41:31.450 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+2026-10-22 16:41:31.451 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+2026-10-22 16:41:31.504 INFO  [main] c.r.web.WorkspaceLocalSmokeTest - Started WorkspaceLocalSmokeTest in 6.933 seconds (process running for 7.568)
+2026-10-22 16:41:31.676 WARN  [main] o.s.w.s.h.HandlerMappingIntrospector - Cache miss for REQUEST dispatch to '/admin/settings' (previous null). Performing MatchableHandlerMapping lookup. This is logged once only at WARN level, and every time at TRACE.
+2026-10-22 16:41:31.963 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /admin/settings -> 200 (273 ms) client=127.0.0.1 requestId=066dfd26
+2026-10-22 16:41:32.153 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/categories -> 200 (141 ms) client=127.0.0.1 requestId=8a0405a5
+2026-10-22 16:41:32.218 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/dashboard -> 200 (60 ms) client=127.0.0.1 requestId=2dda770d
+2026-10-22 16:41:32.309 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/categories -> 200 (58 ms) client=127.0.0.1 requestId=55b2ee5c
+2026-10-22 16:41:32.369 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/products -> 200 (56 ms) client=127.0.0.1 requestId=3c7ae990
+2026-10-22 16:41:32.409 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/inventory -> 200 (37 ms) client=127.0.0.1 requestId=e8872cba
+2026-10-22 16:41:32.448 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/inventory-intelligence -> 200 (37 ms) client=127.0.0.1 requestId=e0c7c068
+2026-10-22 16:41:32.499 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/sales -> 200 (49 ms) client=127.0.0.1 requestId=b5051b92
+2026-10-22 16:41:32.541 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/cash -> 200 (39 ms) client=127.0.0.1 requestId=b4ea89dc
+2026-10-22 16:41:32.584 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/returns -> 200 (41 ms) client=127.0.0.1 requestId=f01a649f
+2026-10-22 16:41:32.612 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/purchasing -> 200 (26 ms) client=127.0.0.1 requestId=61a5f6cc
+2026-10-22 16:41:32.640 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/reports -> 200 (25 ms) client=127.0.0.1 requestId=33bf667b
+2026-10-22 16:41:32.669 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/change -> 200 (26 ms) client=127.0.0.1 requestId=b3303f24
+2026-10-22 16:41:32.790 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:32.851 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/users -> 200 (180 ms) client=127.0.0.1 requestId=772d25bb
+2026-10-22 16:41:32.950 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:32.985 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/customers -> 200 (121 ms) client=127.0.0.1 requestId=9740d7fe
+2026-10-22 16:41:33.052 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.087 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/suppliers -> 200 (98 ms) client=127.0.0.1 requestId=05061fa8
+2026-10-22 16:41:33.183 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.223 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/cash -> 200 (128 ms) client=127.0.0.1 requestId=bacb00eb
+2026-10-22 16:41:33.306 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.318 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.344 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/sales -> 200 (114 ms) client=127.0.0.1 requestId=19ddd9a2
+2026-10-22 16:41:33.389 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/reports -> 200 (42 ms) client=127.0.0.1 requestId=23b4d4f0
+2026-10-22 16:41:33.451 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/categories -> 200 (60 ms) client=127.0.0.1 requestId=eff45153
+2026-10-22 16:41:33.522 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.622 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/products -> 200 (169 ms) client=127.0.0.1 requestId=b257184b
+2026-10-22 16:41:33.708 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.792 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/inventory -> 200 (160 ms) client=127.0.0.1 requestId=a0a4fb87
+2026-10-22 16:41:33.874 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.884 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.898 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/sales -> 200 (100 ms) client=127.0.0.1 requestId=f50ce246
+2026-10-22 16:41:33.962 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:33.983 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/cash -> 200 (82 ms) client=127.0.0.1 requestId=2d220177
+2026-10-22 16:41:34.065 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.075 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.078 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.094 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/returns -> 200 (107 ms) client=127.0.0.1 requestId=ed904f81
+2026-10-22 16:41:34.155 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.208 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/purchasing -> 200 (111 ms) client=127.0.0.1 requestId=5c38834a
+2026-10-22 16:41:34.277 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.369 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/reports -> 200 (154 ms) client=127.0.0.1 requestId=32ebffb0
+2026-10-22 16:41:34.423 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.455 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/change -> 200 (81 ms) client=127.0.0.1 requestId=7fec4b4c
+2026-10-22 16:41:34.509 WARN  [main] org.hibernate.orm.query - HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+2026-10-22 16:41:34.528 INFO  [main] c.r.config.RequestLoggingFilter - HTTP GET /shop/users -> 200 (70 ms) client=127.0.0.1 requestId=bb955b99
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.26 s -- in com.retailzw.web.WorkspaceLocalSmokeTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  12.145 s
+[INFO] Finished at: 2026-10-22T16:41:35+02:00
+[INFO] ------------------------------------------------------------------------

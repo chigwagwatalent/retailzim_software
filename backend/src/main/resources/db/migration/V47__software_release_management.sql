@@ -1,4 +1,4 @@
-CREATE TABLE software_releases (
+CREATE TABLE IF NOT EXISTS software_releases (
     id BIGINT NOT NULL AUTO_INCREMENT,
     platform VARCHAR(20) NOT NULL,
     package_type VARCHAR(30) NOT NULL,

@@ -93,9 +93,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<UserInfo?> _restoreUser() async {
     try {
-      if (widget.restoreUser != null) return widget.restoreUser!();
+      if (widget.restoreUser != null) return await widget.restoreUser!();
       if (!await _api.isLoggedIn()) return null;
-      return _api.getSavedUser();
+      return await _api.getSavedUser();
     } catch (_) {
       // Corrupt or unavailable secure storage must never trap startup.
       return null;

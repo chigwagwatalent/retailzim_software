@@ -24,16 +24,48 @@ CREATE TABLE IF NOT EXISTS tenant_exchange_rates (
         CHECK (base_currency <> quote_currency)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE products
-    ADD COLUMN pricing_mode VARCHAR(20) NOT NULL DEFAULT 'MANUAL',
-    ADD COLUMN exchange_rate_id BIGINT NULL,
-    ADD INDEX idx_products_exchange_rate (exchange_rate_id),
-    ADD CONSTRAINT fk_products_exchange_rate
-        FOREIGN KEY (exchange_rate_id) REFERENCES tenant_exchange_rates(id) ON DELETE SET NULL;
+-- Tolerate legacy schemas and partially applied MySQL DDL on retry.
+SET @migration_sql = IF((SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'products' AND column_name = 'pricing_mode') = 0, 'ALTER TABLE products ADD COLUMN pricing_mode VARCHAR(20) NOT NULL DEFAULT ''MANUAL''', 'SELECT 1');
+PREPARE migration_stmt FROM @migration_sql;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
 
-ALTER TABLE sale_payments
-    MODIFY exchange_rate DECIMAL(19,6) NOT NULL DEFAULT 1.000000,
-    ADD COLUMN exchange_rate_config_id BIGINT NULL,
-    ADD INDEX idx_sale_payments_exchange_rate (exchange_rate_config_id),
-    ADD CONSTRAINT fk_sale_payments_exchange_rate
-        FOREIGN KEY (exchange_rate_config_id) REFERENCES tenant_exchange_rates(id) ON DELETE SET NULL;
+SET @migration_sql = IF((SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'products' AND column_name = 'exchange_rate_id') = 0, 'ALTER TABLE products ADD COLUMN exchange_rate_id BIGINT NULL', 'SELECT 1');
+PREPARE migration_stmt FROM @migration_sql;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @migration_sql = IF((SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'products' AND index_name = 'idx_products_exchange_rate') = 0, 'ALTER TABLE products ADD INDEX idx_products_exchange_rate (exchange_rate_id)', 'SELECT 1');
+PREPARE migration_stmt FROM @migration_sql;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @migration_sql = IF((SELECT COUNT(*) FROM information_schema.table_constraints WHERE table_schema = DATABASE() AND table_name = 'products' AND constraint_name = 'fk_products_exchange_rate') = 0, 'ALTER TABLE products ADD CONSTRAINT fk_products_exchange_rate
+        FOREIGN KEY (exchange_rate_id) REFERENCES tenant_exchange_rates(id) ON DELETE SET NULL', 'SELECT 1');
+PREPARE migration_stmt FROM @migration_sql;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @migration_sql = IF((SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'sale_payments' AND column_name = 'exchange_rate') = 0, 'ALTER TABLE sale_payments ADD COLUMN exchange_rate DECIMAL(19,6) NOT NULL DEFAULT 1.000000', 'SELECT 1');
+PREPARE migration_stmt FROM @migration_sql;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+UPDATE sale_payments SET exchange_rate = 1.000000 WHERE exchange_rate IS NULL;
+ALTER TABLE sale_payments MODIFY exchange_rate DECIMAL(19,6) NOT NULL DEFAULT 1.000000;
+
+SET @migration_sql = IF((SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'sale_payments' AND column_name = 'exchange_rate_config_id') = 0, 'ALTER TABLE sale_payments ADD COLUMN exchange_rate_config_id BIGINT NULL', 'SELECT 1');
+PREPARE migration_stmt FROM @migration_sql;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @migration_sql = IF((SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'sale_payments' AND index_name = 'idx_sale_payments_exchange_rate') = 0, 'ALTER TABLE sale_payments ADD INDEX idx_sale_payments_exchange_rate (exchange_rate_config_id)', 'SELECT 1');
+PREPARE migration_stmt FROM @migration_sql;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @migration_sql = IF((SELECT COUNT(*) FROM information_schema.table_constraints WHERE table_schema = DATABASE() AND table_name = 'sale_payments' AND constraint_name = 'fk_sale_payments_exchange_rate') = 0, 'ALTER TABLE sale_payments ADD CONSTRAINT fk_sale_payments_exchange_rate
+        FOREIGN KEY (exchange_rate_config_id) REFERENCES tenant_exchange_rates(id) ON DELETE SET NULL', 'SELECT 1');
+PREPARE migration_stmt FROM @migration_sql;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
